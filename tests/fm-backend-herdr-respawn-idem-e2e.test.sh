@@ -50,15 +50,23 @@ command -v jq >/dev/null 2>&1 || { echo "skip: jq not found (required by the her
 # as a cross-session parent identity (tests/herdr-test-safety.sh).
 herdr_forget_inherited_pane
 
-SESSION="fm-lab-respawn-idem-e2e-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name respawn-idem) || exit 1
 export HERDR_SESSION="$SESSION"
 SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/fm-herdr-respawn-idem.XXXXXX")
+CLEANED=0
 cleanup_all() {
-  herdr_safe_stop_and_delete "$SESSION"
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
   rm -rf "$SCRATCH"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+# A task-private startup transport may capture the tripwire atomically in
+# provision when the backend requests startup. Normal invocations prepare here.
+if [ "${FM_TEST_HERDR_START_VIA_HELPER:-0}" != 1 ]; then
+  "$HERDR_LAB_HELPER" prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+fi
 
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-backend.sh"
@@ -76,7 +84,11 @@ fm_backend_herdr_version_check || fail "version_check failed against the real in
 PROJ_CWD="$SCRATCH/proj"
 mkdir -p "$PROJ_CWD"
 
+COLD_STATUS=$("$HERDR_LAB_HELPER" run "$SESSION" status --json) || fail "could not read the cold lab state"
+printf '%s' "$COLD_STATUS" | jq -e '.server.running == false' >/dev/null || fail "the cold-start fixture already has a running server"
+pass "real herdr: named lab server is absent or stopped before the backend startup request"
 RAW=$(fm_backend_herdr_container_ensure "$PROJ_CWD") || fail "container_ensure failed"
+fm_herdr_lab_check_tripwire "$SESSION" || fail "backend startup did not preserve a valid lab tripwire"
 CONTAINER=${RAW%%$'\t'*}
 SEEDED_TAB_ID=${RAW#*$'\t'}
 WSID=${CONTAINER#*:}
@@ -110,9 +122,12 @@ pass "repro setup: two real fm-<id> task tabs exist (crewmate-shaped and secondm
 # underlying process (a fresh shell) and its agent_status to unknown - the
 # exact husk shape a restored task tab comes back in.
 
-fm_herdr_lab_stop "$SESSION" >/dev/null 2>&1 \
+"$HERDR_LAB_HELPER" stop "$SESSION" >/dev/null 2>&1 \
   || fail "could not stop the isolated session for the restart"
 sleep 0.5
+STOPPED_STATUS=$("$HERDR_LAB_HELPER" run "$SESSION" status --json) || fail "could not read stopped lab state"
+printf '%s' "$STOPPED_STATUS" | jq -e '.server.running == false' >/dev/null || fail "the restart fixture was prewarmed"
+pass "real herdr: owned lab server is stopped before the backend restart request"
 fm_backend_herdr_server_ensure "$SESSION" || fail "the isolated session's server did not come back up after the restart"
 
 if ! herdr pane get "$CREW_PANE_ID" --session "$SESSION" >/dev/null 2>&1; then
@@ -178,5 +193,9 @@ pass "fixed: a genuinely live duplicate (a real registered agent) still refuses 
 fm_backend_herdr_kill "$SESSION:$NEW_CREW_PANE_ID"
 fm_backend_herdr_kill "$SESSION:$NEW_SM_PANE_ID"
 
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded lab teardown or default-fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT

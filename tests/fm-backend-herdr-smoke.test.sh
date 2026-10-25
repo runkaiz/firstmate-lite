@@ -14,6 +14,10 @@
 # that command killed the captain's live default herdr server twice in
 # production because HERDR_SESSION-based targeting (env var OR inline prefix)
 # is not reliably honored once another herdr server is already running.
+# FM_TEST_HERDR_START_VIA_HELPER=1 is for a private test transport that routes
+# only the backend's exact bare server request to the official helper provision.
+# The transport must capture/retain the tripwire and trace the cold request;
+# post-start tripwire validation and guarded teardown remain mandatory.
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -32,15 +36,23 @@ command -v jq >/dev/null 2>&1 || { echo "skip: jq not found (required by the her
 # as a cross-session parent identity (tests/herdr-test-safety.sh).
 herdr_forget_inherited_pane
 
-SESSION="fm-lab-backend-smoke-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name backend-smoke) || exit 1
 export HERDR_SESSION="$SESSION"
 SM_SCRATCH=
+CLEANED=0
 cleanup_all() {
-  [ -n "$SM_SCRATCH" ] && rm -rf "$SM_SCRATCH"
-  herdr_safe_stop_and_delete "$SESSION"
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
+  [ -z "$SM_SCRATCH" ] || rm -rf "$SM_SCRATCH"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+# A task-private startup transport may capture the tripwire atomically in
+# provision when the backend requests startup. Normal invocations prepare here.
+if [ "${FM_TEST_HERDR_START_VIA_HELPER:-0}" != 1 ]; then
+  "$HERDR_LAB_HELPER" prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+fi
 
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-backend.sh"
@@ -57,7 +69,11 @@ pass "real herdr: version_check accepts the installed binary's protocol"
 # one - docs/herdr-backend.md "Default-tab prune"). Split on the guaranteed
 # single tab character; only fm_backend_herdr_create_task is ever allowed to
 # act on the seeded tab id, and only for the container that just created it.
+COLD_STATUS=$("$HERDR_LAB_HELPER" run "$SESSION" status --json) || fail "could not read the cold lab state"
+printf '%s' "$COLD_STATUS" | jq -e '.server.running == false' >/dev/null || fail "the cold-start fixture already has a running server"
+pass "real herdr: named lab server is absent or stopped before the backend startup request"
 CONTAINER_RAW=$(fm_backend_herdr_container_ensure /tmp) || fail "container_ensure failed"
+fm_herdr_lab_check_tripwire "$SESSION" || fail "backend startup did not preserve a valid lab tripwire"
 CONTAINER=${CONTAINER_RAW%%$'\t'*}
 SEEDED_TAB_ID=${CONTAINER_RAW#*$'\t'}
 case "$CONTAINER" in
@@ -241,9 +257,12 @@ pass "real herdr: list_live stays scoped to each home's own workspace - neither 
 # still resolve, unchanged, after a `session stop` + fresh server restart, all
 # scoped to this suite's OWN isolated $SESSION - never the default session.
 
-fm_herdr_lab_stop "$SESSION" >/dev/null 2>&1 \
+"$HERDR_LAB_HELPER" stop "$SESSION" >/dev/null 2>&1 \
   || fail "could not stop the isolated session for the restart-stability check"
 sleep 0.5
+STOPPED_STATUS=$("$HERDR_LAB_HELPER" run "$SESSION" status --json) || fail "could not read stopped lab state"
+printf '%s' "$STOPPED_STATUS" | jq -e '.server.running == false' >/dev/null || fail "the restart fixture was prewarmed"
+pass "real herdr: owned lab server is stopped before the backend restart request"
 fm_backend_herdr_server_ensure "$SESSION" || fail "the isolated session's server did not come back up after the stop"
 
 POST_LIST=$(herdr workspace list --session "$SESSION" 2>&1)
@@ -363,5 +382,9 @@ pass "real herdr: list_live discovers a live task tab by fm-<id> label"
 
 fm_backend_herdr_kill "$SESSION:$PANE_ID2"
 
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded lab teardown or default-fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT

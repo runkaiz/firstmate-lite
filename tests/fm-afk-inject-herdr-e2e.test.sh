@@ -49,7 +49,8 @@ herdr_forget_inherited_pane
 fail() { printf 'not ok - %s\n' "$1" >&2; cleanup_all; exit 1; }
 pass() { printf 'ok - %s\n' "$1"; }
 
-SESSION="fm-lab-afk-herdr-e2e-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name afk-inject) || exit 1
 export HERDR_SESSION="$SESSION"
 STATE_DIR=
 HERDR_SHIM_DIR=
@@ -59,18 +60,21 @@ SUPERVISOR_TARGET=
 PANE_ID=
 LOOP_SCRIPT=
 
+CLEANED=0
 cleanup_all() {
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
   if [ -n "${DAEMON_PID:-}" ]; then
     afk_exit "${STATE_DIR:-}" 2>/dev/null || true
     kill "$DAEMON_PID" 2>/dev/null || true
     wait "$DAEMON_PID" 2>/dev/null || true
   fi
-  herdr_safe_stop_and_delete "$SESSION" 2>/dev/null || true
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
   rm -rf "${HERDR_SHIM_DIR:-}" 2>/dev/null || true
   rm -rf "${STATE_DIR:-}" 2>/dev/null || true
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+"$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
 
 # --- source the daemon (for afk_enter/afk_exit/FM_INJECT_MARK) + the backend -
 # shellcheck source=/dev/null
@@ -537,5 +541,9 @@ echo "all real-herdr afk injection e2e tests passed"
 
 fm_backend_herdr_kill "$SUPERVISOR_TARGET" 2>/dev/null || true
 fm_backend_herdr_kill "$SESSION:$FAKE_CREW_PANE_ID" 2>/dev/null || true
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded lab teardown or default-fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT

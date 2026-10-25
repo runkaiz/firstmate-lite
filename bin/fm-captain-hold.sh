@@ -1492,8 +1492,7 @@ reconcile_request_retire() {  # <task-id>
 }
 
 publish_parent_resolution_then_retire() {  # <task-id> <occurrence> <note>
-  local id=$1 occurrence=$2 note=$3 request
-  request=$(reconcile_request_path "$id")
+  local id=$1 occurrence=$2 note=$3
 
 
   reconcile_request_retire "$id"

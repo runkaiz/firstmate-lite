@@ -405,7 +405,7 @@ test_spawn_refuses_secondmate() {
     "$SPAWN" "$id" muse --secondmate 2>&1)
   status=$?
   [ "$status" -ne 0 ] || fail "muse was accepted as a secondmate harness"
-  assert_contains "$out" "crewmate/scout adapter only" "muse secondmate refusal did not explain the boundary"
+  assert_contains "$out" "persistent secondmates are no longer supported" "muse secondmate refusal did not explain the boundary"
   pass "muse is refused as a secondmate harness"
 }
 

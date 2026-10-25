@@ -1096,7 +1096,7 @@ test_secondmate_spawn_refuses_cmux_backend() {
     "$ROOT/bin/fm-spawn.sh" sm-cmux-test --secondmate --backend cmux 2>&1 )
   status=$?
   [ "$status" -ne 0 ] || fail "fm-spawn.sh should refuse a --secondmate spawn with --backend cmux"
-  assert_contains "$out" "does not support --secondmate" "fm-spawn.sh did not report the cmux secondmate refusal"
+  assert_contains "$out" "persistent secondmates are no longer supported" "fm-spawn.sh did not report the cmux secondmate refusal"
   pass "fm-spawn.sh: refuses backend=cmux for --secondmate spawns (mirrors Orca's refusal; no secondmate launch design exists yet)"
 }
 

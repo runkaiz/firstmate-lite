@@ -46,6 +46,9 @@ test_unpushed_ship_done_is_refused() {
     *"named head $sha is unreachable outside the worker copy") ;;
     *) fail "unpushed refusal did not name the commit: $reason" ;;
   esac
+  reason=$(accept_done ship no-mistakes "$wt" "$repo" "done: PR https://github.com/example/repo/pull/1")
+  rc=$?
+  [ "$rc" -eq 1 ] || fail "a published PR note without green wording bypassed named-head custody"
   pass "unpushed ship done: is refused"
 }
 

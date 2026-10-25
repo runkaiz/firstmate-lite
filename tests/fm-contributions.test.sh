@@ -381,26 +381,21 @@ test_away_yolo_is_fleet_work() {
 }
 
 test_away_yolo_cross_home_is_fleet_work() {
-  local home child
-  home=$(new_home away-yolo-parent)
-  child=$(new_home away-yolo-child)
-  mkdir -p "$child/bin"
-  printf '# Fixture\n' > "$child/AGENTS.md"
-  printf 'child\n' > "$child/.fm-secondmate-home"
-  forge_home "$child"
-  with_home "$child" "$ROOT/bin/fm-pr-check.sh" delivery https://github.com/o/r/pull/8 >/dev/null \
-    || fail 'could not register child away delivery'
-  printf 'yolo=on\n' >> "$child/state/delivery.meta"
-  with_home "$child" "$ROOT/bin/fm-afk-contract.sh" enter --words 'merge the delivery PR when green' >/dev/null \
-    || fail 'could not enter child away posture'
-  mutate_record "$child" delivery '.records[0].observation.can_merge=true'
-  FM_SNAPSHOT_NOW="$NOW" with_home "$child" "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary > "$child/state/home-summary.json" \
-    || fail 'could not collect child contribution summary'
-  printf -- '- child - fixture (home: %s; scope: fixture; projects: sample; added 2026-09-16)\n' "$child" > "$home/data/secondmates.md"
-  bearings "$home" | jq -e '.contributions.checked == 1 and .contributions.counts.captain == 0
-    and .contributions.counts.fleet == 1' >/dev/null \
-    || fail 'cross-home away yolo delivery requiring a merge remained captain work'
-  pass 'cross-home away yolo delivery is fleet work'
+  local home child before out rc=0
+  home=$(new_home test_away_yolo_cross_home_is_fleet_work)
+  child=$(new_home test_away_yolo_cross_home_is_fleet_work-legacy)
+  record "$child" child-work 15 open mergeable
+  before=$(cat "$child/data/child-work/contributions.json")
+  printf -- '- child - historical (home: %s; scope: retained records; projects: sample)\n' "$child" > "$home/data/secondmates.md"
+  printf '{"schema":"fm-secondmate-home-summary.v1","contributions":{"known":1,"checked":1,"proven_clear":true}}\n' > "$child/state/home-summary.json"
+  bearings "$home" | jq -e '.contributions.known == 0 and .contributions.checked == 0' >/dev/null \
+    || fail 'parent imported retired child contribution authority'
+  out=$(with_home "$child" "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail 'retired supervisor summary publication succeeded'
+  assert_contains "$out" 'persistent supervisor home summaries are no longer supported' 'retired summary refusal lost its reason'
+  assert_equals "$before" "$(cat "$child/data/child-work/contributions.json")" 'parent inspection rewrote retained child contribution evidence'
+  assert_present "$child/state/home-summary.json" 'parent inspection erased historical summary'
+  pass 'retired child contribution evidence is preserved without importing its authority'
 }
 
 test_retired_and_unsupported_coverage() {
@@ -601,17 +596,13 @@ test_expired_child_unsupported_forge_stays_unmeasured() {
   printf '# Fixture\n' > "$child/AGENTS.md"
   printf 'child\n' > "$child/.fm-secondmate-home"
   printf -- '- [ ] unsupported - Filed https://gitlab.com/o/r/-/merge_requests/2 (repo: sample) (kind: ship)\n' >> "$child/data/backlog.md"
-  FM_SNAPSHOT_NOW="$NOW" with_home "$child" "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary > "$child/state/home-summary.json" \
-    || fail 'could not collect child unsupported-forge coverage'
-  jq '.contributions.valid_until=0' "$child/state/home-summary.json" > "$child/update.json"
-  mv "$child/update.json" "$child/state/home-summary.json"
+  printf '{"schema":"fm-secondmate-home-summary.v1","contributions":{"known":1,"checked":0,"unmeasured":1,"valid_until":0}}\n' > "$child/state/home-summary.json"
   printf -- '- child - fixture (home: %s; scope: fixture; projects: sample; added 2026-09-16)\n' "$child" > "$home/data/secondmates.md"
-  bearings "$home" | jq -e '.contributions.known == 1 and .contributions.checked == 0
-    and .contributions.unmeasured == 1 and .contributions.counts.captain == 0
-    and .contributions.counts.fleet == 0 and .contributions.complete == false
-    and .contributions.proven_clear == false' >/dev/null \
-    || fail 'expired child unsupported-forge coverage became fleet work'
-  pass 'expired child unsupported-forge coverage remains unmeasured'
+  bearings "$home" | jq -e '.contributions.known == 0 and .contributions.checked == 0' >/dev/null \
+    || fail 'expired retired child evidence entered parent contribution authority'
+  assert_grep 'unsupported' "$child/data/backlog.md" 'parent read erased unsupported child ownership'
+  assert_grep '"valid_until":0' "$child/state/home-summary.json" 'parent read rewrote expired historical evidence'
+  pass 'expired retired child evidence remains preserved and outside parent contribution authority'
 }
 
 test_watcher_surfaces_new_contribution_once() {
@@ -643,23 +634,21 @@ test_watcher_surfaces_new_contribution_once() {
 }
 
 test_home_summary_coverage() {
-  local home child
-  home=$(new_home parent)
-  child=$(new_home child)
-  mkdir -p "$child/bin"
-  printf '# Fixture\n' > "$child/AGENTS.md"
-  printf 'child\n' > "$child/.fm-secondmate-home"
+  local home child before out rc=0
+  home=$(new_home test_home_summary_coverage)
+  child=$(new_home test_home_summary_coverage-legacy)
   record "$child" child-work 15 open mergeable
-  FM_SNAPSHOT_NOW="$NOW" with_home "$child" "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary > "$child/state/home-summary.json" \
-    || fail 'child summary failed'
-  printf -- '- child - fixture (home: %s; scope: fixture; projects: sample; added 2026-09-16)\n' "$child" > "$home/data/secondmates.md"
-  bearings "$home" | jq -e '.contributions.known == 1 and .contributions.checked == 1
-    and .contributions.proven_clear == true' >/dev/null || fail 'measured child coverage did not reach parent'
-  jq '.contributions.valid_until=0' "$child/state/home-summary.json" > "$child/update.json"
-  mv "$child/update.json" "$child/state/home-summary.json"
-  bearings "$home" | jq -e '.contributions.known == 1 and .contributions.checked == 0
-    and .contributions.proven_clear == false' >/dev/null || fail 'expired child evidence proved parent silence'
-  pass 'parent consumes measured child coverage and refuses expired child silence'
+  before=$(cat "$child/data/child-work/contributions.json")
+  printf -- '- child - historical (home: %s; scope: retained records; projects: sample)\n' "$child" > "$home/data/secondmates.md"
+  printf '{"schema":"fm-secondmate-home-summary.v1","contributions":{"known":1,"checked":1,"proven_clear":true}}\n' > "$child/state/home-summary.json"
+  bearings "$home" | jq -e '.contributions.known == 0 and .contributions.checked == 0' >/dev/null \
+    || fail 'parent imported retired child contribution authority'
+  out=$(with_home "$child" "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail 'retired supervisor summary publication succeeded'
+  assert_contains "$out" 'persistent supervisor home summaries are no longer supported' 'retired summary refusal lost its reason'
+  assert_equals "$before" "$(cat "$child/data/child-work/contributions.json")" 'parent inspection rewrote retained child contribution evidence'
+  assert_present "$child/state/home-summary.json" 'parent inspection erased historical summary'
+  pass 'retired child contribution evidence is preserved without importing its authority'
 }
 
 test_unreadable_pending_is_not_empty() {

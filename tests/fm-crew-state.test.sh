@@ -1823,12 +1823,10 @@ EOF
   assert_not_contains "$out" 'state: failed' "$scenario cancellation is not a failure"
   assert_not_contains "$out" 'held for merge' "$scenario has no positive delivery evidence"
   summary=$(PATH="$d/fakebin:$PATH" FM_HOME="$d" FM_ROOT_OVERRIDE="$d/fixture-root" \
-    "$ROOT/bin/fm-fleet-snapshot.sh" --secondmate-home-summary)
+    "$ROOT/bin/fm-fleet-snapshot.sh" --json)
   printf '%s' "$summary" | jq -e '
-    .state == "unknown" and .valid == false
-    and .invalidity == {kind:"child_current_unavailable",ids:["cancelled"]}
-    and .reason == "child current state unavailable: cancelled"
-  ' >/dev/null || fail "cancellation must not report a terminal/backlog contradiction: $summary"
+    any(.tasks[]; .id == "cancelled" and .current_state.state == "unknown")
+  ' >/dev/null || fail "cancellation must retain its unknown current state in the fleet: $summary"
   assert_equals "$backlog_before" "$(cat "$d/data/backlog.md")" 'correct backlog is unchanged'
   assert_equals "$status_before" "$(cat "$d/state/cancelled.status")" 'historical event is unchanged'
   pass "$scenario cancelled run leaves fleet inventory unverified without a failure contradiction"
@@ -2710,48 +2708,34 @@ test_no_run_idle_pane_paused() {
 
 test_secondmate_open_block_survives_unrelated_append() {
   reset_fakes
-  local d out suffix gen
-  d=$(new_case buried-block)
-  mkdir -p "$d/wt"
+  local d out suffix before
+  d=$(new_case retired-buried-block)
   make_fakebin "$d" >/dev/null
-  fm_write_meta "$d/state/mate.meta" "window=fm:fm-mate" "worktree=$d/wt" "kind=secondmate" "harness=claude"
-  gen=$("$ROOT/bin/fm-busy-event.sh" arm "$d/state" mate)
-  "$ROOT/bin/fm-busy-event.sh" apply "$d/state" mate busy --gen "$gen" --source claude-hook --event user-prompt-submit
-  for suffix in '' 'note: unrelated progress' 'resolved [key=other]: unrelated answer' 'working: continuing another task' 'done: another task completed' 'failed: another task failed' $'done: another task completed\nnote: cleanup complete' $'failed: another task failed\nnote: cleanup complete'; do
+  fm_write_meta "$d/state/mate.meta" "window=fm:fm-mate" "kind=secondmate" "harness=claude"
+  for suffix in '' 'working: unrelated progress' 'done: unrelated task' 'resolved [key=other]: another answer'; do
     printf 'blocked [key=access]: need release access\n%s\n' "$suffix" > "$d/state/mate.status"
+    before=$(cat "$d/state/mate.status")
     out=$(run_crew_state "$d" mate)
-    assert_contains "$out" "state: blocked" "open blocker survives '$suffix' with a busy endpoint"
-    assert_contains "$out" "need release access" "the open blocker's reason remains visible"
+    assert_contains "$out" 'state: unknown' "retired record claimed a current verdict"
+    assert_contains "$out" 'source: retired-supervisor' "retired record lost its preservation reason"
+    assert_equals "$before" "$(cat "$d/state/mate.status")" "retired state read rewrote the unresolved blocker"
   done
-  printf 'resolved [key=access]: access granted\n' >> "$d/state/mate.status"
-  out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "state: unknown" "matching resolution clears the blocker"
-  assert_not_contains "$out" "need release access" "closed blocker is not resurrected"
-  pass "a busy secondmate keeps its open blocker until that exact key closes"
+  pass "retired supervisor state stays unknown while preserving unresolved blocker bytes"
 }
 
 test_newest_open_decision_supplies_the_reported_detail() {
   reset_fakes
-  local d out gen
-  d=$(new_case newest-open-decision)
-  mkdir -p "$d/wt"
+  local d out before
+  d=$(new_case retired-multiple-decisions)
   make_fakebin "$d" >/dev/null
-  fm_write_meta "$d/state/mate.meta" "window=fm:fm-mate" "worktree=$d/wt" "kind=secondmate" "harness=claude"
-  gen=$("$ROOT/bin/fm-busy-event.sh" arm "$d/state" mate)
-  "$ROOT/bin/fm-busy-event.sh" apply "$d/state" mate busy --gen "$gen" --source claude-hook --event user-prompt-submit
-  printf 'blocked [key=a]: staging is down\nneeds-decision [key=b]: pick a rollout order\n' > "$d/state/mate.status"
+  fm_write_meta "$d/state/mate.meta" "window=fm:fm-mate" "kind=secondmate" "harness=claude"
+  printf 'blocked [key=a]: staging down\nneeds-decision [key=b]: choose release\nresolved [key=a]: staging restored\n' > "$d/state/mate.status"
+  before=$(cat "$d/state/mate.status")
   out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "state: parked" "the newer open decision is the reported state"
-  assert_contains "$out" "pick a rollout order" "the newer open decision supplies the detail"
-  printf 'blocked [key=c]: the deploy host went away\n' >> "$d/state/mate.status"
-  out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "state: blocked" "a newer blocker takes the report back"
-  assert_contains "$out" "the deploy host went away" "the newest blocker supplies the detail"
-  printf 'resolved [key=c]: host restored\n' >> "$d/state/mate.status"
-  out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "state: parked" "closing the newest decision falls back to the next open one"
-  assert_contains "$out" "pick a rollout order" "the still-open older decision is not lost"
-  pass "the most recently opened decision supplies the reported state and detail"
+  assert_contains "$out" 'state: unknown' "historical decisions revived live supervisor state"
+  assert_contains "$out" 'records are preserved' "historical decisions lost their preservation diagnostic"
+  assert_equals "$before" "$(cat "$d/state/mate.status")" "historical decision read rewrote keyed custody"
+  pass "retired supervisor decisions retain exact keyed history without a live verdict"
 }
 
 test_single_owner_terminal_declaration_supersedes_stale_decision() {
@@ -2880,7 +2864,7 @@ test_no_run_idle_pane_custom_paused_verb() {
 # `doing`. Regression for the bearings render bug where such a secondmate showed
 # state=unknown with resolution prose. The one-owner keyed fold in fm-classify-lib.sh
 # is untouched; this only stops the deriver from reading a non-state event as state.
-test_no_run_idle_secondmate_resolved_event_not_state() {
+test_retired_supervisor_events_do_not_revive_current_state() {
   reset_fakes
   local d; d=$(new_case resolved-idle)
   mkdir -p "$d/wt"
@@ -2892,18 +2876,19 @@ test_no_run_idle_secondmate_resolved_event_not_state() {
   FM_FAKE_BUSY=0
   local out; out=$(run_crew_state "$d" mate)
   assert_contains "$out" "state: unknown" "resolved-then-idle secondmate is not a spurious run-state"
-  assert_contains "$out" "source: none" "a resolved event is not treated as a status-log state source"
+  assert_contains "$out" "source: retired-supervisor" "a resolved event is not treated as a status-log state source"
   assert_not_contains "$out" "subscribe-before-write" "resolution prose must not leak into the detail"
   # A bare (non-keyed) resolved: closes the default key and behaves the same.
   printf 'blocked: waiting on infra\nresolved: infra access granted\n' > "$d/state/mate.status"
   out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "source: none" "a bare resolved: is not a state source either"
+  assert_contains "$out" "source: retired-supervisor" "a bare resolved: is not a state source either"
   assert_not_contains "$out" "infra access granted" "bare resolution prose must not leak into the detail"
-  # Control: a genuine trailing state verb still renders from the log.
+  # A historical working event cannot revive the retired supervisor either.
   printf 'working: reconciling routed items\n' > "$d/state/mate.status"
   out=$(run_crew_state "$d" mate)
-  assert_contains "$out" "state: working" "a real trailing state verb still renders"
-  assert_contains "$out" "reconciling routed items" "a real state line still carries its detail"
+  assert_contains "$out" "state: unknown" "historical activity revived a supervisor verdict"
+  assert_not_contains "$out" "reconciling routed items" "historical activity was presented as a current verdict"
+  assert_equals 'working: reconciling routed items' "$(cat "$d/state/mate.status")" "retired state read changed its historical working event"
   pass "a trailing resolved: event does not corrupt state render (idle stays idle)"
 }
 
@@ -3100,60 +3085,23 @@ run_remote_crew_state() {  # <case-dir> <id>
     FM_SSH_BIN="$1/fakebin/fake-ssh" "$CREW_STATE" "$2"
 }
 
-test_remote_alive_with_log_uses_status_log() {
-  reset_fakes
-  local d out rc
-  d=$(setup_remote_case remote-alive-log)
-  make_fakebin "$d" >/dev/null
-  printf 'working: refactoring the quota adapter\n' > "$d/state/rsm.status"
-  out=$(FM_FAKE_REMOTE_STATE_OUT=alive FM_FAKE_SSH_RC=0 run_remote_crew_state "$d" rsm); rc=$?
-  expect_code 0 "$rc" "remote alive exits 0"
-  assert_contains "$out" "state: working" "alive remote mate with a working log reads working"
-  assert_contains "$out" "source: status-log" "alive remote mate reads current activity from the routed log"
-  assert_contains "$out" "remote endpoint alive on remote-mac" "the remote liveness read should be visible"
-  assert_not_contains "$out" "worktree gone" "a healthy remote mate must never read as torn down"
-  pass "fm-crew-state remote: alive endpoint falls through to the routed status log"
-}
-
-test_remote_alive_idle_is_healthy_not_gone() {
-  reset_fakes
-  local d out rc
-  d=$(setup_remote_case remote-alive-idle)
-  make_fakebin "$d" >/dev/null
-  out=$(FM_FAKE_REMOTE_STATE_OUT=alive FM_FAKE_SSH_RC=0 run_remote_crew_state "$d" rsm); rc=$?
-  expect_code 0 "$rc" "remote alive-idle exits 0"
-  assert_contains "$out" "source: remote-endpoint" "the remote endpoint is the reported source"
-  assert_contains "$out" "alive on remote-mac" "an idle remote mate reads alive"
-  assert_not_contains "$out" "worktree gone" "a healthy remote mate must never read as torn down"
-  assert_not_contains "$out" "backend target gone" "a healthy remote mate must never read as a dead target"
-  pass "fm-crew-state remote: an idle alive endpoint reads alive, never gone or dead"
-}
-
-test_remote_unreachable_is_unknown_remote_not_dead() {
-  reset_fakes
-  local d out rc
-  d=$(setup_remote_case remote-unreachable)
-  make_fakebin "$d" >/dev/null
-  printf 'working: refactoring the quota adapter\n' > "$d/state/rsm.status"
-  out=$(FM_FAKE_SSH_RC=255 run_remote_crew_state "$d" rsm); rc=$?
-  expect_code 0 "$rc" "unreachable remote exits 0"
-  assert_contains "$out" "unknown-remote" "an unreachable remote must be labeled unknown-remote"
-  assert_contains "$out" "not proof of death" "an unreachable remote must not read as dead"
-  assert_not_contains "$out" "worktree gone" "an unreachable remote must never read as torn down"
-  assert_not_contains "$out" "backend target gone" "an unreachable remote must never read as a dead target"
-  pass "fm-crew-state remote: an unreachable host reads unknown-remote, never gone or dead"
-}
-
-test_remote_dead_reports_remote_verdict() {
-  reset_fakes
-  local d out rc
-  d=$(setup_remote_case remote-dead)
-  make_fakebin "$d" >/dev/null
-  out=$(FM_FAKE_REMOTE_STATE_OUT=dead FM_FAKE_SSH_RC=0 run_remote_crew_state "$d" rsm); rc=$?
-  expect_code 0 "$rc" "remote dead exits 0"
-  assert_contains "$out" "remote endpoint dead on remote-mac" \
-    "a genuinely dead remote endpoint reports the remote host's own verdict"
-  pass "fm-crew-state remote: the remote host's own dead verdict is reported truthfully"
+test_retired_remote_records_are_preserved_without_probes() {
+  local scenario d out before
+  for scenario in alive idle unreachable dead; do
+    reset_fakes
+    d=$(setup_remote_case "retired-remote-$scenario")
+    make_fakebin "$d" >/dev/null
+    printf 'blocked [key=access]: historical remote blocker\n' > "$d/state/rsm.status"
+    before=$(cat "$d/state/rsm.meta" "$d/state/rsm.status" "$d/data/secondmates.md")
+    printf '#!/usr/bin/env bash\nprintf called > %q\nexit 99\n' "$d/ssh-called" > "$d/fakebin/fake-ssh"
+    chmod +x "$d/fakebin/fake-ssh"
+    out=$(FM_FAKE_REMOTE_STATE_OUT="$scenario" run_remote_crew_state "$d" rsm) || fail "retired remote state read failed"
+    assert_contains "$out" 'state: unknown' "retired remote endpoint claimed a current verdict"
+    assert_contains "$out" 'source: retired-supervisor' "retired remote endpoint lost its preservation reason"
+    assert_absent "$d/ssh-called" "retired remote read performed transport"
+    assert_equals "$before" "$(cat "$d/state/rsm.meta" "$d/state/rsm.status" "$d/data/secondmates.md")" "retired remote read changed private custody records"
+  done
+  pass "retired remote records remain unknown without SSH probes or private-state changes"
 }
 
 test_missing_meta() {
@@ -5482,7 +5430,7 @@ test_no_run_idle_pane_uses_log
 test_no_run_idle_pane_uses_keyed_log
 test_no_run_idle_pane_paused
 test_no_run_idle_pane_custom_paused_verb
-test_no_run_idle_secondmate_resolved_event_not_state
+test_retired_supervisor_events_do_not_revive_current_state
 test_dead_window_ignores_stale_status_log
 test_no_run_tmux_unreadable_reads_unreachable_not_gone
 test_dead_window_still_reports_terminal_run_step
@@ -5490,10 +5438,7 @@ test_dead_window_still_reports_active_run_step
 test_no_timeout_uses_perl_bound
 test_scout_skips_run_lookup
 test_torn_down_worktree
-test_remote_alive_with_log_uses_status_log
-test_remote_alive_idle_is_healthy_not_gone
-test_remote_unreachable_is_unknown_remote_not_dead
-test_remote_dead_reports_remote_verdict
+test_retired_remote_records_are_preserved_without_probes
 test_missing_meta
 test_provably_working_via_runs_list_fallback
 test_not_provably_working_when_stopped

@@ -864,7 +864,7 @@ test_agy_secondmate_is_refused() {
     FM_SPAWN_NO_GUARD=1 PATH="$FAKEBIN_DIR:$BASE_PATH" \
     "$SPAWN" "$id" --secondmate agy 2>&1) || rc=$?
   [ "$rc" -ne 0 ] || fail "an agy secondmate spawn should be refused"
-  assert_contains "$out" "agy is a verified crewmate/scout adapter only" \
+  assert_contains "$out" "persistent secondmates are no longer supported" \
     "agy secondmate refusal lacked its concrete reason"
   pass "fm-spawn: agy cannot be launched as a secondmate"
 }

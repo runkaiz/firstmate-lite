@@ -169,48 +169,7 @@ network_sweep_authorized() {
   return 1
 }
 
-# Concurrent per-item runner for the deferred network sweeps. Each worker's
-# stdout and stderr are captured to private files and replayed in original
-# order after every worker finishes, so concurrent probes cannot interleave
-# or mis-attribute SECONDMATE_LIVENESS / SECONDMATE_SYNC lines. Respawned ids
-# are collected from per-id files because background workers cannot mutate
-# the parent's SECONDMATE_RESPAWNED_IDS.
-bootstrap_parallel_begin() {
-  BOOTSTRAP_PAR_DIR=$(mktemp -d "${TMPDIR:-/tmp}/fm-bootstrap-par.XXXXXX") || return 1
-  BOOTSTRAP_PAR_N=0
-  FM_BOOTSTRAP_PARALLEL_DIR=$BOOTSTRAP_PAR_DIR
-  export FM_BOOTSTRAP_PARALLEL_DIR
-}
 
-bootstrap_parallel_spawn() {
-  BOOTSTRAP_PAR_N=$((BOOTSTRAP_PAR_N + 1))
-  (
-    "$@"
-  ) >"$BOOTSTRAP_PAR_DIR/$BOOTSTRAP_PAR_N.out" 2>"$BOOTSTRAP_PAR_DIR/$BOOTSTRAP_PAR_N.err" &
-  printf '%s\n' "$!" > "$BOOTSTRAP_PAR_DIR/$BOOTSTRAP_PAR_N.pid"
-}
-
-bootstrap_parallel_finish() {
-  local i pid f
-  i=1
-  while [ "$i" -le "$BOOTSTRAP_PAR_N" ]; do
-    pid=$(cat "$BOOTSTRAP_PAR_DIR/$i.pid")
-    wait "$pid" || true
-    i=$((i + 1))
-  done
-  i=1
-  while [ "$i" -le "$BOOTSTRAP_PAR_N" ]; do
-    cat "$BOOTSTRAP_PAR_DIR/$i.out"
-    cat "$BOOTSTRAP_PAR_DIR/$i.err" >&2
-    i=$((i + 1))
-  done
-  for f in "$BOOTSTRAP_PAR_DIR"/respawned.*; do
-    [ -f "$f" ] || continue
-    SECONDMATE_RESPAWNED_IDS="$SECONDMATE_RESPAWNED_IDS $(tr -d '\n' < "$f")"
-  done
-  rm -rf "$BOOTSTRAP_PAR_DIR"
-  unset FM_BOOTSTRAP_PARALLEL_DIR BOOTSTRAP_PAR_DIR BOOTSTRAP_PAR_N
-}
 
 
 

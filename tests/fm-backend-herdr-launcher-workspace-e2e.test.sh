@@ -295,6 +295,8 @@ WS_PRIMARY_TABS_BEFORE=$(tab_labels_of_workspace "$WS_PRIMARY")
 cat > "$TMP_ROOT/spawn-in-pane.sh" <<SPAWN
 #!/usr/bin/env bash
 set -u
+export PATH=$(printf '%q' "$PATH")
+export TREEHOUSE_ROOT=$(printf '%q' "${TREEHOUSE_ROOT:-$TMP_ROOT/treehouse}")
 FM_SPAWN_NO_GUARD=1 FM_HOME="$PRIMARY_HOME" FM_ROOT_OVERRIDE="$ROOT" \\
   "$ROOT/bin/fm-spawn.sh" dupC "$PROJ" "sh -c 'echo launcher-ws-ok'" --mode no-mistakes --yolo off --backend herdr \\
   > "$TMP_ROOT/dupC.out" 2> "$TMP_ROOT/dupC.err"
@@ -417,15 +419,12 @@ pass "real herdr E2E: a secondmate launching its own worker gets the same exact-
 # --- 7. a --secondmate launch is NOT collapsed into the launcher's workspace -
 
 spawn_from_launcher "$LAUNCH_DUP_PANE" "$PRIMARY_HOME" "$SM2_ID" "$SM2_HOME" --secondmate
-[ "$SPAWN_RC" -eq 0 ] || fail "the primary's --secondmate launch failed"$'\n'"$(cat "$SPAWN_ERR")"
-SM2_META="$PRIMARY_HOME/state/$SM2_ID.meta"
-SM2_PANE=$(grep '^herdr_pane_id=' "$SM2_META" | cut -d= -f2-)
-SM2_WS=$(workspace_of_pane "$SM2_PANE")
-[ "$SM2_WS" != "$WS_PRIMARY_DUP" ] \
-  || fail "a --secondmate launch must stand up the secondmate's own workspace, not join the launcher's"
-[ "$(label_of_workspace "$SM2_WS")" = "2ndmate-$SM2_ID" ] \
-  || fail "a --secondmate launch should land in '2ndmate-$SM2_ID', got '$(label_of_workspace "$SM2_WS")'"
-pass "real herdr E2E: a --secondmate launch still stands up that secondmate's own workspace instead of inheriting the launcher's"
+[ "$SPAWN_RC" -ne 0 ] || fail "retired supervisor launch succeeded"
+assert_contains_local "$(cat "$SPAWN_ERR")" 'persistent secondmates are no longer supported' "retired supervisor refusal lost its reason"
+[ ! -e "$PRIMARY_HOME/state/$SM2_ID.meta" ] || fail "retired supervisor launch published metadata"
+[ "$(cat "$SM2_HOME/.fm-secondmate-home")" = "$SM2_ID" ] || fail "retired supervisor launch changed the home marker"
+[ "$(label_of_workspace "$WS_PRIMARY_DUP")" = firstmate ] || fail "retired supervisor launch changed the launcher workspace"
+pass "real herdr E2E: retired supervisor launch refuses without publishing metadata or changing the launcher"
 
 # --- 8. teardown closes only the worker's own pane --------------------------
 

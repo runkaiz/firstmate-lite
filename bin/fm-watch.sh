@@ -2262,10 +2262,8 @@ fi
 # first. Publication is eventually consistent by design and every reader
 # re-derives current state from the owning home anyway, while beacon freshness
 # is what the whole supervision chain rests on.
-HOME_SUMMARY_PID=
 
 
-RECONCILE_REQUEST_PID=
 
 
 

@@ -574,6 +574,8 @@ test_captain_override_ignores_event_time() {
     [ "$(last_status_line "$dir/state/task.status")" = "$line" ] \
       || fail "event scan skipped the stamped custom-verb event: $line"
   done
+  # Public input consumed by the sourced production classifier.
+  # shellcheck disable=SC2034
   FM_CAPTAIN_RE="^done \\[corr=$CORR\\]: literal \\[at=1700000000\\]$"
   for line in "done [corr=$CORR]: literal [at=1700000000]" \
     "done [at=1700000000] [corr=$CORR]: literal [at=1700000000]" \
@@ -615,14 +617,12 @@ test_malformed_event_time_is_ordinary_bytes() {
       # whether the supervisor sees a terminal event - including a readable
       # timestamp whose colons would otherwise swallow the head/note separator.
       (
-        FM_CAPTAIN_RE='done:|needs-decision:|blocked:|failed:'
-        status_is_captain_relevant "$line" || exit 1
+        FM_CAPTAIN_RE='done:|needs-decision:|blocked:|failed:' status_is_captain_relevant "$line" || exit 1
         exit 0
       ) || fail "override lost a terminal event to a malformed tag: $line"
       printf '%s\n' "$line" > "$dir/state/scan.status"
       (
-        FM_CAPTAIN_RE='done:|needs-decision:|blocked:|failed:'
-        event=$(last_status_line "$dir/state/scan.status")
+        event=$(FM_CAPTAIN_RE='done:|needs-decision:|blocked:|failed:' last_status_line "$dir/state/scan.status")
         [ "$event" = "$line" ] || exit 1
       ) || fail "event scan lost a terminal event to a malformed tag: $line"
     done

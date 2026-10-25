@@ -2889,6 +2889,14 @@ test_dispatch_and_completion_are_structural() {
 
   meta="$home/state/$id.meta"
   printf 'pr=%s\n' "$pr" >> "$meta"
+  # A published PR reference alone cannot prove landing. Supply its merged
+  # head explicitly so teardown can verify the fixture's actual commit.
+  cat > "$case_dir/fakebin/gh" <<SH
+#!/usr/bin/env bash
+[ "\${1:-} \${2:-}" = 'pr view' ] || exit 1
+printf 'MERGED\t%s\t%s\n' '$(git -C "$case_dir/wt" rev-parse HEAD)' '$pr'
+SH
+  chmod +x "$case_dir/fakebin/gh"
   out=$(run_teardown "$case_dir" "$id") \
     || fail "structural teardown failed: $out"
   [ "$(row_state "$case_dir" "$id")" = "done" ] \
@@ -2982,7 +2990,7 @@ test_a_secondmate_home_keeps_its_own_books() {
 }
 
 test_a_persistent_secondmate_is_never_a_backlog_item() {
-  local case_dir id out mate
+  local case_dir id out mate rc before
   id=atomic-mate-b14
   case_dir=$(make_home mate-not-an-item)
   mate="$case_dir/mate-home"
@@ -2993,13 +3001,16 @@ test_a_persistent_secondmate_is_never_a_backlog_item() {
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$mate/.gitignore"
   git -C "$mate" init -q -b main
 
-  # No backlog item exists for the mate, and none should be required: agents are
-  # not work items. The dispatch must succeed anyway.
-  out=$(run_spawn "$case_dir" "$id" "$mate" --secondmate) \
-    || fail "secondmate spawn failed: $out"
-  assert_contains "$out" "spawned $id" "secondmate spawn did not report success"
-  assert_present "$(home_of "$case_dir")/state/$id.meta" "secondmate spawn published no record"
-  pass "dispatching a persistent secondmate needs no backlog item"
+  before=$(cat "$(backlog_of "$case_dir")")
+  rc=0
+  out=$(run_spawn "$case_dir" "$id" "$mate" --secondmate 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail "retired supervisor dispatch was accepted"
+  assert_contains "$out" 'persistent secondmates are no longer supported' "retired dispatch lost its refusal reason"
+  assert_absent "$(home_of "$case_dir")/state/$id.meta" "retired dispatch published a task record"
+  assert_equals "$before" "$(cat "$(backlog_of "$case_dir")")" "retired dispatch changed the backlog"
+  assert_equals "$id" "$(cat "$mate/.fm-secondmate-home")" "retired dispatch changed its private home marker"
+  assert_equals "charter for $id" "$(cat "$mate/data/charter.md")" "retired dispatch changed its private charter"
+  pass "retired supervisor dispatch refuses without requiring or creating a backlog item"
 }
 
 test_backend_resolution_preserves_config_errors

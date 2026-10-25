@@ -68,8 +68,6 @@ path_is_ancestor_of() {
   return 1
 }
 
-VALIDATED_HOME=""
-VALIDATION_ERROR=""
 
 
 
@@ -114,7 +112,6 @@ changed_instr() {
 # status, which on this leg can only mean that host's Firstmate copy predates the
 # parent-targeted sync it was just asked for; every other failure already carries
 # its own diagnostic.
-REMOTE_SYNC_UNSUPPORTED_STATUS=2
 
 
 # Translate a remote inheritance push's combined output into an operator-
@@ -255,8 +252,13 @@ ff_target() {
     return 0
   fi
   after=$(git -C "$dir" rev-parse --short HEAD)
+  # Public result read by callers such as fm-update.sh.
+  # shellcheck disable=SC2034
   FF_STATUS="updated"
+  # Public result for instruction-aware callers.
+  # shellcheck disable=SC2034
   FF_INSTR="$instr"
+
 
   if [ -n "$instr" ]; then
     echo "$label: updated $before..$after (instructions changed: $instr)"
@@ -268,8 +270,6 @@ ff_target() {
 
 # Sweep accumulators. The caller resets both before a sweep and reads
 # FF_NUDGE_WINDOWS after.
-FF_NUDGE_WINDOWS=""
-FF_SEEN_HOMES=""
 
 # Validate and fast-forward one secondmate home, accumulating its stable
 # fm-<id> task selector into FF_NUDGE_WINDOWS when it should be live-converged.

@@ -180,7 +180,6 @@ BASE_BRANCH=
 BASE_BRANCH_SET=0
 FORGE=none
 FORGE_SET=0
-SHAPE=
 SHAPE_SET=0
 UPSTREAM_CONSENT=
 UPSTREAM_CONSENT_SET=0
@@ -198,7 +197,7 @@ for a in "$@"; do
       branch-prefix) BRANCH_PREFIX=$a; BRANCH_PREFIX_SET=1 ;;
       base-branch) BASE_BRANCH=$a; BASE_BRANCH_SET=1 ;;
       forge) FORGE=$a; FORGE_SET=1 ;;
-      shape) SHAPE=$a; SHAPE_SET=1 ;;
+      shape) SHAPE_SET=1 ;;
       upstream-consent) UPSTREAM_CONSENT=$a; UPSTREAM_CONSENT_SET=1 ;;
       project) PROJECT_DIR=$a; PROJECT_DIR_SET=1 ;;
       *) echo "error: internal parser state for --$want_value" >&2; exit 1 ;;
@@ -220,7 +219,7 @@ for a in "$@"; do
     --forge) want_value=forge ;;
     --forge=*) FORGE=${a#--forge=}; FORGE_SET=1 ;;
     --shape) want_value=shape ;;
-    --shape=*) SHAPE=${a#--shape=}; SHAPE_SET=1 ;;
+    --shape=*) SHAPE_SET=1 ;;
     --upstream-consent) want_value="upstream-consent" ;;
     --upstream-consent=*) UPSTREAM_CONSENT=${a#--upstream-consent=}; UPSTREAM_CONSENT_SET=1 ;;
     --project) want_value="project" ;;

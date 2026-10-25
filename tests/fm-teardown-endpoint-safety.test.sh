@@ -14,7 +14,9 @@ make_case() {  # <name>
   mkdir -p "$TMP_ROOT/$dir/home/state" "$TMP_ROOT/$dir/home/data" \
     "$TMP_ROOT/$dir/home/config" "$TMP_ROOT/$dir/fakebin" \
     "$TMP_ROOT/$dir/worktree" "$TMP_ROOT/$dir/project"
-  git init -q "$TMP_ROOT/$dir/project"
+  rmdir "$TMP_ROOT/$dir/worktree" || return 1
+  fm_git_init_commit "$TMP_ROOT/$dir/project"
+  git -C "$TMP_ROOT/$dir/project" worktree add --quiet -b fm/fixture "$TMP_ROOT/$dir/worktree"
   : > "$TMP_ROOT/$dir/worktree/sentinel"
   : > "$TMP_ROOT/$dir/runtime.log"
   cat > "$TMP_ROOT/$dir/fakebin/tmux" <<'SH'

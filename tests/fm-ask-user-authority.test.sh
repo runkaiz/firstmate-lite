@@ -28,15 +28,14 @@ test_primary_and_secondmate_instruction_generation() {
   assert_no_grep 'the captain, not you, owns the ask-user decisions' "$ship" \
     "generated implementation brief retained conflicting captain-only wording"
 
-  FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" FM_SECONDMATE_CHARTER='Handle sample work.' \
-    "$BRIEF" authority-mate --secondmate --no-projects >/dev/null 2>&1
+  local rc=0 out
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" FM_SECONDMATE_CHARTER='Handle sample work.' \
+    "$BRIEF" authority-mate --secondmate --no-projects 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail "retired supervisor brief was accepted"
+  assert_contains "$out" 'persistent secondmate charters are no longer supported' "retired brief refusal lost its reason"
   charter="$home/data/authority-mate/brief.md"
-  # shellcheck disable=SC2016 # Backticks are literal generated Markdown.
-  assert_grep 'The local `AGENTS.md` is your job description' "$charter" \
-    "generated secondmate charter does not load the tracked authority boundary"
-  assert_no_grep 'continuous frame-by-frame monitoring' "$charter" \
-    "generated secondmate charter duplicated the detailed authority procedure"
-  pass "primary workers and secondmates receive the authority rule through generated instructions"
+  assert_absent "$charter" "retired supervisor brief created authority instructions"
+  pass "workers receive the authority rule and retired supervisor charters are refused before publication"
 }
 
 test_primary_and_secondmate_instruction_generation

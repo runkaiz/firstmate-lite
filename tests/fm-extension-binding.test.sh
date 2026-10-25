@@ -1882,23 +1882,22 @@ H_REMOTE="$HOMES/remote-home"
 REMOTE_ROOT="$TMP_ROOT/remote-root"
 REMOTE_FAKEBIN=$(fm_fakebin "$TMP_ROOT/remote-fakebin")
 REMOTE_SSH_COUNT="$TMP_ROOT/remote-ssh.count"
-mkdir -p "$H_REMOTE_CONTROL/data" "$H_REMOTE" "$REMOTE_ROOT/bin"
+mkdir -p "$H_REMOTE_CONTROL/config" "$H_REMOTE_CONTROL/data" "$H_REMOTE" "$REMOTE_ROOT/bin"
+# The remote entrypoint deliberately resolves the real account home, ignoring
+# caller HOME. Supply this fixture's declared Node prerequisite in its own code
+# root, rather than depending on or changing the shared account's tool install.
+ln -s "$(command -v node)" "$REMOTE_ROOT/bin/node"
 printf 'fixture\n' > "$REMOTE_ROOT/AGENTS.md"
-for remote_file in \
-  fm-extension.mjs fm-extension-launch-barrier.mjs fm-extension.sh fm-procevent.sh fm-procevent-lib.sh fm-procevent-extension-capture.pl fm-procevent-lavish.sh \
-  fm-pr-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-remote-entrypoint.sh fm-remote-job-lib.sh \
-  fm-remote-job-worker.sh; do
-  cp "$ROOT/bin/$remote_file" "$REMOTE_ROOT/bin/$remote_file"
-done
+# Copy a complete executable checkout so transitive production libraries stay
+# on the same revision as the commands exercised through the real transport.
+cp -R "$ROOT/bin/." "$REMOTE_ROOT/bin/"
 chmod +x "$REMOTE_ROOT/bin"/fm-*.sh "$REMOTE_ROOT/bin/fm-extension.mjs" "$REMOTE_ROOT/bin/fm-extension-launch-barrier.mjs"
 git -C "$REMOTE_ROOT" init -q -b main
 git -C "$REMOTE_ROOT" config user.email test@example.com
 git -C "$REMOTE_ROOT" config user.name Test
 git -C "$REMOTE_ROOT" add AGENTS.md bin
 git -C "$REMOTE_ROOT" commit -qm 'remote extension fixture'
-cat > "$H_REMOTE_CONTROL/data/secondmates.md" <<EOF
-- ios - remote extension home (host: remote-mac; root: $REMOTE_ROOT; home: $H_REMOTE; scope: extension test; projects: none; added 2026-08-27)
-EOF
+printf 'ios\tremote-mac\t%s\t%s\n' "$REMOTE_ROOT" "$H_REMOTE" > "$H_REMOTE_CONTROL/config/remote-routes"
 cat > "$REMOTE_FAKEBIN/fake-ssh" <<'SH'
 #!/usr/bin/env bash
 count=$(cat "$FM_FAKE_SSH_COUNT" 2>/dev/null || echo 0)

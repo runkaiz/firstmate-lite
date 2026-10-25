@@ -38,15 +38,19 @@ command -v jq >/dev/null 2>&1 || { echo "skip: jq not found (required by the her
 # as a cross-session parent identity (tests/herdr-test-safety.sh).
 herdr_forget_inherited_pane
 
-SESSION="fm-lab-prune-safety-e2e-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name prune-safety) || exit 1
 export HERDR_SESSION="$SESSION"
 SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/fm-herdr-prune-safety.XXXXXX")
+CLEANED=0
 cleanup_all() {
-  herdr_safe_stop_and_delete "$SESSION"
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
   rm -rf "$SCRATCH"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+"$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
 
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-backend.sh"
@@ -176,5 +180,9 @@ pass "happy path: a genuinely fresh workspace's seeded default tab is still prun
 
 fm_backend_herdr_kill "$SESSION:$HAPPY_PANE"
 
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded lab teardown or default-fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT

@@ -1343,7 +1343,7 @@ seed_working_child() {  # <mate-home> <id> <doing> [repo]
 }
 
 test_working_captain_holds_keep_their_bucket_surfaces() {
-  local home mate fakebin id summary json expanded
+  local home mate fakebin id  json expanded
   home=$(make_home working-hold-buckets)
     cat > "$home/data/backlog.md" <<'EOF'
 ## In flight

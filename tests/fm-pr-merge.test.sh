@@ -17,25 +17,8 @@ PR_MERGE="$ROOT/bin/fm-pr-merge.sh"
 TMP_ROOT=$(fm_test_tmproot fm-pr-merge-tests)
 BASE_PATH=$PATH
 
-# The GitLab fixture. A placeholder host that resolves nowhere, and a namespace
-# deeper than one group, because a GitLab project has no owner/repository pair.
-MR_HOST=gitlab.example
-MR_PATH=group/subgroup/project
-MR_PROJECT_URL="https://$MR_HOST/$MR_PATH"
-MR_URL="$MR_PROJECT_URL/-/merge_requests/7"
+# Retained malformed/unsupported merge-request fixture head.
 MR_HEAD=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-MR_STALE_HEAD=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-
-# The Forgejo fixture. A placeholder host that resolves nowhere, exactly two
-# path segments (owner/repository, no subgroup nesting), and the plural
-# "pulls" route Forgejo/Gitea use.
-FJ_HOST=forgejo.example
-FJ_OWNER=fixture
-FJ_REPO=fixture-repo
-FJ_LOGIN=fm-fixture
-FJ_URL="https://$FJ_HOST/$FJ_OWNER/$FJ_REPO/pulls/9"
-FJ_HEAD=cccccccccccccccccccccccccccccccccccccccc
-FJ_STALE_HEAD=dddddddddddddddddddddddddddddddddddddddd
 
 JQ_BIN=$(command -v jq) || fail "these tests read glab's JSON with the real jq, which was not found"
 REAL_MV=$(command -v mv) || fail "these tests need mv to simulate a failed poll publish"
@@ -2897,7 +2880,7 @@ test_away_branch_refuses_when_record_archived_during_preflight() {
 }
 
 test_away_posture_refuses_asynchronous_merge_paths() {
-  local case_dir rc url head merge_line
+  local case_dir rc url head
   head=abababababababababababababababababababab
   url=https://github.com/example/repo/pull/89
 

@@ -67,6 +67,7 @@ make_named_shells() {  # <dir> -> echoes <bindir>
 test_detection_anchored_name_and_marker_precedence() {
   local bin out
   bin=$(make_named_shells "$TMP_ROOT/named")
+  ln -s /bin/bash "$bin/claude"
   # shellcheck disable=SC2016 # the quoted body expands inside the named shell
   out=$(env -u CLAUDECODE -u FM_OMP_HARNESS -u PI_CODING_AGENT -u CURSOR_AGENT -u CURSOR_INVOKED_AS \
     "$bin/omp" -c '"$1"; :' _ "$HARNESS")
@@ -85,7 +86,7 @@ test_detection_anchored_name_and_marker_precedence() {
   # ...and is inert when it leaks into a worker with no omp ancestor.
   # shellcheck disable=SC2016 # the quoted body expands inside the named shell
   out=$(env -u PI_CODING_AGENT -u CURSOR_AGENT -u CURSOR_INVOKED_AS CLAUDECODE=1 FM_OMP_HARNESS=omp \
-    bash -c '"$1"; :' _ "$HARNESS")
+    "$bin/claude" -c '"$1"; :' _ "$HARNESS")
   [ "$out" = claude ] || fail "a leaked FM_OMP_HARNESS without an omp ancestor must not relabel a claude worker, got '$out'"
   pass "fm-harness: omp detects by its anchored name; the marker is a precedence override that needs real omp ancestry"
 }
@@ -214,7 +215,7 @@ test_secondmate_launch_relies_on_discovery() {
   # launch must carry the posture overlay and pin --cwd to the home. Its only
   # -e is the state-resident busy extension: omp auto-discovers the home's
   # tracked .omp/extensions, and a file named both ways loads twice.
-  local world home fakebin launchlog out status launch
+  local world home fakebin launchlog out status
   world="$TMP_ROOT/secondmate"
   home="$world/sm"
   mkdir -p "$world/home/state" "$world/home/data" "$world/home/config" "$home/bin" "$home/data"
@@ -236,17 +237,13 @@ test_secondmate_launch_relies_on_discovery() {
     FM_SPAWN_NO_GUARD=1 FM_FAKE_LAUNCH_LOG="$launchlog" \
     "$ROOT/bin/fm-spawn.sh" sm "$home" omp --secondmate 2>&1)
   status=$?
-  expect_code 0 "$status" "omp secondmate spawn should succeed: $out"
-  assert_grep "harness=omp" "$world/home/state/sm.meta" "secondmate meta missing harness=omp"
-  launch=$(cat "$launchlog")
-  [ "$(printf '%s\n' "$launch" | grep -o ' -e ' | wc -l | tr -d ' ')" = 1 ] \
-    || fail "an omp secondmate launch must name exactly one -e: omp auto-discovers .omp/extensions and a file named both ways loads twice: $launch"
-  assert_contains "$launch" "-e '$world/home/state/sm.omp-ext.ts'" "an omp secondmate launch must load the parent-home busy extension: $launch"
-  assert_contains "$launch" "--config '$ROOT/.omp/fm-worker-overlay.yml' --auto-approve --cwd '$home'" "secondmate launch lost the posture overlay or the pinned home directory: $launch"
-  assert_contains "$launch" "FM_OMP_HARNESS=omp OMP_SKIP_SETUP=1 '$fakebin/omp'" "secondmate launch lost the omp marker or executable"
-  assert_contains "$launch" "FM_SUPERVISION_MODEL=extension" "an omp secondmate must run the extension supervision model"
-  assert_present "$world/home/state/sm.omp-ext.ts" "a secondmate must receive the per-task busy extension"
-  pass "fm-spawn: a real omp secondmate launch loads only the busy -e and auto-discovers its primary extensions"
+  expect_code 2 "$status" "retired omp supervisor must be refused: $out"
+  assert_contains "$out" 'persistent secondmates are no longer supported' "retired supervisor refusal lost its reason"
+  assert_absent "$world/home/state/sm.meta" "retired spawn published task metadata"
+  assert_absent "$world/home/state/sm.omp-ext.ts" "retired spawn published busy bindings"
+  [ ! -s "$launchlog" ] || fail "retired supervisor refusal launched an endpoint"
+  assert_equals charter "$(cat "$home/data/charter.md")" "retired spawn changed private charter"
+  pass "fm-spawn: omp supervisor launch is refused without endpoint or metadata changes"
 }
 
 test_secondmate_config_pinned_model_is_validated() {
@@ -275,9 +272,8 @@ test_secondmate_config_pinned_model_is_validated() {
     FM_SPAWN_NO_GUARD=1 FM_FAKE_LAUNCH_LOG="$launchlog" \
     "$ROOT/bin/fm-spawn.sh" sm "$home" --secondmate 2>&1)
   status=$?
-  expect_code 1 "$status" "a config-pinned unlisted omp model must refuse the secondmate spawn: $out"
-  assert_contains "$out" "omp model 'openai-codex/gpt-nope' is not listed by 'omp models --json' although provider 'openai-codex' is" \
-    "the refusal did not name the config-pinned model under its listed provider: $out"
+  expect_code 2 "$status" "retired config-pinned omp supervisor must be refused: $out"
+  assert_contains "$out" 'persistent secondmates are no longer supported' "retired model pin bypassed the refusal"
   assert_absent "$world/home/state/sm.meta" "a refused secondmate spawn must publish no sm.meta"
   [ ! -s "$launchlog" ] || fail "a refused secondmate spawn must record no launch: $(cat "$launchlog")"
   pass "fm-spawn: the config/secondmate-harness model pin is validated against the omp catalog before launch"

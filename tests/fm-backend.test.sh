@@ -126,30 +126,6 @@ backend_base_ref() {
   printf '%s\n' "$BASE_REF"
 }
 
-# Newest first-parent revision whose bin/backends/tmux.sh still uses the
-# pre-exact permissive kill-window target. Content-addressed from history so the
-# fixture stays historical on default-branch CI and on branches cut after the
-# exact-selector change, where merge-base with main is self-referential.
-resolve_permissive_tmux_kill_ref() {
-  local commit body
-  while IFS= read -r commit; do
-    [ -n "$commit" ] || continue
-    body=$(git -C "$ROOT" show "$commit:bin/backends/tmux.sh" 2>/dev/null) || continue
-    # shellcheck disable=SC2016
-    case "$body" in
-      *'tmux kill-window -t "=$session:=$window"'*) continue ;;
-    esac
-    # shellcheck disable=SC2016
-    case "$body" in
-      *'tmux kill-window -t "$1"'*|*'tmux kill-window -t "$target"'*)
-        printf '%s\n' "$commit"
-        return 0
-        ;;
-    esac
-  done < <(git -C "$ROOT" log --first-parent --format='%H' HEAD -- bin/backends/tmux.sh)
-  return 1
-}
-
 # --- shared: a pre-refactor bin/ shim --------------------------------------
 #
 # build_old_bin echoes a directory whose bin/ subdir is the complete bin/ tree
@@ -1030,7 +1006,7 @@ run_teardown_case() {
 }
 
 test_teardown_conformance_old_vs_new() {
-  local old_bin fb proj wt id old_tmux_ref saved_base_ref
+  local old_bin fb proj wt id saved_base_ref
   local state_old state_new config_old config_new data log_old log_new out_old out_new rc_old rc_new
   # Force the post-squash topology inside this case: merge-base with main may
   # equal HEAD on default-branch CI, and that must not make the legacy kill
@@ -1038,11 +1014,14 @@ test_teardown_conformance_old_vs_new() {
   # only the tmux kill adapter is pinned to the content-historical permissive ref.
   saved_base_ref=$BASE_REF
   BASE_REF=$(git -C "$ROOT" rev-parse HEAD)
-  old_tmux_ref=$(resolve_permissive_tmux_kill_ref) \
-    || { BASE_REF=$saved_base_ref; fail "unable to locate a historical bin/backends/tmux.sh with permissive kill-window selectors"; }
   old_bin=$(build_old_bin teardown-old)
-  git -C "$ROOT" show "$old_tmux_ref:bin/backends/tmux.sh" > "$old_bin/bin/backends/tmux.sh" \
-    || { BASE_REF=$saved_base_ref; fail "could not materialize historical tmux adapter from $old_tmux_ref"; }
+  # A fixed permissive adapter control keeps fresh-root repositories independent
+  # of private or pre-squash ancestors. Every endpoint operation is fake here.
+  cat >> "$old_bin/bin/backends/tmux.sh" <<'SH'
+fm_backend_tmux_kill() {
+  tmux kill-window -t "$1"
+}
+SH
   BASE_REF=$saved_base_ref
   proj="$TMP_ROOT/teardown-project"; wt="$TMP_ROOT/teardown-wt"
   id="teardownconform1"

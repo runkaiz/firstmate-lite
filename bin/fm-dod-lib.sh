@@ -440,7 +440,7 @@ fm_dod_should_gate_ship_done() {  # <kind> <mode> <line>
   case "$2" in
     direct-PR|local-only) return 0 ;;
     no-mistakes|'')
-      fm_dod_note_reports_ci_ready "$note" || fm_dod_note_reports_published_change "$note" ;;
+      fm_dod_note_reports_ci_ready "$note" || [ -n "$(fm_dod_pr_url_from_done_note "$note")" ] ;;
     *) return 1 ;;
   esac
 }

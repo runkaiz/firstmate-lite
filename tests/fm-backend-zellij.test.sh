@@ -902,10 +902,13 @@ test_forced_secondmate_teardown_kills_zellij_children_with_child_home_tag() {
     FM_ZELLIJ_LOG="$dir/log" FM_ZELLIJ_RESPONSES="$dir/responses" FM_ZELLIJ_SESSION_LIST="firstmate" \
     "$ROOT/bin/fm-teardown.sh" smz --force 2>&1 )
   status=$?
-  expect_code 0 "$status" "fm-teardown should force-retire a secondmate with a zellij child: $out"
-  assert_contains "$(cat "$dir/log")" $'\x1f''close-tab-by-id'$'\x1f''4' \
-    "forced secondmate teardown did not close a child zellij tab scoped to the child home"
-  pass "fm-teardown.sh: force cleanup kills zellij children using the child home tag"
+  expect_code 1 "$status" "forced retired supervisor teardown must refuse: $out"
+  assert_contains "$out" 'private home, records and endpoint are preserved' "retired teardown lost its custody reason"
+  [ ! -s "$dir/log" ] || fail "retired teardown called zellij"
+  assert_present "$state/smz.meta" "retired teardown erased parent metadata"
+  assert_present "$home/state/childz.meta" "retired teardown erased child metadata"
+  assert_equals smz "$(cat "$home/.fm-secondmate-home")" "retired teardown changed the home marker"
+  pass "fm-teardown.sh: even forced retired supervisor teardown preserves child endpoints and records"
 }
 
 # --- send_text_submit: classifier-based verify-and-retry ---------------------
