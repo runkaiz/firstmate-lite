@@ -1,0 +1,38 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody
+/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody
+EXIT=0
+$ git init --bare -q /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/remote.git
+EXIT=0
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/projects/demo
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/projects/demo commit -q --allow-empty -m Initial disposable fixture
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/projects/demo remote add origin /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/remote.git
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/projects/demo push -q -u origin main
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/projects/demo worktree add -q -b fix /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/worker
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/worker commit -q --allow-empty -m Named head only in worker
+EXIT=0
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/worker rev-parse HEAD
+f5462cf07da488d43709efbb34900c916aa4bf7e
+EXIT=0
+$ bin/fm-pr-check.sh demo https://github.com/example/disposable-validation/pull/1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: named head f5462cf07da488d43709efbb34900c916aa4bf7e is unreachable outside the worker copy
+EXIT=1
+$ git -C /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/custody/worker push -q -u origin fix
+EXIT=0
+$ bin/fm-pr-check.sh demo https://github.com/example/disposable-validation/pull/1
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+armed: state/demo.check.sh
+EXIT=0
+Only disposable local Git was pushed; no forge CLI was on PATH. Refused unpushed named head without recording PR; accepted after real local-remote push.
+Disposable Git repositories and lab removed.

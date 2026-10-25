@@ -1,0 +1,59 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live
+/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live
+EXIT=0 elapsed=0.004s
+$ bin/fm-crew-state.sh retired
+state: unknown · source: retired-supervisor · persistent supervisor records are preserved but no longer supervised
+EXIT=0 elapsed=0.021s
+$ bin/fm-brief.sh --secondmate retired unused unused
+error: persistent secondmate charters are no longer supported
+EXIT=1 elapsed=0.013s
+$ bin/fm-spawn.sh --secondmate retired unused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: persistent secondmates are no longer supported; private homes and records are preserved
+EXIT=2 elapsed=0.130s
+$ bin/fm-teardown.sh retired
+REFUSED: persistent secondmate teardown is unsupported; its private home, records and endpoint are preserved
+EXIT=1 elapsed=0.044s
+Preserved all original disposable private records byte-for-byte.
+$ bin/fm-extension.mjs bind /var/home/runkai/.no-mistakes/evidence/01M5TETBKV45J8FE1S494BH8ZK/file-signal-package --adapter file-signal --trust-same-user-code --consent artifact-references
+bound: org.firstmate.example.file-signal@1.0.0
+binding: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live/config/extensions.d/org.firstmate.example.file-signal.json
+binding-digest: sha256:dc6ac620de0049112e5c439173a03283a4c86291e50bf6c8b366338f112350f8
+package: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live/data/extensions/packages/org.firstmate.example.file-signal/1.0.0/a670d3f1353bbfa659564b86f6af7783cd47d32ae9a04e7962b28aedf5bc0e76
+package-digest: sha256:a670d3f1353bbfa659564b86f6af7783cd47d32ae9a04e7962b28aedf5bc0e76
+verified: process-event-adapter/1 (file-signal)
+EXIT=0 elapsed=0.184s
+$ bin/fm-procevent.sh register-extension file-signal live-source --config-ref file:/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live/completion.txt
+registered: live-source (file-signal from org.firstmate.example.file-signal@1.0.0)
+owner-token: sha256:f2211c095b2f16b55a0629b70c1860bf2150f328f7edf4363b618e9805e5a8c4
+retire: bin/fm-procevent.sh retire live-source --if-owner sha256:f2211c095b2f16b55a0629b70c1860bf2150f328f7edf4363b618e9805e5a8c4
+EXIT=0 elapsed=0.134s
+$ bin/fm-procevent.sh register-extension file-signal live-source --config-ref replacement
+error: cannot replace extension registration while its prior runner remains active: live-source
+EXIT=1 elapsed=0.040s
+$ bin/fm-procevent.sh register lavish live-source -- /bin/echo replacement
+error: cannot replace extension registration while its prior runner remains active: live-source
+EXIT=1 elapsed=0.044s
+$ bin/fm-procevent.sh handled live-source 1
+handled: live-source 1
+EXIT=0 elapsed=0.041s
+$ bin/fm-procevent.sh retire live-source --if-owner sha256:f2211c095b2f16b55a0629b70c1860bf2150f328f7edf4363b618e9805e5a8c4
+retired: live-source
+EXIT=0 elapsed=0.076s
+$ bin/fm-procevent.sh register-extension file-signal live-source --config-ref file:/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M5TETBKV45J8FE1S494BH8ZK/.test-validation/live/completion.txt
+registered: live-source (file-signal from org.firstmate.example.file-signal@1.0.0)
+owner-token: sha256:a27f361459d5248ccb382cb204927411b771f1523d31800b2618f151ebf7be2c
+retire: bin/fm-procevent.sh retire live-source --if-owner sha256:a27f361459d5248ccb382cb204927411b771f1523d31800b2618f151ebf7be2c
+EXIT=0 elapsed=0.142s
+$ bin/fm-procevent.sh retire live-source --if-owner sha256:a27f361459d5248ccb382cb204927411b771f1523d31800b2618f151ebf7be2c
+retired: live-source
+EXIT=0 elapsed=0.088s
+Active replacement refused promptly; original signal captured; replacement allowed after completion and explicit retirement.
+Disposable lab removed.

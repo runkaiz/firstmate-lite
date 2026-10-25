@@ -1,0 +1,13 @@
+Real Claude primary attempt (no simulated CLI or login):
+1. Created a marked disposable FM_HOME inside the worktree with bin/fm-lab-home.sh.
+2. Tried tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c <run-worktree> -e FM_HOME=<lab> claude, with TMUX_TMPDIR inside that lab and fleet overrides removed.
+   The longer lab directory produced "File name too long" for its private UNIX socket.
+3. Retried using the shorter worktree-local .l/t private socket directory. Session launch returned 0 with a 120x40 terminal.
+4. Captured the real primary after eight seconds. It displayed:
+   Quick safety check: Is this a project you created or one you trust?
+   No, exit
+   Yes, I trust this folder
+   Enter to confirm · Esc to cancel
+5. No trust choice, prompt, or credential operation was sent. The private tmux server was killed through the same -L fm-lab socket and its disposable home removed.
+
+The workspace boundary prohibits changes to global/user-level tool configuration. The repository's Claude adapter guidance identifies workspace trust as a persisted setting in ~/.claude.json, and forbids answering that dialog through the key plane. Live Claude Stop-hook/hand-back behavior therefore remains untested. A pre-trusted run worktree, or explicit authority for that trust configuration change, is required to continue this real-primary proof. An empty alternative CLAUDE_CONFIG_DIR was not used and no missing-login claim is made.
