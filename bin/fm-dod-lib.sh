@@ -28,7 +28,8 @@
 # accepted while the named head exists only in the worker's disposable copy.
 # The check tests that head, not whether some branch moved. In no-mistakes
 # mode the pre-validation done summary is a pipeline handoff and is not gated;
-# the later CI-ready PR report is gated against the named head.
+# a CI-ready report or a report containing a recognized PR URL is gated against
+# the named head, even without green-check wording.
 # Recorded GitHub PR heads and confirmed merge receipts can prove reachability.
 # Teardown remains the complete landed-work discard gate.
 # The machine-readable Delivery contract and Ship branch lines bind dispatch

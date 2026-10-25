@@ -376,8 +376,6 @@ fi
 # but a login can be removed or renamed after arming, so this is re-derived
 # fresh rather than trusted from that earlier check).
 
-# The recorded head is read before bin/fm-pr-check.sh rewrites the metadata,
-# because that script re-records pr= and drops a pr_head= it cannot resolve.
 
 FM_PR_MERGE_HEAD=
 
