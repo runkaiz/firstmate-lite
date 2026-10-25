@@ -1677,7 +1677,8 @@ Under the default ordering, this happens after the initial `check` publication.
   An adapter with no notion of ending needs no change.
 
 - A failed terminal removal stays durably terminal and is completed by ordinary reconciliation without restarting its poll, while a concurrently replaced registration survives and becomes independently runnable after the old claim releases.
-- Any registration refuses to replace an external registration while its prior runner claim is live, uncertain, orphaned, or terminal-pending; replacement becomes eligible only after that generation is proved gone or its terminal retirement completes.
+- Any registration refuses to replace an external registration while its prior runner claim is live, uncertain, orphaned, or terminal-pending; `register-extension` checks this before waiting for the lifecycle lock held by a polling adapter, so refusal does not wait for its poll to finish.
+  Replacement becomes eligible only after that generation is proved gone or its terminal retirement completes.
 - A source that has ended therefore captures at most one terminal result, is never restarted, and leaves no recurring poll work.
 - For ordinary sources, explicit `retire` stays the supported and idempotent path afterwards; a task-owned board instead refuses `retire` until its owner concludes the open terminal round with `handled`.
 - For Lavish that verdict covers an ended session, a missing session, and the final feedback of a `Send & End` review, which the published poll marks with `session_ended` before it returns only empty ended sessions.

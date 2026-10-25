@@ -1597,7 +1597,6 @@ fi
 SPAWN_TASK_LOCK_HELD=1
 PROJ=
 ARG3=
-FIRSTMATE_HOME=
 RAW_LAUNCH=0
 
 # --relaunch adoption: every identity axis comes from the task's own validated
@@ -1765,14 +1764,12 @@ elif [ "$KIND" = secondmate ]; then
     ;;
   *' '*)
     if [ "${#POS[@]}" -gt 2 ] || [ -d "${POS[1]}" ]; then
-      FIRSTMATE_HOME=${POS[1]}
       ARG3=${POS[2]:-}
     else
       ARG3=${POS[1]}
     fi
     ;;
   *)
-    FIRSTMATE_HOME=${POS[1]}
     ARG3=${POS[2]:-}
     ;;
   esac

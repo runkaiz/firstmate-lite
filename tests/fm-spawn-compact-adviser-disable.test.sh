@@ -171,7 +171,7 @@ test_launch_command_carries_the_switch_without_the_pane_export() {
 # secondmate that inbox lives in the launching home's state, not its own. The
 # cleared allowlist environment is where an ambient forward would be lost.
 test_launch_exports_task_inbox() {
-  local kind rec id sm out status seen want
+  local kind rec id  out status seen want
   kind=ship
     id="inbox-$kind-a1"
     rec=$(make_case "inbox-$kind" codex "$id")

@@ -4302,68 +4302,68 @@ test_reheld_captain_call_starts_its_own_resurface_window() {
 
 
 
-test_secondmate_paused_resurfaces_in_normal_mode() {
+test_worker_paused_resurfaces_in_normal_mode() {
   local dir state fakebin out capture_file statusf window key pane_hash sig pid back
-  dir=$(make_case secondmate-paused-resurface); state="$dir/state"; fakebin="$dir/fakebin"
-  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/secondmate-held.status"
-  window="test:fm-secondmate-held"
+  dir=$(make_case worker-paused-resurface); state="$dir/state"; fakebin="$dir/fakebin"
+  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/worker-held.status"
+  window="test:fm-worker-held"
   printf 'idle awaiting external\n' > "$capture_file"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/secondmate-held.meta"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/worker-held.meta"
   printf 'paused: awaiting the upstream release\nThe release window opens tomorrow.\n\n' > "$statusf"
   back=$(( $(date +%s) - 500 ))
   if [ "$(uname)" = Darwin ]; then touch -mt "$(date -r "$back" '+%Y%m%d%H%M.%S')" "$statusf"
   else touch -m -d "@$back" "$statusf"; fi
-  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-secondmate-held_status"
+  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-worker-held_status"
   key=$(printf '%s' "$window" | tr '.:/' '___')
   pane_hash=$(hash_text "idle awaiting external")
   printf '%s' "$pane_hash" > "$state/.hash-$key"
   printf '1\n' > "$state/.count-$key"
   export FM_FAKE_CREW_STATE='state: paused · source: status-log · awaiting the upstream release'
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_STATE_OVERRIDE="$state" FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" FM_PAUSE_RESURFACE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   pid=$!
-  wait_for_exit "$pid" 100 || fail "watcher did not re-surface a paused secondmate"
-  grep -F "stale: $window" "$out" >/dev/null || fail "paused secondmate did not emit a stale recheck"
-  grep -F "awaiting external" "$out" >/dev/null || fail "paused secondmate recheck omitted its external-wait reason"
-  grep -F "awaiting the captain" "$out" >/dev/null && fail "paused secondmate recheck named the captain instead of its external dependency"
-  grep -F "possible wedge" "$out" >/dev/null && fail "paused secondmate was mislabeled a wedge"
+  wait_for_exit "$pid" 100 || fail "watcher did not re-surface a paused worker"
+  grep -F "stale: $window" "$out" >/dev/null || fail "paused worker did not emit a stale recheck"
+  grep -F "awaiting external" "$out" >/dev/null || fail "paused worker recheck omitted its external-wait reason"
+  grep -F "awaiting the captain" "$out" >/dev/null && fail "paused worker recheck named the captain instead of its external dependency"
+  grep -F "possible wedge" "$out" >/dev/null && fail "paused worker was mislabeled a wedge"
   unset FM_FAKE_CREW_STATE
-  pass "a declared paused secondmate re-surfaces on the bounded normal-mode cadence"
+  pass "a declared paused worker re-surfaces on the bounded normal-mode cadence"
 }
 
 # A captain hold is the other declared wait, but unlike paused: it has no
 # current-state mapping, so a held mate reports `unknown` rather than `paused`.
 # The bounded re-surface must still reach it, or a mate's hold rots invisibly:
 # nothing else re-reads a quiet mate's endpoint.
-test_secondmate_captain_held_resurfaces_in_normal_mode() {
+test_worker_captain_held_resurfaces_in_normal_mode() {
   local dir state fakebin out capture_file statusf window key pane_hash sig pid back
-  dir=$(make_case secondmate-held-resurface); state="$dir/state"; fakebin="$dir/fakebin"
-  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/secondmate-hold.status"
-  window="test:fm-secondmate-hold"
+  dir=$(make_case worker-held-resurface); state="$dir/state"; fakebin="$dir/fakebin"
+  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/worker-hold.status"
+  window="test:fm-worker-hold"
   printf 'idle awaiting the captain\n' > "$capture_file"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/secondmate-hold.meta"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/worker-hold.meta"
   printf 'captain-held [key=route]: tracked by task-decision-route\n' > "$statusf"
   back=$(( $(date +%s) - 500 ))
   if [ "$(uname)" = Darwin ]; then touch -mt "$(date -r "$back" '+%Y%m%d%H%M.%S')" "$statusf"
   else touch -m -d "@$back" "$statusf"; fi
-  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-secondmate-hold_status"
+  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-worker-hold_status"
   key=$(printf '%s' "$window" | tr '.:/' '___')
   pane_hash=$(hash_text "idle awaiting the captain")
   printf '%s' "$pane_hash" > "$state/.hash-$key"
   printf '1\n' > "$state/.count-$key"
   export FM_FAKE_CREW_STATE='state: unknown · source: none · no current-state source available'
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_STATE_OVERRIDE="$state" FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" FM_PAUSE_RESURFACE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   pid=$!
-  wait_for_exit "$pid" 100 || fail "watcher did not re-surface a captain-held secondmate"
-  grep -F "stale: $window" "$out" >/dev/null || fail "captain-held secondmate did not emit a stale recheck"
-  grep -F "awaiting the captain" "$out" >/dev/null || fail "captain-held secondmate recheck did not name the captain as the blocker: $(cat "$out")"
-  grep -F "awaiting external" "$out" >/dev/null && fail "captain-held secondmate recheck claimed an external wait"
-  grep -F "possible wedge" "$out" >/dev/null && fail "captain-held secondmate was mislabeled a wedge"
+  wait_for_exit "$pid" 100 || fail "watcher did not re-surface a captain-held worker"
+  grep -F "stale: $window" "$out" >/dev/null || fail "captain-held worker did not emit a stale recheck"
+  grep -F "awaiting the captain" "$out" >/dev/null || fail "captain-held worker recheck did not name the captain as the blocker: $(cat "$out")"
+  grep -F "awaiting external" "$out" >/dev/null && fail "captain-held worker recheck claimed an external wait"
+  grep -F "possible wedge" "$out" >/dev/null && fail "captain-held worker was mislabeled a wedge"
   unset FM_FAKE_CREW_STATE
-  pass "a captain-held secondmate re-surfaces on the bounded normal-mode cadence"
+  pass "a captain-held worker re-surfaces on the bounded normal-mode cadence"
 }
 
 test_secondmate_nonpaused_stale_remains_suppressed() {
@@ -4390,13 +4390,13 @@ test_secondmate_nonpaused_stale_remains_suppressed() {
   pass "a non-paused secondmate retains normal stale suppression"
 }
 
-test_secondmate_unpause_clears_pause_tracking() {
+test_worker_unpause_clears_pause_tracking() {
   local dir state fakebin out statusf window key pid
-  dir=$(make_case secondmate-unpause-clears); state="$dir/state"; fakebin="$dir/fakebin"
-  out="$dir/watch.out"; statusf="$state/secondmate-resumed.status"; window="test:fm-secondmate-resumed"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/secondmate-resumed.meta"
+  dir=$(make_case worker-unpause-clears); state="$dir/state"; fakebin="$dir/fakebin"
+  out="$dir/watch.out"; statusf="$state/worker-resumed.status"; window="test:fm-worker-resumed"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/worker-resumed.meta"
   printf 'working: upstream landed\n' > "$statusf"
-  printf '%s' "$(seen_sig "$statusf")" > "$state/.seen-secondmate-resumed_status"
+  printf '%s' "$(seen_sig "$statusf")" > "$state/.seen-worker-resumed_status"
   key=${window//:/_}
   key=${key//\//_}
   key=${key//./_}
@@ -4408,12 +4408,12 @@ test_secondmate_unpause_clears_pause_tracking() {
   : > "$state/.wedge-escalations-$key"
   watch_bg "$state" "$fakebin" "$out"
   pid=$!
-  wait_poll_cycle "$state" "$pid" || fail "watcher exited while reconciling a resumed secondmate: $(cat "$out")"
-  [ ! -e "$state/.paused-$key" ] || { reap "$pid"; fail "resumed secondmate retained the pause marker"; }
-  [ ! -e "$state/.stale-$key" ] || { reap "$pid"; fail "resumed secondmate retained stale tracking"; }
-  [ ! -e "$state/.wedge-escalations-$key" ] || { reap "$pid"; fail "resumed secondmate retained wedge tracking"; }
+  wait_poll_cycle "$state" "$pid" || fail "watcher exited while reconciling a resumed worker: $(cat "$out")"
+  [ ! -e "$state/.paused-$key" ] || { reap "$pid"; fail "resumed worker retained the pause marker"; }
+  [ ! -e "$state/.stale-$key" ] || { reap "$pid"; fail "resumed worker retained stale tracking"; }
+  [ ! -e "$state/.wedge-escalations-$key" ] || { reap "$pid"; fail "resumed worker retained wedge tracking"; }
   reap "$pid"
-  pass "a resumed secondmate clears pause and stale tracking before stale exemption"
+  pass "a resumed worker clears pause and stale tracking before stale exemption"
 }
 
 test_nonterminal_stale_pause_transitions_reclassify_unchanged_hash() {
@@ -6446,16 +6446,16 @@ archive_away_record() {  # <state>
 
 test_captain_held_never_rechecked_while_away_record_exists() {
   local dir state fakebin out capture_file statusf window key pane_hash sig pid back
-  dir=$(make_case away-record-held-secondmate); state="$dir/state"; fakebin="$dir/fakebin"
-  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/secondmate-hold.status"
-  window="test:fm-secondmate-hold"
+  dir=$(make_case away-record-held-worker); state="$dir/state"; fakebin="$dir/fakebin"
+  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/worker-hold.status"
+  window="test:fm-worker-hold"
   printf 'idle awaiting the captain\n' > "$capture_file"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/secondmate-hold.meta"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/worker-hold.meta"
   printf 'captain-held [key=route]: tracked by task-decision-route\n' > "$statusf"
   back=$(( $(date +%s) - 500 ))
   if [ "$(uname)" = Darwin ]; then touch -mt "$(date -r "$back" '+%Y%m%d%H%M.%S')" "$statusf"
   else touch -m -d "@$back" "$statusf"; fi
-  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-secondmate-hold_status"
+  sig=$(seen_sig "$statusf"); printf '%s' "$sig" > "$state/.seen-worker-hold_status"
   key=$(printf '%s' "$window" | tr '.:/' '___')
   pane_hash=$(hash_text "idle awaiting the captain")
   printf '%s' "$pane_hash" > "$state/.hash-$key"
@@ -6464,7 +6464,7 @@ test_captain_held_never_rechecked_while_away_record_exists() {
   export FM_FAKE_CREW_STATE='state: unknown · source: none · no current-state source available'
   # Phase A: the record exists, the hold is well past the cadence, and the
   # watcher still absorbs it across whole poll cycles: no wake, no throttle.
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_STATE_OVERRIDE="$state" FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" FM_PAUSE_RESURFACE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   pid=$!
@@ -6481,7 +6481,7 @@ test_captain_held_never_rechecked_while_away_record_exists() {
   # Phase B: archiving the record (the return) restores the bounded recheck.
   archive_away_record "$state"
   : > "$out"
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_STATE_OVERRIDE="$state" FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" FM_PAUSE_RESURFACE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   pid=$!
@@ -6504,21 +6504,21 @@ write_quiet_record() {  # <state>
 test_captain_held_rechecked_under_a_quiet_record() {
   local dir state fakebin out capture_file statusf window key back pid
   dir=$(make_case quiet-record-held); state="$dir/state"; fakebin="$dir/fakebin"
-  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/secondmate-hold.status"
-  window="test:fm-secondmate-hold"
+  out="$dir/watch.out"; capture_file="$dir/pane.txt"; statusf="$state/worker-hold.status"
+  window="test:fm-worker-hold"
   printf 'idle awaiting the captain\n' > "$capture_file"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/secondmate-hold.meta"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/worker-hold.meta"
   printf 'captain-held [key=route]: tracked by task-decision-route\n' > "$statusf"
   back=$(( $(date +%s) - 500 ))
   if [ "$(uname)" = Darwin ]; then touch -mt "$(date -r "$back" '+%Y%m%d%H%M.%S')" "$statusf"
   else touch -m -d "@$back" "$statusf"; fi
-  printf '%s' "$(seen_sig "$statusf")" > "$state/.seen-secondmate-hold_status"
+  printf '%s' "$(seen_sig "$statusf")" > "$state/.seen-worker-hold_status"
   key=$(printf '%s' "$window" | tr '.:/' '___')
   printf '%s' "$(hash_text "idle awaiting the captain")" > "$state/.hash-$key"
   printf '1\n' > "$state/.count-$key"
   write_quiet_record "$state"
   export FM_FAKE_CREW_STATE='state: unknown · source: none · no current-state source available'
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_STATE_OVERRIDE="$state" FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" FM_PAUSE_RESURFACE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   pid=$!
@@ -6540,7 +6540,7 @@ test_captain_held_rechecked_under_a_quiet_record() {
   key=$(printf '%s' "$window" | tr '.:/' '___')
   printf 'quiet\n' > "$state/.afk"
   write_quiet_record "$state"
-  PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
     FM_FAKE_TMUX_CURRENT_COMMAND=zsh \
     FM_STATE_OVERRIDE="$state" FM_POLL=1 FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
@@ -6635,7 +6635,7 @@ paused_until_fixture() {  # <name> <until-epoch> <status-age-secs>
   window="test:fm-until"
   statusf="$state/until.status"
   printf 'idle, waiting for the reset\n' > "$dir/pane.txt"
-  printf 'window=%s\nkind=secondmate\n' "$window" > "$state/until.meta"
+  printf 'window=%s\nkind=ship\n' "$window" > "$state/until.meta"
   printf 'paused: rate limit resets, until %s, then resuming\n' "$(iso_utc_at "$until")" > "$statusf"
   back=$(( $(date +%s) - age ))
   if [ "$(uname)" = Darwin ]; then touch -mt "$(date -r "$back" '+%Y%m%d%H%M.%S')" "$statusf"
@@ -6649,7 +6649,7 @@ paused_until_fixture() {  # <name> <until-epoch> <status-age-secs>
 
 until_watch() {  # <dir> <cadence> -> pid in UNTIL_PID
   local dir=$1
-  PATH="$dir/fakebin:$PATH" FM_FAKE_TMUX_WINDOW=test:fm-until FM_FAKE_TMUX_CAPTURE="$dir/pane.txt" \
+  FM_FAKE_TMUX_CURRENT_COMMAND=zsh PATH="$dir/fakebin:$PATH" FM_FAKE_TMUX_WINDOW=test:fm-until FM_FAKE_TMUX_CAPTURE="$dir/pane.txt" \
     FM_FAKE_CREW_STATE='state: unknown · source: none · no current-state source available' \
     FM_STATE_OVERRIDE="$dir/state" FM_CREW_STATE_BIN="$dir/fakebin/fm-crew-state.sh" \
     FM_PAUSE_RESURFACE_SECS="$2" FM_POLL=1 FM_SIGNAL_GRACE=1 \
@@ -6822,10 +6822,10 @@ test_terminal_delivery_resumed_activity_rearms
 test_terminal_delivery_failed_append_keeps_first_delivery
 test_failed_wake_append_does_not_arm_the_captain_hold_throttle
 test_reheld_captain_call_starts_its_own_resurface_window
-test_secondmate_paused_resurfaces_in_normal_mode
-test_secondmate_captain_held_resurfaces_in_normal_mode
+test_worker_paused_resurfaces_in_normal_mode
+test_worker_captain_held_resurfaces_in_normal_mode
 test_secondmate_nonpaused_stale_remains_suppressed
-test_secondmate_unpause_clears_pause_tracking
+test_worker_unpause_clears_pause_tracking
 test_nonterminal_stale_pause_transitions_reclassify_unchanged_hash
 test_nonterminal_paused_rechecks_authoritative_state
 test_paused_authoritative_working_preserves_wedge_timer

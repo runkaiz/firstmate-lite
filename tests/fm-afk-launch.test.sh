@@ -51,13 +51,24 @@ SLEEPER=$(mktemp "${TMPDIR:-/tmp}/fm-afk-sleeper.XXXXXX")
 printf '#!/usr/bin/env bash\nexec sleep 600\n' > "$SLEEPER"
 chmod +x "$SLEEPER"
 TRACK_TMUX_SESSIONS=""
+HERDR_E2E_SESSION=
+HERDR_E2E_HOME=
+HERDR_E2E_TARGET=
+HERDR_E2E_HELPER=
 GLOBAL_CLEANUP() {
+  local cleanup_status=$?
+  trap - EXIT
+  if [ -n "$HERDR_E2E_SESSION" ] && ! E2E_HERDR_CLEANUP; then
+    printf 'not ok - guarded AFK lab cleanup or default-fleet tripwire failed\n' >&2
+    cleanup_status=1
+  fi
   rm -f "$SLEEPER" 2>/dev/null || true
   rm -rf "$OFF_CONFIG" 2>/dev/null || true
   local s
   for s in $TRACK_TMUX_SESSIONS; do
     tmux kill-session -t "$s" 2>/dev/null || true
   done
+  exit "$cleanup_status"
 }
 trap GLOBAL_CLEANUP EXIT
 
@@ -1713,19 +1724,27 @@ e2e_herdr() {
   # shellcheck source=/dev/null
   . "$ROOT/bin/fm-backend.sh"
 
-  local SESSION home_tmp cap_ws cap_tab cap_pane target
+  local SESSION home_tmp cap_ws cap_tab cap_pane target=
+  local lab_helper=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
   local before during after ws_before ws_during ws_after out dtgt dtab
-  SESSION="fm-lab-afk-launch-e2e-$$"
+  SESSION=$("$lab_helper" name afk-launch) || { fail "herdr e2e: could not generate a lab name"; return 0; }
   export HERDR_SESSION="$SESSION"
   home_tmp=$(mktemp -d "${TMPDIR:-/tmp}/fm-afk-e2e-home.XXXXXX")
+  HERDR_E2E_SESSION=$SESSION
+  HERDR_E2E_HOME=$home_tmp
+  HERDR_E2E_TARGET=
+  HERDR_E2E_HELPER=$lab_helper
   E2E_HERDR_CLEANUP() {
-    # shellcheck disable=SC2031 # Cleanup reads the caller's resolved target; it does not reassign it.
-    FM_HOME="$home_tmp" FM_STATE_OVERRIDE="$home_tmp/state" \
-      FM_SUPERVISOR_TARGET="$target" FM_SUPERVISOR_BACKEND=herdr "$LAUNCH" stop >/dev/null 2>&1 || true
-    herdr_safe_stop_and_delete "$SESSION" >/dev/null 2>&1 || true
-    rm -rf "$home_tmp" 2>/dev/null || true
+    if [ -n "$HERDR_E2E_TARGET" ]; then
+      FM_HOME="$HERDR_E2E_HOME" FM_STATE_OVERRIDE="$HERDR_E2E_HOME/state" \
+        FM_SUPERVISOR_TARGET="$HERDR_E2E_TARGET" FM_SUPERVISOR_BACKEND=herdr "$LAUNCH" stop >/dev/null 2>&1 || true
+    fi
+    "$HERDR_E2E_HELPER" teardown "$HERDR_E2E_SESSION" || return 1
+    rm -rf "$HERDR_E2E_HOME" || return 1
+    HERDR_E2E_SESSION=
+    HERDR_E2E_TARGET=
   }
-  fm_herdr_lab_prepare "$SESSION" || { fail "herdr e2e: could not prepare isolated lab session"; return 0; }
+  "$lab_helper" provision "$SESSION" || { E2E_HERDR_CLEANUP; fail "herdr e2e: could not provision isolated lab session"; return 0; }
   fm_backend_source herdr || { E2E_HERDR_CLEANUP; fail "herdr e2e: fm_backend_source herdr failed"; return 0; }
   fm_backend_herdr_server_ensure "$SESSION" || { E2E_HERDR_CLEANUP; fail "herdr e2e: lab server did not start"; return 0; }
 
@@ -1735,6 +1754,7 @@ e2e_herdr() {
   cap_pane=$(printf '%s' "$out" | jq -r '.result.root_pane.pane_id // empty')
   if [ -z "$cap_ws" ] || [ -z "$cap_pane" ]; then E2E_HERDR_CLEANUP; fail "herdr e2e: could not create captain workspace"; return 0; fi
   target="$SESSION:$cap_pane"
+  HERDR_E2E_TARGET=$target
   enter_posture "$home_tmp" || fail "herdr e2e: could not enter fixture posture"
   before=$(fm_backend_herdr_cli "$SESSION" pane list --workspace "$cap_ws" 2>/dev/null | jq --arg t "$cap_tab" '[.result.panes[]?|select(.tab_id==$t)]|length')
   ws_before=$(fm_backend_herdr_cli "$SESSION" workspace list 2>/dev/null | jq '[.result.workspaces[]?]|length')
@@ -1762,7 +1782,7 @@ e2e_herdr() {
   if [ "$ws_after" = "$ws_before" ]; then pass "herdr e2e: daemon workspace removed by exact id on stop"; else fail "herdr e2e: daemon workspace leaked ($ws_before -> $ws_after)"; fi
   if [ ! -e "$home_tmp/state/.afk-daemon-terminal" ] && [ ! -e "$home_tmp/state/.afk" ]; then pass "herdr e2e: record + .afk cleared on stop"; else fail "herdr e2e: record or .afk not cleared"; fi
 
-  E2E_HERDR_CLEANUP
+  E2E_HERDR_CLEANUP || fail "herdr e2e: guarded teardown or default-fleet tripwire failed"
 }
 
 # ---------------------------------------------------------------------------

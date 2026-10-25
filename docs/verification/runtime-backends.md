@@ -1531,7 +1531,6 @@ ok - real herdr E2E: with a duplicated home label, a projected worker still hang
 ok - real herdr E2E: an ambiguous home label with no launcher identity refuses before any worker endpoint exists
 ok - real herdr E2E: a launcher pane that no longer exists refuses before any worker endpoint exists
 ok - real herdr E2E: a secondmate launching its own worker gets the same exact-workspace guarantee, and its same-labeled sibling is untouched
-ok - real herdr E2E: a --secondmate launch still stands up that secondmate's own workspace instead of inheriting the launcher's
 ok - real herdr E2E: teardown closes only the worker's own pane and leaves the launcher, its workspace, and the same-labeled sibling intact
 ```
 
@@ -1547,7 +1546,8 @@ HERDR_LAB_HELPER=bin/fm-herdr-lab.sh \
   tests/fm-backend-herdr-workspace-per-home-e2e.test.sh
 ```
 
-Observed guarantee: the primary and secondmate used distinct home workspaces, a child launched by the secondmate stayed in that secondmate workspace, list-live remained home-scoped, and exact cleanup did not affect sibling homes.
+The current suite checks ordinary worker placement, home-scoped listing, and exact cleanup against an inert historical-home sentinel, and refuses retired supervisor launches while preserving private home state.
+The earlier live observation used a running secondmate and does not establish a live result for the revised refusal fixture.
 
 The complete projection suite ran on 2026-07-21 against Herdr 0.7.4 protocol 16:
 
@@ -1598,10 +1598,10 @@ Observed default and opt-out guarantees:
 ```text
 ok - real Herdr lab: an opted-out spawn retains the Stage 1 Herdr command sequence with zero ordering calls
 ok - real Herdr lab: a home that configured nothing is projected by default
-ok - real Herdr lab: the primary presentation setting inherits into real secondmate homes
 ok - real Herdr lab validation completed on Herdr 0.8.0 with the default-session tripwire intact
 ```
 
+The current projection suite uses explicit local settings in inert historical-home fixtures and checks retired supervisor launch refusal instead of configuration inheritance.
 The projected spawn in that run used the historical empty opt-in file, so a home that had already enabled the projection keeps it without any migration step.
 One concurrent cross-home recovery case refused under contention on a loaded machine and passed on an immediate rerun; recovery-path presentation lock contention remains a deliberate hard refusal by default rather than a flat fallback, which default-on makes reachable from any Herdr home.
 Callers that need concurrent recoveries to serialize can pass `fm-spawn.sh --herdr-resume-lock-wait`.

@@ -1445,7 +1445,7 @@ SH
 }
 
 test_pi_exclude_tools_do_not_leak_across_homes_or_to_secondmates() {
-  local rec_a rec_b id_a id_b launch sm out status
+  local rec_a rec_b id_a id_b launch  out status
   id_a=excl-home-a-z9f
   id_b=excl-home-b-z9g
   rec_a=$(make_spawn_case excl-home-a pi "$id_a")

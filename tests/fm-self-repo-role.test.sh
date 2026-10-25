@@ -23,8 +23,6 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-role-lib.sh"
-# shellcheck source=/dev/null
-. "$ROOT/bin/fm-config-inherit-lib.sh"
 
 ROLE="$ROOT/bin/fm-role.sh"
 BRIEF="$ROOT/bin/fm-brief.sh"
@@ -402,8 +400,14 @@ test_secondmate_inheritance_receipt_lifecycle() {
   receipt="$dst_config/.fm-inherit-firstmate-role.generation"
 
   printf 'maintainer %s\n' "${PUB_TARGET:-github.com/kunchenguid/firstmate}" > "$src/firstmate-role"
-  FM_INHERITABLE_CONFIG=firstmate-role propagate_inheritable_config "$src" "$dst_config" \
-    || fail "local propagation of firstmate-role failed"
+  # Replay a retained on-disk receipt, without reviving config propagation.
+  cp "$src/firstmate-role" "$dst_config/firstmate-role"
+  {
+    printf '1\n'
+    wc -c < "$dst_config/firstmate-role" | tr -d '[:space:]'; printf '\n'
+    fm_role_sha256_stdin < "$dst_config/firstmate-role"
+    printf 'put\n'
+  } > "$receipt"
   assert_present "$dst_config/firstmate-role" "propagation did not copy the role file"
   assert_present "$receipt" "propagation did not commit the role receipt"
   out=$(run_role "$sm_home" report)
@@ -441,8 +445,8 @@ test_secondmate_inheritance_receipt_lifecycle() {
   # destination file and records the absence in the receipt.
   printf 'maintainer %s\n' "${PUB_TARGET:-github.com/kunchenguid/firstmate}" > "$dst_config/firstmate-role"
   rm "$src/firstmate-role"
-  FM_INHERITABLE_CONFIG=firstmate-role propagate_inheritable_config "$src" "$dst_config" \
-    || fail "revocation propagation of firstmate-role failed"
+  rm "$dst_config/firstmate-role"
+  printf '3\n0\n%s\nabsent\n' "$(printf '' | fm_role_sha256_stdin)" > "$receipt"
   assert_absent "$dst_config/firstmate-role" "revocation did not remove the inherited role file"
   assert_present "$receipt" "revocation dropped the receipt that proves absence"
   [ "$(sed -n '4p' "$receipt")" = absent ] || fail "revocation did not record an absent receipt"
@@ -462,43 +466,22 @@ test_secondmate_inheritance_receipt_lifecycle() {
 # file the primary's own resolver rejects (symlinked or malformed) propagates
 # as revocation, never as a copied grant.
 test_secondmate_inherits_only_resolved_primary_role() {
-  local src dst_config sm_home out receipt scope bad
-  scope=${PUB_TARGET:-github.com/kunchenguid/firstmate}
-  src="$TMP_ROOT/resolved-src-home/config"
-  sm_home="$TMP_ROOT/resolved-sm"
-  dst_config="$sm_home/config"
-  mkdir -p "$src" "$dst_config" "$sm_home/state" "$sm_home/data"
-  : > "$sm_home/.fm-secondmate-home"
-  receipt="$dst_config/.fm-inherit-firstmate-role.generation"
-
+  local home out bad before
+  home=$(make_role_home invalid-primary)
   for bad in symlink two-directives; do
-    rm -f "$src/firstmate-role"
-    printf '# operator note\nmaintainer %s\n' "$scope" > "$src/firstmate-role"
-    FM_INHERITABLE_CONFIG=firstmate-role propagate_inheritable_config "$src" "$dst_config" \
-      || fail "propagation of a valid primary grant failed"
-    out=$(run_role "$sm_home" report)
-    assert_equals "fm-role: maintainer $scope (inherited)" "$out" "a valid primary grant must be inherited"
-
-    rm -f "$src/firstmate-role"
-    case $bad in
-    symlink)
-      printf 'maintainer %s\n' "$scope" > "$TMP_ROOT/resolved-symlink-target"
-      ln -s "$TMP_ROOT/resolved-symlink-target" "$src/firstmate-role"
-      ;;
-    two-directives)
-      printf 'maintainer %s\nuser\n' "$scope" > "$src/firstmate-role"
-      ;;
+    rm -f "$home/config/firstmate-role"
+    printf 'maintainer github.com/example/repo\n' > "$home/saved-role"
+    case "$bad" in
+      symlink) ln -s "$home/saved-role" "$home/config/firstmate-role" ;;
+      two-directives) printf 'maintainer github.com/example/repo\nuser\n' > "$home/config/firstmate-role" ;;
     esac
-    out=$(FM_HOME="$TMP_ROOT/resolved-src-home" FM_CONFIG_OVERRIDE="$src" "$ROLE" report 2>&1)
-    assert_contains "$out" "fm-role: user" "the $bad primary role file must resolve to user on the primary"
-    FM_INHERITABLE_CONFIG=firstmate-role propagate_inheritable_config "$src" "$dst_config" \
-      || fail "propagation of a rejected $bad primary role failed"
-    assert_absent "$dst_config/firstmate-role" "a rejected $bad primary role must not be copied downstream"
-    [ "$(sed -n '4p' "$receipt")" = absent ] || fail "a rejected $bad primary role must record an absent receipt"
-    out=$(run_role "$sm_home" report)
-    assert_equals "fm-role: user (inherited)" "$out" "a rejected $bad primary role must revoke the secondmate grant"
+    before=$(cat "$home/config/firstmate-role")
+    out=$(run_role "$home" report)
+    assert_contains "$out" 'fm-role: user' "invalid primary $bad role granted publication authority"
+    assert_equals "$before" "$(cat "$home/config/firstmate-role")" "role read changed private $bad configuration"
+    assert_equals 'maintainer github.com/example/repo' "$(cat "$home/saved-role")" "role read changed the symlink target"
   done
-  pass "secondmate home: a primary role its own resolver rejects propagates as revocation"
+  pass "invalid primary roles confer no publication authority and reads preserve private bytes"
 }
 
 # --- delivery contract rendering --------------------------------------------
@@ -721,7 +704,7 @@ test_secondmate_spawn_refuses_consent_flag() {
   out=$(run_spawn "$home" spawn-sm-c1 "$home" --secondmate --mode no-mistakes --yolo off \
     --upstream-consent github.com/a/b 2>&1) || rc=$?
   [ "$rc" -ne 0 ] || fail "a secondmate charter must refuse a consent flag"
-  assert_contains "$out" "applies only to ship spawns" "a secondmate charter must refuse a consent flag"
+  assert_contains "$out" "persistent secondmates are no longer supported" "a secondmate charter must refuse a consent flag"
   pass "fm-spawn.sh: --upstream-consent is refused on secondmate charters"
 }
 

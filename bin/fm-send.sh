@@ -88,7 +88,6 @@
 # path do not pay it.
 set -eu
 
-FM_SEND_ORIGINAL_ARGS=("$@")
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 
@@ -216,8 +215,6 @@ fm_send_resolve_target() { # <raw-target>
   EXPECTED_LABEL=""
   TARGET_META=""
   TARGET_SELECTOR=""
-  TARGET_REMOTE_ID=""
-  TARGET_REMOTE_HOST=""
   RESOLUTION_TRIED=""
 
   meta=$(fm_backend_meta_for_selector "$raw" "$STATE" 2>/dev/null || true)
@@ -394,8 +391,6 @@ done
 # An explicit backend target (the escape hatch for endpoints outside this home)
 # and any crewmate/scout target are left unmarked, and so is the --key path.
 MARK_FROM_FIRSTMATE=0
-PENDING_REPLY_CORR=
-PENDING_REPLY_CREATED=0
 TARGET_TASK_ID=
 fm_send_known_undelivered_cleanup() { return 0; }
 

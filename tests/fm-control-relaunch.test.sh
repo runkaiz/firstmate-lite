@@ -2319,6 +2319,8 @@ test_afk_relaunch_serializes_with_fresh_admission() {
   out=$(run_control "$dir" afk-race exit) || fail "initial stop failed: $out"
   : > "$dir/fake/afk-hold-launch"
   run_control "$dir" afk-race relaunch --note 'Concurrent launch fixture' > "$dir/relaunch.log" &
+  # This PID is set by the launch immediately above, in this shell.
+  # shellcheck disable=SC2031
   worker=$!
   for ((attempt=0; attempt<1000; attempt++)); do
     [ -f "$dir/fake/afk-launch-reached" ] && break

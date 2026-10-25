@@ -45,7 +45,8 @@ STANDIN_BIN=$(fm_agent_standin "$STANDIN_DIR") || {
   exit 0
 }
 
-SESSION="fm-lab-control-smoke-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name control-smoke) || exit 1
 export HERDR_SESSION="$SESSION"
 SCRATCH=
 LAB_PREPARED=0
@@ -65,7 +66,7 @@ cleanup_all() {
     }
   fi
   if [ "$LAB_PREPARED" = 1 ]; then
-    herdr_safe_stop_and_delete "$SESSION" || {
+    "$HERDR_LAB_HELPER" teardown "$SESSION" || {
       echo "not ok - could not tear down Herdr smoke lab session: $SESSION" >&2
       cleanup_status=1
     }
@@ -75,8 +76,8 @@ cleanup_all() {
   exit "$status"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
 LAB_PREPARED=1
+"$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
 
 SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/fm-control-herdr.XXXXXX")
 SCRATCH=$(cd "$SCRATCH" && pwd)
@@ -176,12 +177,13 @@ STATE=$(fm_backend_agent_state herdr "$SESSION:$PANE_ID")
 # session.
 [ "$(fm_backend_herdr_server_running_state "$SESSION")" = running ] \
   || version_fail "this run's own live lab session does not report .server.running=true through status --json"
-[ "$(fm_backend_herdr_server_running_state "fm-lab-never-started-$$")" = stopped ] \
+ABSENT_SESSION=$("$HERDR_LAB_HELPER" name control-smoke) || version_fail "could not generate the absent-session probe name"
+[ "$(HERDR_SESSION="$ABSENT_SESSION" fm_backend_herdr_server_running_state "$ABSENT_SESSION")" = stopped ] \
   || version_fail "a session with no server does not report .server.running=false, so authoritative absence can no longer be told from an unreadable read"
 
 # Issue #4091's exact stranding shape: an endpoint recorded in a session whose
 # server is not running used to read `unreadable` and block recovery.
-[ "$(fm_backend_agent_state herdr "fm-lab-never-started-$$:w1:p2")" = missing ] \
+[ "$(HERDR_SESSION="$ABSENT_SESSION" fm_backend_agent_state herdr "$ABSENT_SESSION:w1:p2")" = missing ] \
   || version_fail "an endpoint in a session with no running server is not classified as recoverable"
 
 # And the safety direction: an uninterpretable read must never license recovery.

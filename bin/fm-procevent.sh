@@ -750,6 +750,13 @@ cmd_register_extension() {
   # result holds the source lock while the extension host takes the lifecycle
   # lock. The reverse order here would let both wait on each other forever.
   fm_procevent_source_lock_acquire "$id" || die "cannot lock the source"
+  # A polling adapter can hold the lifecycle lock until its result arrives.
+  # Refuse its replacement under the source lock before waiting on that poll;
+  # the later check still guards publication after lifecycle-lock acquisition.
+  if ! extension_registration_replacement_safe_locked "$id"; then
+    fm_procevent_source_lock_release "$id"
+    die "cannot replace extension registration while its prior runner remains active: $id"
+  fi
   if ! extension_lifecycle_lock_acquire; then
     fm_procevent_source_lock_release "$id"
     die "cannot lock the extension lifecycle"

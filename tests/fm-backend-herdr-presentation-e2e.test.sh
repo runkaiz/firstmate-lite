@@ -301,9 +301,10 @@ $RECORDED_WORKTREES
 EOF
   if [ "$LAB_READY" -eq 1 ]; then
     PATH="$HERDR_ORIGINAL_PATH" \
-      "$HERDR_LAB_HELPER" teardown "$HERDR_LAB_SESSION" >/dev/null 2>&1 || true
+      "$HERDR_LAB_HELPER" teardown "$HERDR_LAB_SESSION" || return 1
     LAB_READY=0
   fi
+  find "$TMP_ROOT" -type d -exec chmod u+rwx {} + 2>/dev/null
   rm -rf "$TMP_ROOT"
 }
 trap cleanup_all EXIT
@@ -1000,44 +1001,22 @@ mkdir -p "$SECOND_HOME_A/bin"
 printf '# Firstmate secondmate fixture\n' > "$SECOND_HOME_A/AGENTS.md"
 printf 'Secondmate alpha charter.\n' > "$SECOND_HOME_A/data/charter.md"
 
-# Primary setting only; real inheritance must push it into both secondmate homes.
-[ -f "$HOME_DIR/config/herdr-presentation-spaces" ] \
-  || fail "primary presentation setting disappeared before multi-home inheritance"
-[ ! -e "$SECOND_HOME_A/config/herdr-presentation-spaces" ] \
-  || fail "secondmate A unexpectedly had a local presentation setting before inheritance"
-[ ! -e "$SECOND_HOME_B/config/herdr-presentation-spaces" ] \
-  || fail "secondmate B unexpectedly had a local presentation setting before inheritance"
+# The old supervisor launch refuses before publishing metadata or inheriting
+# configuration. The retained ordering checks below use inert legacy home
+# fixtures with explicit local settings; they launch only ordinary task workers.
 SECOND_SPAWN_LOG_START=$(log_line_count)
-spawn_secondmate_task alpha "$SECOND_HOME_A" > "$TMP_ROOT/alpha.out" 2> "$TMP_ROOT/alpha.err" \
-  || fail "secondmate alpha spawn failed: $(cat "$TMP_ROOT/alpha.err")"
-[ -f "$SECOND_HOME_A/config/herdr-presentation-spaces" ] \
-  || fail "secondmate spawn did not inherit the presentation setting"
-[ ! -e "$HOME_DIR/state/alpha.herdr-presentation" ] \
-  || fail "secondmate spawn published a presentation journal"
-SECOND_META="$HOME_DIR/state/alpha.meta"
-[ "$(grep '^kind=' "$SECOND_META" | cut -d= -f2-)" = secondmate ] \
-  || fail "secondmate spawn did not record kind=secondmate"
-SECOND_WSID=$(grep '^herdr_workspace_id=' "$SECOND_META" | cut -d= -f2-)
-SECOND_LABEL=$(lab workspace get "$SECOND_WSID" | jq -r '.result.workspace.label')
-[ "$SECOND_LABEL" = 2ndmate-alpha ] \
-  || fail "secondmate spawn did not use its flat parent workspace: $SECOND_LABEL"
-[ -z "$(projection_labels_from_log "$SECOND_SPAWN_LOG_START")" ] \
-  || fail "secondmate spawn created a corner projection workspace"
-if sed -n "$((SECOND_SPAWN_LOG_START + 1)),\$p" "$HERDR_CALL_LOG" \
-  | grep -E $'^(workspace\tmove|session\tlist)' >/dev/null 2>&1; then
-  fail "secondmate spawn attempted presentation ordering"
+if spawn_secondmate_task alpha "$SECOND_HOME_A" > "$TMP_ROOT/alpha.out" 2> "$TMP_ROOT/alpha.err"; then
+  fail "retired supervisor launch succeeded"
 fi
-# shellcheck source=/dev/null
-. "$ROOT/bin/fm-config-inherit-lib.sh"
-propagate_inheritable_config "$HOME_DIR/config" "$SECOND_HOME_A/config" \
-  || fail "inheritance into secondmate A failed"
-propagate_inheritable_config "$HOME_DIR/config" "$SECOND_HOME_B/config" \
-  || fail "inheritance into secondmate B failed"
-[ -f "$SECOND_HOME_A/config/herdr-presentation-spaces" ] \
-  || fail "primary presentation setting did not reach secondmate A"
-[ -f "$SECOND_HOME_B/config/herdr-presentation-spaces" ] \
-  || fail "primary presentation setting did not reach secondmate B"
-pass "real Herdr lab: the primary presentation setting inherits into real secondmate homes"
+grep -F 'persistent secondmates are no longer supported' "$TMP_ROOT/alpha.err" >/dev/null \
+  || fail "retired supervisor refusal lost its reason"
+[ ! -e "$HOME_DIR/state/alpha.meta" ] || fail "retired launch published task metadata"
+[ ! -e "$SECOND_HOME_A/config/herdr-presentation-spaces" ] || fail "retired launch copied private configuration"
+[ "$(log_line_count)" = "$SECOND_SPAWN_LOG_START" ] || fail "retired launch called Herdr"
+[ "$(cat "$SECOND_HOME_A/data/charter.md")" = 'Secondmate alpha charter.' ] || fail "retired launch changed its private charter"
+: > "$SECOND_HOME_A/config/herdr-presentation-spaces"
+: > "$SECOND_HOME_B/config/herdr-presentation-spaces"
+pass "real Herdr lab: retired supervisor launch preserves endpoints, private charter, and configuration"
 
 # Keep the pre-existing 2ndmate-alpha/bravo workspaces as owning parents and captain focus.
 assert_focus_is "$CAPTAIN_FOCUS" "multi-home captain focus"
@@ -1506,7 +1485,6 @@ pass "real Herdr lab: legacy projection labels and flat secondmate tabs are left
 for META_HOME_PAIR in \
   "p1:$HOME_DIR" "p2:$HOME_DIR" "pcw:$HOME_DIR" "post-legacy:$HOME_DIR" \
   "a1:$SECOND_HOME_A" "a2:$SECOND_HOME_A" "acw:$SECOND_HOME_A" \
-  "alpha:$HOME_DIR" \
   "b1:$SECOND_HOME_B" "b2:$SECOND_HOME_B" "bcw:$SECOND_HOME_B"
 do
   TASK_ID=${META_HOME_PAIR%%:*}

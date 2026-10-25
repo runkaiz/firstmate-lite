@@ -68,8 +68,6 @@ path_is_ancestor_of() {
   return 1
 }
 
-VALIDATED_HOME=""
-VALIDATION_ERROR=""
 
 
 
@@ -109,20 +107,8 @@ changed_instr() {
   printf '%s' "$out"
 }
 
-# Translate one remote home sync leg's failure into an operator-actionable
-# reason. The remote leg refuses a command shape it does not recognize with this
-# status, which on this leg can only mean that host's Firstmate copy predates the
-# parent-targeted sync it was just asked for; every other failure already carries
-# its own diagnostic.
-REMOTE_SYNC_UNSUPPORTED_STATUS=2
 
 
-# Translate a remote inheritance push's combined output into an operator-
-# actionable reason. The push prints one "unchanged: <item>" line per item that
-# already matched before failing on the item that stopped it, so the plain
-# first line usually names an unrelated unchanged item rather than the error;
-# prefer the push's own "error: ..." line and fall back to the first line only
-# when it emitted none (an interrupted or unrecognized-shape failure).
 
 
 dirty_status() {
@@ -255,8 +241,13 @@ ff_target() {
     return 0
   fi
   after=$(git -C "$dir" rev-parse --short HEAD)
+  # Public result read by callers such as fm-update.sh.
+  # shellcheck disable=SC2034
   FF_STATUS="updated"
+  # Public result for instruction-aware callers.
+  # shellcheck disable=SC2034
   FF_INSTR="$instr"
+
 
   if [ -n "$instr" ]; then
     echo "$label: updated $before..$after (instructions changed: $instr)"
@@ -265,40 +256,3 @@ ff_target() {
   fi
   return 0
 }
-
-# Sweep accumulators. The caller resets both before a sweep and reads
-# FF_NUDGE_WINDOWS after.
-FF_NUDGE_WINDOWS=""
-FF_SEEN_HOMES=""
-
-# Validate and fast-forward one secondmate home, accumulating its stable
-# fm-<id> task selector into FF_NUDGE_WINDOWS when it should be live-converged.
-# Args:
-#   id home window base_mode nudge_requires_instr
-# A home is nudged only when it ACTUALLY advanced (FF_STATUS=updated) and has a
-# live window. With nudge_requires_instr=yes the advance must also have changed
-# the instruction surface (FF_INSTR non-empty): an already-current home, or one
-# whose only change was non-instruction tracked files, is left undisturbed. The
-# firstmate repo itself (FM_ROOT) is never processed as its own secondmate, and
-# each resolved home is processed at most once.
-#
-# Two optional caller hooks fire from here, each at most once per resolved home:
-#   fm_ff_after_instruction_update <id> <home> <window> <instr>
-#     the nudge-shaped hook: only for an advance that changed the instruction
-#     surface, and only under nudge_requires_instr=yes.
-#   fm_ff_after_secondmate_settled <id> <home> <window> <status> <instr>
-#     the settled-state hook: for every home this sweep left AT the base with a
-#     live window, whether it advanced (status=updated) or was already there
-#     (status=current). A home that was SKIPPED is never settled, so a dirty,
-#     diverged, offline, or unsafe home never reaches this hook and nothing here
-#     forces, stashes, or discards its work. /updatefirstmate uses this hook to
-#     reach every live mate that is genuinely on the new bytes, including the
-#     ones that needed no advance to get there.
-# An undefined hook is simply not called.
-
-
-# Sweep this home's LIVE secondmate direct reports - state/<id>.meta files with
-# kind=secondmate - fast-forwarding each to base_mode. Passes base_mode and
-# nudge_requires_instr through to process_secondmate. Accumulates into
-# FF_NUDGE_WINDOWS / FF_SEEN_HOMES, which the caller resets before and reads after.
-# The registry argument is only for home= fallback on older or incomplete meta records.

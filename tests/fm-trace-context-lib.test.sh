@@ -240,14 +240,17 @@ for tok in brief prompt report status ; do
 done
 pass "the lib code never reads a brief, prompt, report, or status - it cannot leak content"
 
-# --- secondmate inheritance wires the nested chain ---------------------------
-
-# shellcheck source=/dev/null
-. "$ROOT/bin/fm-config-inherit-lib.sh"
-case " $FM_INHERITABLE_CONFIG " in
-  *" trace-context "*) : ;;
-  *) fail "config/trace-context must be in FM_INHERITABLE_CONFIG so secondmate homes stay traced" ;;
-esac
-pass "config/trace-context is inherited into secondmate homes, keeping the nested chain enabled end to end"
+# A retired supervisor launch must not mint or publish a new task identity.
+TMP_ROOT=$(fm_test_tmproot fm-trace-context-lib)
+home="$TMP_ROOT/retired-supervisor"
+mkdir -p "$home/state" "$home/data" "$home/config"
+printf 'historical trace identity\n' > "$home/state/retired.meta"
+before=$(cat "$home/state/retired.meta")
+rc=0
+out=$(FM_HOME="$home" "$ROOT/bin/fm-spawn.sh" retired --secondmate 2>&1) || rc=$?
+[ "$rc" -ne 0 ] || fail "retired supervisor launch succeeded"
+assert_contains "$out" 'persistent secondmates are no longer supported' "retired launch lost its refusal"
+[ "$(cat "$home/state/retired.meta")" = "$before" ] || fail "retired launch changed the recorded identity"
+pass "retired supervisor launch preserves its historical identity"
 
 echo "# fm-trace-context-lib.test.sh: all assertions passed"

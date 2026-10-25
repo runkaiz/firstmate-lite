@@ -355,7 +355,7 @@ test_rovo_secondmate_is_refused() {
     FM_SPAWN_NO_GUARD=1 PATH="$FAKEBIN_DIR:$BASE_PATH" \
     "$SPAWN" "$id" --secondmate rovo 2>&1) || rc=$?
   [ "$rc" -ne 0 ] || fail "a rovo secondmate spawn should be refused"
-  assert_contains "$out" "rovo is a verified crewmate/scout adapter only" \
+  assert_contains "$out" "persistent secondmates are no longer supported" \
     "rovo secondmate refusal lacked its concrete reason"
   pass "fm-spawn: rovo cannot be launched as a secondmate"
 }

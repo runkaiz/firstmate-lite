@@ -323,9 +323,6 @@ FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 DATA="${FM_DATA_OVERRIDE:-$FM_HOME/data}"
 CONFIG="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
-SECONDMATE_REG="$DATA/secondmates.md"
-SUB_HOME_MARKER=".fm-secondmate-home"
-SUB_HOME_PARENT_MARKER=".fm-secondmate-parent"
 # A missing `.` target is not a teardown result. Stock Bash 3.2 can abort it
 # into an EXIT trap whose status is 0, and a newer Bash can print the
 # diagnostic and continue into cleanup. Refuse by name before sourcing.
@@ -465,11 +462,6 @@ SM_LIVENESS_LOCK=
 META_LOCK=
 META_LOCK_HELD=0
 DESCENDANT_LOCK_PATHS=()
-DESCENDANT_TASK_STATES=()
-DESCENDANT_TASK_IDS=()
-DESCENDANT_TASK_KINDS=()
-DESCENDANT_TASK_HOMES=()
-DESCENDANT_TREEHOUSE_LOCK_PATHS=()
 teardown_release_locks() {
   local status=$? i
   if declare -F teardown_release_herdr_locks >/dev/null 2>&1; then
@@ -654,21 +646,9 @@ if [ "$TEARDOWN_BACKLOG_APPLIES" = 1 ]; then
   esac
 fi
 
-REMOTE_HANDOFF_DIR_PRESENT=0
-REMOTE_HANDOFF_DIR_REAL=
-REMOTE_OUTBOX_PRESENT=0
-PENDING_REPLIES_DIR_PRESENT=0
-PENDING_REPLIES_DIR_REAL=
-REMOTE_HANDOFF_LOCK=
-REMOTE_REGISTRY_LOCK=
-REMOTE_REPLY_LIFECYCLE_LOCK=
 LOCAL_HANDOFF_LOCK=
 LOCAL_REGISTRY_LOCK=
-HANDOFF_WAKE_RETIRE_MARKER=
-HANDOFF_WAKE_RETIRE_VALUE=
-HANDOFF_WAKE_RETIRE_CORR=
 HANDOFF_WAKE_RETIRE_LOCK=
-HANDOFF_WAKE_RETIRE_STAGE=
 
 
 
@@ -736,7 +716,6 @@ teardown_require_backend_prerequisites "$BACKEND" "$ID" || exit 1
 if [ "${FM_TEARDOWN_GUARD_DONE:-0}" != 1 ]; then
   "$FM_ROOT/bin/fm-guard.sh" || true
 fi
-HOME_PATH=$(grep '^home=' "$META" | cut -d= -f2- || true)
 PR_URL=$(grep '^pr=' "$META" | tail -1 | cut -d= -f2- || true)
 # tasktmp is recorded by fm-spawn for tasks that set up a per-task temp root
 # (/tmp/fm-<id>/); absent for tasks spawned before that change, so tolerate empty.
@@ -1194,7 +1173,6 @@ fi
 STALE_WORKTREE_LOCK_RETRY_WAIT_SECS=$TREEHOUSE_RETURN_LOCK_RETRY_WAIT_SECS
 TEARDOWN_TREEHOUSE_LOCK_REFUSED=2
 TEARDOWN_WORKTREE_SAFETY_LOCK_BLOCKED=3
-TEARDOWN_PROCEVENT_RESTORE_FAILED=4
 
 # True when treehouse/git stderr shows the transient index.lock "File exists" race.
 # Other return failures must not enter the retry path.

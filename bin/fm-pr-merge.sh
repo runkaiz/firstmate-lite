@@ -148,7 +148,6 @@ PR_PATH=$FM_PR_PATH
 PR_OWNER=$FM_PR_OWNER
 PR_REPO=$FM_PR_REPO
 PR_NUMBER=$FM_PR_NUMBER
-PROJECT_URL="https://$FM_PR_HOST/$FM_PR_PATH"
 shift 2
 ATTENDED_OVERRIDE=false
 ALLOW_RED=()
@@ -377,9 +376,6 @@ fi
 # but a login can be removed or renamed after arming, so this is re-derived
 # fresh rather than trusted from that earlier check).
 
-# The recorded head is read before bin/fm-pr-check.sh rewrites the metadata,
-# because that script re-records pr= and drops a pr_head= it cannot resolve.
-RECORDED_HEAD=
 
 FM_PR_MERGE_HEAD=
 

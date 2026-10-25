@@ -51,7 +51,7 @@ digest() { shasum -a 256 "$1" | awk '{print $1}'; }
 # builds, with a live private tmux server. Every readiness input starts in its
 # passing state.
 make_lab() {
-  local root="$TMP_ROOT/$1" harness=$2 claude_dir=${3:-} home tmux_dir lock_pid
+  local root="$TMP_ROOT/$1" harness=$2 claude_dir=${3:-} home tmux_dir lock_pid busy_gen
   home="$root/home"
   mkdir -p "$root"
   "$ROOT/bin/fm-lab-home.sh" create "$home" >/dev/null || fail "lab home create"
@@ -71,7 +71,7 @@ make_lab() {
     echo "home=$home"
     echo "expect_host=yes"
     echo "host_off=no"
-    echo "mate=yes"
+    echo "mate=no"
     echo "worker=yes"
     echo "nonce=$NONCE"
     echo "mate_id=$MATE_ID"
@@ -89,9 +89,12 @@ make_lab() {
   record_pid "$root" "$(lab_tmux "$root" display-message -p '#{pid}')"
   lab_tmux "$root" new-window -d -t firstmate: -n main -c "$home" "printf 'LABREADY-$NONCE\n'; exec sleep 600"
   lab_tmux "$root" new-window -d -t firstmate: -n "fm-$MATE_ID" -c "$root/mate" 'exec sleep 600'
-  lab_tmux "$root" new-window -d -t firstmate: -n "fm-$WORKER_ID" -c "$root" 'exec sleep 600'
+  ln -s /bin/bash "$root/claude"
+  lab_tmux "$root" new-window -d -t firstmate: -n "fm-$WORKER_ID" -c "$root" "exec '$root/claude' -c 'while :; do sleep 600; done'"
   fm_write_meta "$home/state/$MATE_ID.meta" "window=firstmate:fm-$MATE_ID" "tasktmp=/tmp/fm-$MATE_ID"
-  fm_write_meta "$home/state/$WORKER_ID.meta" "window=firstmate:fm-$WORKER_ID" "worktree=$home/projects/notes" "kind=secondmate" "tasktmp=/tmp/fm-$WORKER_ID"
+  fm_write_meta "$home/state/$WORKER_ID.meta" "window=firstmate:fm-$WORKER_ID" "worktree=$home/projects/notes" "kind=ship" "harness=claude" "tasktmp=/tmp/fm-$WORKER_ID"
+  busy_gen=$("$ROOT/bin/fm-busy-event.sh" arm "$home/state" "$WORKER_ID")
+  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" "$WORKER_ID" idle --gen "$busy_gen" --source claude-hook --event stop
   mkdir -p "$home/projects/notes"
   printf 'paused [at=1]: waiting on gate file %s to exist\n' "$home/data/$WORKER_ID/gate" > "$home/state/$WORKER_ID.status"
 
@@ -163,10 +166,11 @@ C=$(make_lab c claude)
 CH="$C/home"
 run_check "$C"
 expect_code 0 "$CHECK_RC" "a Claude lab in up's shape is ready: $CHECK_OUT"
-for name in primary probe trust mirror host watcher mate worker treehouse; do
+for name in primary probe trust mirror host watcher worker treehouse; do
   assert_contains "$CHECK_OUT" "ok $name:" "the $name check passes on a ready Claude lab"
 done
-pass "a ready Claude lab passes every readiness check"
+assert_not_contains "$CHECK_OUT" "ok mate:" "ordinary primary lab revived a retired supervisor readiness check"
+pass "a ready Claude lab passes every retained readiness check"
 
 # primary: the lab session lock must name a live process (session start ran).
 printf '999999\n' > "$CH/state/.lock"
@@ -242,42 +246,21 @@ assert_contains "$CHECK_OUT" "fail watcher: no live watcher with a fresh beacon"
 touch "$CH/state/.last-watcher-beat"
 pass "watcher fails on a stale beacon"
 
-# mate: its own window, targeted exactly. A missing window must not resolve to
-# another one (tmux falls back to the current window for an unknown name).
-lab_tmux "$C" kill-window -t "firstmate:=fm-$MATE_ID"
-run_check "$C"
-assert_contains "$CHECK_OUT" "fail mate: the $MATE_ID window is not running" "mate names its missing window"
-lab_tmux "$C" new-window -d -t firstmate: -n "fm-$MATE_ID" -c "$C/mate" 'exec sleep 600'
-rm -f "$C/mate/state/.lock"
-run_check "$C"
-assert_contains "$CHECK_OUT" "fail mate: the mate holds no session lock yet" "mate needs its own session lock"
-lab_tmux "$C" display-message -p -t "firstmate:=fm-$MATE_ID" '#{pane_pid}' > "$C/mate/state/.lock"
-pass "mate fails when its window is gone or it never reached its charter"
-
-# Opt-out readiness must observe the mate's inherited material and its real
-# home gate, rather than just the primary's absent host.
-set_record "$C" host_off yes
-set_record "$C" expect_host no
-host_pid=$(awk -F '\t' '{print $2}' "$CH/state/.supervision-host")
-kill "$host_pid" 2>/dev/null
-wait "$host_pid" 2>/dev/null
-mkdir -p "$C/mate/config" "$C/mate/bin"
-cp "$ROOT/bin/fm-supervision-engine-lib.sh" "$C/mate/bin/"
-run_check "$C"
-expect_code 1 "$CHECK_RC" "off readiness refuses a mate without its inherited flag"
-assert_contains "$CHECK_OUT" "fail mate: the inherited supervision-host-off flag is missing" "mate names the missing opt-out"
-: > "$C/mate/config/supervision-host-off"
-run_check "$C"
-expect_code 0 "$CHECK_RC" "off readiness accepts the mate's inherited flag and disabled gate: $CHECK_OUT"
-printf '#!/usr/bin/env bash\nexit 0\n' > "$C/mate/bin/fm-supervision-engine-lib.sh"
-run_check "$C"
-expect_code 1 "$CHECK_RC" "off readiness refuses a mate whose gate reads on"
-assert_contains "$CHECK_OUT" "fail mate: the supervision-host gate did not read off" "mate names the enabled gate"
-cp "$ROOT/bin/fm-supervision-engine-lib.sh" "$C/mate/bin/"
-set_record "$C" host_off no
-set_record "$C" expect_host yes
-printf 'host\t%s\tx\n' "$(start_sleeper)" > "$CH/state/.supervision-host"
-pass "mate off readiness requires inherited material and a disabled home gate"
+# Historical supervisor labs refuse all lifecycle operations before touching
+# endpoints, private state, or trust. Ordinary primary labs remain supported.
+set_record "$C" mate yes
+saved_record=$(cat "$C/.fm-live-lab")
+saved_trust=$(cat "$HOME/.claude.json")
+for operation in check pane say down; do
+  out=$("$LIVE_LAB" "$operation" "$C" probe 2>&1)
+  expect_code 1 "$?" "historical supervisor lab $operation must refuse"
+  assert_contains "$out" 'historical supervisor lab preserved' "retired lab $operation lost its custody reason"
+  assert_equals "$saved_record" "$(cat "$C/.fm-live-lab")" "retired lab $operation changed its record"
+  assert_equals "$saved_trust" "$(cat "$HOME/.claude.json")" "retired lab $operation changed trust"
+  lab_tmux "$C" has-session -t firstmate || fail "retired lab $operation stopped an endpoint"
+done
+set_record "$C" mate no
+pass "historical supervisor labs refuse lifecycle operations and preserve endpoints, records, and trust"
 
 # The current-state reader, not an old event, establishes the gate wait.
 GATE="$CH/data/$WORKER_ID/gate"

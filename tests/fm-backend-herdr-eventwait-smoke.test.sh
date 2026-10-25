@@ -30,15 +30,19 @@ command -v python3 >/dev/null 2>&1 || { echo "skip: python3 not found (required 
 # as a cross-session parent identity (tests/herdr-test-safety.sh).
 herdr_forget_inherited_pane
 
-SESSION="fm-lab-eventwait-smoke-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name eventwait) || exit 1
 export HERDR_SESSION="$SESSION"
 SCRATCH=
+CLEANED=0
 cleanup_all() {
-  [ -n "$SCRATCH" ] && rm -rf "$SCRATCH"
-  herdr_safe_stop_and_delete "$SESSION"
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
+  [ -z "$SCRATCH" ] || rm -rf "$SCRATCH"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare the isolated Herdr lab session"
+"$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
 
 # The dispatcher is a separately linted production boundary. Its dynamic
 # adapter source edges stop at each independently linted canonical adapter.
@@ -132,5 +136,9 @@ grep -q "$TARGET" "$STATE/.wake-queue" || fail "the stale record must name the t
 grep -q 'herdr: agent blocked' "$STATE/.wake-queue" || fail "the stale payload must name the herdr-blocked cause"
 pass "real herdr: the watcher fast-path enqueues a stale wake naming the task window from the live blocked transition"
 
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded lab teardown or default-fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT

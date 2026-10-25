@@ -66,19 +66,23 @@ herdr_forget_inherited_pane
 # canonicalized project and backend cwd comparisons in the worktree-discovery
 # poll.
 TMP_ROOT=$(mktemp -d "$(cd "${TMPDIR:-/tmp}" && pwd -P)/fm-herdr-e2e.XXXXXX")
-SESSION="fm-lab-herdr-e2e-$$"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+SESSION=$("$HERDR_LAB_HELPER" name fm-herdr-per-home) || exit 1
 export HERDR_SESSION="$SESSION"
 WT1=; WT2=
+CLEANED=0
 cleanup_all() {
+  [ "$CLEANED" = 0 ] || return 0
+  CLEANED=1
   [ -n "$WT1" ] && command -v treehouse >/dev/null 2>&1 && treehouse return --force "$WT1" >/dev/null 2>&1
   [ -n "$WT2" ] && command -v treehouse >/dev/null 2>&1 && treehouse return --force "$WT2" >/dev/null 2>&1
-  herdr_safe_stop_and_delete "$SESSION"
+  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
   # Spawn leaves each state/<id>.git-hooks strip dir read-only.
   find "$TMP_ROOT" -type d -exec chmod u+rwx {} + 2>/dev/null
   rm -rf "$TMP_ROOT"
 }
 trap cleanup_all EXIT
-fm_herdr_lab_prepare "$SESSION" || fail "could not prepare isolated Herdr lab session"
+"$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
 
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-backend.sh"
@@ -167,23 +171,19 @@ FM_SPAWN_NO_GUARD=1 FM_HOME="$PRIMARY_HOME" FM_ROOT_OVERRIDE="$ROOT" \
   "$ROOT/bin/fm-spawn.sh" e2esm1 "$SM_HOME" "sh -c 'echo secondmate-launch-ok'" --secondmate --backend herdr \
   >"$SM_OUT" 2>"$SM_ERR"
 rc=$?
-[ "$rc" -eq 0 ] || fail "the primary's --secondmate spawn of e2esm1 failed"$'\n'"--- stdout ---"$'\n'"$(cat "$SM_OUT")"$'\n'"--- stderr ---"$'\n'"$(cat "$SM_ERR")"
+[ "$rc" -ne 0 ] || fail "retired supervisor spawn succeeded"
+assert_contains_local "$(cat "$SM_ERR")" 'persistent secondmates are no longer supported' "retired supervisor refusal lost its reason"
+[ ! -e "$PRIMARY_HOME/state/e2esm1.meta" ] || fail "retired supervisor spawn published metadata"
+[ "$(cat "$SM_HOME/.fm-secondmate-home")" = e2esm1 ] || fail "retired supervisor spawn changed its private home marker"
+pass "real herdr E2E: retired supervisor launch preserves private home state"
 
-SM_META="$PRIMARY_HOME/state/e2esm1.meta"
-[ -f "$SM_META" ] || fail "no meta written for e2esm1 (recorded in the PRIMARY's own state dir, since the primary did the spawning)"
-assert_contains_local "$(cat "$SM_META")" "kind=secondmate" "e2esm1 meta missing kind=secondmate"
-assert_contains_local "$(cat "$SM_META")" "backend=herdr" "e2esm1 meta missing backend=herdr"
-assert_contains_local "$(cat "$SM_META")" "home=$SM_HOME" "e2esm1 meta does not record its own home"
-SM_PANE=$(grep '^herdr_pane_id=' "$SM_META" | cut -d= -f2-)
-[ -n "$SM_PANE" ] || fail "e2esm1 meta missing herdr_pane_id"
-pass "real herdr E2E: the primary spawns a --secondmate task on the herdr backend"
-
-SM_WSID=$(herdr pane get "$SM_PANE" --session "$SESSION" 2>/dev/null | jq -r '.result.pane.workspace_id // empty')
-[ -n "$SM_WSID" ] || fail "could not read e2esm1's pane workspace_id"
-[ "$SM_WSID" != "$CM1_WSID" ] || fail "the secondmate's tab must NOT land in the primary's workspace, but it shares $CM1_WSID"
-SM_WS_LABEL=$(herdr workspace list --session "$SESSION" 2>&1 | jq -r --arg id "$SM_WSID" '.result.workspaces[]? | select(.workspace_id == $id) | .label')
-[ "$SM_WS_LABEL" = "2ndmate-e2esm1" ] || fail "a --secondmate spawn should land in '2ndmate-<id>', got '$SM_WS_LABEL'"
-pass "real herdr E2E: a --secondmate spawn by the PRIMARY lands in the SECONDMATE's own labeled workspace, distinct from the primary's"
+# An inert sentinel in the historical home workspace proves that ordinary task
+# placement, recovery, and teardown remain scoped to their owning home.
+SM_FIXTURE=$("$HERDR_LAB_HELPER" run "$SESSION" workspace create --cwd "$SM_HOME" --label 2ndmate-e2esm1 --no-focus) || fail "could not create isolated legacy workspace sentinel"
+SM_WSID=$(printf '%s' "$SM_FIXTURE" | jq -r '.result.workspace.workspace_id // empty')
+SM_PANE=$(printf '%s' "$SM_FIXTURE" | jq -r '.result.root_pane.pane_id // empty')
+[ -n "$SM_WSID" ] && [ -n "$SM_PANE" ] || fail "legacy workspace sentinel returned incomplete identity"
+"$HERDR_LAB_HELPER" run "$SESSION" tab rename "$(printf '%s' "$SM_FIXTURE" | jq -r '.result.tab.tab_id')" fm-sentinel >/dev/null || fail "could not label sentinel"
 
 # --- 3. a crewmate spawned FROM the secondmate-shaped home lands in the SAME
 # secondmate workspace (this exact path has never run before this test) -----
@@ -221,7 +221,7 @@ assert_not_contains_local "$PRIMARY_LIVE" "fm-cm2" "the primary home's list_live
 pass "real herdr E2E: list_live from the primary's own context sees only the primary's own task"
 
 SM_LIVE=$(FM_HOME="$SM_HOME" fm_backend_herdr_list_live "$SESSION")
-assert_contains_local "$SM_LIVE" "fm-e2esm1" "the secondmate home's list_live did not see its own task"
+assert_contains_local "$SM_LIVE" "fm-sentinel" "the secondmate home's list_live did not see its own task"
 assert_contains_local "$SM_LIVE" "fm-cm2" "the secondmate home's list_live did not see the crewmate spawned from it"
 assert_not_contains_local "$SM_LIVE" "fm-cm1" "the secondmate home's list_live must not see the primary's task"
 pass "real herdr E2E: list_live from the secondmate's own context sees only tasks in the secondmate's own workspace (both its own tab and its crewmate's)"
@@ -265,5 +265,9 @@ pass "real herdr E2E: tearing down cm2 closes only its own tab - the secondmate'
 
 fm_backend_herdr_kill "$SESSION:$SM_PANE"
 
-cleanup_all
+if ! cleanup_all; then
+  trap - EXIT
+  printf 'not ok - guarded Herdr teardown or default fleet tripwire failed\n' >&2
+  exit 1
+fi
 trap - EXIT
