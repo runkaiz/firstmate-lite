@@ -1,0 +1,19 @@
+# Staged Linux user-service example; copying this file does not migrate a server.
+# Install/start only after the existing default session is safely quiesced.
+# Starting while a default server exists cannot move that process into this unit.
+# Stopping this unit terminates its server and all descendant terminal processes.
+# No enable/linger or authentication change is required to test a user service.
+# Survival requires the user manager to remain active after SSH disconnects.
+[Unit]
+Description=Persistent Herdr terminal server
+
+[Service]
+Type=exec
+ExecStart=%h/.local/bin/herdr server --session default
+WorkingDirectory=%h
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+KillMode=control-group
+Restart=no
+
+[Install]
+WantedBy=default.target
