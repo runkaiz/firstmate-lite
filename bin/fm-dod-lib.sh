@@ -331,8 +331,18 @@ EOF
 
 
 
-fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>]
-  local mode=$1 id=$2 forge=${4:-none} base=${5:-} consent=${6:-}
+fm_delivery_surface_valid() {  # <surface>
+  case "$1" in
+    internal-only|product-facing|mixed|unknown) return 0 ;;
+    *) echo "error: --delivery-surface must be internal-only, product-facing, mixed, or unknown" >&2; return 1 ;;
+  esac
+}
+
+fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<surface>]
+  local mode=$1 id=$2 forge=${4:-none} base=${5:-} consent=${6:-} surface=${7:-unknown}
+  local record_tool delivery_record_instruction=
+  fm_delivery_surface_valid "$surface" || return 1
+  printf -v record_tool '%q' "${BASH_SOURCE[0]%/*}/fm-delivery-record.py"
   local branch=${3:-fm/$id} pr_base='' nm_base='' base_q contract_forge='' contract_consent='' forge_cli=gh-axi draft_check
   fm_forge_valid_for_mode "$forge" "$mode" fm_dod_block || return 1
   fm_base_branch_valid "$base" "$mode" "$forge" fm_dod_block || return 1
@@ -350,6 +360,12 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>]
     nm_base="This task's base branch is \`$base\`, not the repository default: pass \`--base-branch $base_q\` on every \`no-mistakes axi run\` that starts a run, so the pipeline rebases onto, opens its PR against, and watches CI for that branch.
 "
   fi
+  if [ "$mode" = direct-PR ] && [ "$surface" = internal-only ]; then
+    delivery_record_instruction="Semantic intake classified this task as internal-only; supervision behavior is product-facing even when implemented as tooling.
+For a repository using the conditional provenance gate, append the output of \`python3 $record_tool emit --head \"\$(git rev-parse HEAD)\"\` to the PR body after committing.
+Regenerate that record after every head change, and remove it if reclassification requires full no-mistakes.
+This is an author-editable delivery declaration, never evidence of pipeline completion or authenticated authorization."
+  fi
   case "$mode:$forge" in
     direct-PR:*)
       cat <<EOF
@@ -357,6 +373,8 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>]
 Delivery contract: mode=direct-PR$contract_forge$contract_consent
 Ship branch: $branch
 This task ships **direct-PR**: you raise the PR yourself, without the no-mistakes pipeline.
+Delivery surface: $surface
+$delivery_record_instruction
 The task is complete only when committed on your branch.
 When it is implemented and committed, push your branch and open a PR with \`$forge_cli\` that is ready for review, not a draft$pr_base.
 Before you report done, read the PR back from the forge and confirm it is not a draft $draft_check

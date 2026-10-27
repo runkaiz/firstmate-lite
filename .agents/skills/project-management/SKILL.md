@@ -43,6 +43,7 @@ Choose that posture when adding or creating the project:
 State that resolved default while confirming the source, local name, and posture instead of asking the captain to choose from scratch, and record a flat mode instead whenever they ask for one.
 Existing registry entries keep the meaning they already have and are never migrated or reinterpreted, so a legacy entry with no bracket stays `no-mistakes`.
 Registering a conditional policy is a one-time choice and never requires classifying any change; the per-task surface classification happens at each task's intake, and internal-only is never inferred from file location or project name.
+For repositories using Firstmate-lite's conditional provenance workflow, record that intake result with `--delivery-surface` on the brief or promotion; [`bin/fm-delivery-record.py`](../../../bin/fm-delivery-record.py) owns the resulting public declaration and its structural trust limits.
 
 The optional `+yolo` posture changes merge authority only and does not change the delivery mode.
 Default it off for every project and every posture, and enable it only on the captain's explicit instruction.
