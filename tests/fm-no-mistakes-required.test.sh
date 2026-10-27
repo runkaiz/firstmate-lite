@@ -5,6 +5,10 @@ set -u
 # shellcheck source=tests/lib.sh disable=SC1091
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
+# Empty PR_BODY falls back to the event payload in the shared verifier.
+# Keep synthetic cases independent of the CI event; live cases set their own.
+unset GITHUB_EVENT_PATH
+
 ACTION_REF=f6441c96c352a18b9cadcaef6b6c7017e9ac3970
 TMP_ROOT=$(fm_test_tmproot fm-no-mistakes-required)
 VERIFY="$TMP_ROOT/verify.py"
