@@ -2290,14 +2290,16 @@ test_afk_relaunch_reacquires_a_released_slot() {
   add_ship_task "$dir" afk-resume
   afk_relaunch_fixture "$dir"
   out=$(run_control "$dir" afk-resume exit) || fail "initial stop failed: $out"
-  printf 'kind=scout\n' > "$dir/home/state/other.meta"
+  sed 's/afk-resume/other/g' "$dir/home/state/afk-resume.meta" | grep -v '^afk_worker_stopped=' > "$dir/home/state/other.meta"
+  printf 'fm-other\n' >> "$dir/fake/windows"
   out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
   expect_code 1 "$rc" 'released worker must reacquire a full AFK slot'
   assert_contains "$out" 'caps concurrent workers at 1' 'relaunch bypassed full cap'
   [ "$(cat "$dir/fake/command")" = zsh ] || fail 'denied relaunch started an agent'
   [ -n "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'denial lost stopped receipt'
-  # Only the disposable fixture record is removed, simulating available room.
-  rm "$dir/home/state/other.meta"
+  # Free the holder through the real lifecycle interface, preserving its record.
+  out=$(run_control "$dir" other exit) || fail "parking holder failed: $out"
+  [ -f "$dir/home/state/other.meta" ] || fail 'parking removed historical record'
   out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
   expect_code 0 "$rc" 'relaunch with an available slot must succeed'
   [ -z "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'relaunch retained released occupancy'

@@ -58,6 +58,7 @@ Hold-for-return is the default and the only reach profile this release records: 
 ## While away
 
 For worker occupancy and preserving finished task evidence without retaining an AI-worker slot, follow `bin/fm-afk-capacity-lib.sh` and the lifecycle control plane in `docs/agent-control.md`.
+For a capacity-blocked authorized handoff, follow `bin/fm-branch-prompt.sh` "Capacity recovery while away", including safe remediation or one concrete escalation rather than unchanged-wait churn.
 
 - The record exists, so the watcher never rechecks an item held for the captain, in either supervision shape; the return brief lists it instead.
   Declared external waits keep their condition-aware, hours-long recheck cadence (`bin/fm-watch.sh`, `bin/fm-classify-lib.sh`).

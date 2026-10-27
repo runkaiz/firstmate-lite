@@ -1211,6 +1211,52 @@ test_afk_slots_require_a_verified_stop_and_preserve_evidence() {
   pass 'AFK: completion/PR/holds do not imply stopped; confirmed stop frees capacity and preserves evidence'
 }
 
+test_afk_staged_contexts_and_history_block_handoff_until_parked() {
+  local dir out id n before
+  dir=$(new_case afk-staged-handoff)
+  write_afk_fixture "$dir" 4
+  # Five independent staged contexts, ten historical/deferred records and
+  # one validated repair awaiting a delivery worker: none imply a stopped AI.
+  for n in {1..16}; do
+    id="context-$n"
+    add_task "$dir" "$id" claude scout
+    printf 'spawn_gen=incarnation-%s\n' "$n" >> "$dir/home/state/$id.meta"
+    printf 'paused: staged or deferred\n' > "$dir/home/state/$id.status"
+    printf 'independent continuation %s\n' "$n" > "$dir/home/data/$id/report.md"
+    printf 'unmerged change %s\n' "$n" > "$dir/wt-$id/uncommitted.txt"
+  done
+  for n in {1..16}; do printf 'fm-context-%s\n' "$n"; done > "$dir/fake/windows"
+  printf 'done: repair validated; delivery pending\n' > "$dir/home/state/context-16.status"
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_contains "$out" 'caps concurrent workers at 4; 16 AI worker slot(s)' 'workload did not reproduce the handoff refusal'
+  # One-variable counterfactual: no additional away cap does not interpret
+  # mandate text or change the conservative population; admission passes it.
+  write_afk_fixture "$dir" -
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_not_contains "$out" 'caps concurrent workers' 'unspecified cap blocked the handoff'
+  write_afk_fixture "$dir" 4
+  # Change only stop evidence through the supported owner, never delete a
+  # historical record or copy. Recovery notes and unmerged bytes must survive.
+  for n in {1..13}; do
+    id="context-$n"
+    before=$(cat "$dir/home/state/$id.meta")
+    out=$(run_control "$dir" "$id" exit) || fail "parking $id failed: $out"
+    [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/$id.meta")" = "$before" ] || fail 'parking changed identity'
+    [ "$(cat "$dir/home/data/$id/report.md")" = "independent continuation $n" ] || fail 'continuation lost'
+    [ "$(cat "$dir/wt-$id/uncommitted.txt")" = "unmerged change $n" ] || fail 'unmerged copy changed'
+    [ "$(cat "$dir/home/state/$id.status")" = 'paused: staged or deferred' ] || fail 'parking reactivated deferred work'
+  done
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_not_contains "$out" 'caps concurrent workers' 'supported parking did not admit delivery'
+  # One unknown historical owner is still charged, even with no incarnation
+  # or endpoint: this is a genuine reconciliation blocker, not free capacity.
+  printf 'kind=scout\n' > "$dir/home/state/unattributed.meta"
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_contains "$out" 'caps concurrent workers at 4; 4 AI worker slot(s)' 'unknown owner silently freed capacity'
+  assert_contains "$out" 'unattributed' 'refusal did not identify the unresolved holder'
+  pass 'AFK: staged contexts plus historical records reproduce refusal; supported parking admits delivery without cleanup; unknown ownership still blocks'
+}
+
 test_afk_late_unknown_and_stale_workers_count_conservatively() {
   local dir out command
   dir=$(new_case afk-uncertain)
@@ -1360,3 +1406,5 @@ test_grok_interrupt_without_acknowledgement_reports_unconfirmed
 test_grok_idle_footer_does_not_confirm_cancellation
 test_secondmate_control_command_carries_no_marker
 test_fm_send_still_marks_the_same_secondmate_task
+
+test_afk_staged_contexts_and_history_block_handoff_until_parked

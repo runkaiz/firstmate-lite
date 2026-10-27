@@ -70,6 +70,8 @@ Typed steering to that preserved worker refuses until `relaunch` reacquires capa
 Unknown worker liveness retains occupancy, and arbitrary background jobs keep their existing controls rather than counting as AI workers.
 `bin/fm-afk-capacity-lib.sh` owns the receipt, fresh liveness validation, reservation, and locking contract.
 The optional per-project capacity declaration remains independent.
+Away entry adds no extra concurrency limit unless supplied with `--spend`; existing finite records keep their cap, including legacy defaults.
+`bin/fm-afk-contract.sh` owns cap selection and representation; `bin/fm-branch-prompt.sh` "Capacity recovery while away" owns safe progress or one concrete escalation after a refusal.
 
 ## Transactional relaunch
 

@@ -52,7 +52,11 @@
 #   expected_return: <UTC ISO 8601> | -
 #   reach_channels: none
 #   reach_announced: <the one-sentence reach announcement>
-#   spend_max_concurrent_workers: <n>
+#   spend_max_concurrent_workers: <positive integer | ->
+#     A new entry adds no away-specific cap unless --spend is supplied.
+#     The sentinel - means not set; project capacity and all other limits
+#     still apply. Existing finite records remain binding, including when
+#     replacing words without --spend. Never infer a cap from mandate text.
 #   confirmed: <UTC ISO 8601>       when this mandate was recorded; /afk itself
 #   confirmed_epoch: <seconds>        is the go, so no later human step stamps it
 #   mode: quiet                    only on a quiet entry (FM_AFK_MODE=quiet); absent
@@ -137,7 +141,7 @@ FM_AFK_CONTRACT_VERSION=2
 # Older record versions this script still reads (never writes).
 FM_AFK_CONTRACT_READABLE_VERSIONS="1 2"
 FM_AFK_CONTRACT_REACH_ANNOUNCED='No phone channel is configured; anything that needs you waits for your return.'
-FM_AFK_CONTRACT_SPEND_DEFAULT=4
+FM_AFK_CONTRACT_SPEND_DEFAULT=-
 FM_AFK_CONTRACT_QUIET_HOLDS_NOTHING='you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.'
 # Generous against the longest legitimate holder, a merge waiting on the forge,
 # so the bound only ever trips on something genuinely wedged.
@@ -357,7 +361,7 @@ fm_afk_contract_validate() {  # <path>
   announced=$(fm_afk_contract_read_field "$path" reach_announced)
   [ -n "$announced" ] || { fm_afk_contract_log "record $path has no reach announcement"; return 1; }
   spend=$(fm_afk_contract_read_field "$path" spend_max_concurrent_workers)
-  case "$spend" in ''|*[!0-9]*|0) fm_afk_contract_log "record $path has no valid spend cap"; return 1 ;; esac
+  case "$spend" in -) ;; ''|*[!0-9]*|0) fm_afk_contract_log "record $path has no valid spend cap"; return 1 ;; esac
   case "$(fm_afk_contract_read_field "$path" mode)" in
     ''|quiet) ;;
     *) fm_afk_contract_log "record $path has an invalid mode"; return 1 ;;
@@ -373,6 +377,14 @@ fm_afk_contract_validate() {  # <path>
 }
 
 # --- rendering --------------------------------------------------------------
+
+fm_afk_contract_spend_text() {  # <record field>
+  if [ "$1" = - ]; then
+    printf 'not set (no additional away limit)'
+  else
+    printf '%s concurrent workers' "$1"
+  fi
+}
 
 # The read-back is the record's content and nothing else: the words verbatim
 # beside the entry time, expected return, spend cap, and reach line. Firstmate's
@@ -394,7 +406,7 @@ fm_afk_contract_render_readback() {  # <path>
     printf 'Away posture (recorded):\n'
     printf '  entered: %s\n' "$(fm_afk_contract_read_field "$path" entered)"
     printf '  expected return: %s\n' "$( [ "$expected" = - ] && printf 'not given' || printf '%s' "$expected")"
-    printf '  spend cap: %s concurrent workers\n' "$spend"
+    printf '  spend cap: %s\n' "$(fm_afk_contract_spend_text "$spend")"
     printf '  reach: hold-for-return only. %s\n' "$(fm_afk_contract_read_field "$path" reach_announced)"
   fi
   words=$(fm_afk_contract_read_words "$path"; rc=$?; printf x; exit "$rc") || return 1
@@ -423,19 +435,19 @@ fm_afk_contract_render_announcement() {  # <path>
   else
     mandate_text='No away instructions were recorded; the away session acts on standing authority only, and anything that needs you waits for your return.'
   fi
-  printf 'Away posture recorded at %s: hold-for-return only. %s %s Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: %s. Spend cap: %s concurrent workers.\n' \
+  printf 'Away posture recorded at %s: hold-for-return only. %s %s Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: %s. Spend cap: %s.\n' \
     "$(fm_afk_contract_read_field "$path" confirmed)" \
     "$(fm_afk_contract_read_field "$path" reach_announced)" \
     "$mandate_text" \
     "$( [ "$expected" = - ] && printf 'not given' || printf '%s' "$expected")" \
-    "$(fm_afk_contract_read_field "$path" spend_max_concurrent_workers)"
+    "$(fm_afk_contract_spend_text "$(fm_afk_contract_read_field "$path" spend_max_concurrent_workers)")"
 }
 
 # --- subcommands ------------------------------------------------------------
 
 fm_afk_contract_parse_inputs() {  # <args...>; sets WORDS, EXPECTED_RETURN, SPEND
   local words_file=''
-  WORDS=; EXPECTED_RETURN=-; SPEND=$FM_AFK_CONTRACT_SPEND_DEFAULT; FM_AFK_CONTRACT_SCALARS_GIVEN=0
+  WORDS=; EXPECTED_RETURN=-; SPEND=$FM_AFK_CONTRACT_SPEND_DEFAULT; FM_AFK_CONTRACT_SPEND_GIVEN=0; FM_AFK_CONTRACT_SCALARS_GIVEN=0
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --words-file)
@@ -459,6 +471,7 @@ fm_afk_contract_parse_inputs() {  # <args...>; sets WORDS, EXPECTED_RETURN, SPEN
         [ "$#" -gt 1 ] || { fm_afk_contract_log '--spend requires a positive integer'; return 2; }
         case "$2" in ''|*[!0-9]*|0) fm_afk_contract_log "--spend must be a positive integer, got '$2'"; return 2 ;; esac
         SPEND=$2
+        FM_AFK_CONTRACT_SPEND_GIVEN=1
         FM_AFK_CONTRACT_SCALARS_GIVEN=1
         shift 2 ;;
       --action|--object|--when|--stop|--grant|--grant=*)
@@ -507,6 +520,9 @@ fm_afk_contract_cmd_enter() {
   if [ -f "$record" ]; then
     fm_afk_contract_validate "$record" || return 1
     standing=$(fm_afk_contract_record_mode "$record")
+    if [ "$standing" = away ] && [ "$FM_AFK_CONTRACT_SPEND_GIVEN" -eq 0 ]; then
+      SPEND=$(fm_afk_contract_read_field "$record" spend_max_concurrent_workers)
+    fi
     [ "$standing" = quiet ] || FM_AFK_CONTRACT_ENTRY_MODE=away
   fi
   if [ -f "$record" ] && [ -z "$WORDS" ] && [ "$standing" = "$FM_AFK_CONTRACT_ENTRY_MODE" ]; then

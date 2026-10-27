@@ -6,6 +6,26 @@ This record supports current session-start, turn-end, watcher-continuity, superv
 Operator behavior and active limits remain in the linked current guides.
 Task-specific chronology, temporary paths, run identifiers, and delivery transcripts remain in private reports or PR evidence.
 
+## Away capacity handoffs
+
+The 2026-10-27 Firstmate-lite check uses the version 2 away-record interface, with version 1 compatibility, and synthetic provider fixtures rather than live agents.
+Refresh the checks with:
+
+```sh
+bash bin/fm-test-run.sh --jobs 1 tests/fm-afk-contract.test.sh tests/fm-control.test.sh tests/fm-control-relaunch.test.sh
+```
+
+The cap-selection regression verifies an unspecified cap, explicit finite limits, and preservation of both current and legacy finite limits when replacing mandate words.
+The staged-handoff regression reproduces `caps concurrent workers at 4; 16 AI worker slot(s)` with five staged contexts, ten historical records, and a validated repair awaiting delivery.
+Its verified-exit counterfactual admits the handoff while preserving independent continuation evidence, unmerged bytes, task identity, and deferred status; an unattributed record restores a concrete admission refusal.
+The relaunch regression then verifies actual replacement launch through the lifecycle interface after parking another holder, without deleting that holder's record.
+All three scripts report `exit=0` and `gate_skip=false`.
+Existing lifecycle cases retain conservative treatment of late agents, uncertain or missing endpoints, stale receipts, and unsupported liveness.
+
+The decision procedure is owned by `bin/fm-branch-prompt.sh` "Capacity recovery while away", shared by the Pi branch and supervision host; the AFK skill points other primaries to that same owner.
+These deterministic checks prove the supported recovery path and refusal boundaries, not model compliance with the prompt or a live vendor lifecycle interaction.
+No harness mechanics or runtime-backend classification changed.
+
 ## Native session-start delivery
 
 The cross-harness transport pass ran on 2026-07-17 with Codex 0.144.4, Grok 0.2.103, OpenCode 1.17.18, Pi 0.80.10, and the tracked Claude hook wiring.
