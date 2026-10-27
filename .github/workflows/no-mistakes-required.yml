@@ -23,11 +23,23 @@ jobs:
   check:
     name: PR must be raised via no-mistakes
     runs-on: ubuntu-latest
-    if: >-
-      github.event.pull_request.user.login != 'github-actions[bot]' &&
-      github.event.pull_request.user.login != 'dependabot[bot]'
     steps:
-      - name: Verify no-mistakes signature and pipeline attestation
-        uses: kunchenguid/no-mistakes/.github/actions/require-no-mistakes@f6441c96c352a18b9cadcaef6b6c7017e9ac3970 # v1.80.1
+      # Read the policy consumer from the base, never execute PR head code here.
+      - uses: actions/checkout@v6
         with:
-          exempt-authors: kunchenguid
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Evaluate current-head conditional delivery declaration
+        id: delivery
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f bin/fm-delivery-record.py ]; then
+            python3 bin/fm-delivery-record.py check-live
+          else
+            # First rollout: the base has not gained the consumer yet.
+            echo 'direct=false' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify no-mistakes signature and pipeline attestation
+        if: steps.delivery.outputs.direct != 'true'
+        uses: kunchenguid/no-mistakes/.github/actions/require-no-mistakes@f6441c96c352a18b9cadcaef6b6c7017e9ac3970 # v1.80.1

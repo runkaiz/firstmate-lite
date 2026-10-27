@@ -13,6 +13,9 @@
 # `## Captain's intent` line opening with a Captain label or address. Firstmate may adjust other
 # sections when the task genuinely deviates (e.g. working an existing external
 # PR instead of shipping a new one).
+# --delivery-surface <internal-only|product-facing|mixed|unknown> records the
+# per-task semantic intake result (default unknown); never infer it from paths.
+# bin/fm-delivery-record.py owns the conditional PR record and trust limits.
 # Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab]
 #        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab]
 #   --scout writes the scout contract instead: the deliverable is a report at
@@ -172,7 +175,10 @@ case "$CONFIG" in /*) ;; *) CONFIG="$PWD/$CONFIG" ;; esac
 KIND=ship
 HERDR_LAB=0
 NO_PROJECTS=0
+# --delivery-surface records the semantic intake classification for the
+# conditional direct path; bin/fm-delivery-record.py owns its public PR record.
 MODE=
+DELIVERY_SURFACE=unknown
 MODE_SET=0
 BRANCH_PREFIX=fm/
 BRANCH_PREFIX_SET=0
@@ -194,6 +200,7 @@ for a in "$@"; do
     esac
     case "$want_value" in
       mode) MODE=$a; MODE_SET=1 ;;
+      delivery-surface) DELIVERY_SURFACE=$a ;;
       branch-prefix) BRANCH_PREFIX=$a; BRANCH_PREFIX_SET=1 ;;
       base-branch) BASE_BRANCH=$a; BASE_BRANCH_SET=1 ;;
       forge) FORGE=$a; FORGE_SET=1 ;;
@@ -210,6 +217,8 @@ for a in "$@"; do
     --secondmate) echo "error: persistent secondmate charters are no longer supported" >&2; exit 1 ;;
     --herdr-lab) HERDR_LAB=1 ;;
     --no-projects) NO_PROJECTS=1 ;;
+    --delivery-surface) want_value=delivery-surface ;;
+    --delivery-surface=*) DELIVERY_SURFACE=${a#--delivery-surface=} ;;
     --mode) want_value=mode ;;
     --mode=*) MODE=${a#--mode=}; MODE_SET=1 ;;
     --branch-prefix) want_value="branch-prefix" ;;
@@ -232,6 +241,7 @@ for a in "$@"; do
   esac
 done
 [ -z "$want_value" ] || { echo "error: --$want_value requires a value" >&2; exit 1; }
+fm_delivery_surface_valid "$DELIVERY_SURFACE" || exit 1
 
 # Ship delivery mode is an explicit per-task decision (AGENTS.md section 7). A
 # missing or invalid value stops the scaffold rather than silently defaulting.
@@ -254,6 +264,10 @@ fi
 
 # A ship branch's prefix is optional per-project cosmetics, not a delivery
 # decision, but it still only makes sense where a branch is actually created.
+if [ "$KIND" != ship ] && [ "$DELIVERY_SURFACE" != unknown ]; then
+  echo "error: --delivery-surface applies only to ship briefs" >&2
+  exit 1
+fi
 if [ "$KIND" != ship ] && [ "$BRANCH_PREFIX_SET" -eq 1 ]; then
   echo "error: --branch-prefix applies only to ship briefs; a scout makes no branch" >&2
   exit 1
@@ -589,7 +603,7 @@ case "$MODE" in
     ;;
 esac
 RULE1=$(fm_ship_rule_one "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH") || exit 1
-DOD=$(fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH" "$UPSTREAM_CONSENT") || exit 1
+DOD=$(fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH" "$UPSTREAM_CONSENT" "$DELIVERY_SURFACE") || exit 1
 
 cat > "$BRIEF" <<EOF
 You are a crewmate: an autonomous worker agent managed by firstmate. Work on your own; do not wait for a human.

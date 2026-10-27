@@ -5,16 +5,26 @@ Preserve its MIT license and existing attribution when redistributing changes.
 Select the intended Firstmate-lite repository and contribution target explicitly; the upstream Firstmate repository is not an implicit destination for derivative changes.
 One rule up front:
 
-**Human-authored pull requests targeting `main` must be raised through [`no-mistakes`](https://github.com/kunchenguid/no-mistakes).**
+**Pull requests targeting `main` use [`no-mistakes`](https://github.com/kunchenguid/no-mistakes), except explicitly classified internal-only changes under the conditional delivery policy.**
 We require this to reduce the maintainer's burden of reviewing and merging contributions.
 
 `no-mistakes` puts a local git proxy in front of your real remote.
 Pushing through it runs an AI-driven review/test/lint pipeline in an isolated worktree, forwards the push upstream only after every check passes, and opens a clean PR automatically.
 
-A GitHub Actions check (`Require no-mistakes`) runs on PRs targeting `main` and requires both the deterministic signature and a parseable structured attestation from no-mistakes v1.46.0 or newer.
-The attestation must bind to the current PR head commit and report the review, test, and document steps as completed, so a stale attestation, a missing `head_sha`, or a skipped required step fails.
-It evaluates every PR opening and body edit independently, reruns after head synchronization or reopening, and prevents a later edit from replacing an earlier pending compliance check.
-GitHub Actions and Dependabot are exempt so their automation keeps working, but other contributor PRs that do not satisfy the attestation contract will not be reviewed or merged.
+The GitHub Actions job `PR must be raised via no-mistakes` accepts a current-head-bound internal-only delivery declaration or requires the existing no-mistakes signature and structured pipeline attestation (v1.46.0 or newer).
+The pipeline attestation must bind to the current PR head and report review, test, and document as completed.
+The conditional declaration has its own format and never claims those pipeline steps ran; [`bin/fm-delivery-record.py`](bin/fm-delivery-record.py) owns its fields, producer/consumer commands, rejection behavior, and structural trust limits.
+Both declarations are author-editable guardrails, not authenticated or signed proof: a contributor can lie about scope just as they can forge the existing pipeline body assertion.
+There are no author, bot, branch, or label exemptions.
+Ordinary lint, tests and other CI checks apply to both paths, and configured merge authority still applies.
+
+Semantic intake, owned by [Delivery posture](.agents/skills/project-management/SKILL.md#delivery-posture), selects the conditional leg.
+Firstmate supervision behavior is product behavior even when implemented in tooling.
+For a genuinely internal-only task, pass `--mode direct-PR --delivery-surface internal-only` to `bin/fm-brief.sh` or `bin/fm-promote.sh`; the generated delivery instructions carry the command that appends the record for the final committed head to the PR body.
+Human contributors can run the same producer with their explicitly chosen mode, surface and full head SHA.
+Reclassification replaces or removes the record, and every head change requires regeneration.
+Missing, malformed, stale, duplicate, unknown, product-facing, or mixed declarations fall through to the full pipeline verifier.
+The workflow reads current PR facts from GitHub even on reruns and executes the policy consumer from the base commit, with read-only permissions.
 
 ## Workflow
 
@@ -47,7 +57,7 @@ Bind the checks to the GitHub Actions app already producing them, rather than ac
 No new app installation or manual runner setup is needed for that setting.
 
 Require the actual job contexts: `Lint 1`, `Lint 2`, `Test coverage guard`, `Repo invariants`, `Stock macOS Bash snapshot compatibility`, `Behavior portable parallel 1`, `Behavior portable parallel 2`, `Behavior portable serial 1` through `Behavior portable serial 9`, `Behavior tests (Herdr)`, `Behavior timing aggregate`, and `PR must be raised via no-mistakes`.
-The last name is the compliance job context, not its workflow title; its existing automation exceptions remain unchanged.
+The last name is the compliance job context, not its workflow title; it evaluates the conditional delivery contract described above.
 The timing aggregate is not a substitute for individual jobs because it can succeed while collecting evidence from a failed run.
 
 Apply the approved rule change only after the corresponding workflow is green and landed, confirming exact names and the Actions integration id from real checks first.
