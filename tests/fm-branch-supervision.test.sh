@@ -69,8 +69,72 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
     *"A second mate's status log is a relay channel for its child work"*"retiring a second mate is MAIN's alone"*"Report a second mate's signal wake from the status lines that wake newly presents"*"A second mate's stale wake is a liveness event: report it even when it presents no new status lines."*) ;;
     *) fail "branch prompt lost the second-mate relay, signal-span, or stale-liveness rule" ;;
   esac
+  # This checks the generated agent interface, not whether a model follows it.
+  case "$out_a" in
+    *'`bin/fm-tasks-axi.sh show <refused-handoff-task> --full`'*'Keep the resolved hold target separate from the wake/report task id'*'re-resolve the refused handoff in the existing backlog'*'never add `--title` or create a surrogate producer task'*'report unresolved handoff identity'*) ;;
+    *) fail "emitted capacity recovery rule lacks backlog resolution and missing-target safeguards" ;;
+  esac
   pass "branch prompt is byte-stable across homes, cwd, timezone, and time, above the cache floor"
 }
+
+# Executable mechanics only: the caller supplies the refused delivery identity.
+# This does not simulate or prove the supervisor's target-selection decision.
+test_delivery_hold_is_independent_of_the_producer_report_scope() (
+  local home="$TMP_ROOT/delivery-hold" out rc before held
+  mkdir -p "$home/state" "$home/data" "$home/config"
+  fm_test_tasks_toml "$home/.tasks.toml"
+  export FM_HOME="$home" PI_CODING_AGENT=true FM_SUPERVISION_ACTOR=branch
+  export FM_LEASE_HOLDER_PID=$$ FM_BRANCH_REPORT_TURN=delivery-hold
+  printf '%s\n' "$$" > "$home/state/.lock"
+  printf 'turn=delivery-hold\nrows=1\ntasks=repair\nunscoped=0\nposture=attended\nwake=signal: repair.status\n' \
+    > "$home/state/.supervision-host-turn"
+  bash "$ROOT/bin/fm-lease.sh" claim backlog >/dev/null || fail "backlog lease refused"
+  bash "$ROOT/bin/fm-tasks-axi.sh" add delivery 'Deliver validated sample repair' \
+    --kind ship --repo sample --body 'Authorized delivery of the completed repair.' >/dev/null \
+    || fail "could not queue the distinct delivery task"
+  before=$(cat "$home/data/backlog.md")
+
+  # Reproduce the missing-producer refusal without creating its suggested row.
+  bash "$ROOT/bin/fm-lease.sh" claim repair >/dev/null || fail "producer lease refused"
+  out=$(bash "$ROOT/bin/fm-captain-hold.sh" hold repair --reason 'Unknown worker ownership prevents admission' 2>&1)
+  rc=$?
+  [ "$rc" -ne 0 ] || fail "holding the absent producer unexpectedly succeeded"
+  assert_contains "$out" '--title is required to create task repair' "missing producer refusal changed"
+  [ "$(cat "$home/data/backlog.md")" = "$before" ] || fail "failed producer hold changed the backlog"
+  bash "$ROOT/bin/fm-lease.sh" release repair >/dev/null || fail "producer release refused"
+
+  # Change only the selected identity: query and hold the existing delivery.
+  out=$(bash "$ROOT/bin/fm-tasks-axi.sh" show delivery --full) || fail "delivery lookup failed"
+  assert_contains "$out" 'state: queued' "delivery was not queued"
+  assert_contains "$out" 'Authorized delivery of the completed repair.' "lookup lost the delivery context"
+  bash "$ROOT/bin/fm-lease.sh" claim delivery >/dev/null || fail "delivery lease refused"
+  bash "$ROOT/bin/fm-captain-hold.sh" hold delivery --reason 'Unknown worker ownership prevents admission' >/dev/null \
+    || fail "existing delivery hold failed"
+  bash "$ROOT/bin/fm-captain-hold.sh" open delivery >/dev/null || fail "delivery hold was not durable"
+  held=$(cat "$home/data/backlog.md")
+  out=$(bash "$ROOT/bin/fm-captain-hold.sh" open repair --distinguish-absent 2>&1); rc=$?
+  [ "$rc" -eq 3 ] || fail "a surrogate producer task was created"
+
+  # The report must still name the producer from the wake, not the held task.
+  out=$(bash "$ROOT/bin/fm-branch-report.sh" --task delivery --verdict captain \
+    --summary 'Delivery held for unresolved worker ownership' 2>&1); rc=$?
+  [ "$rc" -eq 3 ] || fail "report accepted the hold target outside the wake scope"
+  [ ! -e "$home/state/branch-outcomes.jsonl" ] || fail "refused report wrote an outcome"
+  bash "$ROOT/bin/fm-branch-report.sh" --task repair --verdict captain \
+    --summary 'Delivery held for unresolved worker ownership' >/dev/null || fail "producer-scoped report failed"
+  python3 - "$home/state/branch-outcomes.jsonl" <<'PY' || fail "wrong durable report identity"
+import json, sys
+with open(sys.argv[1]) as stream:
+    rows = [json.loads(line) for line in stream]
+assert len(rows) == 1, rows
+assert rows[0]['task'] == 'repair' and rows[0]['verdict'] == 'captain', rows
+PY
+  [ "$(cat "$home/data/backlog.md")" = "$held" ] || fail "report changed the delivery hold"
+  bash "$ROOT/bin/fm-captain-hold.sh" open delivery >/dev/null || fail "report lost the delivery hold"
+  bash "$ROOT/bin/fm-lease.sh" release delivery >/dev/null || fail "delivery release refused"
+  bash "$ROOT/bin/fm-lease.sh" release backlog >/dev/null || fail "backlog release refused"
+  pass "CLI mechanics hold existing delivery while reporting its distinct producer; no surrogate is created"
+)
 
 # --- append-only outcome store ------------------------------------------------
 
@@ -1621,6 +1685,7 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   pass 'away A lands and records completion, eligible B starts, independent hold persists; missing authority, failed validation, dirty copy and decisions refuse'
 }
 
+test_delivery_hold_is_independent_of_the_producer_report_scope
 test_branch_prompt_is_byte_stable_and_above_cache_floor
 test_outcome_store_is_append_only_with_cursor_reads
 test_outcome_append_keeps_a_bounded_display_tail
