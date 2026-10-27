@@ -158,7 +158,11 @@ A historical record without a verifiable endpoint remains a concrete reconciliat
 After confirmed exits, retry the authorized dispatch through `bin/fm-spawn.sh`, or continue an existing worker through `bin/fm-control.sh <task> relaunch --note <continuation>` when that is the supported handoff.
 Honor the recorded finite away cap and the independent project-capacity admission contract; parking an AI worker does not itself free a project place.
 Never raise a cap or relax validation, merge authority, or the mandate to unblock a handoff.
-If no safe lifecycle step can make progress, report verdict captain once for that unchanged blocker with the affected handoff, exact refusal, uncertain holders, and required remedy; record the hold through the existing task/backlog owners so it remains visible at return.
+If no safe lifecycle step can make progress, first claim the affected handoff task and `backlog` leases, then run `bin/fm-captain-hold.sh hold <handoff-task> --reason <blocker-and-required-remedy>` in the owning home; hold the delivery work item even when the wake names its finished producer.
+Before reporting the escalation as handled, run `bin/fm-captain-hold.sh open <handoff-task>` and require exit 0, which verifies the durable captain hold.
+Only then report verdict captain once for that unchanged blocker with the affected handoff, exact refusal, uncertain holders, and required remedy, using the wake's task id for the report.
+An earlier captain outcome alone does not complete this handling: verify the hold before suppressing an unchanged follow-up, and repair a missing hold through the same owner.
+If a lease, hold, or verification fails, report that concrete failure without claiming the hold was recorded or treating the blocker as durably handled; never replace the hold with an outcome note.
 A new refusal or changed ownership evidence is new information to handle; an unchanged cap refusal is not progress or a healthy external wait.
 
 # Discipline
