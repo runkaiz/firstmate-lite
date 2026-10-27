@@ -362,7 +362,7 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<s
   fi
   if [ "$mode" = direct-PR ] && [ "$surface" = internal-only ]; then
     delivery_record_instruction="Semantic intake classified this task as internal-only; supervision behavior is product-facing even when implemented as tooling.
-For a repository using the conditional provenance gate, append the output of \`python3 $record_tool emit --mode direct-PR --surface internal-only --head \"\$(git rev-parse HEAD)\"\` to the PR body after committing.
+For a repository using the conditional provenance gate, append the output of \`python3 $record_tool emit --head \"\$(git rev-parse HEAD)\"\` to the PR body after committing.
 Regenerate that record after every head change, and remove it if reclassification requires full no-mistakes.
 This is an author-editable delivery declaration, never evidence of pipeline completion or authenticated authorization."
   fi

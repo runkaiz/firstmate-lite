@@ -21,8 +21,8 @@ Ordinary lint, tests and other CI checks apply to both paths, and configured mer
 Semantic intake, owned by [Delivery posture](.agents/skills/project-management/SKILL.md#delivery-posture), selects the conditional leg.
 Firstmate supervision behavior is product behavior even when implemented in tooling.
 For a genuinely internal-only task, pass `--mode direct-PR --delivery-surface internal-only` to `bin/fm-brief.sh` or `bin/fm-promote.sh`; the generated delivery instructions carry the command that appends the record for the final committed head to the PR body.
-Human contributors can run the same producer with their explicitly chosen mode, surface and full head SHA.
-Reclassification replaces or removes the record, and every head change requires regeneration.
+Human contributors can run the same producer with their full head SHA after explicitly classifying the task as internal-only direct-PR work.
+Reclassification removes the record, and every head change requires regeneration.
 Missing, malformed, stale, duplicate, unknown, product-facing, or mixed declarations fall through to the full pipeline verifier.
 The workflow reads current PR facts from GitHub even on reruns and executes the policy consumer from the base commit, with read-only permissions.
 

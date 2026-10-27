@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Produce and consume Firstmate conditional delivery declarations.
 
-emit --mode MODE --surface SURFACE --head SHA prints the PR-body record after
-semantic intake classification; it is not pipeline provenance or authentication.
-check --pr-json FILE consumes normalized GitHub PR JSON and prints the decision.
+emit --head SHA prints the internal-only direct-PR body record after semantic
+intake classification; it is not pipeline provenance or authentication.
 check-live reads the PR number from GITHUB_EVENT_PATH, fetches its current body
 and head through the GitHub API, and writes direct=true/false to GITHUB_OUTPUT.
 The workflow falls through to the existing no-mistakes action unless direct=true.
@@ -15,7 +14,7 @@ pipeline assertion. Semantic intake must treat supervision behavior as product,
 not infer internal-only from a path, branch, author or repository name.
 One complete v1 record with exactly these fields is accepted for the current
 head only. Missing, duplicate, unknown-version, malformed, stale, or non-internal
-records require the full no-mistakes verifier. Reclassification replaces/removes
+records require the full no-mistakes verifier. Reclassification removes
 the record; head changes require regenerating it. Normal CI still applies.
 """
 
@@ -111,27 +110,21 @@ def live_pr():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    emit = commands.add_parser("emit", help="serialize an intake classification for a committed head")
-    emit.add_argument("--mode", required=True, choices=("direct-PR", "no-mistakes", "local-only"))
-    emit.add_argument("--surface", required=True, choices=("internal-only", "product-facing", "mixed", "unknown"))
+    emit = commands.add_parser("emit", help="serialize an internal-only direct-PR declaration for a committed head")
     emit.add_argument("--head", required=True)
-    check = commands.add_parser("check", help="judge normalized GitHub PR JSON")
-    check.add_argument("--pr-json", required=True)
     commands.add_parser("check-live", help="judge live GitHub PR body/head and emit workflow output")
     args = parser.parse_args()
     try:
         if args.command == "emit":
             if not sha_valid(args.head):
                 raise ValueError("--head must be a full lowercase Git commit SHA")
-            record = dict(policy=POLICY, mode=args.mode, surface=args.surface, head_sha=args.head)
+            record = dict(policy=POLICY, mode="direct-PR", surface="internal-only", head_sha=args.head)
             print(VERSION + json.dumps(record, separators=(",", ":")) + CLOSING)
             return 0
-        pr = live_pr() if args.command == "check-live" else json.loads(Path(args.pr_json).read_text())
-        direct = internal_direct(pr)
+        direct = internal_direct(live_pr())
         print(json.dumps({"direct": direct, "requires_no_mistakes": not direct}))
-        if args.command == "check-live":
-            with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-                output.write("direct=" + str(direct).lower() + "\n")
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+            output.write("direct=" + str(direct).lower() + "\n")
         return 0
     except (OSError, ValueError, KeyError, TypeError, urllib.error.URLError):
         print("::error::Could not evaluate delivery declaration from current PR facts.", file=sys.stderr)

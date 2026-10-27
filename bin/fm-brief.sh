@@ -16,7 +16,7 @@
 # --delivery-surface <internal-only|product-facing|mixed|unknown> records the
 # per-task semantic intake result (default unknown); never infer it from paths.
 # bin/fm-delivery-record.py owns the conditional PR record and trust limits.
-# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab]
+# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab]
 #        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab]
 #   --scout writes the scout contract instead: the deliverable is a report at
 #   data/<task-id>/report.md (no branch, no push, no PR) and the worktree is scratch.

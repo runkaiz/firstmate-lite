@@ -79,6 +79,7 @@ python3 - "$ROOT" "$TMP_ROOT" "$VERIFY" <<'PYTEST' || fail "conditional delivery
 import json
 import os
 import re
+import runpy
 import subprocess
 import sys
 import threading
@@ -89,26 +90,20 @@ root, scratch, verifier = map(Path, sys.argv[1:])
 consumer = root / "bin/fm-delivery-record.py"
 sha = "2" * 40
 other = "1" * 40
-pr_file = scratch / "pr.json"
+internal_direct = runpy.run_path(str(consumer))["internal_direct"]
 
 def call(*args, env=None, cwd=None):
     return subprocess.run(list(map(str, args)), env=env, cwd=cwd,
                           capture_output=True, text=True, check=False)
 
-def produce(mode="direct-PR", surface="internal-only", head=sha):
-    result = call("python3", consumer, "emit", "--mode", mode,
-                  "--surface", surface, "--head", head)
+def produce(head=sha):
+    result = call("python3", consumer, "emit", "--head", head)
     assert result.returncode == 0, result.stderr
     return result.stdout.strip()
 
 def judge(body, head=sha, author="contributor"):
     pr = dict(number=1, body=body, head=dict(sha=head, ref="synthetic"), user=dict(login=author))
-    pr_file.write_text(json.dumps(pr))
-    result = call("python3", consumer, "check", "--pr-json", pr_file)
-    assert result.returncode == 0, result.stderr
-    decision = json.loads(result.stdout)
-    assert decision["requires_no_mistakes"] == (not decision["direct"])
-    return decision["direct"]
+    return internal_direct(pr)
 
 def falls_through(body, head=sha, author="contributor"):
     assert not judge(body, head, author), (body, head, author)
@@ -123,9 +118,9 @@ internal = produce()
 assert judge(internal)
 falls_through("Ordinary direct PR without pipeline provenance.")
 for surface in ("product-facing", "mixed", "unknown"):
-    falls_through(produce(surface=surface))
+    falls_through(internal.replace('"surface":"internal-only"', f'"surface":"{surface}"'))
 for mode in ("no-mistakes", "local-only"):
-    falls_through(produce(mode=mode))
+    falls_through(internal.replace('"mode":"direct-PR"', f'"mode":"{mode}"'))
 falls_through(internal, other)
 falls_through(internal + "\n" + internal)
 falls_through(internal.replace("v1 ", "v2 "))
@@ -147,10 +142,9 @@ for actor in ("contributor", "kunchenguid", "github-actions[bot]", "dependabot[b
     assert judge(internal, author=actor)
     falls_through("No delivery or pipeline declaration", author=actor)
 assert judge(internal)
-falls_through(produce(surface="product-facing"))
+falls_through("")
 assert judge(produce(head=other), other)
-assert call("python3", consumer, "emit", "--mode", "direct-PR", "--surface", "untrusted", "--head", sha).returncode != 0
-assert call("python3", consumer, "emit", "--mode", "direct-PR", "--surface", "internal-only", "--head", "short").returncode != 0
+assert call("python3", consumer, "emit", "--head", "short").returncode != 0
 print("PASS: actual producer/consumer admits internal-only, falls through for all non-internal/invalid/stale cases, independent of author")
 
 # Generate the intake instructions and execute their actual producer command
@@ -197,7 +191,8 @@ thread = threading.Thread(target=server.serve_forever, daemon=True)
 thread.start()
 event = scratch / "event.json"
 output = scratch / "github-output"
-event.write_text(json.dumps(dict(pull_request=dict(number=1, body=produce(surface="mixed"), head=dict(sha=other)))))
+mixed = internal.replace('"surface":"internal-only"', '"surface":"mixed"')
+event.write_text(json.dumps(dict(pull_request=dict(number=1, body=mixed, head=dict(sha=other)))))
 env = os.environ.copy()
 env.update(GITHUB_EVENT_PATH=str(event), GITHUB_OUTPUT=str(output), GITHUB_REPOSITORY="synthetic/project",
            GITHUB_TOKEN="synthetic-token", GITHUB_API_URL=f"http://127.0.0.1:{server.server_port}")
@@ -205,16 +200,20 @@ def live(expected):
     output.write_text("")
     result = call("python3", consumer, "check-live", env=env)
     assert result.returncode == 0, result.stderr
-    assert json.loads(result.stdout)["direct"] is expected
+    assert json.loads(result.stdout) == dict(direct=expected, requires_no_mistakes=not expected)
     assert output.read_text() == "direct=" + str(expected).lower() + "\n"
 try:
     live(True)
-    state["body"] = produce(surface="mixed")
+    state["body"] = mixed
+    live(False)
+    state["body"] = ""
     live(False)
     state["body"] = internal
     state["head"] = other
     live(False)
     state["body"] = produce(head=other)
+    live(True)
+    state.update(body=emitted.stdout, head=committed)
     live(True)
     state["status"] = 403
     output.write_text("")
