@@ -65,7 +65,7 @@ A relaunch does take one session reference when the endpoint's own runtime recor
 ## AFK worker occupancy
 
 A confirmed `exit` preserves the task and records evidence that can release its AFK AI-worker slot while a fresh supported liveness read still proves the agent stopped.
-Completion status alone does not prove a worker stopped; missing or unverified endpoints retain occupancy.
+Completion status alone does not prove a worker stopped; generic missing or unverified endpoints retain occupancy (exact Herdr absence follows the receipt contract below).
 Typed steering to that preserved worker refuses until `relaunch` reacquires capacity; ordinary inbox messages remain queued for recovery.
 Unknown worker liveness retains occupancy, and arbitrary background jobs keep their existing controls rather than counting as AI workers.
 `bin/fm-afk-capacity-lib.sh` owns the receipt, fresh liveness validation, reservation, and locking contract.

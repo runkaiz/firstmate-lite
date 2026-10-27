@@ -1212,16 +1212,20 @@ test_afk_slots_require_a_verified_stop_and_preserve_evidence() {
 }
 
 test_afk_staged_contexts_and_history_block_handoff_until_parked() {
-  local dir out id n before
+  local dir out id n before before_status
   dir=$(new_case afk-staged-handoff)
   write_afk_fixture "$dir" 4
-  # Five independent staged contexts, ten historical/deferred records and
-  # one validated repair awaiting a delivery worker: none imply a stopped AI.
+  # Five independent staged contexts, ten unreconciled deferred records and
+  # one validated repair awaiting delivery: none yet has a stopped receipt.
   for n in {1..16}; do
     id="context-$n"
     add_task "$dir" "$id" claude scout
     printf 'spawn_gen=incarnation-%s\n' "$n" >> "$dir/home/state/$id.meta"
-    printf 'paused: staged or deferred\n' > "$dir/home/state/$id.status"
+    if [ "$n" -le 5 ]; then
+      printf 'paused: staged context\n' > "$dir/home/state/$id.status"
+    else
+      printf 'done: deferred unmerged work\n' > "$dir/home/state/$id.status"
+    fi
     printf 'independent continuation %s\n' "$n" > "$dir/home/data/$id/report.md"
     printf 'unmerged change %s\n' "$n" > "$dir/wt-$id/uncommitted.txt"
   done
@@ -1235,16 +1239,23 @@ test_afk_staged_contexts_and_history_block_handoff_until_parked() {
   out=$(afk_fresh_attempt "$dir") || :
   assert_not_contains "$out" 'caps concurrent workers' 'unspecified cap blocked the handoff'
   write_afk_fixture "$dir" 4
-  # Change only stop evidence through the supported owner, never delete a
-  # historical record or copy. Recovery notes and unmerged bytes must survive.
-  for n in {1..13}; do
+  # First park the ten deferred workers through their owner. They become
+  # historical records with receipts, distinct from the six remaining holders.
+  # Then park three staged contexts to admit delivery under the unchanged cap.
+  for n in {6..15} {1..3}; do
+    if [ "$n" -eq 1 ]; then
+      out=$(afk_fresh_attempt "$dir") || :
+      assert_contains "$out" 'caps concurrent workers at 4; 6 AI worker slot(s)' 'parked history still occupied slots'
+      assert_contains "$out" '(context-1, context-16, context-2, context-3, context-4, context-5)' 'parked history and remaining workers were not distinguished'
+    fi
     id="context-$n"
     before=$(cat "$dir/home/state/$id.meta")
+    before_status=$(cat "$dir/home/state/$id.status")
     out=$(run_control "$dir" "$id" exit) || fail "parking $id failed: $out"
     [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/$id.meta")" = "$before" ] || fail 'parking changed identity'
     [ "$(cat "$dir/home/data/$id/report.md")" = "independent continuation $n" ] || fail 'continuation lost'
     [ "$(cat "$dir/wt-$id/uncommitted.txt")" = "unmerged change $n" ] || fail 'unmerged copy changed'
-    [ "$(cat "$dir/home/state/$id.status")" = 'paused: staged or deferred' ] || fail 'parking reactivated deferred work'
+    [ "$(cat "$dir/home/state/$id.status")" = "$before_status" ] || fail 'parking reactivated deferred work'
   done
   out=$(afk_fresh_attempt "$dir") || :
   assert_not_contains "$out" 'caps concurrent workers' 'supported parking did not admit delivery'

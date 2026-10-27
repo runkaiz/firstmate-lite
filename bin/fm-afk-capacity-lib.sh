@@ -4,8 +4,8 @@
 #
 # Occupancy is conservative: every ordinary task record holds a slot unless
 # fm-control exit recorded afk_worker_stopped=<spawn_gen> (legacy when absent)
-# AND the recovery-grade backend classifier still proves its agent dead.
-# Completion, PRs, holds, idle turns and missing/unreadable endpoints do not
+# AND fresh backend evidence proves its agent dead or its exact Herdr pane gone.
+# Completion, PRs, holds, idle turns and generic missing/unreadable states do not
 # prove a stop. Reports, branches and arbitrary background jobs are untouched;
 # this is not a limit on all background computation.
 #
@@ -34,7 +34,18 @@ fm_afk_capacity_released() {  # <meta>
   fm_backend_validate_task_endpoint "$meta" "$id" >/dev/null 2>&1 || return 1
   backend=$FM_BACKEND_VALIDATED_BACKEND
   target=$FM_BACKEND_VALIDATED_TARGET
-  [ "$(fm_backend_agent_state "$backend" "$target" 2>/dev/null)" = dead ]
+  case "$(fm_backend_agent_state "$backend" "$target" 2>/dev/null)" in
+    dead) return 0 ;;
+    missing)
+      # Herdr also maps a stopped server to missing. Only a fresh, exact pane
+      # absence releases this receipt; counting must never start that server.
+      [ "$backend" = herdr ] || return 1
+      fm_backend_source herdr || return 1
+      fm_backend_herdr_parse_target "$target" || return 1
+      [ "$(fm_backend_herdr_pane_presence_state "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE" 2>/dev/null)" = dead ]
+      ;;
+    *) return 1 ;;
+  esac
 }
 
 # Caller holds the metadata lock (and control lock when stopping, or task-set

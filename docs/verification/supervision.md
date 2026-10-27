@@ -16,11 +16,14 @@ bash bin/fm-test-run.sh --jobs 1 tests/fm-afk-contract.test.sh tests/fm-control.
 ```
 
 The cap-selection regression verifies an unspecified cap, explicit finite limits, and preservation of both current and legacy finite limits when replacing mandate words.
-The staged-handoff regression reproduces `caps concurrent workers at 4; 16 AI worker slot(s)` with five staged contexts, ten historical records, and a validated repair awaiting delivery.
-Its verified-exit counterfactual admits the handoff while preserving independent continuation evidence, unmerged bytes, task identity, and deferred status; an unattributed record restores a concrete admission refusal.
+The staged-handoff regression reproduces `caps concurrent workers at 4; 16 AI worker slot(s)` with five staged contexts, ten unreconciled deferred workers, and a validated repair awaiting delivery.
+Verified exit turns the ten deferred workers into parked historical records with receipts, leaving six occupied slots; parking three staged contexts then passes the AFK admission guard while preserving continuation evidence, unmerged bytes, task identity, and deferred status.
+An unattributed record restores a concrete admission refusal.
 The relaunch regression then verifies actual replacement launch through the lifecycle interface after parking another holder, without deleting that holder's record.
-All three scripts report `exit=0` and `gate_skip=false`.
-Existing lifecycle cases retain conservative treatment of late agents, uncertain or missing endpoints, stale receipts, and unsupported liveness.
+The Herdr regression reproduces verified `endpoint-gone` exit retaining a slot, then checks fresh exact-absence admission and replacement launch with preserved work through the canned provider.
+It also checks that counting never starts a server and retains occupancy for stopped-server, unreadable, malformed, mismatched-pane, live-agent, stale-receipt, foreign-owner, inconsistent-session, and missing-receipt cases.
+Existing lifecycle cases retain conservative treatment of late agents, uncertain endpoints, stale receipts, and unsupported liveness.
+The focused capacity-fix check, `bash bin/fm-test-run.sh --jobs 1 --per-script-timeout-secs 170 tests/fm-control.test.sh tests/fm-control-relaunch.test.sh`, reported `total=2 failed=0 skipped_gate=0`; temporary read-only hook directories required separate cleanup after the relaunch script.
 
 The decision procedure is owned by `bin/fm-branch-prompt.sh` "Capacity recovery while away", shared by the Pi branch and supervision host; the AFK skill points other primaries to that same owner.
 These deterministic checks prove the supported recovery path and refusal boundaries, not model compliance with the prompt or a live vendor lifecycle interaction.
