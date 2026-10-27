@@ -28,9 +28,11 @@ The workflow reads current PR facts from GitHub even on reruns and executes the 
 
 ## Workflow
 
+When the contribution policy above selects no-mistakes, use this workflow.
+
 1. Fork the intended Firstmate-lite repository, then clone its parent or set your local `origin` to that explicitly selected parent.
 2. Create a branch and make your changes.
-3. Initialize the gate with your fork as the push target: `no-mistakes init --fork-url <your-fork-clone-url>` (contributing requires **no-mistakes v1.46.0+** for structured attestation; without a fork, plain `no-mistakes init` still works for maintainers with push access).
+3. Initialize the gate with your fork as the push target: `no-mistakes init --fork-url <your-fork-clone-url>` (this path requires **no-mistakes v1.46.0+** for structured attestation; without a fork, plain `no-mistakes init` still works for maintainers with push access).
 4. Commit your changes.
 5. Push through the gate instead of pushing to `origin`:
 
@@ -78,7 +80,7 @@ Coordinate any workflow rollback with its required-check names so a retired chec
   A local `config/backlog-backend=manual` opt-out forces firstmate's routine backlog updates to hand-editing and stays gitignored; validated secondmate handoffs still delegate through `tasks-axi mv`.
   A local `config/backend` file explicitly overrides runtime auto-detection for new task endpoints and stays gitignored; spawn-supported values are `tmux`, `herdr` (which has its own required CI lane), and `zellij`, `orca`, and `cmux`, which remain experimental with no dedicated real-backend CI lane, while `codex-app` is documented only in `docs/codex-app-backend.md`.
   It does not make `data/` tracked.
-- Helper scripts in `bin/` are plain bash.
+- Shell helpers in `bin/` are plain bash.
   Each starts with a usage header comment; keep it accurate when you change behavior.
   Test scripts and helpers in `tests/` are plain bash too.
   `bin/fm-lint.sh` must pass: it is the single owner of the lint definition (the shellcheck file set, config, pinned shellcheck version, pinned actionlint workflow lint, and the backend-purity check rejecting direct Beads CLI calls in core `bin/` scripts).
@@ -98,7 +100,7 @@ Coordinate any workflow rollback with its required-check names so a retired chec
 
 ## Development
 
-Tracked changes to firstmate itself - `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.tasks.toml`, `.github/workflows/`, `bin/`, `.agents/skills/`, and `skills/` - ship through the `no-mistakes` pipeline on a feature branch and require an explicit merge approval.
+Tracked changes to firstmate itself - `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.tasks.toml`, `.github/workflows/`, `bin/`, `.agents/skills/`, and `skills/` - follow the contribution policy above on a feature branch and require an explicit merge approval.
 Before making any such change, load the agent-only `firstmate-coding-guidelines` skill (`.agents/skills/firstmate-coding-guidelines/SKILL.md`).
 It has the knowledge-placement rules that keep `AGENTS.md` from regrowing after each diet pass.
 Firstmate adds this skill's load line to firstmate-repo briefs by hand; the [coding-guidelines skill](.agents/skills/firstmate-coding-guidelines/SKILL.md#trigger-hygiene) owns the scaffold's detection limits.
