@@ -1,0 +1,378 @@
+=== Independent simultaneous writers and duplicate admission ===
+$ fm-queue.sh add work-3 'Accepted work'
+ok: add work-3
+task:
+  id: work-3
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-1 'Accepted work'
+ok: add work-1
+task:
+  id: work-1
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-0 'Accepted work'
+ok: add work-0
+task:
+  id: work-0
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-2 'Accepted work'
+ok: add work-2
+task:
+  id: work-2
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-4 'Accepted work'
+ok: add work-4
+task:
+  id: work-4
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-5 'Accepted work'
+ok: add work-5
+task:
+  id: work-5
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-6 'Accepted work'
+ok: add work-6
+task:
+  id: work-6
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-7 'Accepted work'
+ok: add work-7
+task:
+  id: work-7
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-8 'Accepted work'
+ok: add work-8
+task:
+  id: work-8
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-9 'Accepted work'
+ok: add work-9
+task:
+  id: work-9
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-10 'Accepted work'
+ok: add work-10
+task:
+  id: work-10
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh add work-11 'Accepted work'
+ok: add work-11
+task:
+  id: work-11
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh list --json
+{"tasks": [{"id": "work-3", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-1", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-0", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-2", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-4", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-5", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-6", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-7", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-8", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-9", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-10", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-11", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+concurrent add contended: exit 1
+error: identity already exists in active queue or archive: contended
+concurrent add contended: exit 1
+error: identity already exists in active queue or archive: contended
+concurrent add contended: exit 0
+ok: add contended
+task:
+  id: contended
+  title: Exactly one
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+concurrent add contended: exit 1
+error: identity already exists in active queue or archive: contended
+$ fm-queue.sh list --json
+{"tasks": [{"id": "work-3", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-1", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-0", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-2", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-4", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-5", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-6", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-7", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-8", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-9", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-10", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-11", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "contended", "title": "Exactly one", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+=== Process interruption after one archive write, then ordinary read recovery ===
+$ fm-queue.sh done contended --report data/contended/report.md --no-prune
+ok: done contended
+task:
+  id: contended
+  title: Exactly one
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: 2026-10-28
+  links: data/contended/report.md
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh prune --keep 0
+[exit 91]
+Pending durable journal exists after process exit 91.
+$ fm-queue.sh show contended --json
+{"ok": true, "task": {"id": "contended", "title": "Exactly one", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": ["data/contended/report.md"], "body": "", "archived": true}}
+[exit 0]
+$ fm-queue.sh show contended --json
+{"ok": true, "task": {"id": "contended", "title": "Exactly one", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": ["data/contended/report.md"], "body": "", "archived": true}}
+[exit 0]
+$ fm-queue.sh add contended 'Cannot reuse'
+error: identity already exists in active queue or archive: contended
+[exit 1]
+Recovery consumed journal once and retained original archived identity/link.
+=== Corrupt rows, metadata, duplicate IDs and recovery data refuse mutation ===
+$ fm-queue.sh add new 'Must refuse'
+error: malformed task row: - [ ] invalid row
+[exit 1]
+$ fm-queue.sh add new 'Must refuse'
+error: empty or ambiguous queue metadata
+[exit 1]
+$ fm-queue.sh add new 'Must refuse'
+error: duplicate active/archive identity: contended
+[exit 1]
+$ fm-queue.sh list
+error: invalid transaction roots
+[exit 1]
+Refusals left persisted input unchanged.
+=== Removing unfinished work never completes a prerequisite ===
+$ fm-queue.sh add dependent Waiting --blocked-by work-0
+ok: add dependent
+task:
+  id: dependent
+  title: Waiting
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: yes
+  blocked_by: work-0
+  deps: work-0
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ fm-queue.sh rm work-0
+error: unfinished work cannot be removed as if completed; retain it with a parked hold
+[exit 1]
+$ fm-queue.sh ready --json
+{"tasks": [{"id": "work-3", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-1", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-0", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-2", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-4", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-5", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-6", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-7", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-8", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-9", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-10", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "work-11", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+Disposable data removed.

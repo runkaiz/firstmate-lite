@@ -1,0 +1,170 @@
+$ $WORKTREE/bin/fm-lab-home.sh create $LAB
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct
+[exit 0]
+
+$ tmux -L fm-lab-queue-test new-session -d -s queue-lab -n fm-stable -x 100 -y 30 -c $WORKTREE 'sleep 600'
+[exit 0]
+
+$ tmux -L fm-lab-queue-test display-message -p -t queue-lab '#{socket_path},#{pid},0'
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/tmux-1000/fm-lab-queue-test,2608679,0
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add stable 'Accepted work'
+ok: add stable
+task:
+  id: stable
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ git init $LAB/projects/demo
+Initialized empty Git repository in /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct/projects/demo/.git/
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+[exit 0]
+
+$ git -C $LAB/projects/demo remote add origin https://example.test/disposable/demo.git
+[exit 0]
+
+$ bash -c 'set -eu
+. "$1/bin/fm-tasks-axi-lib.sh"
+. "$1/bin/fm-backlog-transition-lib.sh"
+fm_backlog_dispatch_transition "$2/state/stable.meta" "$2/data" stable "$2/state"
+fm_backlog_dispatch_transition "$2/state/stable.meta" "$2/data" stable "$2/state"
+cat "$2/state/stable.meta"
+' _ $WORKTREE $LAB
+label=stable
+spawn_gen=1
+backend=tmux
+window=queue-lab:fm-stable
+kind=scout
+mode=scout
+harness=codex
+worktree=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct/projects/demo
+project=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct/projects/demo
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show stable --json
+{"ok": true, "task": {"id": "stable", "title": "Accepted work", "state": "in_flight", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-captain-hold.sh hold scope-choice --title 'Choose the scope' --reason 'Use the small or large scope?'
+scope-choice
+[exit 0]
+
+$ $WORKTREE/bin/fm-send.sh stable --resolve-key scope-choice 'Use the small scope.'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show scope-choice --json
+{"ok": true, "task": {"id": "scope-choice", "title": "Choose the scope", "state": "done", "kind": "captain", "repo": "firstmate", "priority": null, "held": false, "hold_reason": "fm-hold-v1:VXNlIHRoZSBzbWFsbCBvciBsYXJnZSBzY29wZT8=", "hold_kind": "captain", "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": [], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: 46becf6a5cd02a51d41580fed7b4e4d49aff8ccd436c4be35e99d1f4ebe463a5\nResolution mode: answered\n\nCaptain decision:\nCaptain answered this call through a firstmate answer sent to stable.\nTask: scope-choice\nAnswer: Use the small scope.", "archived": false}}
+[exit 0]
+
+Persisted steering inbox:
+schema=fm-task-inbox.v1
+at=2026-10-28T04:15:27Z
+--
+Use the small scope.
+$ $WORKTREE/bin/fm-crew-state.sh stable
+state: unknown · source: pane · harness state unavailable (unknown codex-unverified)
+[exit 0]
+
+$ tmux -L fm-lab-queue-test kill-session -t queue-lab
+[exit 0]
+
+$ $WORKTREE/bin/fm-crew-state.sh stable
+state: unknown · source: none · backend target gone: queue-lab:fm-stable
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show stable --json
+{"ok": true, "task": {"id": "stable", "title": "Accepted work", "state": "in_flight", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh list --json
+{"tasks": [{"id": "stable", "title": "Accepted work", "state": "in_flight", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}, {"id": "scope-choice", "title": "Choose the scope", "state": "done", "kind": "captain", "repo": "firstmate", "priority": null, "held": false, "hold_reason": "fm-hold-v1:VXNlIHRoZSBzbWFsbCBvciBsYXJnZSBzY29wZT8=", "hold_kind": "captain", "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": [], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: 46becf6a5cd02a51d41580fed7b4e4d49aff8ccd436c4be35e99d1f4ebe463a5\nResolution mode: answered\n\nCaptain decision:\nCaptain answered this call through a firstmate answer sent to stable.\nTask: scope-choice\nAnswer: Use the small scope.", "archived": false}]}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add candidate 'Queued until capacity is available'
+ok: add candidate
+task:
+  id: candidate
+  title: Queued until capacity is available
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-spawn.sh candidate $LAB/projects/demo --scout --harness codex
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct
+deferred: project demo admits 1 worker(s) at once on this machine (/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.ltpmmoct/config/project-capacity) and 1 already hold a place (stable); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+[exit 75]
+
+$ $WORKTREE/bin/fm-queue.sh show candidate --json
+{"ok": true, "task": {"id": "candidate", "title": "Queued until capacity is available", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}}
+[exit 0]
+
+$ bash -c 'set -eu
+. "$1/bin/fm-wake-lib.sh"
+. "$1/bin/fm-backend.sh"
+. "$1/bin/fm-project-capacity-lib.sh"
+fm_project_capacity_lookup "$FM_HOME/config" demo
+lock=$(fm_treehouse_project_lock_path "$2")
+fm_project_capacity_occupants "$lock" "$2" "$FM_HOME/state" candidate
+printf '"'"'capacity=%s occupants=%s
+'"'"' "$FM_PROJECT_CAPACITY" "$FM_PROJECT_CAPACITY_OCCUPANTS"
+test "$FM_PROJECT_CAPACITY_OCCUPANTS" -lt "$FM_PROJECT_CAPACITY"
+' _ $WORKTREE $LAB/projects/demo
+capacity=1 occupants=0
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "candidate", "title": "Queued until capacity is available", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+
+Private terminal and disposable home removed.

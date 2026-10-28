@@ -1,0 +1,36 @@
+ok - unsupported adapters refuse before dispatch without redirecting or rewriting the queue
+ok - backend resolution preserves unreadable configuration errors for every caller
+ok - native backend resolution preserves supported overrides and refuses unsupported global selection
+ok - backlog readers and mutations refuse unresolved backends without touching either backlog
+ok - captain hold refuses backend errors and preserves relocated addressing for valid configuration
+ok - dispatch publishes the record and moves the backlog item In flight in one run
+ok - dispatch refuses to supersede a pending authoritative close
+ok - dispatch refuses held rows before creating resources
+ok - dispatch refuses dependency-blocked rows before creating resources
+ok - dispatch refuses held In-flight rows before relaunch
+ok - dispatch reads backlog rows from the backlog addressing root
+ok - recovery uses the parent of a trailing-slash data record
+ok - completion targets nested relative data from the caller directory
+ok - an immediate-child absolute data path keeps one paired backlog
+ok - bare relative data addresses one backlog through dispatch and completion
+ok - dispatch refuses symlinked backlogs without crossing homes
+ok - automatic homes refuse lifecycle mutation without the shipped native queue
+ok - dispatch refuses an unresolvable backlog data directory
+ok - completion refuses before mutation when backlog data is unresolvable
+ok - dispatch refuses, before creating anything, when the home has no item for the id
+ok - dispatch distinguishes backlog read failures from missing items
+ok - dispatch refuses a closed item instead of silently reopening it
+ok - dispatch cannot commit without a verified task-record publication
+ok - a failed backlog transition fails the dispatch loudly and leaves no record
+ok - dispatch reports when failed-transition rollback cannot remove its record
+ok - dispatch verifies both task and busy records during rollback
+ok - dispatch commits neither record nor backlog state before launch delivery succeeds
+ok - dispatch retries interrupted transitions before honoring termination
+ok - a signal-deferred spawn verifies its preserved state and repairs a row that did not move
+ok - a signal-deferred spawn reports attempted preservation as attempted when it cannot be verified
+ok - a signal-deferred spawn bounds its verification so an unresponsive tasks-axi cannot hold the meta lock forever
+ok - fm_tasks_axi bounds the call through its perl watchdog when no timeout binary exists
+ok - fm_tasks_axi's perl watchdog passes the child status and output through unchanged
+ok - fm_tasks_axi fails closed rather than running unbounded when no bounding mechanism exists
+ok - fm_tasks_axi's GNU timeout kills a child that ignores SIGTERM after one further bound
+ok - Kimi readiness interruptions fail before backlog commit

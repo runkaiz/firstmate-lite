@@ -1,0 +1,16 @@
+Before fix (parent wrapper)
+$ FM_QUEUE_BACKEND=beads fm-queue.sh list --backend markdown --json
+fm-queue: native queue supports Markdown only; backend selected by FM_QUEUE_BACKEND requires an explicit compatible export before activation
+[exit 2]
+
+Current wrapper
+$ FM_QUEUE_BACKEND=beads fm-queue.sh list --backend markdown --json
+{"tasks": [{"id": "stable", "title": "Existing accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+
+Compatibility alias
+$ FM_QUEUE_BACKEND=beads fm-tasks-axi.sh list --backend markdown --json
+{"tasks": [{"id": "stable", "title": "Existing accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+
+Disposable comparison fixture removed.

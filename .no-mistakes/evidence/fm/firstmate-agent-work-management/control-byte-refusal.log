@@ -1,0 +1,173 @@
+$ $WORKTREE/bin/fm-lab-home.sh create $WORKTREE/.test-phase-tmp/fm-lab.g4kr31c6
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.g4kr31c6
+[exit 0]
+
+
+=== Capture, authorize, and resist retained-context bypasses ===
+$ $WORKTREE/bin/fm-queue.sh add idea 'Potential improvement' --idea --body 'Unapproved proposal'
+ok: add idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Unapproved proposal
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add outcome 'Durable outcome' --outcome --body 'Related task: idea; no dependency implied'
+ok: add outcome
+task:
+  id: outcome
+  title: Durable outcome
+  state: queued
+  kind: outcome
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "outcome context; not executable"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Related task: idea; no dependency implied
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --priority 0
+ok: update idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: 0
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Unapproved proposal
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh start idea
+error: task is not eligible for dispatch
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh unhold idea
+error: retained context requires explicit authorization, not unhold
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --kind task
+error: retained context kind cannot be changed by update; use authorize for a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh start outcome
+error: task is not eligible for dispatch
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh unhold outcome
+error: retained context requires explicit authorization, not unhold
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh update outcome --kind task
+error: retained context kind cannot be changed by update; use authorize for a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": []}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh authorize idea
+error: record the actual authorization and scope with --body or --body-file
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh authorize outcome --body 'Try to execute context'
+error: authorize requires a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh authorize idea --body 'Approved: implement only this small improvement'
+ok: authorize idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Approved: implement only this small improvement
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "Approved: implement only this small improvement", "archived": false}]}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add next 'Dependent work' --blocked-by idea
+ok: add next
+task:
+  id: next
+  title: Dependent work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: yes
+  blocked_by: idea
+  deps: idea
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh start next
+error: task is not eligible for dispatch
+[exit 1]
+
+
+=== Unicode follow-up history, archived dependency, and same-ID reopening ===
+$ $WORKTREE/bin/fm-queue.sh update idea --body 'Original α middle endtailverticalform
+Artifact context remains.'
+error: queue contains a control byte
+[exit 1]
+
+Disposable home removed.

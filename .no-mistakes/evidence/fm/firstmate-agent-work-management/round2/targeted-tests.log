@@ -1,0 +1,92 @@
+FM_TEST_BEGIN 2026-10-28T04:15:10Z tests/fm-queue.test.sh family=unclassified expected_gate_skip=none
+test_active_archive_conflict_fails_without_discarding (__main__.QueueTests.test_active_archive_conflict_fails_without_discarding) ... ok
+test_ambiguous_content_is_refused_before_persistence (__main__.QueueTests.test_ambiguous_content_is_refused_before_persistence) ... ok
+test_archive_cannot_replace_the_active_lock (__main__.QueueTests.test_archive_cannot_replace_the_active_lock) ... ok
+test_archive_lookup_reopen_and_identity_reservation (__main__.QueueTests.test_archive_lookup_reopen_and_identity_reservation) ... ok
+test_backend_selection_precedence_and_native_defaults (__main__.QueueTests.test_backend_selection_precedence_and_native_defaults) ... ok
+test_capture_authorization_and_restart (__main__.QueueTests.test_capture_authorization_and_restart) ... ok
+test_compatibility_check_and_backup_never_rewrite (__main__.QueueTests.test_compatibility_check_and_backup_never_rewrite) ... ok
+test_concurrent_writers_and_duplicate_admission (__main__.QueueTests.test_concurrent_writers_and_duplicate_admission) ... ok
+test_corrupt_records_transactions_and_adapters_fail_closed (__main__.QueueTests.test_corrupt_records_transactions_and_adapters_fail_closed) ... ok
+test_deferral_does_not_answer_a_human_question (__main__.QueueTests.test_deferral_does_not_answer_a_human_question) ... ok
+test_dependency_completion_with_archived_prerequisite (__main__.QueueTests.test_dependency_completion_with_archived_prerequisite) ... ok
+test_existing_dispatch_recovery_reuses_binding_without_completion (__main__.QueueTests.test_existing_dispatch_recovery_reuses_binding_without_completion) ... ok
+test_existing_hold_answer_owner_and_wrapper_need_no_external_cli (__main__.QueueTests.test_existing_hold_answer_owner_and_wrapper_need_no_external_cli) ... ok
+test_fleet_snapshot_resolves_archived_prerequisite (__main__.QueueTests.test_fleet_snapshot_resolves_archived_prerequisite) ... ok
+test_held_listing_distinguishes_real_questions_from_parked_context (__main__.QueueTests.test_held_listing_distinguishes_real_questions_from_parked_context) ... ok
+test_hold_reasons_never_supply_structured_metadata (__main__.QueueTests.test_hold_reasons_never_supply_structured_metadata) ... ok
+test_interrupted_archive_transaction_recovers_once (__main__.QueueTests.test_interrupted_archive_transaction_recovers_once) ... ok
+test_malformed_or_unreadable_effective_backend_refuses (__main__.QueueTests.test_malformed_or_unreadable_effective_backend_refuses) ... ok
+test_multi_id_handoff_and_destination_recovery (__main__.QueueTests.test_multi_id_handoff_and_destination_recovery) ... ok
+test_ready_and_start_agree_for_ordinary_kinds (__main__.QueueTests.test_ready_and_start_agree_for_ordinary_kinds) ... ok
+test_recoverable_updates_under_same_id (__main__.QueueTests.test_recoverable_updates_under_same_id) ... ok
+test_relative_backup_destination_uses_caller_directory (__main__.QueueTests.test_relative_backup_destination_uses_caller_directory) ... ok
+test_relocated_data_keeps_configured_archive_and_retention (__main__.QueueTests.test_relocated_data_keeps_configured_archive_and_retention) ... ok
+test_removal_never_implies_prerequisite_completion (__main__.QueueTests.test_removal_never_implies_prerequisite_completion) ... ok
+test_removed_commands_and_flags_refuse_without_rewriting (__main__.QueueTests.test_removed_commands_and_flags_refuse_without_rewriting) ... ok
+test_retained_context_requires_authorization_for_kind_changes (__main__.QueueTests.test_retained_context_requires_authorization_for_kind_changes) ... ok
+test_symlinked_user_selection_and_named_refusal_sources (__main__.QueueTests.test_symlinked_user_selection_and_named_refusal_sources) ... ok
+test_unicode_body_survives_mutations_history_and_archive (__main__.QueueTests.test_unicode_body_survives_mutations_history_and_archive) ... ok
+test_user_backend_refusal_preserves_existing_and_absent_queues (__main__.QueueTests.test_user_backend_refusal_preserves_existing_and_absent_queues) ... ok
+test_wrapper_cli_backend_precedence (__main__.QueueTests.test_wrapper_cli_backend_precedence) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 23.283s
+
+OK
+FM_TEST_END 2026-10-28T04:15:34Z tests/fm-queue.test.sh exit=0 duration_ms=23364 gate_skip=false
+FM_TEST_BEGIN 2026-10-28T04:15:34Z tests/fm-afk-return.test.sh family=afk expected_gate_skip=none
+ok - completed return is idempotent without replaying history or consuming unrelated delivery
+ok - unknown return boundary refuses without history scan or lifecycle mutation
+ok - return catch-up owns live blocker remediation, reports itself to Bearings as content, preserves evidence once, and clears idempotently
+ok - tmux and Herdr blockers require the same explicit durable reclassification before ordinary work
+ok - needs-decision remains reportable without masquerading as a firstmate-actionable blocker
+ok - AFK return re-drains published wakes until handling acknowledges
+ok - away-mode re-entry fails closed while the prior return catch-up is pending
+ok - /quiet off's return path behaves identically for a quiet-content flag as for a legacy away-content one
+ok - check retries recorded terminal teardown and keeps catch-up gated until success
+ok - an unreadable superseded mandate stays required until its record validates
+ok - the retained contract epoch requires its final archive on every check
+ok - the return brief renders health, the words with the session account, waiting, could-not-fix, handled, and cost from durable records, and the gate shrinks to what the away session could not fix
+ok - the return brief lists landed work whose worker is still up, from the durable merge marker only, without gating on it and never offering a secondmate for teardown
+ok - the return brief points at the drain for branch outcomes on a host home and leaves the read cursor to it, and a Pi home's brief is unchanged
+ok - the all-silent return keeps the outcome stored without promising a drain presentation
+ok - a drain that cannot record its branch-outcome presentation keeps the return's catch-up gated until a check records it
+ok - a refreshed posture keeps its original window, superseded mandate, and earlier outcomes
+ok - a malformed posture record stays live and gates return catch-up
+ok - an epochless malformed record remains required until restored valid
+ok - an unreadable outcome store gates catch-up until a successful reread
+ok - an unavailable held listing gates catch-up until a successful reread
+ok - an unreadable status stays private and gates until a successful reread
+ok - a status-file-less leftover record gates return; a readable status on that same record is the proven path that passes
+ok - a leftover record with a readable status file lets return catch-up clear
+ok - the read-only guard treats the away-posture record as active away mode without the legacy flag
+ok - the return brief leads with supervisor health and names every detected gap
+ok - the return brief does not report an already-acked watcher-down marker as an open gap
+ok - the return brief reports a wake mid-handling at return as information, and only an open downtime episode as a gap
+ok - the return brief's failures section names an engine latch inside the away window with its time, error count, and cooldown state
+ok - a lost second trip append does not attach the current pause to a recovered episode
+ok - a recovered row preceding the stale retry time does not invent a second trip
+ok - a later failed probe does not change the trip-row error count
+ok - the return brief excludes prior-session latch rows
+ok - the return brief retains in-window trips and failed turns across a main restart
+ok - a return with only the legacy away flag still renders the brief and measures the window from the flag
+FM_TEST_END 2026-10-28T04:15:56Z tests/fm-afk-return.test.sh exit=0 duration_ms=22387 gate_skip=false
+FM_TEST_BEGIN 2026-10-28T04:15:56Z tests/fm-tasks-axi.test.sh family=unclassified expected_gate_skip=none
+ok - bootstrap reports a regular code-root backlog and stays silent for a link into the home or no copy
+ok - bootstrap reports a code-root backlog linked elsewhere and a forked archive
+ok - bootstrap stays silent when the code root is the home
+ok - native raw capture refuses a leaf symlink without forking the queue
+ok - fm-tasks-axi.sh writes, holds, archives, and reads relative body files through to the home from the code root
+ok - fm-tasks-axi.sh pins the home's backlog over an ambient TASKS_AXI_FILE and serves the dashboard
+ok - fm-tasks-axi.sh refuses caller --file, a symlinked home backlog, and an unresolvable home
+ok - fm-tasks-axi.sh refuses add --start while plain add and start <id> pass through
+ok - fm-tasks-axi.sh keeps the single-home layout addressing its own code-root backlog
+FM_TEST_END 2026-10-28T04:15:58Z tests/fm-tasks-axi.test.sh exit=0 duration_ms=1963 gate_skip=false
+FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0 duration_ms=47769
+FM_TEST_SUMMARY_FAMILY family=afk count=1 duration_ms=22387 failed=0
+FM_TEST_SUMMARY_FAMILY family=unclassified count=2 duration_ms=25327 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-queue.test.sh duration_ms=23364
+FM_TEST_SLOWEST rank=2 script=tests/fm-afk-return.test.sh duration_ms=22387
+FM_TEST_SLOWEST rank=3 script=tests/fm-tasks-axi.test.sh duration_ms=1963
+fm-test-run: wrote timing artifact: /home/runkai/.no-mistakes/evidence/01M608TSP7CVSK5MWG7AVYSBJW/round2/targeted-tests.json

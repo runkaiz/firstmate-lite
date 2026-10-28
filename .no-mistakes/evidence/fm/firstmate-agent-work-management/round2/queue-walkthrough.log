@@ -1,0 +1,613 @@
+$ $WORKTREE/bin/fm-lab-home.sh create $WORKTREE/.test-phase-tmp/fm-lab.1cp8wdfk
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk
+[exit 0]
+
+
+=== Capture, authorize, and resist retained-context bypasses ===
+$ $WORKTREE/bin/fm-queue.sh add idea 'Potential improvement' --idea --body 'Unapproved proposal'
+ok: add idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Unapproved proposal
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add outcome 'Durable outcome' --outcome --body 'Related task: idea; no dependency implied'
+ok: add outcome
+task:
+  id: outcome
+  title: Durable outcome
+  state: queued
+  kind: outcome
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "outcome context; not executable"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Related task: idea; no dependency implied
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --priority 0
+ok: update idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: 0
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Unapproved proposal
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh start idea
+error: task is not eligible for dispatch
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh unhold idea
+error: retained context requires explicit authorization, not unhold
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --kind task
+error: retained context kind cannot be changed by update; use authorize for a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh start outcome
+error: task is not eligible for dispatch
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh unhold outcome
+error: retained context requires explicit authorization, not unhold
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh update outcome --kind task
+error: retained context kind cannot be changed by update; use authorize for a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": []}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh authorize idea
+error: record the actual authorization and scope with --body or --body-file
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh authorize outcome --body 'Try to execute context'
+error: authorize requires a parked idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh authorize idea --body 'Approved: implement only this small improvement'
+ok: authorize idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Approved: implement only this small improvement
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "Approved: implement only this small improvement", "archived": false}]}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add next 'Dependent work' --blocked-by idea
+ok: add next
+task:
+  id: next
+  title: Dependent work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: yes
+  blocked_by: idea
+  deps: idea
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh start next
+error: task is not eligible for dispatch
+[exit 1]
+
+
+=== Unicode follow-up history, archived dependency, and same-ID reopening ===
+$ $WORKTREE/bin/fm-queue.sh update idea --body 'Invalid control byte'
+error: queue contains a control byte
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --body 'Original α middle endtail
+Artifact context remains.'
+ok: update idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: "Original α middle endtail\nArtifact context remains."
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea --json
+{"ok": true, "task": {"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": [], "body": "Original α middle endtail\nArtifact context remains.", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh update idea --body 'Revised scope under the same identity'
+ok: update idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: Revised scope under the same identity
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh done idea --report data/idea/report.md --no-prune
+ok: done idea
+task:
+  id: idea
+  title: Potential improvement
+  state: done
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: 2026-10-28
+  links: data/idea/report.md
+  body: Revised scope under the same identity
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh prune --keep 0
+ok: archived completed records; identities retained
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "next", "title": "Dependent work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": ["idea"], "deps": ["idea"], "created": "2026-10-28", "closed": null, "links": [], "body": "", "archived": false}]}
+[exit 0]
+
+$ $WORKTREE/bin/fm-fleet-snapshot.sh --json
+{
+  "schema": "fm-fleet-snapshot.v1",
+  "generated": "2026-10-28T04:15:11Z",
+  "fm_home": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk",
+  "roots": {
+    "fm_root": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW",
+    "state": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/state",
+    "data": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/data",
+    "config": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/config",
+    "projects": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/projects"
+  },
+  "backlog": {
+    "path": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/data/backlog.md",
+    "records": [
+      {
+        "since": "2026-10-28",
+        "structured": true,
+        "id": "outcome",
+        "blocked_by_ids": [],
+        "unresolved_blocker_ids": [],
+        "repo": null,
+        "links": [],
+        "state": "queued",
+        "done": null,
+        "local_note": null,
+        "title": "Durable outcome",
+        "kind": "outcome",
+        "body_lines": [
+          "Related task: idea; no dependency implied"
+        ],
+        "pr_url": null,
+        "hold_until": null,
+        "hold_age_days": 0,
+        "captain_actionable": false,
+        "report_path": null,
+        "blocked_reason": null,
+        "priority": null,
+        "body_excerpt": "Related task: idea; no dependency implied",
+        "raw": "- [ ] outcome - Durable outcome (kind: outcome) (since 2026-10-28) (hold: outcome context; not executable) (hold-kind: parked)",
+        "hold_set": null,
+        "hold_kind": "parked",
+        "hold_bucket": null,
+        "current_role": "queued",
+        "merged": null,
+        "blocked_by": null,
+        "reported": null,
+        "requires_child_metadata": false,
+        "order": 1,
+        "hold_reason": "outcome context; not executable",
+        "checked": false,
+        "completion": {
+          "verb": null,
+          "date": null
+        }
+      },
+      {
+        "done": null,
+        "title": "Dependent work",
+        "kind": null,
+        "local_note": null,
+        "hold_age_days": 0,
+        "body_lines": [],
+        "pr_url": null,
+        "hold_until": null,
+        "report_path": null,
+        "captain_actionable": false,
+        "blocked_by_ids": [
+          "idea"
+        ],
+        "since": "2026-10-28",
+        "id": "next",
+        "structured": true,
+        "unresolved_blocker_ids": [],
+        "repo": null,
+        "links": [],
+        "state": "queued",
+        "current_role": "queued",
+        "merged": null,
+        "reported": null,
+        "blocked_by": "idea",
+        "hold_reason": null,
+        "completion": {
+          "date": null,
+          "verb": null
+        },
+        "checked": false,
+        "requires_child_metadata": false,
+        "order": 2,
+        "body_excerpt": null,
+        "raw": "- [ ] next - Dependent work (since 2026-10-28) blocked-by: idea",
+        "blocked_reason": null,
+        "priority": null,
+        "hold_set": null,
+        "hold_kind": null,
+        "hold_bucket": null
+      }
+    ],
+    "present": true
+  },
+  "tasks": [],
+  "main_inventory": {
+    "valid": true,
+    "reason": null,
+    "orphan_in_flight": [],
+    "unstructured_current_count": 0
+  },
+  "contributions": {
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "unmeasured": 0,
+    "complete": true,
+    "proven_clear": true,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "unreadable_records": 0,
+    "valid_until": 900,
+    "captain": [],
+    "captain_omitted": 0
+  },
+  "scout_reports": [],
+  "secondmate_current": {
+    "registry": {
+      "records": [],
+      "available": true
+    },
+    "records": [],
+    "total_registered": 0,
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "secondmate_landed": {
+    "records": [],
+    "truncated": [],
+    "unreadable": [],
+    "partial": []
+  },
+  "secondmate_guidance": {
+    "note": "Persistent supervisor aggregation is no longer supported."
+  }
+}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea --json
+{"ok": true, "task": {"id": "idea", "title": "Potential improvement", "state": "done", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": ["data/idea/report.md"], "body": "Revised scope under the same identity", "archived": true}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add idea 'Accidental ID reuse'
+error: identity already exists in active queue or archive: idea
+[exit 1]
+
+$ $WORKTREE/bin/fm-queue.sh reopen idea
+ok: reopen idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: data/idea/report.md
+  body: Revised scope under the same identity
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea --json
+{"ok": true, "task": {"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": ["data/idea/report.md"], "body": "Revised scope under the same identity", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": ["data/idea/report.md"], "body": "Revised scope under the same identity", "archived": false}]}
+[exit 0]
+
+
+=== Real answer owner preserves opaque reasons and distinguishes release from completion ===
+$ $WORKTREE/bin/fm-captain-hold.sh hold idea --reason 'Choose scope (not a dependency)
+Literal (hold-kind: parked) text' --until 2000-01-01
+idea
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": []}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea
+task:
+  id: idea
+  title: Potential improvement
+  state: queued
+  kind: task
+  repo: "-"
+  priority: 0
+  held: yes
+  hold_reason: "Choose scope (not a dependency)\nLiteral (hold-kind: parked) text"
+  hold_kind: captain
+  hold_until: 2000-01-01
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: data/idea/report.md
+  body: "Captain hold set: 2026-10-28T04:15:12Z\n\nRevised scope under the same identity"
+  archived: no
+[exit 0]
+
+$ $WORKTREE/bin/fm-captain-hold.sh answer idea --decision-file $WORKTREE/.test-phase-tmp/fm-lab.1cp8wdfk/answer.txt --release
+released: idea
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea --json
+{"ok": true, "task": {"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": ["data/idea/report.md"], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: d239da7ea265da92bf65cd6e6d83509792d3ce21f735492266203522bd55ffbd\nResolution mode: released\n\nCaptain decision:\nUse the existing release.\n\nRevised scope under the same identity", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh ready --json
+{"tasks": [{"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": ["data/idea/report.md"], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: d239da7ea265da92bf65cd6e6d83509792d3ce21f735492266203522bd55ffbd\nResolution mode: released\n\nCaptain decision:\nUse the existing release.\n\nRevised scope under the same identity", "archived": false}]}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show idea --json
+{"ok": true, "task": {"id": "idea", "title": "Potential improvement", "state": "queued", "kind": "task", "repo": null, "priority": "0", "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": null, "links": ["data/idea/report.md"], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: d239da7ea265da92bf65cd6e6d83509792d3ce21f735492266203522bd55ffbd\nResolution mode: released\n\nCaptain decision:\nUse the existing release.\n\nRevised scope under the same identity", "archived": false}}
+[exit 0]
+
+$ $WORKTREE/bin/fm-captain-hold.sh hold question --title 'Choose the final scope' --reason 'A genuine question'
+question
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add parked-idea 'Retained idea' --idea
+ok: add parked-idea
+task:
+  id: parked-idea
+  title: Retained idea
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-10-28
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+
+=== Real away-return brief excludes parked ideas and outcomes ===
+$ $WORKTREE/bin/fm-afk-return.sh check
+=== Return brief (away 2026-10-28T04:15:14Z -> 2026-10-28T04:15:14Z, 0s) ===
+Supervisor health:
+  - GAP: the away daemon was not running at return (the away flag stood with no live daemon)
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+Your instructions:
+  (no away-posture record for this window; legacy away flag only)
+Waiting on you:
+  held in the backlog:
+    tasks[1]{id,title,state,kind,repo,hold_kind,hold_reason,hold_until}:
+      question,Choose the final scope,queued,captain,firstmate,captain,"A genuine question","-"
+Tried and failed, or could not be fixed:
+  (nothing)
+Landed, cleanup due:
+  (nothing)
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 0 AI worker slot(s) occupied or unconfirmed at return.
+catch-up health: GAP: the away daemon was not running at return (the away flag stood with no live daemon)
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+fm-afk-return: catch-up clear; ordinary captain work may proceed
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+[exit 0]
+
+$ $WORKTREE/bin/fm-captain-hold.sh answer question --decision-file $WORKTREE/.test-phase-tmp/fm-lab.1cp8wdfk/answer.txt
+answered: question
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh show question --json
+{"ok": true, "task": {"id": "question", "title": "Choose the final scope", "state": "done", "kind": "captain", "repo": "firstmate", "priority": null, "held": false, "hold_reason": "fm-hold-v1:QSBnZW51aW5lIHF1ZXN0aW9u", "hold_kind": "captain", "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-10-28", "closed": "2026-10-28", "links": [], "body": "Resolution recorded by fm-captain-hold.\nDecision digest: d239da7ea265da92bf65cd6e6d83509792d3ce21f735492266203522bd55ffbd\nResolution mode: answered\n\nCaptain decision:\nUse the existing release.", "archived": false}}
+[exit 0]
+
+
+=== Compatible backup preserves bytes and caller-relative destination ===
+$ $WORKTREE/bin/fm-queue.sh migrate --dry-run
+{"ok": true, "records": 5, "format": "compatible-markdown", "rewrite_required": false, "activated": false}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh migrate --backup-dir ./backup
+{"ok": true, "records": 5, "format": "compatible-markdown", "rewrite_required": false, "activated": false}
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh migrate --backup-dir=./backup
+error: backup directory already exists
+[exit 1]
+
+Backup files: 0-backlog.md, 1-done-archive.md, 2-note-archive.md, manifest.json
+
+=== Legacy backend selection is read-only, actionable, and never a second store ===
+$ $WORKTREE/bin/fm-queue.sh list
+tasks[5]{id,title,state,kind,repo}:
+  outcome,Durable outcome,queued,outcome,"-"
+  next,Dependent work,queued,task,"-"
+  idea,Potential improvement,queued,task,"-"
+  parked-idea,Retained idea,queued,idea,"-"
+  question,Choose the final scope,done,captain,firstmate
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh add forbidden 'Must not create'
+fm-queue: native queue supports Markdown only; backend selected by /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/.tasks-axi/config.toml requires an explicit compatible export before activation
+[exit 2]
+
+$ $WORKTREE/bin/fm-queue.sh list
+tasks[5]{id,title,state,kind,repo}:
+  outcome,Durable outcome,queued,outcome,"-"
+  next,Dependent work,queued,task,"-"
+  idea,Potential improvement,queued,task,"-"
+  parked-idea,Retained idea,queued,idea,"-"
+  question,Choose the final scope,done,captain,firstmate
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.py list --file $WORKTREE/.test-phase-tmp/fm-lab.1cp8wdfk/data/backlog.md --backend markdown
+tasks[5]{id,title,state,kind,repo}:
+  outcome,Durable outcome,queued,outcome,"-"
+  next,Dependent work,queued,task,"-"
+  idea,Potential improvement,queued,task,"-"
+  parked-idea,Retained idea,queued,idea,"-"
+  question,Choose the final scope,done,captain,firstmate
+[exit 0]
+
+$ $WORKTREE/bin/fm-queue.sh list --backend markdown
+tasks[5]{id,title,state,kind,repo}:
+  outcome,Durable outcome,queued,outcome,"-"
+  next,Dependent work,queued,task,"-"
+  idea,Potential improvement,queued,task,"-"
+  parked-idea,Retained idea,queued,idea,"-"
+  question,Choose the final scope,done,captain,firstmate
+[exit 0]
+
+
+=== All walkthrough assertions passed ===
+Disposable home removed.

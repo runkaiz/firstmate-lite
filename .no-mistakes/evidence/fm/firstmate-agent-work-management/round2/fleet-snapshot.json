@@ -1,0 +1,147 @@
+{
+  "schema": "fm-fleet-snapshot.v1",
+  "generated": "2026-10-28T04:15:11Z",
+  "fm_home": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk",
+  "roots": {
+    "fm_root": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW",
+    "state": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/state",
+    "data": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/data",
+    "config": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/config",
+    "projects": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/projects"
+  },
+  "backlog": {
+    "path": "/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M608TSP7CVSK5MWG7AVYSBJW/.test-phase-tmp/fm-lab.1cp8wdfk/data/backlog.md",
+    "records": [
+      {
+        "since": "2026-10-28",
+        "structured": true,
+        "id": "outcome",
+        "blocked_by_ids": [],
+        "unresolved_blocker_ids": [],
+        "repo": null,
+        "links": [],
+        "state": "queued",
+        "done": null,
+        "local_note": null,
+        "title": "Durable outcome",
+        "kind": "outcome",
+        "body_lines": [
+          "Related task: idea; no dependency implied"
+        ],
+        "pr_url": null,
+        "hold_until": null,
+        "hold_age_days": 0,
+        "captain_actionable": false,
+        "report_path": null,
+        "blocked_reason": null,
+        "priority": null,
+        "body_excerpt": "Related task: idea; no dependency implied",
+        "raw": "- [ ] outcome - Durable outcome (kind: outcome) (since 2026-10-28) (hold: outcome context; not executable) (hold-kind: parked)",
+        "hold_set": null,
+        "hold_kind": "parked",
+        "hold_bucket": null,
+        "current_role": "queued",
+        "merged": null,
+        "blocked_by": null,
+        "reported": null,
+        "requires_child_metadata": false,
+        "order": 1,
+        "hold_reason": "outcome context; not executable",
+        "checked": false,
+        "completion": {
+          "verb": null,
+          "date": null
+        }
+      },
+      {
+        "done": null,
+        "title": "Dependent work",
+        "kind": null,
+        "local_note": null,
+        "hold_age_days": 0,
+        "body_lines": [],
+        "pr_url": null,
+        "hold_until": null,
+        "report_path": null,
+        "captain_actionable": false,
+        "blocked_by_ids": [
+          "idea"
+        ],
+        "since": "2026-10-28",
+        "id": "next",
+        "structured": true,
+        "unresolved_blocker_ids": [],
+        "repo": null,
+        "links": [],
+        "state": "queued",
+        "current_role": "queued",
+        "merged": null,
+        "reported": null,
+        "blocked_by": "idea",
+        "hold_reason": null,
+        "completion": {
+          "date": null,
+          "verb": null
+        },
+        "checked": false,
+        "requires_child_metadata": false,
+        "order": 2,
+        "body_excerpt": null,
+        "raw": "- [ ] next - Dependent work (since 2026-10-28) blocked-by: idea",
+        "blocked_reason": null,
+        "priority": null,
+        "hold_set": null,
+        "hold_kind": null,
+        "hold_bucket": null
+      }
+    ],
+    "present": true
+  },
+  "tasks": [],
+  "main_inventory": {
+    "valid": true,
+    "reason": null,
+    "orphan_in_flight": [],
+    "unstructured_current_count": 0
+  },
+  "contributions": {
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "unmeasured": 0,
+    "complete": true,
+    "proven_clear": true,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "unreadable_records": 0,
+    "valid_until": 900,
+    "captain": [],
+    "captain_omitted": 0
+  },
+  "scout_reports": [],
+  "secondmate_current": {
+    "registry": {
+      "records": [],
+      "available": true
+    },
+    "records": [],
+    "total_registered": 0,
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "secondmate_landed": {
+    "records": [],
+    "truncated": [],
+    "unreadable": [],
+    "partial": []
+  },
+  "secondmate_guidance": {
+    "note": "Persistent supervisor aggregation is no longer supported."
+  }
+}
