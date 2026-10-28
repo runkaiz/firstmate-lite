@@ -1,6 +1,8 @@
 """Behavioral native queue tests. No external tasks-axi executable is used."""
 
 import concurrent.futures
+import datetime
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,6 +13,25 @@ import unittest
 
 ROOT = Path(__file__).resolve().parent.parent
 CLI = ROOT / "bin/fm-queue.py"
+TODAY = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+# Synthetic archive in the legacy writer's append shape: each prune appended
+# "\n## Archived <date>\n" plus the pruned rows' original lines.
+LEGACY_ARCHIVE = (
+    "\n## Archived 2026-01-05\n"
+    "- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n"
+    "  Accepted first scope (kind: not-metadata)\n"
+    "\n"
+    "  ## Intent\n"
+    "  - [x] lookalike - not a row (done 2026-01-01)\n"
+    "\n## Archived 2026-01-07\n"
+    "- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n"
+    "\n## Archived 2026-01-07\n"
+    "- [x] gamma - Unrelated (done 2026-01-07)\n"
+    "\n## Archived 2026-01-09\n"
+    "- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n"
+    "  Follow-up scope\n"
+)
+GAMMA = "- [x] gamma - Unrelated (done 2026-01-07)\n\n"
 
 
 class QueueTests(unittest.TestCase):
@@ -29,7 +50,7 @@ class QueueTests(unittest.TestCase):
         result = subprocess.run([str(CLI), *args, "--file", str(path or self.file)], cwd=self.home, env=env, text=True, capture_output=True, timeout=20)
         if good:
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        else:
+        elif good is not None:
             self.assertNotEqual(result.returncode, 0, result.stdout)
         return result
 
@@ -38,6 +59,15 @@ class QueueTests(unittest.TestCase):
 
     def ready(self):
         return [task["id"] for task in json.loads(self.call("ready", "--json").stdout)["tasks"]]
+
+    def history(self, identifier):
+        return json.loads(self.call("show", identifier, "--history", "--json").stdout)
+
+    def legacy(self, active="## In flight\n\n## Queued\n\n## Done\n", archive=LEGACY_ARCHIVE):
+        self.archive = self.home / "data/done-archive.md"
+        self.file.write_text(active)
+        self.archive.write_text(archive)
+        return self.file.read_bytes(), self.archive.read_bytes()
 
     def test_user_backend_refusal_preserves_existing_and_absent_queues(self):
         self.call("add", "stable", "Existing", "--body", "Original intent")
@@ -422,6 +452,133 @@ class QueueTests(unittest.TestCase):
         self.call("show", "same", good=False)
         self.call("add", "unrelated", "Do not guess", good=False)
         self.assertEqual(before, (self.file.read_bytes(), archive.read_bytes()))
+
+    def test_legacy_dated_archive_sections_are_completed_history(self):
+        active = "## In flight\n\n## Queued\n- [ ] next - Follow-on (repo: project) blocked-by: beta\n- [ ] later - Uses alpha blocked-by: alpha\n\n## Done\n"
+        before = self.legacy(active)
+        check = json.loads(self.call("migrate", "--dry-run").stdout)
+        self.assertEqual((check["records"], check["identities"], check["ambiguous_histories"]), (6, 5, ["alpha"]))
+        backup = self.home / "backup"
+        self.call("migrate", "--backup-dir", str(backup))
+        self.assertEqual(((backup / "0-backlog.md").read_bytes(), (backup / "1-done-archive.md").read_bytes()), before)
+        hashes = {entry["backup"]: entry["sha256"] for entry in json.loads((backup / "manifest.json").read_text())}
+        self.assertEqual(hashes["1-done-archive.md"], hashlib.sha256(before[1]).hexdigest())
+        beta = self.task("beta")
+        self.assertEqual((beta["links"], beta["closed"], beta["kind"], beta["archived"]), (["data/beta/report.md"], "2026-01-06", "scout", True))
+        self.assertEqual(self.task("gamma")["closed"], "2026-01-07")
+        history = self.history("alpha")
+        self.assertIn("done-archive.md:3 (Archived 2026-01-05, kind ship, merged 2026-01-04)", history["ambiguous"])
+        self.assertIn("done-archive.md:16 (Archived 2026-01-09, kind task, done 2026-01-09)", history["ambiguous"])
+        first, latest = history["records"]
+        self.assertEqual((first["title"], first["links"]), ("First delivery", ["https://example.test/project/pull/1"]))
+        self.assertEqual(first["body"], "Accepted first scope (kind: not-metadata)\n\n## Intent\n- [x] lookalike - not a row (done 2026-01-01)")
+        self.assertEqual((latest["title"], latest["body"]), ("Follow-up delivery", "Follow-up scope"))
+        self.call("show", "lookalike", good=False)
+        self.assertEqual(self.ready(), ["next", "later"], "archived prerequisites did not count as complete")
+        for identifier in ("alpha", "beta", "gamma"):
+            self.assertIn("already exists", self.call("add", identifier, "Reuse", good=False).stderr)
+        self.assertEqual((self.file.read_bytes(), self.archive.read_bytes()), before)
+        self.call("add", "delta", "Native completion")
+        self.assertEqual(self.archive.read_bytes(), before[1], "an active-only change rewrote the archive")
+        self.call("done", "delta", "--keep", "0")
+        appended = self.archive.read_text()
+        self.assertTrue(appended.startswith(LEGACY_ARCHIVE), "native archival rewrote legacy history")
+        self.assertRegex(appended[len(LEGACY_ARCHIVE):], r"\A\n## Archived " + TODAY + r"\n- \[x\] delta - Native completion \(since " + TODAY + r"\) \(done " + TODAY + r"\)\n\Z")
+        # A later append by the legacy writer stays readable after native writes.
+        with self.archive.open("a") as stream:
+            stream.write("\n## Archived 2099-01-01\n- [x] epsilon - Legacy writer row (done 2099-01-01)\n")
+        self.assertTrue(self.task("epsilon")["archived"])
+        self.assertTrue(self.task("delta")["archived"])
+        self.assertEqual(len(self.history("alpha")["records"]), 2)
+
+    def test_reopened_single_record_keeps_identity_and_appends_completion(self):
+        self.legacy()
+        self.call("reopen", "gamma")
+        reopened = self.task("gamma")
+        self.assertEqual((reopened["state"], reopened["archived"], reopened["title"]), ("queued", False, "Unrelated"))
+        self.assertEqual(self.archive.read_text(), LEGACY_ARCHIVE.replace(GAMMA, ""))
+        self.assertIn(GAMMA, (self.home / "data/note-archive.md").read_text())
+        self.call("add", "gamma", "Reuse", good=False)
+        self.call("start", "gamma")
+        self.call("done", "gamma", "--keep", "0")
+        self.assertEqual([(row["archived"], row["closed"]) for row in self.history("gamma")["records"]], [(True, TODAY)])
+        self.assertTrue(self.archive.read_text().startswith(LEGACY_ARCHIVE.replace(GAMMA, "")))
+        self.call("done", "gamma", "--pr", "https://example.test/project/pull/2")
+        self.assertEqual(self.task("gamma")["links"], ["https://example.test/project/pull/2"])
+        self.assertTrue(self.archive.read_text().startswith(LEGACY_ARCHIVE.replace(GAMMA, "")), "completion evidence moved archived history")
+        self.call("mv", "beta", "--to", str(self.home / "other/data/backlog.md"))
+        moved = json.loads(self.call("show", "beta", "--json", path=self.home / "other/data/backlog.md").stdout)["task"]
+        self.assertEqual((moved["archived"], moved["closed"]), (True, "2026-01-06"))
+
+    def test_repeated_archived_identity_is_refused_not_guessed(self):
+        first = "- [x] dup - Private first title (kind: ship) (done 2026-01-04)\n  Private first scope; digest sha256:00000000synthetic\n"
+        cases = {
+            "same section": "\n## Archived 2026-01-05\n" + first + "- [x] dup - Private second title (done 2026-01-05)\n",
+            "differing kind": "\n## Archived 2026-01-05\n" + first + "\n## Archived 2026-01-09\n- [x] dup - Private second title (kind: task) (done 2026-01-09)\n",
+            "prose citation": "\n## Archived 2026-01-05\n" + first + "\n## Archived 2026-01-09\n- [x] dup - Private second title (kind: ship) (done 2026-01-09)\n  Recovery of digest sha256:00000000synthetic\n",
+            "ordered dates": "\n## Archived 2026-01-05\n" + first + "\n## Archived 2026-01-09\n- [x] dup - Private first title (kind: ship) (done 2026-01-09)\n",
+        }
+        for case, archive in cases.items():
+            with self.subTest(case=case):
+                before = self.legacy("## Queued\n- [ ] other - Unrelated work\n", archive)
+                for command in (("show", "dup"), ("reopen", "dup"), ("update", "dup", "--body", "Guess"),
+                                ("done", "dup", "--pr", "https://example.test/x/pull/3"), ("rm", "dup"), ("hold", "dup", "--reason", "Guess")):
+                    error = self.call(*command, good=False).stderr
+                    self.assertIn("ambiguous archived identity dup: repeated archived records", error)
+                    self.assertIn("done-archive.md:3", error)
+                    self.assertNotIn("Private", error)
+                self.assertIn("already exists", self.call("add", "dup", "Reuse", good=False).stderr)
+                self.call("mv", "dup", "--to", str(self.home / "other/data/backlog.md"), good=False)
+                self.assertEqual((self.file.read_bytes(), self.archive.read_bytes()), before)
+                self.assertFalse((self.home / "data/note-archive.md").exists())
+                self.assertEqual(json.loads(self.call("migrate", "--dry-run").stdout)["ambiguous_histories"], ["dup"])
+                self.assertEqual([row["title"] for row in self.history("dup")["records"]], ["Private first title", "Private first title" if case == "ordered dates" else "Private second title"])
+                self.call("block", "other", "--by", "dup")
+                self.assertEqual(self.ready(), ["other"])
+                self.call("done", "other", "--keep", "0")
+                self.assertTrue(self.archive.read_text().startswith(archive))
+                self.assertTrue(self.task("other")["archived"])
+
+    def test_active_record_beside_archived_history_stays_refused(self):
+        before = self.legacy("## Queued\n- [ ] beta - Active reuse\n- [ ] other - Unrelated\n")
+        notes = self.home / "data/note-archive.md"
+        for evidence in (None, "\n## beta - Reopened with identity preserved - 2026-01-08T00:00:00+00:00\n\n" + "- [x] beta - Prerequisite (reported 2026-01-06)\n\n"):
+            with self.subTest(evidence=evidence):
+                if evidence:
+                    notes.write_text(evidence)
+                for command in (("show", "beta"), ("add", "unrelated", "Do not guess"), ("migrate", "--dry-run")):
+                    error = self.call(*command, good=False).stderr
+                    self.assertIn("duplicate active/archive identity: beta; records: done-archive.md:10", error)
+                    self.assertIn("backlog.md:2", error)
+                self.assertEqual((self.file.read_bytes(), self.archive.read_bytes()), before)
+
+    def test_legacy_history_survives_crash_recovery_and_concurrent_writers(self):
+        self.legacy()
+        self.call("add", "stable", "Task")
+        self.call("done", "stable", "--no-prune")
+        result = self.call("prune", "--keep", "0", extra_env={"FM_QUEUE_TEST_CRASH_AFTER_WRITES": "1"}, good=False)
+        self.assertEqual(result.returncode, 91)
+        self.assertTrue(self.task("stable")["archived"])
+        self.assertFalse(Path(str(self.file) + ".transaction").exists())
+        self.assertEqual(self.archive.read_text().count("- [x] stable - "), 1)
+
+        def complete(index):
+            add = self.call("add", "id-" + str(index), "Concurrent task", good=None)
+            done = self.call("done", "id-" + str(index), "--keep", "0", good=None)
+            return add.returncode, done.returncode
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+            self.assertEqual(list(pool.map(complete, range(8))), [(0, 0)] * 8)
+
+        def reuse(_):
+            return self.call("add", "alpha", "Reuse", good=None).returncode
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            self.assertNotIn(0, list(pool.map(reuse, range(4))))
+        archive = self.archive.read_text()
+        self.assertTrue(archive.startswith(LEGACY_ARCHIVE))
+        for index in range(8):
+            self.assertEqual(archive.count("- [x] id-" + str(index) + " - "), 1)
+        self.assertEqual([row["title"] for row in self.history("alpha")["records"]], ["First delivery", "Follow-up delivery"])
+        self.assertEqual(json.loads(self.call("migrate", "--dry-run").stdout)["ambiguous_histories"], ["alpha"])
 
     def test_recoverable_updates_under_same_id(self):
         self.call("add", "scope", "Original title", "--body", "Original scope")

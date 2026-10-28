@@ -13,6 +13,9 @@ Normal reads, identity checks and mutations share locking; multi-file writes hav
 Malformed records, duplicate identities, conflicting recovery data and unsupported adapters fail with a diagnostic before a new mutation is committed.
 
 `show` finds active and archived tasks by original ID.
+The archive is append-only completed history: existing repeated `## Archived <date>` sections are read in place, and newly archived rows are appended as another such section, so records are never normalized, reordered, merged or renumbered.
+An ID that appears in more than one archived record has no structured field proving those records are one task, so `show`, `reopen` and other single-task commands refuse it with each record's location instead of choosing by date or position.
+`show <id> --history` lists every record for an ID read-only, including a refused one; the ID stays reserved, and a dependency on it is satisfied because every record is complete.
 `reopen` moves an archived task back to the active queue with its original identity, body, hold provenance and artifact links.
 Creation refuses identities found in either active storage or the archive, including conflicts between them.
 Replacing a body automatically archives the superseded record in the existing note history.
@@ -45,7 +48,7 @@ With writers stopped, run the native `migrate --dry-run` compatibility check on 
 The supported Markdown format requires no rewrite.
 Use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
 The backup refuses an existing destination and does not switch configuration, install a CLI, start a home or import data into another store.
-If rollback is necessary, stop native writers first and restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
+If rollback is necessary, stop native writers first, then delete the empty `<backlog>.lock` file the native queue leaves behind, because the earlier writer treats any existing lock file as held; restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
 Keep any subsequent native work separately preserved before restoring an older snapshot.
 
 The existing `.tasks.toml` Markdown paths and retention are accepted as compatibility configuration.
