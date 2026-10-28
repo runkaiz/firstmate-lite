@@ -139,10 +139,10 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
         fm_git_worktree_error 'reserved source changed; preserving copy rather than rebasing recovery'; return 1;
       }
     base=$(fm_git_worktree_field "$record" base) || return 1
-    git -C "$project" cat-file -e "$base^{commit}" &&
-      git -C "$project" merge-base --is-ancestor "$base" "$source_ref" || {
-        fm_git_worktree_error 'reserved base is missing or source history was rewritten; inspect reservation before retrying'; return 1;
-      }
+    if ! git -C "$project" cat-file -e "$base^{commit}" ||
+      ! git -C "$project" merge-base --is-ancestor "$base" "$source_ref"; then
+      fm_git_worktree_error 'reserved base is missing or source history was rewritten; inspect reservation before retrying'; return 1
+    fi
     if [ -d "$FM_GIT_WORKTREE_PATH" ]; then
       processes=$(lsof -a -d cwd -Fn 2>/dev/null) || {
         fm_git_worktree_error 'cannot prove reserved copy has no live owner (lsof failed); preserving copy'; return 1;
