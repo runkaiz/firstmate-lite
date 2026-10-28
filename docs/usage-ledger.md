@@ -46,7 +46,8 @@ A pipeline sharing its worker's cwd has unknown activity separation; absent nati
 `fm-pipeline-spend.sh` remains the sole owner of invocation deltas and task-purpose accounting, including resumed validation sessions.
 Its opt-in flag is independent and is never removed or overridden by native collection.
 
-Refreshes serialize with a nonblocking local file lock, throttle routine ticks, rotate discovery scopes, metadata retries, and source batches, and bound native byte reads and candidate counts.
+Refreshes serialize with a nonblocking local file lock, throttle routine ticks, prioritize active discovery scopes while rotating ended scopes, and bound metadata retries, native byte reads and candidate counts.
+Fully consumed sources with unchanged file identity and timestamps do not consume source refresh slots.
 The two-second refresh deadline and vendor-query deadline keep collection from taking over supervision.
 Backlog, partial tails, unsupported sources, and refresh failures are visible in `status`; subsequent ordinary lifecycle calls continue bounded work without a model turn.
 A failed refresh never becomes a successful empty measurement.

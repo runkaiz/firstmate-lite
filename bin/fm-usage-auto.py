@@ -211,6 +211,20 @@ def candidates(scope, harness, catalog, limit, gaps):
         return []
 
 
+def rotate(items, catalog, key, limit):
+    start = catalog.get(key, 0) % max(1, len(items))
+    selected = (items + items)[start:start + min(limit, len(items))]
+    catalog[key] = (start + len(selected)) % max(1, len(items))
+    return selected
+
+
+def scope_batch(scopes, catalog, key, limit):
+    active = [s for s in scopes if s["end"] is None]
+    ended = [s for s in scopes if s["end"] is not None]
+    selected = rotate(active, catalog, key, limit - bool(ended))
+    return selected + rotate(ended, catalog, key + "_ended", limit - len(selected))
+
+
 def refresh(args, store, catalog):
     gaps = set()
     state = Path(os.environ.get("FM_STATE_OVERRIDE", str(args.home / "state")))
@@ -231,9 +245,7 @@ def refresh(args, store, catalog):
                    harness=None, activity="supervisor")]
     generations = list(catalog["generations"].values())
     pipeline = catalog.setdefault("pipeline_scopes", {})
-    start = catalog.get("pipeline_cursor", 0) % max(1, len(generations))
-    chosen = (generations + generations)[start:start + min(4, len(generations))]
-    catalog["pipeline_cursor"] = (start + len(chosen)) % max(1, len(generations))
+    chosen = scope_batch(generations, catalog, "pipeline_cursor", 4)
     if len(generations) > len(chosen):
         gaps.add("pipeline_scope_discovery_backlog")
     for g in chosen:
@@ -243,11 +255,13 @@ def refresh(args, store, catalog):
         scopes.append(dict(g, activity="worker"))
         if g["harness"] not in ledger.MAPS:
             gaps.add("unsupported_worker_reader_" + (g["harness"] or "unknown"))
-    scopes.extend(pipeline.values())
+    for p in pipeline.values():
+        owner = catalog["generations"].get(ledger.identity(p["task"], p["generation"]))
+        if owner:
+            p["end"] = owner["end"]
+        scopes.append(p)
     # Scope rotation prevents a long fleet/history from starving later scopes.
-    start = catalog.get("scope_cursor", 0) % len(scopes)
-    selected = (scopes + scopes)[start:start + min(8, len(scopes))]
-    catalog["scope_cursor"] = (start + 1) % len(scopes)
+    selected = scope_batch(scopes, catalog, "scope_cursor", 8)
     if len(scopes) > len(selected):
         gaps.add("scope_discovery_backlog")
     remaining = args.max_candidates
@@ -286,9 +300,7 @@ def refresh(args, store, catalog):
                     gaps.add("native_metadata_unavailable")
     # Retry only bounded partial headers, no transcript history or new timer.
     retries = list(catalog["retry"].items())
-    start = catalog.get("retry_cursor", 0) % max(1, len(retries))
-    selected_retries = (retries + retries)[start:start + min(32, len(retries))]
-    catalog["retry_cursor"] = (start + len(selected_retries)) % max(1, len(retries))
+    selected_retries = rotate(retries, catalog, "retry_cursor", 32)
     for sid, pending in selected_retries:
         try:
             native = header(pending["path"], pending["harness"])
@@ -312,28 +324,44 @@ def refresh(args, store, catalog):
         if len(catalog["retry"]) > len(selected_retries):
             gaps.add("metadata_retry_backlog")
     specs = list(catalog["sources"].values())
-    start = catalog.get("source_cursor", 0) % max(1, len(specs))
-    batch = (specs + specs)[start:start + min(64, len(specs))]
-    catalog["source_cursor"] = (start + 1) % max(1, len(specs))
-    if len(specs) > len(batch):
-        gaps.add("source_refresh_backlog")
-    # Recheck only bounded metadata, so rotation cannot silently adopt another cwd.
-    verified = []
-    for spec in batch:
-        sid = ledger.identity(os.path.abspath(spec["path"]))
-        try:
-            proof = catalog.get("proofs", {}).get(sid)
-            native = header(spec["path"], spec["harness"])
-            if native is not None and proof == dict(cwd=native[0], created=native[1], run=native[2]):
-                verified.append(spec)
-            else:
-                gaps.add("source_metadata_changed_or_unavailable")
-        except (OSError, ValueError, TypeError, AttributeError):
-            gaps.add("source_missing_or_unreadable")
-    save(store / "catalog.json", catalog)
     with ledger.database(store / "usage.sqlite") as db:
-        # Serialize offsets and events with the same transaction, even for other CLI writers.
         db.execute("BEGIN IMMEDIATE")
+        saved_sources = {row["id"]: json.loads(row["data"]) for row in db.execute("select id,data from sources")}
+        changed = []
+        for spec in specs:
+            sid = ledger.identity(os.path.abspath(spec["path"]))
+            saved = saved_sources.get(sid, {})
+            try:
+                st = os.stat(spec["path"], follow_symlinks=False)
+                if not stat.S_ISREG(st.st_mode):
+                    gaps.add("source_missing_or_unreadable")
+                    continue
+                if (saved.get("harness") == spec["harness"]
+                        and saved.get("joins") == {k: spec.get(k) for k in ledger.JOINS}
+                        and saved.get("file") == [st.st_dev, st.st_ino]
+                        and saved.get("offset") == st.st_size and saved.get("mtime_ns") == st.st_mtime_ns
+                        and saved.get("ctime_ns") == st.st_ctime_ns and not saved.get("current")):
+                    continue
+            except OSError:
+                gaps.add("source_missing_or_unreadable")
+                continue
+            changed.append(spec)
+        batch = rotate(changed, catalog, "source_cursor", 64)
+        if len(changed) > len(batch):
+            gaps.add("source_refresh_backlog")
+        verified = []
+        for spec in batch:
+            sid = ledger.identity(os.path.abspath(spec["path"]))
+            try:
+                proof = catalog.get("proofs", {}).get(sid)
+                native = header(spec["path"], spec["harness"])
+                if native is not None and proof == dict(cwd=native[0], created=native[1], run=native[2]):
+                    verified.append(spec)
+                else:
+                    gaps.add("source_metadata_changed_or_unavailable")
+            except (OSError, ValueError, TypeError, AttributeError):
+                gaps.add("source_missing_or_unreadable")
+        save(store / "catalog.json", catalog)
         result = ledger.collect(db, verified, args.max_bytes, usage_only=True)
         source_gaps = db.execute("select data from sources").fetchall()
         for row in source_gaps:

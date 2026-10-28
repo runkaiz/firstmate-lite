@@ -382,7 +382,8 @@ def collect(db, specs, budget, usage_only=False):
                         reader.gap("malformed_or_unknown_record")
                 if offset < st.st_size:
                     saved["current"].append("unread_bytes")
-                saved.update(offset=offset, file=[st.st_dev, st.st_ino], anchor=anchor(stream, offset))
+                saved.update(offset=offset, file=[st.st_dev, st.st_ino], anchor=anchor(stream, offset),
+                             mtime_ns=st.st_mtime_ns, ctime_ns=st.st_ctime_ns)
         except OSError:
             saved["current"].append("source_missing_or_unreadable")
         saved.setdefault("offset", 0)

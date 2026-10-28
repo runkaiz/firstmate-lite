@@ -492,11 +492,13 @@ test_native_relaunch_preserves_copy_and_recorded_allocator_after_config_switch()
   add_ship_task "$dir" rl-native claude
   # shellcheck source=bin/fm-git-worktree-lib.sh disable=SC1091
   . "$ROOT/bin/fm-git-worktree-lib.sh"
+  mv "$dir/home/state/rl-native.meta" "$dir/native-meta.pending"
   base=$(git -C "$dir/proj" rev-parse HEAD)
   branch=$(git -C "$dir/proj" symbolic-ref --short HEAD)
   fm_git_worktree_allocate "$dir/home/state" rl-native "$dir/home" "$dir/proj" "$dir/native" "$base" "refs/heads/$branch" \
     || fail 'could not prepare native relaunch copy'
   wt=$FM_GIT_WORKTREE_PATH
+  mv "$dir/native-meta.pending" "$dir/home/state/rl-native.meta"
   awk -v wt="$wt" '/^worktree=/ {print "worktree=" wt; next} {print}' "$dir/home/state/rl-native.meta" > "$dir/meta.new"
   mv "$dir/meta.new" "$dir/home/state/rl-native.meta"
   printf 'allocator=git\n' >> "$dir/home/state/rl-native.meta"

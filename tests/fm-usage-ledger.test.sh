@@ -406,6 +406,63 @@ with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
     index.close();(codex/"state_5.sqlite").unlink()
     assert "codex_native_index_unavailable" in refresh()["gaps"]
     assert not (codex/"state_5.sqlite").exists()
+    index = sqlite3.connect(codex / "state_5.sqlite")
+    index.execute("create table threads (id text primary key, rollout_path text, cwd text)")
+    index.commit()
+    metadata(start+300, "codex")
+    for i in range(48):
+        (home / "state" / f"ended-{i}.meta").write_text(
+            f"spawn_gen=s{start}.123.{i}\nworktree={root / ('ended-' + str(i))}\n"
+            f"harness=codex\nkind=ship\nbranch=fm/ended-{i}\nproject={project}\n")
+    refresh()
+    for f in (home / "state").glob("ended-*.meta"):
+        f.unlink()
+    refresh()
+    before = total()
+    cx("active-worker-late", worktree, "2026-10-25T10:10:00Z", 3)
+    cx("active-supervisor-late", home, "2026-10-25T10:10:00Z", 5)
+    pipeline.execute("insert into runs values (?,?,?,?,?)", ("r-new", "p", "fm/job", start+301, str(root/"validation-new")))
+    pipeline.commit()
+    cx("active-validation-late", root/"validation-new", "2026-10-25T10:10:00Z", 7)
+    for _ in range(3):
+        refresh()
+        if total() == before + 15:
+            break
+    assert total() == before + 15, report()
+    historical = []
+    for i in range(140):
+        historical.append(cx(f"settled-{i:03}", home, f"2026-10-25T10:11:00.{i:03}Z", 1))
+    for _ in range(30):
+        status = refresh()
+        assert status["selected_sources"] <= 64
+        if total() == before + 155:
+            break
+    assert total() == before + 155, total()
+    assert refresh()["selected_sources"] == 0
+    for i, path in enumerate(historical):
+        write(path, [dict(type="event_msg", timestamp=f"2026-10-25T10:12:00.{i:03}Z",
+            payload=dict(type="token_count", info=dict(total_token_usage=dict(input_tokens=2, output_tokens=2),
+                                                      last_token_usage=dict(input_tokens=1, output_tokens=0))))], "a")
+    for _ in range(3):
+        status = refresh()
+        assert status["selected_sources"] <= 64
+    assert total() == before + 295, total()
+    assert refresh()["selected_sources"] == 0
+    live_path = root/"logs/active-supervisor-late.jsonl"
+    write(live_path, [dict(type="event_msg", timestamp="2026-10-25T10:13:00Z",
+        payload=dict(type="token_count", info=dict(total_token_usage=dict(input_tokens=6, output_tokens=2),
+                                                  last_token_usage=dict(input_tokens=1, output_tokens=0))))], "a")
+    status = refresh()
+    assert status["selected_sources"] == 1, status
+    assert total() == before + 296, total()
+    unchanged = live_path.read_bytes()
+    live_path.write_bytes(unchanged.replace(b'active-supervisor-late', b'rogue--supervisor-late'))
+    assert live_path.stat().st_size == len(unchanged)
+    assert "source_metadata_changed_or_unavailable" in refresh()["gaps"]
+    assert total() == before + 296
+    live_path.write_bytes(unchanged)
+    refresh()
+    index.close()
     # Privacy covers catalog/index/status and persistent DB, not just summaries.
     for f in store.rglob("*"):
         assert f.stat().st_mode & 0o077 == 0,(f,oct(f.stat().st_mode))
