@@ -840,6 +840,8 @@ test_local_only_merged_to_local_main_allows() {
   local case_dir rc
   case_dir=$(make_case merged-main)
   write_meta "$case_dir" local-only ship
+  # A new-task opt-in cannot change an existing pooled task's lifecycle.
+  printf 'git\n' > "$case_dir/config/worktree-allocator"
   wt_commit "$case_dir" "merged work"
   # Fast-forward the project's main to the worktree's HEAD commit so HEAD is
   # reachable from main. update-ref works whether or not main is checked out,
@@ -855,7 +857,7 @@ test_local_only_merged_to_local_main_allows() {
 
   expect_code 0 "$rc" "merged-main: teardown should succeed when work is merged into local main"
   ! grep -q REFUSED "$case_dir/stderr" || fail "merged-main: teardown printed a REFUSED line"
-  pass "local-only worktree with work merged into local main is torn down (no regression)"
+  pass "local-only pooled worktree landed in main still returns after new tasks opt into native allocation"
 }
 
 test_no_mistakes_origin_remote_allows() {

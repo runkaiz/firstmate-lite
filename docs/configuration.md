@@ -361,6 +361,29 @@ An unreadable configuration, unsupported adapter, unresolvable data directory, c
 Neither a configuration compatibility check nor merging this code authorizes rewriting or activating an existing operating home.
 
 
+## Task worktree allocator (config/worktree-allocator)
+
+The default remains Treehouse for new task copies; Orca continues to own its own copies.
+Set `config/worktree-allocator` to `git` only after reviewing a native candidate and approving activation for that home.
+The native allocator currently supports tmux and Herdr, whose endpoint ownership checks are verified.
+Native cleanup requires `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
+Other runtime backends remain available through their existing allocators.
+
+Native allocation also requires `config/git-worktree-root`, containing one absolute directory path outside the project, its primary checkout and the active Firstmate home.
+Its parent must already exist; the root must be owned by the current user and not writable by group or others.
+Each task receives its own new copy without pooling or reuse across task identities.
+`bin/fm-git-worktree-lib.sh` owns the path, reservation schema and recovery/removal mechanics.
+
+Local-only ships and scouts of registered local-only projects select accepted local history, including when origin has diverged.
+Other deliveries retain origin freshness; relaunch retains the recorded copy and its work.
+Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
+
+Native cleanup conservatively requires exact ancestry in the recorded source ref and no dirty or untracked content, including ignored files, even for scouts.
+It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard.
+Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them.
+This can retain copies after a squash merge whose content landed without preserving HEAD ancestry.
+Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
+
 ## Runtime backend (config/backend / FM_BACKEND)
 
 For spawn-capable adapters, the runtime session-provider backend controls where task windows/endpoints are created, captured, sent to, watched, and killed.

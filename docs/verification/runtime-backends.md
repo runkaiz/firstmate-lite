@@ -29,6 +29,34 @@ It verifies one allocation per attempt, an isolated worker cwd, allocator status
 This proves completion reporting and the existing isolation boundary; it does not establish pool eligibility or change local versus origin base selection.
 `bin/fm-spawn.sh` owns the completion-file mechanics.
 
+## Native Git task copies
+
+Verified on 2026-10-26 UTC with Herdr 0.9.5 and Git 2.56.0 in isolated local-file fixtures.
+Refresh with serial runs:
+
+```sh
+bash bin/fm-test-run.sh --jobs 1 tests/fm-git-worktree.test.sh
+bash bin/fm-test-run.sh --jobs 1 tests/fm-herdr-attached-viewer-live-e2e.test.sh
+bash bin/fm-test-run.sh --jobs 1 tests/fm-control-relaunch.test.sh tests/fm-teardown.test.sh
+```
+
+Representative output:
+
+```text
+ok - native ship selects exact accepted source on divergence and refuses duplicate spawn
+ok - native scout selects exact accepted source on divergence and refuses duplicate spawn
+ok - native remote selects exact accepted source on divergence and refuses duplicate spawn
+ok - native scout: divergent local history, interrupted allocation recovery, one worker, busy/dirty refusal and complete owned teardown
+```
+
+The real attached-viewer check interrupts the launcher after allocation but before endpoint/metadata publication, then verifies one allocation and one marker worker on recovery.
+The fixture keeps an existing pooled task while opting new tasks into native copies.
+The portable checks cover foreign reservations, path collisions, primary-root refusal, changed recovery source and preservation of dirty, untracked, ignored and unlanded content.
+They also exercise one real tmux marker worker on a private socket, busy-owner refusal and complete clean removal.
+The lifecycle suites preserve dirty native work across an allocator-setting change and still return an existing pooled task after new tasks opt into native allocation.
+These checks submit no model prompts and authorize no production allocator switch.
+The native cleanup contract is deliberately more conservative than pooled scout discard; `bin/fm-git-worktree-lib.sh` owns it and the [configuration guide](../configuration.md#task-worktree-allocator-configworktree-allocator) records its supported limits.
+
 ## Worker profile evidence
 
 Verified on 2026-10-25 UTC with Pi 1.4.0 and Node 22.23.2 using the installed SDK, in-memory credentials/settings, an isolated resource loader and no prompt or network access.

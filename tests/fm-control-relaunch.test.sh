@@ -60,11 +60,12 @@ chmod +x "$META_WRITER"
 TASK_TMPS=()
 
 relaunch_cleanup() {
-  local d
+  local d status=$?
   for d in "${TASK_TMPS[@]:-}"; do
-    [ -n "$d" ] && rm -rf "$d"
+    [ -z "$d" ] || fm_test_remove_tree "$d" || status=1
   done
-  rm -rf "$TMP_ROOT"
+  fm_test_cleanup || status=1
+  exit "$status"
 }
 trap relaunch_cleanup EXIT
 
@@ -483,6 +484,36 @@ test_same_harness_relaunch_keeps_identity_and_reuses_the_endpoint() {
   assert_grep "cd -- '$dir/wt'" "$dir/fake/keys" "the replacement launch must enter the recorded worktree"
   assert_grep "Firstmate operational input waiting: read" "$dir/fake/literal" "the replacement should have been launched"
   pass "fm-control relaunch: a same-harness relaunch replaces the agent in the same endpoint and worktree"
+}
+
+test_native_relaunch_preserves_copy_and_recorded_allocator_after_config_switch() {
+  local dir wt base branch before inventory out
+  dir=$(new_case native rl-native)
+  add_ship_task "$dir" rl-native claude
+  # shellcheck source=bin/fm-git-worktree-lib.sh disable=SC1091
+  . "$ROOT/bin/fm-git-worktree-lib.sh"
+  base=$(git -C "$dir/proj" rev-parse HEAD)
+  branch=$(git -C "$dir/proj" symbolic-ref --short HEAD)
+  fm_git_worktree_allocate "$dir/home/state" rl-native "$dir/home" "$dir/proj" "$dir/native" "$base" "refs/heads/$branch" \
+    || fail 'could not prepare native relaunch copy'
+  wt=$FM_GIT_WORKTREE_PATH
+  awk -v wt="$wt" '/^worktree=/ {print "worktree=" wt; next} {print}' "$dir/home/state/rl-native.meta" > "$dir/meta.new"
+  mv "$dir/meta.new" "$dir/home/state/rl-native.meta"
+  printf 'allocator=git\n' >> "$dir/home/state/rl-native.meta"
+  mkdir -p "$dir/home/config"
+  printf 'treehouse\n' > "$dir/home/config/worktree-allocator"
+  printf '%s' "$wt" > "$dir/fake/cwd"
+  printf 'unfinished work\n' > "$wt/user-work"
+  before=$(cat "$dir/home/state/rl-native.git-worktree")
+  inventory=$(git -C "$dir/proj" worktree list --porcelain)
+  out=$(run_control "$dir" rl-native relaunch --note 'continue in the recorded native copy')
+  expect_code 0 "$?" "native relaunch failed: $out"
+  [ "$(meta_field "$dir" rl-native allocator)" = git ] || fail 'config switch changed recorded allocator'
+  [ "$(meta_field "$dir" rl-native worktree)" = "$wt" ] || fail 'native relaunch changed copy'
+  [ "$(cat "$wt/user-work")" = 'unfinished work' ] || fail 'native relaunch lost uncommitted work'
+  [ "$(cat "$dir/home/state/rl-native.git-worktree")" = "$before" ] || fail 'native relaunch changed reservation'
+  [ "$(git -C "$dir/proj" worktree list --porcelain)" = "$inventory" ] || fail 'native relaunch allocated another copy'
+  pass 'native relaunch retains its copy, dirty work and recorded allocator after config switch'
 }
 
 test_relaunch_refuses_before_exit_when_the_composer_holds_pending_text() {
@@ -2431,6 +2462,7 @@ test_exit_and_relaunch_remove_the_dialog_file
 test_exit_removes_the_dialog_file_before_releasing_the_lock
 test_two_project_recovery_preserves_independent_approval_and_work
 test_same_harness_relaunch_keeps_identity_and_reuses_the_endpoint
+test_native_relaunch_preserves_copy_and_recorded_allocator_after_config_switch
 test_relaunch_refuses_before_exit_when_the_composer_holds_pending_text
 test_relaunch_refuses_before_exit_when_the_composer_state_is_unproven
 test_relaunch_from_linked_home_preserves_recorded_worktree

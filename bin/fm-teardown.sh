@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+# allocator=git metadata selects native removal regardless of current config;
+# absent allocator keeps legacy pooled/Orca behavior. Native copies always face
+# bin/fm-git-worktree-lib.sh's exact ownership, clean/untracked and source-ancestry
+# gates, even scouts; --force is unsupported. A live/unverified owner refuses.
+# Only the recorded idle endpoint is closed; remaining copy processes refuse
+# removal rather than being reaped. Git removal uses no force and keeps branch
+# refs. An interrupted removal with an absent, unregistered copy retires only
+# its matching reservation. Pooled tasks are never migrated or removed by this.
 # Tear down a finished task: return the treehouse worktree, release the Orca
 # worktree, or retire a secondmate home; kill the recorded runtime endpoint,
 # clear volatile state, and transition this home's backlog item for ship and
@@ -345,6 +353,7 @@ for _teardown_source in \
   fm-backlog-transition-lib.sh \
   fm-timeout-lib.sh \
   fm-backend.sh \
+  fm-git-worktree-lib.sh \
   fm-control-lib.sh \
   fm-lock-lib.sh \
   fm-classify-lib.sh \
@@ -371,6 +380,8 @@ unset _teardown_source
 . "$SCRIPT_DIR/fm-backlog-transition-lib.sh"
 # shellcheck source=bin/fm-backend.sh
 . "$SCRIPT_DIR/fm-backend.sh"
+# shellcheck source=bin/fm-git-worktree-lib.sh
+. "$SCRIPT_DIR/fm-git-worktree-lib.sh"
 # shellcheck source=bin/fm-control-lib.sh
 . "$SCRIPT_DIR/fm-control-lib.sh"
 # shellcheck source=bin/fm-lock-lib.sh
@@ -435,6 +446,7 @@ TREEHOUSE_PROJECT_LOCK=
 TREEHOUSE_PROJECT_LOCK_HELD=0
 TREEHOUSE_SLOT_LOCK_REQUIRED=0
 if [ -f "$META" ] && [ ! -L "$META" ]; then
+  TEARDOWN_LOCK_ALLOCATOR=$(fm_git_worktree_meta_allocator "$META" "$STATE/$ID.git-worktree") || exit 1
   TEARDOWN_LOCK_KIND=$(fm_meta_get "$META" kind)
   [ -n "$TEARDOWN_LOCK_KIND" ] || TEARDOWN_LOCK_KIND=ship
   TEARDOWN_LOCK_BACKEND=$(fm_meta_get "$META" backend)
@@ -443,7 +455,7 @@ if [ -f "$META" ] && [ ! -L "$META" ]; then
   TEARDOWN_LOCK_PROJECT=$(fm_meta_get "$META" project)
   if [ "$TEARDOWN_LOCK_KIND" != secondmate ] \
      && [ "$TEARDOWN_LOCK_BACKEND" != orca ] \
-     && fm_treehouse_pool_slot "$TEARDOWN_LOCK_PROJECT" "$TEARDOWN_LOCK_WT"; then
+     && { [ "$TEARDOWN_LOCK_ALLOCATOR" = git ] || fm_treehouse_pool_slot "$TEARDOWN_LOCK_PROJECT" "$TEARDOWN_LOCK_WT"; }; then
     TREEHOUSE_SLOT_LOCK_REQUIRED=1
     TREEHOUSE_PROJECT_LOCK=$(fm_treehouse_project_lock_path "$TEARDOWN_LOCK_PROJECT") || {
       echo "REFUSED: cannot resolve the shared Treehouse project lock for ${TEARDOWN_LOCK_PROJECT:-<missing>}; nothing was changed" >&2
@@ -729,10 +741,36 @@ ORCA_PATH_MATCH_VERIFIED=0
 CLEANUP_RECOVERY=$TEARDOWN_CLEANUP_RECOVERY
 
 KIND=$TEARDOWN_META_KIND
+WORKTREE_ALLOCATOR=$(fm_git_worktree_meta_allocator "$META" "$STATE/$ID.git-worktree") || exit 1
+case "$WORKTREE_ALLOCATOR" in treehouse|git) ;; *) echo 'REFUSED: unknown recorded worktree allocator' >&2; exit 1 ;; esac
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
+  fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
+    case "$(fm_backend_agent_state "$BACKEND" "$T")" in
+      dead) ;;
+      *) echo 'REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first' >&2; exit 1 ;;
+    esac
+    if [ "$BACKEND" = herdr ]; then
+      fm_backend_herdr_parse_target "$T" || exit 1
+      fm_backend_herdr_pane_idle_shell_pid "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE" >/dev/null || {
+        echo 'REFUSED: native endpoint is not a proven idle childless shell; preserving copy' >&2; exit 1;
+      }
+    elif [ "$BACKEND" = tmux ]; then
+      native_pane_pid=$(tmux display-message -p -t "$T" '#{pane_pid}') || exit 1
+      case "$native_pane_pid" in ''|*[!0-9]*) echo 'REFUSED: native shell PID is unverified' >&2; exit 1 ;; esac
+      native_children_rc=0
+      pgrep -P "$native_pane_pid" >/dev/null || native_children_rc=$?
+      [ "$native_children_rc" = 1 ] || {
+        echo 'REFUSED: native shell has children or child ownership is unreadable; preserving copy' >&2; exit 1;
+      }
+    fi
+  fi
+fi
 TEARDOWN_POOL_SLOT_LOST=0
 EXPECTED_TREEHOUSE_PROJECT_LOCK=
 if [ "$BACKEND" != orca ] \
-   && fm_treehouse_pool_slot "$PROJ" "$WT"; then
+   && { [ "$WORKTREE_ALLOCATOR" = git ] || fm_treehouse_pool_slot "$PROJ" "$WT"; }; then
   EXPECTED_TREEHOUSE_PROJECT_LOCK=$(fm_treehouse_project_lock_path "$PROJ") || {
     echo "REFUSED: cannot resolve the shared Treehouse project lock for ${PROJ:-<missing>}; nothing was changed" >&2
     exit 1
@@ -2317,7 +2355,9 @@ fi
 # kind=secondmate: a secondmate home's own runtime lifecycle is owned by the
 # dedicated process-event and firstmate-home removal machinery further below,
 # not by task-worktree cleanup.
-if teardown_owns_worktree; then
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  : # Native cleanup closes only its recorded agent-free endpoint; never reaps foreign processes.
+elif teardown_owns_worktree; then
   conclude_task_no_mistakes_run "$WT"
   reap_task_worktree_processes worktree "$WT" "$TASK_TMP"
 elif [ "$KIND" != secondmate ]; then
@@ -2353,7 +2393,9 @@ remove_generated_worker_wiring() {
 }
 
 # Best-effort: drop the local task branch so the shared repo does not accumulate refs.
-if [ "$BACKEND" = orca ] && [ "$KIND" != secondmate ]; then
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  : # Retain the copy until its endpoint close has been confirmed below.
+elif [ "$BACKEND" = orca ] && [ "$KIND" != secondmate ]; then
   if [ "$ORCA_PATH_MATCH_VERIFIED" != 1 ]; then
     require_orca_worktree_path_match_if_present "$ORCA_WORKTREE_ID" "$WT" || exit 1
     ORCA_PATH_MATCH_VERIFIED=1
@@ -2502,6 +2544,14 @@ fi
 
 
 
+
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  if [ -d "$WT" ]; then
+    task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free' >&2; exit 1; }
+    [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
+  fi
+  fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+fi
 
 remove_grok_turnend_auth "$STATE" "$ID" || exit 1
 remove_kimi_turnend_auth "$STATE" "$ID" || exit 1
