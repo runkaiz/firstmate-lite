@@ -255,12 +255,14 @@ General component replacement, ANSI cursor erasure, provider-context mutation, a
 The installed `@earendil-works/pi-coding-agent` package reported version `1.4.0`.
 Its README, complete extension and TUI guides, extension declarations, built-in renderer example, codemode definition and renderer, extension runner, tool component, and HTML exporter were inspected.
 The public `registerToolRenderer((name, next) => renderers)` API resolves presentation independently of tool execution, including late registrations and restored calls.
-Calm uses that resolver only for the registered tool name `codemode` with both render slots and retains the existing built-in compatibility path.
-Normal rendering and exports delegate to the original slots; built-in default shells reuse Calm's existing box composition, while self-shell renderers keep their own original components across toggles.
+[`calm.md`](calm.md#codemode-renderers) owns the resolver's supported scope and compatibility behavior.
+Original renderers receive call and result updates even while their rows are hidden, preserving lifecycle cleanup; built-in default shells reuse Calm's existing box composition, while self-shell renderers keep their own original components across toggles.
 
 The deterministic regressions use installed Pi renderers and TUI with synthetic tool results and a test-private stored session, without model inference or access to a real session.
 The installed codemode definition provides the real script header, nested-call status, and output renderer.
 The same replay distinguishes Calm off, first activation, reload, and restart/resume, while the renderer fixture checks codemode pending and error results, original self-shell components, export/share, unchanged arguments/results, and missing renderer slots.
+The renderer fixture also intercepts interval scheduling deterministically to check the installed codemode renderer's redraw timer after a partial result, both when Calm starts on and when it turns on before completion.
+It asserts timer removal, no further timer-driven redraws, zero-height hidden rows, and stock rendering after Calm turns off for synthetic success, error, and cancellation results.
 An unrelated custom-tool negative control retains visible call and result rows across Calm toggles and session lifecycle events.
 The built-in collision tests retain their existing non-retroactive first-toggle boundary.
 
