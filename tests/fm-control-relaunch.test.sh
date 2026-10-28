@@ -2188,7 +2188,7 @@ test_relaunch_reverifies_an_already_in_flight_item_instead_of_rewriting_it() {
     return 0
   }
   fm_tasks_axi_compatible || {
-    pass "skipped: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so dispatch refuses automatic backlog transitions"
+    pass "skipped: native queue or Python is unavailable, so dispatch refuses automatic backlog transitions"
     return 0
   }
   dir=$(new_case reverify rl40)
@@ -2210,7 +2210,7 @@ test_relaunch_moves_a_drifted_item_back_in_flight() {
     return 0
   }
   fm_tasks_axi_compatible || {
-    pass "skipped: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so dispatch refuses automatic backlog transitions"
+    pass "skipped: native queue or Python is unavailable, so dispatch refuses automatic backlog transitions"
     return 0
   }
   dir=$(new_case drifted rl41)

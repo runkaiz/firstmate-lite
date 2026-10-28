@@ -13,9 +13,6 @@ FM_QUEUE_CLI="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/fm-queue.py"
 if [ "${FM_TEST_SEAM:-0}" = 1 ] && [ -n "${FM_QUEUE_TEST_CLI:-}" ]; then
   FM_QUEUE_CLI=$FM_QUEUE_TEST_CLI
 fi
-FM_TASKS_AXI_MIN=1.0.0
-FM_TASKS_AXI_COMPATIBLE_MEMO=${FM_TASKS_AXI_COMPATIBLE:-}
-unset FM_TASKS_AXI_COMPATIBLE
 
 fm_tasks_axi_version_parts() {
   "$FM_QUEUE_CLI" --version | tr . ' '

@@ -932,7 +932,7 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
   local keyword_report shipping_report fleet_json created_kind failures=''
   [ -n "$TASKS_AXI_BIN" ] || fail "tasks-axi is required for the landed-selector regression"
   fm_tasks_axi_compatible || {
-    echo "skip: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so the real backlog mutations this regression needs are refused"
+    echo "skip: native queue or Python is unavailable, so the real backlog mutations this regression needs are refused"
     return 0
   }
   home=$(make_home kind-owned-landed)
@@ -1088,7 +1088,7 @@ test_kind_fallback_matches_tasks_axi_word_boundaries() {
   local home fakebin id title kind producer_kind fleet_json json
   [ -n "$TASKS_AXI_BIN" ] || fail "tasks-axi is required for the kind-boundary regression"
   fm_tasks_axi_compatible || {
-    echo "skip: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so the real backlog mutations this regression needs are refused"
+    echo "skip: native queue or Python is unavailable, so the real backlog mutations this regression needs are refused"
     return 0
   }
   home=$(make_home kind-word-boundaries)
