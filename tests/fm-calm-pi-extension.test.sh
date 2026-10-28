@@ -1590,6 +1590,7 @@ let hiddenThinkingLabel = "unset";
 const statuses = new Map();
 const sessionEntries = [{ type: "message", message: { role: "toolResult", content: "kept" } }];
 const entriesBefore = JSON.stringify(sessionEntries);
+const timerProbeRows = [];
 const commandContext = {
   sessionManager: { getEntries: () => sessionEntries },
   ui: {
@@ -1616,6 +1617,7 @@ const commandContext = {
       watchActual.setExpanded(value);
       customRow.setExpanded(value);
       for (const { actual } of codemodeProbeRows) actual.setExpanded(value);
+      for (const row of timerProbeRows) row.setExpanded(value);
       imageRow.setExpanded(value);
     },
     setWorkingVisible(value) {
@@ -1897,6 +1899,81 @@ for (const reason of ["startup", "new", "resume", "fork", "reload"]) {
   }
 }
 await calmCommand.handler("", commandContext);
+
+const realSetInterval = globalThis.setInterval;
+const realClearInterval = globalThis.clearInterval;
+const redrawTimers = new Map();
+globalThis.setInterval = (callback, delay, ...args) => {
+  const timer = { unref() {} };
+  redrawTimers.set(timer, () => callback(...args));
+  return timer;
+};
+globalThis.clearInterval = (timer) => {
+  if (!redrawTimers.delete(timer)) realClearInterval(timer);
+};
+try {
+  for (const startHidden of [false, true]) {
+    for (const status of ["ok", "error", "cancelled"]) {
+      const label = `codemode-${startHidden ? "hidden" : "visible"}-start-${status}`;
+      if (startHidden) await calmCommand.handler("", commandContext);
+      let redraws = 0;
+      const args = { code: 'text("TIMER_SCRIPT")' };
+      const row = new ToolExecutionComponent(
+        "codemode", label, args, { showImages: false },
+        resolveRenderers("codemode", codemodeDefinition),
+        { requestRender() { redraws++; } }, process.cwd(),
+      );
+      timerProbeRows.push(row);
+      row.markExecutionStarted();
+      row.setArgsComplete();
+      row.updateResult({
+        content: [],
+        details: { calls: [{ name: "fixture.echo", args: "timer", status: "running" }] },
+        isError: false,
+      }, true);
+      if (redrawTimers.size !== 1) throw new Error(`${label} did not start its renderer timer`);
+      const beforeTick = redraws;
+      for (const tick of [...redrawTimers.values()]) tick();
+      if (redraws <= beforeTick) throw new Error(`${label} timer did not request a redraw`);
+      if (!startHidden) {
+        if (!row.render(100).join("\n").includes("TIMER_SCRIPT")) {
+          throw new Error(`${label} lost its visible partial call`);
+        }
+        await calmCommand.handler("", commandContext);
+      }
+      if (row.render(100).length !== 0) throw new Error(`${label} exposed its active hidden row`);
+      const result = {
+        content: [{ type: "text", text: `TIMER_OUTPUT_${status}` }],
+        details: { calls: [{ name: "fixture.echo", args: "timer", status, durationMs: 4000 }] },
+        isError: status !== "ok",
+        durationMs: 4000,
+      };
+      row.updateResult(result);
+      if (redrawTimers.size !== 0) throw new Error(`${label} retained its completed renderer timer`);
+      const afterCompletion = redraws;
+      for (const tick of [...redrawTimers.values()]) tick();
+      if (redraws !== afterCompletion) throw new Error(`${label} redrew after completion`);
+      if (row.render(100).length !== 0) throw new Error(`${label} exposed its completed hidden row`);
+      await calmCommand.handler("", commandContext);
+      row.setExpanded(true);
+      const baseline = new ToolExecutionComponent(
+        "codemode", `stock-${label}`, args, { showImages: false },
+        codemodeDefinition, renderUi, process.cwd(),
+      );
+      baseline.markExecutionStarted();
+      baseline.setArgsComplete();
+      baseline.updateResult(result);
+      baseline.setExpanded(true);
+      if (JSON.stringify(row.render(100)) !== JSON.stringify(baseline.render(100))) {
+        throw new Error(`${label} did not restore the completed stock renderer`);
+      }
+      if (redrawTimers.size !== 0) throw new Error(`${label} restarted its completed renderer timer`);
+    }
+  }
+} finally {
+  globalThis.setInterval = realSetInterval;
+  globalThis.clearInterval = realClearInterval;
+}
 
 const readWrapper = tools.find((tool) => tool.name === "read");
 const originalRead = createReadToolDefinition(process.cwd());

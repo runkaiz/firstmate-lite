@@ -305,13 +305,13 @@ export default function (pi: ExtensionAPI) {
       ) {
         rememberCalmToolRow(context.state as object, context.invalidate);
         if (exportRendering) return originalRenderCall(args, theme, context);
-        if (calmPresentationHides("assistant-tool-call")) return new Container();
 
         const state = shellStateFor(context);
         state.call = originalRenderCall(args, theme, {
           ...context,
           lastComponent: state.call,
         });
+        if (calmPresentationHides("assistant-tool-call")) return new Container();
         return originalSelfShell ? state.call : refreshStandardShell(state, theme, context);
       },
 
@@ -323,13 +323,13 @@ export default function (pi: ExtensionAPI) {
       ) {
         rememberCalmToolRow(context.state as object, context.invalidate);
         if (exportRendering) return originalRenderResult(result, options, theme, context);
-        if (calmPresentationHides("tool-result")) return new Container();
 
         const state = shellStateFor(context);
         state.result = originalRenderResult(result, options, theme, {
           ...context,
           lastComponent: state.result,
         });
+        if (calmPresentationHides("tool-result")) return new Container();
         if (originalSelfShell) return state.result;
         refreshStandardShell(state, theme, context);
         return new Container();
