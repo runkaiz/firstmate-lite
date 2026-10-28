@@ -113,6 +113,9 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
   done
   home=$(cd "$home" && pwd -P) && project=$(cd "$project" && pwd -P) || return 1
   record="$state/$id.git-worktree"
+  if [ -e "$state/$id.backlog-close" ] || [ -L "$state/$id.backlog-close" ]; then
+    fm_git_worktree_error 'task retirement is pending; finish teardown or its recorded replay first'; return 1
+  fi
   if [ -e "$state/$id.meta" ] || [ -L "$state/$id.meta" ]; then
     fm_git_worktree_error 'task metadata already exists; use guarded task relaunch'; return 1
   fi
@@ -182,7 +185,15 @@ fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path>
   [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0 # confirmed unregistered removal/reservation recovery
   fm_git_worktree_clean "$FM_GIT_WORKTREE_PATH" || return 1
   ref=$(fm_git_worktree_field "$1/$2.git-worktree" source_ref) || return 1
-  case "$ref" in refs/heads/*|refs/remotes/origin/*) ;; *) return 1 ;; esac
+  case "$ref" in
+    refs/heads/*) ;;
+    refs/remotes/origin/*)
+      git -C "$4" fetch --no-tags --no-write-fetch-head origin "refs/heads/${ref#refs/remotes/origin/}:$ref" || {
+        fm_git_worktree_error 'recorded remote source could not be refreshed; preserving copy'; return 1;
+      }
+      ;;
+    *) return 1 ;;
+  esac
   if ! git -C "$4" show-ref --verify --quiet "$ref" ||
     ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
     fm_git_worktree_error "unlanded HEAD is not contained in $ref; preserving copy"; return 1
@@ -197,7 +208,8 @@ fm_git_worktree_remove() { # same arguments as safe; caller proved endpoint gone
     git -C "$4" worktree remove -- "$FM_GIT_WORKTREE_PATH" || return 1
   fi
   if [ -d "$container" ]; then rmdir -- "$container" || return 1; fi
-  if [ ! -e "$1/$2.meta" ] && [ ! -L "$1/$2.meta" ]; then
+  if [ ! -e "$1/$2.meta" ] && [ ! -L "$1/$2.meta" ] \
+     && [ ! -e "$1/$2.backlog-close" ] && [ ! -L "$1/$2.backlog-close" ]; then
     rm -- "$1/$2.git-worktree" || return 1
   fi
 }

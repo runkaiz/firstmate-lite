@@ -185,6 +185,30 @@ if remove_copy content; then fail 'unlanded committed work was discarded'; fi
 [ -d "$WT" ] && [ -f "$HOME_DIR/state/content.git-worktree" ] || fail 'refusal lost copy/record'
 pass 'native cleanup preserves untracked, ignored, dirty and unlanded content'
 
+make_case remote-landing
+git clone -q --bare "$PROJ" "$CASE/origin.git"
+git -C "$PROJ" remote add origin "file://$CASE/origin.git"
+git -C "$CASE/origin.git" branch other "$BASE"
+git -C "$PROJ" fetch -q origin
+fm_git_worktree_allocate "$HOME_DIR/state" landed "$HOME_DIR" "$PROJ" "$COPY_ROOT" "$BASE" "refs/remotes/origin/$MAIN" \
+  || fail 'remote landing fixture allocation failed'
+WT=$FM_GIT_WORKTREE_PATH
+printf 'merged change\n' > "$WT/merged"
+git -C "$WT" add merged
+git -C "$WT" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid commit -qm merged
+merged=$(git -C "$WT" rev-parse HEAD)
+git -C "$CASE/origin.git" fetch -q "$WT" "HEAD:refs/heads/$MAIN" HEAD:refs/heads/other
+[ "$(git -C "$PROJ" rev-parse "refs/remotes/origin/$MAIN")" = "$BASE" ] || fail 'remote landing fixture did not leave a stale tracking ref'
+fm_git_worktree_safe "$HOME_DIR/state" landed "$HOME_DIR" "$PROJ" "$WT" || fail 'merged remote source was not refreshed before native ancestry proof'
+[ "$(git -C "$PROJ" rev-parse "refs/remotes/origin/$MAIN")" = "$merged" ] || fail 'recorded remote source did not advance'
+[ "$(git -C "$PROJ" rev-parse refs/remotes/origin/other)" = "$BASE" ] || fail 'native safety fetched an unrelated remote ref'
+git -C "$PROJ" remote set-url origin "$CASE/missing-remote"
+if remove_copy landed; then fail 'native removal trusted cached ancestry after a failed fetch'; fi
+[ -d "$WT" ] && [ -f "$HOME_DIR/state/landed.git-worktree" ] || fail 'failed remote refresh lost native work'
+git -C "$PROJ" remote set-url origin "file://$CASE/origin.git"
+remove_copy landed || fail 'native merged remote copy could not retire'
+pass 'native safety refreshes only its recorded remote ref and fails closed on refresh failure'
+
 for kind in ship scout remote; do
   make_case "source-$kind"
   # Local and origin share a base but then diverge, matching the recurrence.
@@ -229,10 +253,22 @@ for kind in ship scout remote; do
   pass "native $kind selects exact accepted source on divergence and refuses duplicate spawn"
 done
 
-for backend in tmux herdr; do
-  make_case "missing-$backend"
+for scenario in tmux-manual tmux-close tmux-retain herdr-manual; do
+  backend=${scenario%%-*}
+  retirement=${scenario#*-}
+  make_case "missing-$scenario"
   printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
   id=missing-endpoint
+  if [ "$retirement" != manual ]; then
+    printf 'markdown\n' > "$HOME_DIR/config/backlog-backend"
+    fm_test_tasks_toml "$HOME_DIR/.tasks.toml"
+    printf '# Backlog\n\n## In flight\n\n## Queued\n\n## Done\n' > "$HOME_DIR/data/backlog.md"
+    tasks-axi add "$id" fixture --kind ship --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'could not seed native backlog'
+    tasks-axi start "$id" --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'could not start native backlog row'
+    if [ "$retirement" = retain ]; then
+      tasks-axi hold "$id" --reason 'captain decision pending' --kind captain --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'could not hold native backlog row'
+    fi
+  fi
   allocate "$id" || fail 'missing endpoint fixture allocation failed'
   WT=$FM_GIT_WORKTREE_PATH
   fakebin=$(fm_fakebin "$CASE/fake")
@@ -311,18 +347,71 @@ done
 exec "${FM_TEST_REAL_RM:?}" "$@"
 SH
   chmod +x "$fakebin/rm"
+  cp "$fakebin/rm" "$CASE/rm-shim"
   for artifact in busy-gen meta; do
     rc=0
     out=$(FM_TEST_REAL_RM="$real_rm" FM_TEST_RETIRE_PATH="$HOME_DIR/state/$id.$artifact" run_native_teardown 2>&1) || rc=$?
     [ "$rc" != 0 ] || fail "$backend $artifact fault did not fail teardown"
+    case "$artifact" in
+      busy-gen) assert_contains "$out" 'busy-state retirement failed' 'busy fault did not reach busy retirement' ;;
+      meta) assert_contains "$out" 'task record could not be removed' 'metadata fault did not reach record retirement' ;;
+    esac
     [ ! -e "$WT" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
       || fail "$backend $artifact failure lost retry ownership evidence"
   done
+  run_native_replay() {
+    env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+      FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+      FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_BOOTSTRAP_NETWORK=skip \
+      FM_TEST_HERDR_SOCKET="$CASE/herdr.sock" bash "$ROOT/bin/fm-bootstrap.sh"
+  }
+  real_queue=$(command -v tasks-axi)
+  if [ "$retirement" != manual ]; then
+    cat > "$fakebin/tasks-axi" <<'SH'
+#!/usr/bin/env bash
+case "$1" in done|reopen) echo 'fixture queue retirement failure' >&2; exit 1 ;; esac
+exec "${FM_TEST_REAL_QUEUE:?}" "$@"
+SH
+    chmod +x "$fakebin/tasks-axi"
+  fi
+  rc=0
+  out=$(FM_TEST_REAL_RM="$real_rm" FM_TEST_REAL_QUEUE="$real_queue" \
+    FM_TEST_RETIRE_PATH="$HOME_DIR/state/$id.git-worktree" run_native_teardown 2>&1) || rc=$?
+  [ "$rc" != 0 ] && [ ! -e "$HOME_DIR/state/$id.meta" ] \
+    && [ -f "$HOME_DIR/state/$id.git-worktree" ] && [ -f "$HOME_DIR/state/$id.backlog-close" ] \
+    || fail "$scenario did not retain retirement evidence after metadata disappeared: $out"
+  "$real_rm" -f "$fakebin/rm" "$fakebin/tasks-axi"
+  if allocate "$id"; then fail 'pending retirement was reused as an unpublished reservation'; fi
+  cp "$HOME_DIR/state/$id.git-worktree" "$CASE/reservation"
+  alternate=$(printf 'other base\n' | git -C "$PROJ" -c user.name=Tests -c user.email=tests@example.invalid commit-tree "$BASE^{tree}" -p "$BASE")
+  sed "s/^base=.*/base=$alternate/" "$CASE/reservation" > "$HOME_DIR/state/$id.git-worktree"
+  out=$(run_native_replay 2>&1)
+  [ -f "$HOME_DIR/state/$id.git-worktree" ] && [ -f "$HOME_DIR/state/$id.backlog-close" ] \
+    || fail "$scenario replay retired changed ownership evidence"
+  cp "$CASE/reservation" "$HOME_DIR/state/$id.git-worktree"
+  mkdir -p "$WT"
+  printf 'preserve\n' > "$WT/sentinel"
+  out=$(run_native_replay 2>&1)
+  [ -f "$WT/sentinel" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
+    || fail "$scenario replay removed a reappeared unknown path"
+  rm "$WT/sentinel"
+  rmdir "$WT" "${WT%/worktree}"
+  cp "$CASE/rm-shim" "$fakebin/rm"
+  out=$(FM_TEST_REAL_RM="$real_rm" FM_TEST_RETIRE_PATH="$HOME_DIR/state/$id.backlog-close" run_native_replay 2>&1)
+  [ ! -e "$HOME_DIR/state/$id.git-worktree" ] && [ -f "$HOME_DIR/state/$id.backlog-close" ] \
+    || fail "$scenario did not preserve replay after reservation retirement"
   "$real_rm" "$fakebin/rm"
-  out=$(run_native_teardown 2>&1)
-  expect_code 0 "$?" "$backend native retry after endpoint loss failed: $out"
+  if allocate "$id"; then fail 'pending final retirement marker allowed task reuse'; fi
+  out=$(run_native_replay 2>&1)
+  expect_code 0 "$?" "$scenario native retirement replay failed: $out"
   [ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] && [ ! -e "$HOME_DIR/state/$id.git-worktree" ] \
     || fail "$backend missing endpoint cleanup left copy or records"
+  [ ! -e "$HOME_DIR/state/$id.backlog-close" ] || fail "$scenario replay left its retirement marker"
+  git -C "$PROJ" update-ref "refs/heads/$MAIN" "$alternate"
+  BASE=$alternate
+  allocate "$id" || fail "$scenario replay stranded future allocation"
+  [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" = "$BASE" ] || fail 'completed task reused its retired base'
+  remove_copy "$id" || fail 'fresh post-retirement allocation did not clean up'
   pass "native $backend teardown retries a missing endpoint but preserves unreadable and live owners"
 done
 

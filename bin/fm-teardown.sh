@@ -2647,6 +2647,13 @@ elif [ "$KIND" = secondmate ] && [ ! -e "$STATE" ] && [ ! -L "$STATE" ]; then
   # deletion; do not turn its confirmed absence into a false cleanup failure.
   :
 else
+  if [ "$WORKTREE_ALLOCATOR" = git ]; then
+    if ! fm_backlog_meta_spawn_gen "$META" "$STATE" \
+       || ! fm_backlog_close_marker_write "$STATE" "$ID" "$DATA" "$FM_BACKLOG_META_SPAWN_GEN" --remove; then
+      echo "error: native task retirement could not be recorded: $FM_BACKLOG_TRANSITION_ERROR" >&2
+      exit 1
+    fi
+  fi
   if ! fm_backlog_atomic_transition remove "$STATE/$ID.meta" "task record" "$STATE"; then
     fm_lock_release "$META_LOCK"
     META_LOCK_HELD=0
@@ -2655,7 +2662,7 @@ else
   fi
 fi
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
-  rm -- "$STATE/$ID.git-worktree" || exit 1
+  fm_backlog_close_marker_clear "$STATE" "$ID" || exit 1
 fi
 fm_lock_release "$META_LOCK"
 META_LOCK_HELD=0
