@@ -22,12 +22,12 @@
 # A close that fails is fatal and loud, preserves its pending-close record, and
 # is retried by the next session start. The transition is skipped on a
 # config/backlog-backend=manual home and in a markdown home that keeps no
-# data/backlog.md; those cases print the manual follow-up. A configured
-# non-markdown adapter remains active without a markdown file; any active
-# automatic backend without compatible tasks-axi refuses before cleanup.
+# data/backlog.md; those cases print the manual follow-up. An unsupported
+# adapter or unavailable native queue refuses before cleanup under the
+# automatic transition gate owned by fm-backlog-transition-lib.sh.
 # None of this loosens the landed-work gates below: the transition runs only on
 # the paths that already proceed to remove the record.
-# The close - and only the close - is replaced by `tasks-axi reopen` with the
+# The close - and only the close - is replaced by native queue `reopen` with the
 # deliverable recorded while the backlog item is still an open captain call
 # (bin/fm-captain-hold.sh `open` owns that predicate), because the policy holds
 # the very work item a question gates and cleanup must never retire the

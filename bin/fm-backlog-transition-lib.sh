@@ -1,8 +1,7 @@
 # shellcheck shell=bash
 # Fused backlog transitions for the scripts that own a task's physical record.
 # Usage: . bin/fm-tasks-axi-lib.sh; . bin/fm-backlog-transition-lib.sh
-# (this library reads that one's backend gate and never sources it itself, so a
-# caller that already sourced it keeps its memoised compatibility verdict).
+# (this library reads that one's backend gate and never sources it itself).
 #
 # INVARIANT. In ordinary successful lifecycle state, `state/<id>.meta` exists
 # <=> this home's backlog row for <id> is In flight; the one teardown crash
@@ -11,8 +10,8 @@
 # same process, under the per-task meta lock it already holds, before it reports
 # success. Nothing else - not a later agent turn, not a printed reminder - is
 # load-bearing for the pairing.
-#   bin/fm-spawn.sh      meta published => `tasks-axi start`
-#   bin/fm-teardown.sh   meta removed => `tasks-axi done`, or `tasks-axi reopen`
+#   bin/fm-spawn.sh      meta published => native queue `start`
+#   bin/fm-teardown.sh   meta removed => native queue `done`, or `reopen`
 #                        with the deliverable recorded when the row is still an
 #                        open captain call (bin/fm-captain-hold.sh `open`), so
 #                        cleanup never retires the captain's own question
@@ -25,18 +24,18 @@
 # homes whose configured backlog backend is manual and markdown homes that keep
 # no backlog file. Those return-1 exemptions are never errors; an
 # unresolvable configured data directory, a backend resolution error, or
-# incompatible tasks-axi instead returns 2 so callers refuse before mutation.
+# unavailable native queue instead returns 2 so callers refuse before mutation.
 #
 # ADDRESSING. Every call runs from the configured data directory's parent so
 # that home's `.tasks.toml` supplies the adapter selection, done_keep, and the
-# archive path. A markdown backlog also passes `--file <data>/backlog.md` so the
+# archive path. The Markdown backlog passes `--file <data>/backlog.md` so the
 # change lands in the home that owns the task regardless of the caller's working
-# directory. A configured non-markdown adapter is addressed by that root alone,
-# because `--file` would override the adapter's own workspace path. The parent of
+# directory. Unsupported adapters are refused by the native resolver. The parent of
 # the data directory is the addressing root rather than FM_HOME, so a home whose
 # data directory is relocated keeps its backlog and its archive together. A root
-# with no `.tasks.toml` gets tasks-axi's built-in defaults.
-# bin/fm-tasks-axi-lib.sh owns backend precedence and configuration failures.
+# with no `.tasks.toml` uses native path defaults; backend selection still checks
+# legacy pins. bin/fm-queue.py owns precedence and configuration failures through
+# bin/fm-tasks-axi-lib.sh's compatibility entry points.
 #
 # CRASH RECOVERY. Only teardown needs a durable record: it removes the meta and
 # with it the completion links, so a process killed between the two halves would
@@ -46,7 +45,7 @@
 # that record before destructive cleanup, so it never publishes or acts on a close
 # replay would reject. The validator pins the data path to this home's configured
 # root before any recovery mutation, then re-runs exactly that close.
-# `tasks-axi done` on an already-closed task backfills links
+# Native `done` on an already-closed task backfills links
 # without moving the close date, so replay is idempotent. Spawn needs no marker:
 # it publishes the meta first, so a crash
 # leaves the meta itself as the evidence that the row is owed a start.

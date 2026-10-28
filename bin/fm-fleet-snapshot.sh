@@ -4,10 +4,11 @@
 # Output contract: `--json` prints one object with schema
 # `fm-fleet-snapshot.v1`.
 # The command does not acquire the session lock, drain wakes, arm watchers,
-# mutate backlog state, or write reports. Its default ledger collector may
+# issue task mutations, or write reports. Native queue reads may finish pending
+# storage recovery under the queue lock (bin/fm-queue.py). Its default ledger collector may
 # atomically refresh parent-side cached copies of remote home summaries under
 # state/secondmate-summary-cache; those observational cache writes are its only
-# fleet-state mutation.
+# projection-cache mutation.
 #
 # Top-level fields:
 #   schema: stable schema id.
@@ -16,15 +17,16 @@
 #   roots: resolved root/config/data/state/projects directories.
 #   backlog: {path,present,records[]} where records are ordered as written in
 #     data/backlog.md and cover In flight, Queued, and Done.
-#     Canonical tasks-axi rows are structured; free-form non-empty lines in
+#     Canonical Markdown queue rows are structured; free-form non-empty lines in
 #     those sections are preserved as unstructured records.
 #     Structured rows preserve captain-hold metadata such as hold_kind,
-#     hold_reason, and hold_until when tasks-axi emits it. They also carry
+#     hold_reason, and hold_until when present. They also carry
 #     normalized current_role, requires_child_metadata, blocked_by_ids,
 #     unresolved_blocker_ids, captain_actionable, hold_set, hold_age_days,
 #     and hold_bucket fields.
 #     Repeated blocker tokens remain ordered; a blocker resolves only when its
-#     structured record is Done, and missing ids stay open.
+#     structured record is Done, including archived identities in native mode;
+#     missing ids stay open.
 #     There is no separate decision type: any captain-held task is the same
 #     primitive, whatever kind its row carries.
 #     hold_bucket is the single classification for every captain hold, decided

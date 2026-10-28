@@ -13,7 +13,7 @@
 # THE RETURN BRIEF (stdout, on begin and on every check) is rendered from durable
 # records, never from conversation memory: the archived away-posture record
 # (bin/fm-afk-contract.sh), the supervision outcome store
-# (bin/fm-branch-outcome.sh), the held set in the backlog (tasks-axi), and the
+# (bin/fm-branch-outcome.sh), the captain-held set in the native queue, and the
 # status logs. Its order is fixed: supervisor health across the away window
 # first, then the captain's away instructions - their words verbatim, including
 # superseded in-session mandates - followed by the away session's account of

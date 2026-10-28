@@ -30,12 +30,11 @@
 #          Missing or incompatible lavish-axi reports PRESENTATION_UNAVAILABLE;
 #          a compatible older build keeps legacy boards and reports a BOOTSTRAP_INFO
 #          upgrade recommendation for synchronous reply acceptance.
-#          tasks-axi feature probes remain a separate defense-in-depth check.
 #          workflow_delivery_tools below owns conditional delivery prerequisites.
-#          tasks-axi is required by the automatic backlog backend; quota-axi
+#          The shipped queue and Python are required by automatic backlog work; quota-axi
 #          and jq are required when crew-dispatch.json is configured.
 #          Browser tooling is checked when browser work is selected, not here.
-#          A compatible tasks-axi default backend is silent.
+#          Native queue availability is silent unless verbose facts are requested.
 #          quota-axi is required for the agent-owned dispatch-profile array
 #          procedure in AGENTS.md section 4 and
 #          .agents/skills/quota-array-dispatch/SKILL.md.
@@ -295,7 +294,7 @@ missing_tool_diagnostic() {
 # The registry and recorded task modes select delivery dependencies.
 # Local-only needs neither GitHub nor no-mistakes; direct-PR needs GitHub;
 # no-mistakes and conditional/unknown modes need both. Missing registry input
-# retains both. Manual backlog needs no tasks-axi. Configured routing needs
+# retains both. Manual backlog skips the native queue requirement. Configured routing needs
 # jq and quota-axi. Browser work checks its own feature-specific dependency.
 # Missing/unsafe/unknown input stays conservative. No live project is mutated.
 workflow_delivery_tools() {
@@ -351,9 +350,7 @@ NO_MISTAKES_MIN=1.46.0
 # version of that tool, captain-bumped periodically to keep the whole fleet on the
 # newest axi tools. It is NOT the minimum feature-introduced version. These floors
 # are expected to drift upward as new versions ship. Never lower a floor to the
-# earliest release that happens to satisfy some depended-on behavior. The
-# tasks-axi feature probes are an independent defense-in-depth concern, not part
-# of its floor.
+# earliest release that happens to satisfy some depended-on behavior.
 GH_AXI_MIN=0.1.29
 LAVISH_AXI_MIN=0.1.80
 LAVISH_AXI_BOARD_MIN=0.1.77
@@ -829,10 +826,9 @@ detect_local_config() {
 
 # Shadow-backlog check. When this home's data directory is not the code root's,
 # a code-root data/backlog.md or data/done-archive.md that is not this home's
-# own file is a queue a cwd-relative tasks-axi write has already forked; a link
-# into the home does not survive such a write (docs/configuration.md "Backlog
-# backend" owns why). Detect-only: neither copy is a safe winner, so nothing is
-# merged here.
+# own file is a separate queue copy. The home-addressed native entry point and
+# its symlink refusal are documented in docs/configuration.md "Backlog backend".
+# Detect-only: neither copy is a safe winner, so nothing is merged here.
 detect_code_root_backlog_fork() {
   local name root_copy
   [ "$FM_ROOT/data" -ef "$DATA" ] && return 0

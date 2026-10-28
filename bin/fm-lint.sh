@@ -38,8 +38,8 @@
 # given paths, matching the same config, without the workflow YAML check.
 # Explicit core bin/ and bin/backends/ scripts still receive the
 # backend-purity check. The backend-purity check rejects direct Beads CLI
-# invocations in the core bin/ and bin/backends/ scripts so every configured
-# backlog backend follows the same tasks-axi lifecycle path.
+# invocations in the core bin/ and bin/backends/ scripts so backlog work cannot
+# bypass the shared native queue lifecycle path.
 #
 # Lint defaults to two concurrency-limited workers over two stable logical
 # shards, and each worker runs ONE canonical root per ShellCheck process, so a
@@ -476,9 +476,8 @@ fm_lint_run_workflows() {
   "$SELF_DIR/fm-lint-workflows.sh"
 }
 
-# Backend adapters belong behind tasks-axi. Keep direct Beads CLI invocations
-# out of firstmate's core scripts so every configured backend follows the same
-# lifecycle path.
+# Keep direct Beads CLI invocations out of firstmate's core scripts so backlog
+# work cannot bypass the native queue's supported-backend boundary.
 fm_lint_run_backend_purity() {
   local findings path canonical
   local -a purity_roots
