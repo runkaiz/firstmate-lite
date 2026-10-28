@@ -4,7 +4,7 @@
 # Run `fm-queue.sh <command> --help` for the shipped storage interface.
 # FM_DATA_OVERRIDE, then FM_HOME/data, then the code-root data select the queue.
 # The existing addressing/transition library owns path and symlink refusals.
-# Relative --to and --*-file values are resolved against the caller directory;
+# Relative --to, --backup-dir and --*-file values resolve from the caller directory;
 # report links remain relative to the backlog root. Caller --file is refused.
 # add/create --start is refused: fm-spawn owns worker bindings and dispatch.
 # show/view/list decode hold reasons through fm-hold-reason-lib.sh.
@@ -72,11 +72,11 @@ for arg in "$@"; do
       esac
       ARGS+=("$arg")
       ;;
-    --to|--*-file)
+    --to|--backup-dir|--*-file)
       ARGS+=("$arg")
       path_value_next=1
       ;;
-    --to=*|--*-file=*)
+    --to=*|--backup-dir=*|--*-file=*)
       ARGS+=("${arg%%=*}=$(absolute_from_caller "${arg#*=}")")
       ;;
     *)

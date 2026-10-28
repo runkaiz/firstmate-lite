@@ -184,6 +184,167 @@ class QueueTests(unittest.TestCase):
         self.call("create", "new", "New task")
         self.assertEqual(self.task("new")["state"], "queued")
 
+    def test_unicode_body_survives_mutations_history_and_archive(self):
+        body = "\nFirst\u0085second\u2028third\u2029fourth\n  Indented 雪 🧭\n\n"
+        self.call("add", "unicode", "Unicode intent", "--body", body)
+        self.assertEqual(self.task("unicode")["body"], body)
+        self.call("hold", "unicode", "--kind", "captain", "--reason", "Choose scope")
+        self.assertEqual(self.task("unicode")["body"], body)
+        self.call("unhold", "unicode")
+        self.call("start", "unicode")
+        note = "Completed\u2028with evidence"
+        self.call("done", "unicode", "--note", note, "--pr", "https://example.test/pull/1")
+        expected = body + "\n\n" + note
+        self.assertEqual(self.task("unicode")["body"], expected)
+        self.call("prune", "--keep", "0")
+        self.assertEqual(self.task("unicode")["body"], expected)
+        self.call("reopen", "unicode")
+        self.assertEqual(self.task("unicode")["body"], expected)
+        replacement = "Revised\u2028scope\nNext\u0085step\u2029雪"
+        body_file = self.home / "intent.txt"
+        body_file.write_text(replacement)
+        self.call("edit", "unicode", "--body-file", str(body_file))
+        self.assertEqual(self.task("unicode")["body"], replacement)
+        history = (self.home / "data/note-archive.md").read_text()
+        self.assertIn("First\u0085second\u2028third\u2029fourth", history)
+        self.assertIn(note, history)
+        target = self.home / "other/data/backlog.md"
+        self.call("mv", "unicode", "--to", str(target))
+        moved = json.loads(self.call("show", "unicode", "--json", path=target).stdout)["task"]
+        self.assertEqual(moved["body"], replacement)
+        self.assertEqual(moved["links"], ["https://example.test/pull/1"])
+
+    def test_ambiguous_content_is_refused_before_persistence(self):
+        self.call("add", "stable", "Original title", "--body", "Accepted intent")
+        before = self.file.read_bytes()
+        for command in (("add", "ambiguous", "Compare with - https://example.test/x"),
+                        ("edit", "stable", "--title", "Compare with - https://example.test/x"),
+                        ("done", "stable", "--report", "unrecognized-report.md")):
+            result = self.call(*command, good=False)
+            self.assertIn("round-trip", result.stderr)
+            self.assertEqual(self.file.read_bytes(), before)
+            self.assertFalse((self.home / "data/note-archive.md").exists())
+            self.assertFalse(Path(str(self.file) + ".transaction").exists())
+        self.assertEqual(self.task("stable")["links"], [])
+        self.call("update", "stable", "--title", "Revised title")
+        self.assertEqual(self.task("stable")["title"], "Revised title")
+
+    def test_retained_context_requires_authorization_for_kind_changes(self):
+        for kind in ("idea", "outcome"):
+            self.call("add", kind, "Retained context", "--kind", kind)
+            for verb in ("update", "edit"):
+                for new_kind in ("ship", "scout", "task", "idea", "outcome"):
+                    if new_kind == kind:
+                        continue
+                    before = self.file.read_bytes()
+                    self.call(verb, kind, "--kind", new_kind, good=False)
+                    self.assertEqual(self.file.read_bytes(), before)
+            for hold_kind in (None, "future", "captain", "external", "load"):
+                flags = ["--kind", hold_kind] if hold_kind else []
+                before = self.file.read_bytes()
+                self.call("hold", kind, "--reason", "Revisit later", *flags, good=False)
+                self.assertEqual(self.file.read_bytes(), before)
+            self.call("hold", kind, "--kind", "parked", "--reason", "Retain context", "--until", "2000-01-01")
+            self.call("edit", kind, "--kind", kind, "--body", "Retained scope")
+            self.call("unhold", kind, good=False)
+            self.call("start", kind, good=False)
+            self.assertNotIn(kind, self.ready())
+        self.call("add", "ordinary", "Accepted task", "--kind", "ship")
+        for verb in ("update", "edit"):
+            for kind in ("idea", "outcome"):
+                self.call(verb, "ordinary", "--kind", kind, good=False)
+        self.call("update", "ordinary", "--kind", "scout")
+        self.assertEqual(self.task("ordinary")["kind"], "scout")
+        self.call("authorize", "idea", "--kind", "ship", "--body", "Accepted instruction")
+        self.assertIn("idea", self.ready())
+        self.assertIsNone(self.task("idea")["hold_kind"])
+        self.assertIn("Retained scope", (self.home / "data/note-archive.md").read_text())
+        self.call("authorize", "outcome", "--body", "Cannot execute an umbrella", good=False)
+        self.assertNotIn("outcome", self.ready())
+
+    def test_relative_backup_destination_uses_caller_directory(self):
+        self.call("add", "stable", "Original", "--body", "Accepted scope")
+        caller = self.home / "caller"
+        caller.mkdir()
+        env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT))
+        before = self.file.read_bytes()
+        for entry in ("fm-queue.sh", "fm-tasks-axi.sh"):
+            for joined in (False, True):
+                name = entry + ("-joined" if joined else "-separate")
+                flags = ["--backup-dir=./" + name] if joined else ["--backup-dir", "./" + name]
+                command = ["bash", str(ROOT / "bin" / entry), "migrate", *flags]
+                result = subprocess.run(command, cwd=caller, env=env, text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual((caller / name / "0-backlog.md").read_bytes(), before)
+                self.assertFalse((self.home / name).exists())
+                repeated = subprocess.run(command, cwd=caller, env=env, text=True, capture_output=True)
+                self.assertNotEqual(repeated.returncode, 0)
+                self.assertEqual((caller / name / "0-backlog.md").read_bytes(), before)
+        self.assertEqual(self.file.read_bytes(), before)
+
+    def test_symlinked_user_selection_and_named_refusal_sources(self):
+        project = self.home / ".tasks.toml"
+        project.write_text('[markdown]\npath = "data/backlog.md"\n')
+        legacy = self.home / ".tasks-axi/config.toml"
+        legacy.parent.mkdir()
+        target = self.home / "dotfiles/tasks.toml"
+        target.parent.mkdir()
+        legacy.symlink_to(target)
+        target.write_text('backend = "markdown"\n')
+        env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT))
+        probe = '. "$1/bin/fm-tasks-axi-lib.sh"; "$2" "$3"'
+        commands = [[str(CLI), "list"], [str(CLI), "snapshot"],
+                    ["bash", str(ROOT / "bin/fm-queue.sh"), "list"],
+                    ["bash", str(ROOT / "bin/fm-tasks-axi.sh"), "list"]]
+        for resolver in ("fm_tasks_axi_backend", "fm_tasks_axi_backend_resolve"):
+            commands.append(["bash", "-c", probe, "_", str(ROOT), resolver, str(self.home)])
+        for command in commands:
+            result = subprocess.run(command, cwd=self.home, env=env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+        for source in (str(legacy), str(project), "TASKS_AXI_BACKEND", "FM_QUEUE_BACKEND", "--backend"):
+            target.write_text('backend = "private-backend-value"\n[beads]\npassword = "private-password"\n')
+            project.write_text('backend = "private-backend-value"\n' if source == str(project) else '[markdown]\npath = "data/backlog.md"\n')
+            selected_env = dict(env)
+            if source in ("FM_QUEUE_BACKEND", "TASKS_AXI_BACKEND"):
+                selected_env[source] = "private-backend-value"
+            selected_commands = [[str(CLI), "list", "--backend", "private-backend-value"]] if source == "--backend" else commands
+            for command in selected_commands:
+                result = subprocess.run(command, cwd=self.home, env=selected_env, text=True, capture_output=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(source, result.stderr)
+                self.assertIn("Markdown only", result.stderr)
+                self.assertNotIn("private-backend-value", result.stdout + result.stderr)
+                self.assertNotIn("private-password", result.stdout + result.stderr)
+        for case in ("invalid-utf8", "directory", "fifo", "dangling", "permissions"):
+            if case == "permissions" and os.geteuid() == 0:
+                continue
+            target.unlink(missing_ok=True)
+            if case == "directory":
+                target.mkdir()
+            elif case == "fifo":
+                os.mkfifo(target)
+            elif case != "dangling":
+                target.write_bytes(b'\xff' if case == "invalid-utf8" else b'backend = "markdown"\n')
+                if case == "permissions":
+                    target.chmod(0)
+            try:
+                for command in commands:
+                    result = subprocess.run(command, cwd=self.home, env=env, text=True, capture_output=True, timeout=20)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(str(legacy), result.stderr)
+                    self.assertIn("cannot be read", result.stderr)
+                    self.assertFalse(self.file.exists())
+            finally:
+                if case == "directory":
+                    target.rmdir()
+                elif case == "permissions":
+                    target.chmod(0o600)
+        project.write_text('backend = "markdown"\n')
+        target.write_text('backend = "beads"\n')
+        self.call("add", "override", "Explicit supported project")
+        self.assertTrue(legacy.is_symlink())
+        self.assertEqual(target.read_text(), 'backend = "beads"\n')
+
     def test_capture_authorization_and_restart(self):
         self.call("add", "outcome", "Outcome", "--outcome", "--body", "Members: idea, accepted")
         self.call("add", "idea", "Idea", "--idea", "--priority", "0")
@@ -402,7 +563,7 @@ fm_backlog_dispatch_transition "$2/state/stable.meta" "$2/data" stable "$2/state
         self.call("hold", "later", "--kind", "future", "--reason", "Start after date", "--until", "2000-01-01")
         self.assertIn("later", self.ready())
         self.call("add", "speculative", "Still an idea", "--idea")
-        self.call("hold", "speculative", "--kind", "future", "--reason", "Revisit", "--until", "2000-01-01")
+        self.call("hold", "speculative", "--kind", "future", "--reason", "Revisit", "--until", "2000-01-01", good=False)
         self.assertTrue(self.task("speculative")["held"])
         self.assertNotIn("speculative", self.ready())
         self.call("start", "speculative", good=False)

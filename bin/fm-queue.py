@@ -100,11 +100,15 @@ def atomic(path, text):
             os.unlink(name)
 
 
-def backend_from_config(path):
+def backend_from_config(path, follow_symlinks=False):
     try:
         if path.parent.is_dir() and not os.access(path.parent, os.X_OK):
             raise OSError()
-        content = read(path)
+        if follow_symlinks and path.is_symlink():
+            require(path.is_file(), "selection must name a regular file")
+            content = path.read_text(encoding="utf-8")
+        else:
+            content = read(path)
     except (OSError, UnicodeError, QueueError) as error:
         raise QueueError(f"tasks-axi backend configuration cannot be read at {path}") from error
     selected = None
@@ -124,16 +128,21 @@ def backend_from_config(path):
 
 
 def resolve_backend(cfg, override=None):
-    selected = override
+    selected, source = override, "--backend"
     if selected is None:
-        selected = os.environ.get("FM_QUEUE_BACKEND", os.environ.get("TASKS_AXI_BACKEND"))
+        for variable in ("FM_QUEUE_BACKEND", "TASKS_AXI_BACKEND"):
+            if variable in os.environ:
+                selected, source = os.environ[variable], variable
+                break
     if selected is None:
-        selected = backend_from_config(cfg)
+        source = cfg
+        selected = backend_from_config(source)
     if selected is None and os.environ.get("HOME"):
-        selected = backend_from_config(Path(os.environ["HOME"]) / ".tasks-axi/config.toml")
+        source = Path(os.environ["HOME"]) / ".tasks-axi/config.toml"
+        selected = backend_from_config(source, follow_symlinks=True)
     if selected is None:
-        selected = "markdown"
-    require(selected == "markdown", "native queue supports Markdown only; configured backend requires an explicit compatible export before activation")
+        return "markdown"
+    require(selected == "markdown", f"native queue supports Markdown only; backend selected by {source} requires an explicit compatible export before activation")
     return selected
 
 
@@ -237,7 +246,10 @@ class Task:
                 break
             links.insert(0, link.strip("<>"))
             rest = prefix
-        body = "\n".join(line[2:].rstrip("\r\n") if line.startswith("  ") else line.rstrip("\r\n") for line in lines[1:]).strip("\n")
+        body_lines = lines[1:]
+        while body_lines and body_lines[-1] in ("\n", "\r\n"):
+            body_lines.pop()
+        body = "\n".join(line[2:].rstrip("\r\n") if line.startswith("  ") else line.rstrip("\r\n") for line in body_lines)
         task = cls(identifier or bold, rest.strip(), state, "".join(lines), body, metadata, list(dict.fromkeys(deps)), links)
         require(bool(task.title), f"empty title for {task.id}")
         task.block_reason = reason[1] if reason else ""
@@ -299,7 +311,9 @@ class Document:
         self.parts = []
         require(not any(ord(char) < 32 and char not in "\t\r\n" for char in text or ""), "queue contains a control byte")
         section = None
-        lines = (text or "## In flight\n\n## Queued\n\n## Done\n").splitlines(True)
+        lines = re.split(r"(?<=\n)", text or "## In flight\n\n## Queued\n\n## Done\n")
+        if lines[-1] == "":
+            lines.pop()
         index = 0
         seen_sections = set()
         while index < len(lines):
@@ -460,6 +474,7 @@ def commit(stores):
             for task in document.tasks():
                 if task.dirty:
                     require(parsed[task.id].meta == task.meta, "metadata does not round-trip; use the encoded hold owner for literal reasons")
+                    require(all(getattr(parsed[task.id], field) == getattr(task, field) for field in ("title", "body", "links", "deps", "state")), "task content does not round-trip; ambiguous queue representation")
         for path, text in store.changes().items():
             files.append({"path": str(path), "before": store.original[path], "after": text})
     if not files:
@@ -675,6 +690,8 @@ def execute(options, stores):
             output(task, store, options)
             return
         if verb in ("update", "authorize"):
+            if verb == "update" and options.kind is not None and options.kind != task.meta.get("kind"):
+                require(task.meta.get("kind") not in ("idea", "outcome") and options.kind not in ("idea", "outcome"), "retained context kind cannot be changed by update; use authorize for a parked idea")
             if verb == "authorize":
                 require(task.meta.get("kind") == "idea" and task.meta.get("hold-kind") == "parked", "authorize requires a parked idea")
                 require(options.kind not in ("idea", "outcome"), "authorization must select executable work, not retained context")
@@ -719,6 +736,7 @@ def execute(options, stores):
         elif verb == "hold":
             require(options.reason and options.reason.strip() and not any(c in options.reason for c in "\n\r()"), "hold requires a single-line --reason without parentheses")
             require(options.kind in (None, "captain", "external", "load", "parked", "future"), "invalid hold kind")
+            require(task.meta.get("kind") not in ("idea", "outcome") or options.kind == "parked", "retained context must keep a parked hold; use authorize for a parked idea")
             task.meta["hold"] = options.reason
             if options.kind:
                 task.meta["hold-kind"] = options.kind
@@ -759,7 +777,7 @@ def execute(options, stores):
                 task.links.append(options.note)
         elif options.note not in task.body.split("\n"):
             store.history(task, "Completion note added")
-            task.body = (task.body + "\n\n" + options.note).lstrip("\n")
+            task.body = task.body + "\n\n" + options.note if task.body else options.note
         task.dirty = True
     if verb == "done" and not options.no_prune:
         keep = store.keep if options.keep is None else options.keep
