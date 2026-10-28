@@ -13,7 +13,7 @@
 # THE RETURN BRIEF (stdout, on begin and on every check) is rendered from durable
 # records, never from conversation memory: the archived away-posture record
 # (bin/fm-afk-contract.sh), the supervision outcome store
-# (bin/fm-branch-outcome.sh), the held set in the backlog (tasks-axi), and the
+# (bin/fm-branch-outcome.sh), the captain-held set in the native queue, and the
 # status logs. Its order is fixed: supervisor health across the away window
 # first, then the captain's away instructions - their words verbatim, including
 # superseded in-session mandates - followed by the away session's account of
@@ -591,7 +591,7 @@ render_return_brief() {  # <evidence-file> <blockers-file> <since-epoch> <drain-
   count=0
   HELD_READ_FAILED=0
   HELD_READ_PATH=$(fm_backlog_file "$DATA" 2>/dev/null || printf '%s/backlog.md' "$DATA")
-  if held=$(fm_backlog_row_list "$DATA" --state held --fields hold_kind,hold_reason,hold_until 2>&1); then
+  if held=$(fm_backlog_row_list "$DATA" --state held --hold-kind captain --fields hold_kind,hold_reason,hold_until 2>&1); then
     rows=$(printf '%s\n' "$held" | strip_axi_help | grep -v '^count: ' | grep -v '^tasks\[0\]' || true)
     if printf '%s\n' "$held" | grep -q '^count: 0'; then
       :

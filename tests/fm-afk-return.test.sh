@@ -37,6 +37,7 @@ install_runner() {  # <case-dir>
   cp "$ROOT/bin/fm-afk-contract.sh" "$dir/bin/"
   cp "$ROOT/bin/fm-branch-outcome.sh" "$dir/bin/"
   cp "$ROOT/bin/fm-tasks-axi-lib.sh" "$dir/bin/"
+  cp "$ROOT/bin/fm-queue.py" "$dir/bin/"
   cp "$ROOT/bin/fm-hold-reason-lib.sh" "$dir/bin/"
   cp "$ROOT/bin/fm-backlog-transition-lib.sh" "$dir/bin/"
   # The merge-notification marker reader behind the brief's landed section.
@@ -384,12 +385,15 @@ line_of() {  # <haystack> <needle> -> 1-based line number of the first match, or
 }
 
 test_return_brief_composes_from_record_store_and_held_set() {
-  local dir out rc gate health_line words_line waiting_line failed_line second
+  local dir out rc gate health_line words_line waiting_line failed_line second waiting
   dir="$TMP_ROOT/brief"
   install_runner "$dir"
   (cd "$dir/home" && tasks-axi add fix-windows 'Fix the windows lane' --file data/backlog.md >/dev/null \
     && tasks-axi hold fix-windows --reason 'awaiting the captain on the merge' --kind captain --file data/backlog.md >/dev/null) \
     || fail "could not seed the held backlog"
+  (cd "$dir/home" && "$ROOT/bin/fm-queue.py" add parked-idea 'Possible future work' --idea --file data/backlog.md >/dev/null \
+    && "$ROOT/bin/fm-queue.py" add parked-outcome 'Retained outcome' --outcome --file data/backlog.md >/dev/null) \
+    || fail "could not seed parked context"
   contract_in "$dir" enter --words $'merge the windows fix when green, then cut a prerelease\nif the install deadlocks abort the competing run' >/dev/null 2>&1 || fail "could not confirm the away-posture record"
   # Two live blockers, one on a task with a captain-verdict outcome and one on a
   # task with a routine outcome. A third task failed outright.
@@ -450,8 +454,11 @@ test_return_brief_composes_from_record_store_and_held_set() {
   assert_not_contains "$out" 'still building' "the return brief rendered a silent routine outcome"
   assert_not_contains "$out" 'not executed' "the brief still calls the words inert"
   assert_not_contains "$out" 'clause' "the brief still speaks of clauses"
-  assert_contains "$out" 'fix-windows,queued,task' "the held backlog item was not listed under waiting on you"
-  assert_contains "$out" 'awaiting the captain on the merge' "the hold reason was not listed"
+  waiting=$(printf '%s\n' "$out" | sed -n '/^Waiting on you:$/,/^Tried and failed, or could not be fixed:$/p')
+  assert_contains "$waiting" 'fix-windows,Fix the windows lane,queued,task' "the held backlog item was not listed under waiting on you"
+  assert_contains "$waiting" 'awaiting the captain on the merge' "the hold reason was not listed"
+  assert_not_contains "$waiting" 'parked-idea' "a parked idea was presented as an unanswered decision"
+  assert_not_contains "$waiting" 'parked-outcome' "an outcome umbrella was presented as an unanswered decision"
   assert_contains "$out" 'other [key=pick] needs your decision: choose the target' "the open decision was not listed under waiting on you"
   assert_contains "$out" 'fix-windows: blocked on a token only the captain holds; held for return' "the captain-verdict outcome was not listed"
   assert_contains "$out" 'fix-windows [key=token] still blocked, firstmate remediates before ordinary work' "the blocker sharing a task with a captain outcome was exempted"

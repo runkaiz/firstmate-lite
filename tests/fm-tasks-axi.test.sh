@@ -114,19 +114,19 @@ test_guard_silent_for_single_home() {
   pass "bootstrap stays silent when the code root is the home"
 }
 
-# The end-to-end fork: a bare tasks-axi write from the code root. Whatever the
-# installed tasks-axi does to the link, bootstrap must agree with the result:
-# a replaced link is reported, a written-through link is not.
+# The native compatibility executable refuses a leaf symlink rather than
+# replacing it and forking the home's authority.
 test_bare_tasks_axi_fork_is_detected() {
-  local dir out
+  local dir out rc=0
   dir=$(make_split bare-fork)
   (cd "$dir/code" && tasks-axi add bare-1 "written from the code root" >/dev/null 2>&1) \
-    || fail "bare tasks-axi add failed in the code root"
+    || rc=$?
+  [ "$rc" -ne 0 ] || fail "native raw capture followed a symlinked queue"
   out=$(bootstrap_backlog_lines "$dir/code" "$dir/home")
   if [ -L "$dir/code/data/backlog.md" ]; then
-    assert_grep "bare-1" "$dir/home/data/backlog.md" "a written-through link lost the row"
-    assert_equals "" "$out" "a written-through link was reported as a fork"
-    pass "bare tasks-axi wrote through the code-root link and bootstrap stayed silent"
+    assert_no_grep "bare-1" "$dir/home/data/backlog.md" "a refused capture changed the home"
+    assert_equals "" "$out" "a preserved home link was reported as a fork"
+    pass "native raw capture refuses a leaf symlink without forking the queue"
   else
     assert_no_grep "bare-1" "$dir/home/data/backlog.md" "the replaced link still reached the home"
     assert_contains "$out" "code-root $dir/code/data/backlog.md is not this home's" \

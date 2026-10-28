@@ -270,14 +270,6 @@ exit 0
 SH
     chmod +x "$CASE_BIN/herdr"
   fi
-  cat > "$CASE_BIN/tasks-axi" <<'SH'
-#!/usr/bin/env bash
-case "${1:-}:${2:-}" in
-  --version:*) printf '0.2.6\n' ;;
-  update:--help) printf '%s\n' --archive-body ;;
-  mv:--help) printf '%s\n' 'usage: tasks-axi mv <id> [<id>...]' ;;
-esac
-SH
   cat > "$CASE_BIN/treehouse" <<'SH'
 #!/usr/bin/env bash
 exit 0
@@ -286,7 +278,7 @@ SH
 #!/usr/bin/env bash
 exit 0
 SH
-  chmod +x "$CASE_BIN/uname" "$CASE_BIN/launchctl" "$CASE_BIN/dscl" "$CASE_BIN/tasks-axi" "$CASE_BIN/treehouse" "$CASE_BIN/claude"
+  chmod +x "$CASE_BIN/uname" "$CASE_BIN/launchctl" "$CASE_BIN/dscl" "$CASE_BIN/treehouse" "$CASE_BIN/claude"
   cat > "$CASE_BIN/sleep" <<'SH'
 #!/usr/bin/env bash
 exit 0
@@ -787,20 +779,20 @@ mkdir -p "$MANAGER_BIN"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$MANAGER_BIN/codex"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$MANAGER_BIN/grok"
 chmod +x "$MANAGER_BIN/codex" "$MANAGER_BIN/grok"
-mv "$CASE_BIN/tasks-axi" "$MANAGER_BIN/tasks-axi"
+mv "$CASE_BIN/treehouse" "$MANAGER_BIN/treehouse"
 doctor
 expect_code 1 "$DOCTOR_RC" "a version-manager-only required tool was reported ready"
-assert_contains "$DOCTOR_OUT" 'required tasks-axi=MISSING' "the missing managed tool was not reported"
+assert_contains "$DOCTOR_OUT" 'required treehouse=MISSING' "the missing managed tool was not reported"
 assert_contains "$DOCTOR_OUT" 'tools in an unselected nvm version or outside the discovered asdf or mise paths need an absolute wrapper' \
   "the missing-tool diagnostic contradicted filesystem version-manager discovery"
 doctor --fix
 expect_code 0 "$DOCTOR_RC" "--fix did not create a wrapper for the discoverable managed tool"
-assert_contains "$DOCTOR_OUT" 'fix required-tasks-axi=applied:' "--fix did not report the owned wrapper"
-assert_contains "$DOCTOR_OUT" "required tasks-axi=$CASE_HOME/.local/bin/tasks-axi" \
+assert_contains "$DOCTOR_OUT" 'fix required-treehouse=applied:' "--fix did not report the owned wrapper"
+assert_contains "$DOCTOR_OUT" "required treehouse=$CASE_HOME/.local/bin/treehouse" \
   "the worker PATH did not resolve the generated wrapper"
-assert_grep '# Firstmate remote tool wrapper v1' "$CASE_HOME/.local/bin/tasks-axi" \
+assert_grep '# Firstmate remote tool wrapper v1' "$CASE_HOME/.local/bin/treehouse" \
   "the generated wrapper is not marked Firstmate-owned"
-assert_grep "$MANAGER_BIN/tasks-axi" "$CASE_HOME/.local/bin/tasks-axi" \
+assert_grep "$MANAGER_BIN/treehouse" "$CASE_HOME/.local/bin/treehouse" \
   "the generated wrapper does not execute the discovered absolute target"
 assert_absent "$CASE_HOME/.local/bin/codex" "--fix wrapped an alternate harness when claude already satisfied readiness"
 assert_absent "$CASE_HOME/.local/bin/grok" "--fix wrapped an alternate harness when claude already satisfied readiness"
@@ -811,7 +803,7 @@ expect_code 0 "$DOCTOR_RC" "--fix did not wrap one discoverable harness when non
 assert_present "$CASE_HOME/.local/bin/codex" "--fix did not create the first needed harness wrapper"
 assert_absent "$CASE_HOME/.local/bin/grok" "--fix created more harness wrappers than readiness requires"
 
-mv "$CASE_BIN/treehouse" "$MANAGER_BIN/treehouse"
+rm "$CASE_HOME/.local/bin/treehouse"
 mkdir -p "$CASE_HOME/.local/bin"
 printf 'operator wrapper\n' > "$CASE_HOME/.local/bin/treehouse"
 doctor --fix
@@ -827,7 +819,7 @@ CASE_REMOTE_JOB_ACTIVE=
 CASE_PLATFORM_OVERRIDE=Linux
 rm -f "$CASE_BIN/sleep" "$CASE_BIN/uname"
 mkdir -p "$CASE_HOME/.local/bin"
-for tool in herdr tasks-axi treehouse claude; do
+for tool in herdr treehouse claude; do
   ln -s "$CASE_BIN/$tool" "$CASE_HOME/.local/bin/$tool"
 done
 HOME="$CASE_HOME" FM_ROOT_OVERRIDE="$ROOT" FM_REMOTE_JOB_PLATFORM_OVERRIDE=Linux \

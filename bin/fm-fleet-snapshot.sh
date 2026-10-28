@@ -4,10 +4,11 @@
 # Output contract: `--json` prints one object with schema
 # `fm-fleet-snapshot.v1`.
 # The command does not acquire the session lock, drain wakes, arm watchers,
-# mutate backlog state, or write reports. Its default ledger collector may
+# issue task mutations, or write reports. Native queue reads may finish pending
+# storage recovery under the queue lock (bin/fm-queue.py). Its default ledger collector may
 # atomically refresh parent-side cached copies of remote home summaries under
 # state/secondmate-summary-cache; those observational cache writes are its only
-# fleet-state mutation.
+# projection-cache mutation.
 #
 # Top-level fields:
 #   schema: stable schema id.
@@ -16,15 +17,16 @@
 #   roots: resolved root/config/data/state/projects directories.
 #   backlog: {path,present,records[]} where records are ordered as written in
 #     data/backlog.md and cover In flight, Queued, and Done.
-#     Canonical tasks-axi rows are structured; free-form non-empty lines in
+#     Canonical Markdown queue rows are structured; free-form non-empty lines in
 #     those sections are preserved as unstructured records.
 #     Structured rows preserve captain-hold metadata such as hold_kind,
-#     hold_reason, and hold_until when tasks-axi emits it. They also carry
+#     hold_reason, and hold_until when present. They also carry
 #     normalized current_role, requires_child_metadata, blocked_by_ids,
 #     unresolved_blocker_ids, captain_actionable, hold_set, hold_age_days,
 #     and hold_bucket fields.
 #     Repeated blocker tokens remain ordered; a blocker resolves only when its
-#     structured record is Done, and missing ids stay open.
+#     structured record is Done, including archived identities in native mode;
+#     missing ids stay open.
 #     There is no separate decision type: any captain-held task is the same
 #     primitive, whatever kind its row carries.
 #     hold_bucket is the single classification for every captain hold, decided
@@ -125,6 +127,8 @@ cleanup_json_files() {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/fm-tasks-axi-lib.sh
+. "$SCRIPT_DIR/fm-tasks-axi-lib.sh"
 FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
@@ -143,7 +147,7 @@ fi
 case "$SNAPSHOT_EPOCH" in ''|*[!0-9]*) SNAPSHOT_EPOCH=$(date +%s) ;; esac
 # The observation date gates captain-hold deferral: a `hold-until` date still in
 # the future keeps a captain hold out of captain_actionable until it is due
-# (tasks-axi's own contract: the hold is inactive on and after that date).
+# Execution release remains the native queue/recorded-answer owner's decision.
 SNAPSHOT_TODAY=${SNAPSHOT_NOW%%T*}
 case "$SNAPSHOT_TODAY" in
   [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) : ;;
@@ -390,9 +394,22 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
     return 0
   fi
 
+  local observation owner_config=$CONFIG lines_input=$backlog
+  observation=$(umask 077; mktemp "${TMPDIR:-/tmp}/fm-queue-observation.XXXXXX") || return 1
+  trap 'rm -f -- "$observation"' EXIT
+  [ "$backlog" = "$BACKLOG" ] || owner_config="$(dirname "$(dirname "$backlog")")/config"
+  if fm_backlog_backend_manual "$owner_config"; then
+    printf '%s\n' '{"text":null,"closed_ids":[]}' > "$observation"
+  elif ! fm_run_timed "$FM_SNAPSHOT_CREW_STATE_TIMEOUT" "$SCRIPT_DIR/fm-queue.py" snapshot --file "$backlog" > "$observation"; then
+    printf 'fm-fleet-snapshot: native queue observation unavailable for %s\n' "$backlog" >&2
+    return 1
+  else
+    lines_input=/dev/null
+  fi
+
   set -o pipefail
   # shellcheck disable=SC2094
-  jq -Rn --arg path "$backlog" --arg today "$SNAPSHOT_TODAY" --arg now "$SNAPSHOT_NOW" \
+  jq -Rn --slurpfile native "$observation" --arg path "$backlog" --arg today "$SNAPSHOT_TODAY" --arg now "$SNAPSHOT_NOW" \
     --argjson age_days "$FM_SNAPSHOT_UNDATED_HOLD_AGE_DAYS" '
     def trim: gsub("^[[:space:]]+|[[:space:]]+$"; "");
     def timestamp_epoch($d):
@@ -516,7 +533,9 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
              body_lines:[],
              body_excerpt:null}
         end;
-    reduce inputs as $line
+    def observed_lines:
+      if $native[0].text == null then inputs else $native[0].text | split("\n")[] end;
+    reduce observed_lines as $line
       ({path:$path,present:true,records:[],section:null,order:0};
        if ($line | test("^##[[:space:]]+")) then
          .section = (($line | sub("^##[[:space:]]+";"") | trim) | section_state)
@@ -533,6 +552,7 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
          .order += 1
          | .records += [{order:.order,state:.section,structured:false,id:null,raw:$line,body_lines:[],body_excerpt:null}]
        end)
+    | .records |= map(if .structured then . + ($native[0].metadata[.id] // {}) else . end)
     | .records |= map(
         if (.body_lines | length) > 0 then
           .hold_set = cap(.body_lines[0]; "^Captain hold set:[[:space:]]*(?<v>[0-9]{4}-[0-9]{2}-[0-9]{2}(?:T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)?)$")
@@ -545,7 +565,8 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
           | .body_excerpt = ((.body_lines | join(" "))[:240])
         else . end)
     | .records as $records
-    | (reduce ($records[] | select(.structured)) as $record ({};
+    | (reduce ($native[0].closed_ids[]?) as $id ({}; .[$id] = true)) as $closed
+    | (reduce ($records[] | select(.structured)) as $record ($closed;
          .[$record.id] = ((.[$record.id] // true) and ($record.state == "done")))) as $resolved_ids
     | .records |= map(
         if .structured then
@@ -573,7 +594,7 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
           | .captain_actionable = (.hold_bucket == "live")
         else . end)
     | del(.section,.order)
-  ' < "$backlog" | fm_hold_reason_decode_stream json
+  ' < "$lines_input" | fm_hold_reason_decode_stream json
 )
 
 SNAPSHOT_TASK_DIR=

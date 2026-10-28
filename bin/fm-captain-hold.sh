@@ -41,39 +41,36 @@
 # optional --origin records provenance in the new task's body and supplies the
 # default repo from that origin's metadata). Prefer holding the work item the
 # question gates over minting a new row. Creating a missing row uses
-# `tasks-axi add --kind captain`: that kind is backlog metadata, and the Beads
-# adapter maps it to native issue type `task`. Captain holds have no due
-# semantics (`--until` is the optional hold deferral), so the create waives
-# Beads `due.required` through `BD_DUE_REQUIRED` rather than inventing a due
-# date or registering a `types.custom` captain issue type. The command records
+# native queue `add --kind captain`: that kind is backlog metadata.
+# Backend compatibility is owned by docs/queue.md. The command records
 # a UTC `Captain hold set:` timestamp in the task body: repeating an active
 # hold preserves the existing timestamp, while re-holding released work starts
 # a new lifecycle. A task already closed is refused rather than reopened.
 # `--origin` also records the origin on a `Captain hold origin:` body line, which
 # `complete` and `verify` check. The reason may hold parentheses and line breaks:
-# tasks-axi refuses them, so `hold` escapes them where it writes the reason and
+# native storage refuses them, so `hold` escapes them where it writes the reason and
 # readers decode them (bin/fm-hold-reason-lib.sh owns the encoding).
-# `--until` records the captain's own deferral date through `tasks-axi hold
-# --until`, so a "revisit later" answer is stored as a date instead of a live
+# `--until` records the captain's own deferral date through native `hold`,
+# so a "revisit later" answer is stored as a date instead of a live
 # card.
 #
 # `answer` records the captain's exact words and resolves the call in the same
 # act. It requires a non-empty captain decision file of at most 8192 bytes and
 # writes a resolution block while preserving the leading hold-set stamp until
 # the close succeeds (the previous body is preserved and archived through
-# tasks-axi --archive-body). It closes a question with `tasks-axi done` - or,
-# with `--release`, lifts the hold with `tasks-axi unhold` so a captain-gated
+# the queue's body-history contract). It closes a question with native `done` - or,
+# with `--release`, lifts the hold with native `unhold` so a captain-gated
 # WORK item resumes without closing - and restores resolution-first body
 # ordering. An exact retry also completes unfinished ordering normalization and
 # is idempotent only when its requested close mode
 # matches the newest record; a changed decision or a mode mismatch is rejected.
 # A re-held task may record a new answer on top. On a task already closed outside this script,
 # `answer` records the missing resolution block (the old `repair` path) only
-# when the task still carries the captain-hold provenance tasks-axi preserves
+# when the task still carries the captain-hold provenance the queue preserves
 # through a close, so an ordinary finished task cannot be dressed up as an
-# answered captain call. A hold that expired by date (`--until` in the past) is
-# still answerable: the surviving hold annotations, not tasks-axi's live
-# `held:` bit, prove the captain owned it.
+# answered captain call. A deferred hold whose `--until` date has passed is
+# still held and answerable in the native queue: its date never supplies the
+# missing answer or authorizes execution.
 #
 # ONE KEYED-ANSWER INTAKE, FED BY EVERY CHANNEL.
 # "A keyed answer resolves its matching captain-held task" is a single
@@ -155,16 +152,9 @@
 # `decisions_reviewed=1` and `decision_keys=` keys, and an inventory entry that
 # names no existing task resolves through the legacy `<origin>-decision-<entry>`
 # identity, so pre-collapse metadata written by fm-decision-hold.sh verifies
-# unchanged. An entry that exists as a task id is always that task. On the
-# Beads backend an attested legacy markdown id that resolves to no task is
-# accepted through the migrated row fm-hold-migration produced, found by the
-# authoritative evidence first: a row whose notes carry the marker line
-# "migrated from data/backlog.md id <legacy id>", alone or followed by
-# " on <date>". Only when no row carries that line is the legacy id tried under
-# the configured beads prefix, and that name-only guess is accepted solely for
-# a single row still held for the captain; two such rows refuse rather than
-# attest, and `complete` names each prefix-resolved row beside its attested
-# legacy id so the guess stays auditable.
+# unchanged. An entry that exists as a task id is always that task.
+# The retained Beads migration helpers below are unreachable through the native
+# backend resolver; docs/queue.md owns existing-home activation limits.
 #
 # `open` is the read-only predicate a mechanical closer asks before it may
 # retire a task's row: is this task still an open captain call? Exit 0 means it
@@ -331,10 +321,8 @@ load_decision() {  # <path>; sets DECISION_TEXT and DECISION_DIGEST
 
 # Mutations address the configured data directory's backlog from its root, the
 # way bin/fm-backlog-transition-lib.sh addresses every transition, so a home
-# with a relocated data directory keeps one backlog. The explicit --file file
-# belongs to the markdown backend only; a non-markdown backend is addressed by
-# the root's own tasks-axi configuration, exactly like the transition library's
-# mutate path.
+# with a relocated data directory keeps one backlog. Native addressing uses
+# an explicit --file; unsupported backend selections fail in the shared resolver.
 tasks_axi() {
   local data file root backend
   data=$(fm_backlog_data_absolute "$DATA") || fail "data directory cannot be resolved: $DATA"
@@ -342,16 +330,15 @@ tasks_axi() {
   backend=$(fm_tasks_axi_backend "$root") || return 2
   if [ "$backend" = markdown ]; then
     file=$(fm_backlog_file "$data") || fail "$FM_BACKLOG_TRANSITION_ERROR"
-    (cd "$root" && tasks-axi "$@" --file "$file")
+    (cd "$root" && "$FM_QUEUE_CLI" "$@" --file "$file")
   else
-    (cd "$root" && tasks-axi "$@")
+    (cd "$root" && "$FM_QUEUE_CLI" "$@")
   fi
 }
 
 require_tasks_axi() {
-  fm_tasks_axi_compatible || fail "compatible tasks-axi is required"
-  tasks-axi hold --help 2>&1 | grep -F -- '--kind captain' >/dev/null \
-    || fail "tasks-axi does not expose the captain-hold contract"
+  fm_tasks_axi_compatible || fail "native queue and python3 are required"
+
 }
 
 # Read one row into TASK_SHOW_OUTPUT; a non-zero return means the row is
@@ -1854,9 +1841,9 @@ EOF
 # of fact can prove its first reading wrong - so the report says only that the
 # two records disagree and names both reconciliation directions above.
 #
-# Cost stays flat on a healthy home: one `tasks-axi list`, one key scan per
+# Cost stays flat on a healthy home: one native queue listing, one key scan per
 # status log, and the precise per-key fold only for a key that already names a
-# still-open task. If tasks-axi is unavailable or its listing cannot be parsed,
+# still-open task. If the native queue is unavailable or its listing cannot be parsed,
 # the guard cannot read the structured record and prints nothing.
 #
 # Output: one `<task-id>\t<origin>\t<key>\t<title>` line per divergence, in
@@ -1896,15 +1883,14 @@ command_diverged() {
   local ids resolve f origin tokens id keys key show title
   [ "$#" -eq 0 ] || { usage >&2; exit 2; }
   # Both records must belong to the SAME home or the comparison is meaningless:
-  # tasks-axi reads $FM_HOME's backlog, so a state dir pointed somewhere else
+  # The queue reader addresses $FM_HOME's backlog, so a state dir pointed somewhere else
   # would report one home's status logs against another home's tasks. Every
   # production caller pairs the two; a mismatch stays silent rather than
   # inventing a cross-home divergence.
   [ "$STATE" = "$FM_HOME/state" ] || return 0
-  # A read-only listing on a per-wake path, so it skips the mutation-oriented
-  # compatibility floor and its extra probes: a listing this parser cannot read
-  # simply yields no candidates and the report stays silent.
-  command -v tasks-axi >/dev/null 2>&1 || return 0
+  # A read-only listing on a per-wake path: unavailable native storage or a
+  # listing this parser cannot read yields no candidates and stays silent.
+  fm_tasks_axi_compatible || return 0
   ids=$(open_task_ids) || return 0
   [ -n "$ids" ] || return 0
   resolve=${FM_CLASSIFY_RESOLVE_VERB:-$FM_CLASSIFY_RESOLVE_VERB_DEFAULT}
@@ -1989,7 +1975,7 @@ command_open() {  # <task-id> [--identity] [--distinguish-absent]
       return 1
     fi
   fi
-  fm_tasks_axi_compatible || { printf 'fm-captain-hold: compatible tasks-axi is required\n' >&2; exit 2; }
+  fm_tasks_axi_compatible || { printf 'fm-captain-hold: native queue and python3 are required\n' >&2; exit 2; }
   if fm_backlog_row_probe "$data" "$id"; then
     state=${FM_BACKLOG_ROW_STATE%% *}
     if [ "$state" != "done" ] && [ "$FM_BACKLOG_ROW_HOLD_KIND" = captain ]; then

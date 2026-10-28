@@ -18,9 +18,8 @@
 # override, blank-env defaulting, partial-output relay, and pre-launch timeout
 # scan.
 # Dedicated network-phase cases pin FM_BOOTSTRAP_NETWORK as a true partition of
-# one run into its local and network halves, and the one-hop tasks-axi
-# compatibility handoff that keeps a session start from paying for that verdict
-# twice.
+# one run into its local and network halves, and native queue independence from
+# legacy tasks-axi compatibility verdicts.
 set -u
 
 # shellcheck source=tests/lib.sh disable=SC1091
@@ -307,10 +306,10 @@ test_bootstrap_reporting() {
 treehouse --lease support is accepted silently^1^0.2.6^1^manual^empty^^
 treehouse without --lease reports an upgrade, gh auth is fine^0^0.2.6^1^-^grep^MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)^NEEDS_GH_AUTH
 compatible tasks-axi is silent by default^1^0.2.6^1^-^empty^^
-missing tasks-axi is required by default^1^-^1^-^exact^MISSING: tasks-axi (install: npm install -g tasks-axi)^
-incompatible tasks-axi is required by default^1^0.1.0^1^-^exact^MISSING: tasks-axi (install: npm install -g tasks-axi)^
-tasks-axi without archive-body is required by default^1^0.2.6:noarchive^1^-^exact^MISSING: tasks-axi (install: npm install -g tasks-axi)^
-tasks-axi without multi-id mv is required by default^1^0.2.6:nomulti^1^-^exact^MISSING: tasks-axi (install: npm install -g tasks-axi)^
+missing external tasks-axi does not gate native queue^1^-^1^-^empty^^
+old external tasks-axi does not gate native queue^1^0.1.0^1^-^empty^^
+external archive-body feature does not gate native queue^1^0.2.6:noarchive^1^-^empty^^
+external mv feature does not gate native queue^1^0.2.6:nomulti^1^-^empty^^
 inactive routing does not require quota-axi^1^0.2.6^0^manual^empty^^
 manual backlog needs no tasks-axi^1^-^1^manual^empty^^
 manual backlog backend suppresses tasks-axi availability^1^0.2.6^1^manual^empty^^
@@ -364,7 +363,8 @@ SH
   rm "$home/config/backlog-backend"
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" 'MISSING: tasks-axi' "automatic backlog must retain compatibility checks"
+  assert_not_contains "$out" 'MISSING: tasks-axi' "native queue incorrectly required external installation"
+  assert_no_grep 'tasks-axi' "$dir/calls" "native startup probed an unused external executable"
   pass "bootstrap follows local, remote, in-flight, routing and backlog workflow requirements"
 }
 
@@ -508,13 +508,13 @@ minimum tasks-axi version is accepted^0.2.6^empty
 newer tasks-axi patch is accepted^0.2.7^empty
 newer tasks-axi minor is accepted^0.3.0^empty
 newer tasks-axi major is accepted^1.0.0^empty
-older tasks-axi with features reports an upgrade^0.1.1^missing
-the patch just below the floor reports an upgrade^0.2.5^missing
-unparseable tasks-axi version reports an upgrade^tasks-axi development build^missing
-tasks-axi at floor without archive-body reports an upgrade^0.2.6:noarchive^missing
-tasks-axi at floor without multi-id reports an upgrade^0.2.6:nomulti^missing
+older tasks-axi with features does not gate native queue^0.1.1^empty
+the patch just below the floor does not gate native queue^0.2.5^empty
+unparseable tasks-axi version does not gate native queue^tasks-axi development build^empty
+tasks-axi at floor without archive-body does not gate native queue^0.2.6:noarchive^empty
+tasks-axi at floor without multi-id does not gate native queue^0.2.6:nomulti^empty
 ROWS
-  pass "bootstrap enforces tasks-axi minimum version"
+  pass "bootstrap does not gate native storage on external CLI versions"
 }
 
 # These rows exercise the real bootstrap check with a fake quota-axi answering
@@ -1084,8 +1084,8 @@ test_network_phases_record_per_step_elapsed_times() {
   pass "bootstrap: each deferred network phase, secondmate, and clone records its own elapsed time"
 }
 
-test_tasks_axi_verdict_handoff_is_consumed_once() {
-  local case_dir fakebin log out
+test_native_queue_ignores_external_compatibility_verdicts() {
+  local case_dir fakebin log out verdict
   case_dir="$TMP_ROOT/tasks-axi-handoff"
   mkdir -p "$case_dir/home/config"
   fakebin=$(make_fake_toolchain "$case_dir")
@@ -1093,39 +1093,19 @@ test_tasks_axi_verdict_handoff_is_consumed_once() {
   cat > "$fakebin/tasks-axi" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "${FM_FAKE_TASKS_AXI_LOG:?}"
-printf '0.0.1\n'
-exit 0
+exit 97
 SH
   chmod +x "$fakebin/tasks-axi"
-
-  # Without the handoff, the incompatible stub is probed and reported.
-  : > "$log"
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_FAKE_TASKS_AXI_LOG="$log" FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" "MISSING: tasks-axi (install:" "the unaided run did not probe tasks-axi"
-  assert_grep '--version' "$log" "the unaided run never ran the probe"
-
-  # With it, the probe is skipped entirely and the handed-in verdict is used.
-  : > "$log"
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_FAKE_TASKS_AXI_LOG="$log" FM_FAKE_TREEHOUSE_LEASE_HELP=1 \
-    FM_TASKS_AXI_COMPATIBLE=1 "$ROOT/bin/fm-bootstrap.sh")
-  assert_not_contains "$out" "MISSING: tasks-axi" "the handed-in verdict was ignored"
-  [ ! -s "$log" ] || fail "the handed-in verdict did not save the probe: $(cat "$log")"
-
-  # A malformed value is not a verdict.
-  : > "$log"
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_FAKE_TASKS_AXI_LOG="$log" FM_FAKE_TREEHOUSE_LEASE_HELP=1 \
-    FM_TASKS_AXI_COMPATIBLE=yes "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" "MISSING: tasks-axi (install:" "a malformed handoff value was trusted"
-
-  # And the handoff never reaches a grandchild: bootstrap spawns agents, and a
-  # verdict cached into an agent's environment would outlive the tool it describes.
-  out=$(FM_TASKS_AXI_COMPATIBLE=1 bash -c '. "$1"; printf "%s\n" "${FM_TASKS_AXI_COMPATIBLE-unset}"' \
-    _ "$ROOT/bin/fm-tasks-axi-lib.sh")
-  [ "$out" = unset ] || fail "sourcing the library left the handoff in the environment: $out"
-  pass "bootstrap: the tasks-axi compatibility verdict travels exactly one process hop"
+  for verdict in '' 0 1 yes; do
+    : > "$log"
+    out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
+      FM_FAKE_TASKS_AXI_LOG="$log" FM_FAKE_TREEHOUSE_LEASE_HELP=1 \
+      FM_TASKS_AXI_COMPATIBLE="$verdict" "$ROOT/bin/fm-bootstrap.sh") || fail "native bootstrap failed"
+    assert_not_contains "$out" 'MISSING: tasks-axi' 'external compatibility verdict affected native availability'
+    assert_not_contains "$out" 'MISSING: native queue' 'legacy verdict hid the available native queue'
+    [ ! -s "$log" ] || fail "native bootstrap executed an external queue probe"
+  done
+  pass "bootstrap ignores external compatibility verdicts without running that tool"
 }
 
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info() {
@@ -1310,6 +1290,6 @@ test_routine_bootstrap_contract_runs_under_system_bash
 test_network_phase_partitions_the_run
 test_network_sweeps_recheck_lock_ownership
 test_network_phases_record_per_step_elapsed_times
-test_tasks_axi_verdict_handoff_is_consumed_once
+test_native_queue_ignores_external_compatibility_verdicts
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info
 test_crew_dispatch_validation

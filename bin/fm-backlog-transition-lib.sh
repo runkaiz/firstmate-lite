@@ -1,8 +1,7 @@
 # shellcheck shell=bash
 # Fused backlog transitions for the scripts that own a task's physical record.
 # Usage: . bin/fm-tasks-axi-lib.sh; . bin/fm-backlog-transition-lib.sh
-# (this library reads that one's backend gate and never sources it itself, so a
-# caller that already sourced it keeps its memoised compatibility verdict).
+# (this library reads that one's backend gate and never sources it itself).
 #
 # INVARIANT. In ordinary successful lifecycle state, `state/<id>.meta` exists
 # <=> this home's backlog row for <id> is In flight; the one teardown crash
@@ -11,8 +10,8 @@
 # same process, under the per-task meta lock it already holds, before it reports
 # success. Nothing else - not a later agent turn, not a printed reminder - is
 # load-bearing for the pairing.
-#   bin/fm-spawn.sh      meta published => `tasks-axi start`
-#   bin/fm-teardown.sh   meta removed => `tasks-axi done`, or `tasks-axi reopen`
+#   bin/fm-spawn.sh      meta published => native queue `start`
+#   bin/fm-teardown.sh   meta removed => native queue `done`, or `reopen`
 #                        with the deliverable recorded when the row is still an
 #                        open captain call (bin/fm-captain-hold.sh `open`), so
 #                        cleanup never retires the captain's own question
@@ -25,18 +24,18 @@
 # homes whose configured backlog backend is manual and markdown homes that keep
 # no backlog file. Those return-1 exemptions are never errors; an
 # unresolvable configured data directory, a backend resolution error, or
-# incompatible tasks-axi instead returns 2 so callers refuse before mutation.
+# unavailable native queue instead returns 2 so callers refuse before mutation.
 #
 # ADDRESSING. Every call runs from the configured data directory's parent so
 # that home's `.tasks.toml` supplies the adapter selection, done_keep, and the
-# archive path. A markdown backlog also passes `--file <data>/backlog.md` so the
+# archive path. The Markdown backlog passes `--file <data>/backlog.md` so the
 # change lands in the home that owns the task regardless of the caller's working
-# directory. A configured non-markdown adapter is addressed by that root alone,
-# because `--file` would override the adapter's own workspace path. The parent of
+# directory. Unsupported adapters are refused by the native resolver. The parent of
 # the data directory is the addressing root rather than FM_HOME, so a home whose
 # data directory is relocated keeps its backlog and its archive together. A root
-# with no `.tasks.toml` gets tasks-axi's built-in defaults.
-# bin/fm-tasks-axi-lib.sh owns backend precedence and configuration failures.
+# with no `.tasks.toml` uses native path defaults; backend selection still checks
+# legacy pins. bin/fm-queue.py owns precedence and configuration failures through
+# bin/fm-tasks-axi-lib.sh's compatibility entry points.
 #
 # CRASH RECOVERY. Only teardown needs a durable record: it removes the meta and
 # with it the completion links, so a process killed between the two halves would
@@ -46,7 +45,7 @@
 # that record before destructive cleanup, so it never publishes or acts on a close
 # replay would reject. The validator pins the data path to this home's configured
 # root before any recovery mutation, then re-runs exactly that close.
-# `tasks-axi done` on an already-closed task backfills links
+# Native `done` on an already-closed task backfills links
 # without moving the close date, so replay is idempotent. Spawn needs no marker:
 # it publishes the meta first, so a crash
 # leaves the meta itself as the evidence that the row is owed a start.
@@ -266,12 +265,12 @@ fm_backlog_source_present() {  # <data-dir> <authorized-data-dir> [root authoriz
 # - the bound wrapper execs, so a nested subshell here would add a process
 # layer between tasks-axi and the caller, which the lock-holding callers'
 # interruption contract counts on not existing.
-fm_backlog_tasks_axi_addressing() {  # <data-dir>
+fm_backlog_tasks_axi_addressing() {  # <data-dir> [queue-cli-args...]
   FM_BACKLOG_AXI_FILE=
   local data root backend
   data=$(fm_backlog_data_absolute "$1") || return $?
   root=$(fm_backlog_root "$data") || return $?
-  backend=$(fm_tasks_axi_backend "$root" 2>&1) || {
+  backend=$(fm_tasks_axi_backend "$root" "${@:2}" 2>&1) || {
     FM_BACKLOG_TRANSITION_ERROR=$backend
     return 2
   }
@@ -314,7 +313,7 @@ fm_backlog_transition_applies() {  # <config-dir> <data-dir> <kind>
     return 2
   fi
   if ! fm_tasks_axi_compatible; then
-    FM_BACKLOG_TRANSITION_ERROR="automatic backlog transitions require tasks-axi ${FM_TASKS_AXI_MIN:-(unknown minimum)} or newer with the required update and mv features"
+    FM_BACKLOG_TRANSITION_ERROR="automatic backlog transitions require python3 and the shipped native queue"
     return 2
   fi
   return 0
@@ -339,9 +338,9 @@ fm_tasks_axi_timeout_expired() {  # <status>
 fm_tasks_axi() {
   local bound=${FM_TASKS_AXI_TIMEOUT:-}
   if [ -z "$bound" ]; then
-    exec tasks-axi "$@"
+    exec "$FM_QUEUE_CLI" "$@"
   fi
-  fm_exec_timed "$bound" "$bound" tasks-axi "$@"
+  fm_exec_timed "$bound" "$bound" "$FM_QUEUE_CLI" "$@"
 }
 
 # Print one row's `tasks-axi show` output (plus stderr) from the addressing
@@ -389,8 +388,8 @@ fm_backlog_row_show() {  # <resolved-data-dir> <id> [flag...]
     set -- "$@" --file "$FM_BACKLOG_AXI_FILE"
   fi
   # shellcheck disable=SC2016  # Expansion is deliberately deferred to the child shell.
-  out=$(fm_run_timed "$secs" bash -c 'cd "$1" 2>/dev/null || exit 1; shift; exec tasks-axi show "$@"' \
-    _ "$FM_BACKLOG_AXI_ROOT" "$id" "$@" 2>&1)
+  out=$(fm_run_timed "$secs" bash -c 'cd "$1" 2>/dev/null || exit 1; shift; queue_cli=$1; shift; exec "$queue_cli" show "$@"' \
+    _ "$FM_BACKLOG_AXI_ROOT" "$FM_QUEUE_CLI" "$id" "$@" 2>&1)
   status=$?
   # A backend that wrote a header or a progress line before wedging leaves that
   # fragment as the first output line, and every caller reads the first line as

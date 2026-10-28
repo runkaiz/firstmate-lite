@@ -66,7 +66,7 @@ unset FM_TASK_ID
 # fixture addresses its own data/backlog.md through its copied .tasks.toml, an
 # explicit --file, or bin/fm-tasks-axi.sh; a case that verifies the wrapper
 # against an ambient override sets TASKS_AXI_FILE itself.
-unset TASKS_AXI_FILE TASKS_AXI_BACKEND
+unset TASKS_AXI_FILE TASKS_AXI_BACKEND FM_QUEUE_FILE FM_QUEUE_BACKEND FM_QUEUE_TEST_CLI
 
 # Write the tracked default backlog configuration into a fixture home. Never copy
 # "$ROOT/.tasks.toml": an operator's primary checkout keeps a gitignored override
@@ -88,6 +88,12 @@ TOML
 # test files, not by this library, so it reads as "unused" here.
 # shellcheck disable=SC2034
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Old fixture command spellings execute the native queue. Fault-specific fakes
+# still prepend their own PATH entry; the explicit existing test seam keeps
+# that dispatch strictly in synthetic test processes.
+PATH="$ROOT/tests/queue-compat:$PATH"
+FM_QUEUE_TEST_CLI="$ROOT/tests/queue-compat/fm-queue-dispatch"
+export PATH FM_QUEUE_TEST_CLI
 
 # --- reporters --------------------------------------------------------------
 

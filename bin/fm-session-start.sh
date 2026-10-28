@@ -128,8 +128,8 @@
 # The tradeoff this ordering accepts: a refused (read-only) session must not
 # go dark. So on refusal, bootstrap still runs (in FM_BOOTSTRAP_DETECT_ONLY=1
 # mode) for its local read-only detect lines - missing tools, the worktree-tangle
-# check, the harness override, crew-dispatch validation, tasks-axi and quota-axi
-# tool checks, and tasks-axi availability - none of which mutate shared state
+# check, the harness override, crew-dispatch validation, native queue availability
+# and quota-axi tool checks - none of which mutate shared state
 # and all of which are safe to compute without verified lock ownership.
 # It deliberately skips the network-only GitHub-auth probe because a read-only
 # session has no dispatch, spawn, steer, or merge action for that verdict to gate.
@@ -147,27 +147,27 @@
 #     hold_kind/hold_reason and blocked_by. Those are the rows AGENTS.md
 #     sections 7 and 10 make actionable at startup, so they are never bounded
 #     away.
-#   - Only the plain queued (dispatchable-now) listing is bounded, by
+#   - Only the ready queued candidate listing is bounded, by
 #     FM_SESSION_START_QUEUED_LIMIT, default 20. Anything it omits is disclosed
 #     with an exact remainder count and the command that shows the rest, so a
 #     deep queue costs a counter rather than kilobytes.
 #     (This replaces FM_SESSION_START_BACKLOG_LIMIT, which bounded the whole
 #     listing indiscriminately and so could drop a held or blocked row.)
-# When compatible tasks-axi is selected and available, the shared tasks-axi
-# backend probe remains the compatibility owner and this script asks
-# `tasks-axi list` for the compact identity fields plus blocked_by, hold_kind,
+# When the native queue is selected and available, fm-tasks-axi-lib.sh owns
+# its availability check and this script asks the shipped queue's
+# `list` for the compact identity fields plus blocked_by, hold_kind,
 # and hold_reason, never body. The groups are the tool's own filters
 # (`--state in_flight`, `--state held`, `--state queued --blocked`, and
-# `tasks-axi ready`), so this script never reimplements task state; the groups
+# `ready`), so this script never reimplements task state; the groups
 # can overlap, because an in-flight item that is also held appears under both.
-# When manual mode is selected, or tasks-axi is unavailable or incompatible,
+# When manual mode is selected, or the native queue is unavailable,
 # this script prints only backlog section headings and item title lines, so
 # title-line hold and blocked-by metadata remain visible while indented bodies
 # stay out of the startup digest; the same never-bound-a-held-or-blocked-row
 # rule applies, recognized there from the title line's own hold/blocked-by
 # markers.
-# Full bodies are targeted follow-up only: `bin/fm-tasks-axi.sh show <id> --full` when
-# compatible tasks-axi is available, or `data/backlog.md` when the file body is
+# Full bodies are targeted follow-up only: `bin/fm-queue.sh show <id> --full` when
+# the native queue is available, or `data/backlog.md` when the file body is
 # truly needed.
 #
 # STATUS TAILS: FM_SESSION_START_STATUS_TAIL bounds how many lines each task's
@@ -378,15 +378,6 @@ PRIMARY_HARNESS=$("$SCRIPT_DIR/fm-harness.sh" 2>/dev/null || printf unknown)
 # shellcheck source=bin/fm-hold-reason-lib.sh
 . "$SCRIPT_DIR/fm-hold-reason-lib.sh"
 
-# One tasks-axi compatibility verdict per session start. The probe costs three
-# tasks-axi subprocesses and this digest needs the same answer twice - here for
-# the backlog listing and again inside the fm-bootstrap.sh child, which reports
-# an incompatible build as MISSING. Computing it once and handing it to that
-# child collapses six subprocesses to three. fm-tasks-axi-lib.sh owns both reuse
-# layers and the one-hop consumption rule that keeps the verdict out of any
-# agent's environment.
-if fm_tasks_axi_compatible; then TASKS_AXI_COMPATIBLE=1; else TASKS_AXI_COMPATIBLE=0; fi
-
 STATUS_TAIL=${FM_SESSION_START_STATUS_TAIL:-5}
 case "$STATUS_TAIL" in ''|*[!0-9]*) STATUS_TAIL=5 ;; esac
 QUEUED_LIMIT=${FM_SESSION_START_QUEUED_LIMIT:-20}
@@ -479,7 +470,7 @@ print_backlog_manual_compact() {
   ' "$path" | fm_hold_reason_decode_stream markdown
 }
 
-# tasks-axi closes every listing with its own help block. This section composes
+# Legacy listings may close with a help block. This section composes
 # four listings, so keeping them would repeat the same pointers four times, once
 # per group, each carrying this home's full backlog path. The section prints one
 # equivalent pointer of its own (print_backlog_pointer), so the per-group help
@@ -516,24 +507,24 @@ print_ready_queued_bounded() {
 
 print_backlog_tasks_axi_compact() {
   local path=$1 in_flight held blocked ready err
-  if ! in_flight=$(tasks-axi list --file "$path" --state in_flight --fields "$BACKLOG_FIELDS" 2>&1); then
+  if ! in_flight=$("$FM_QUEUE_CLI" list --file "$path" --state in_flight --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$in_flight
-  elif ! held=$(tasks-axi list --file "$path" --state held --fields "$BACKLOG_FIELDS" 2>&1); then
+  elif ! held=$("$FM_QUEUE_CLI" list --file "$path" --state held --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$held
-  elif ! blocked=$(tasks-axi list --file "$path" --state queued --blocked --fields "$BACKLOG_FIELDS" 2>&1); then
+  elif ! blocked=$("$FM_QUEUE_CLI" list --file "$path" --state queued --blocked --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$blocked
-  elif ! ready=$(tasks-axi ready --file "$path" 2>&1); then
+  elif ! ready=$("$FM_QUEUE_CLI" ready --file "$path" 2>&1); then
     err=$ready
   else
     printf 'compact backlog listing (tasks-axi; done rows omitted; every in-flight, held, and blocked row shown in full; ready queued bounded to %s; task bodies omitted)\n' \
       "$QUEUED_LIMIT"
     printf '\nin flight:\n'
     printf '%s\n' "$in_flight" | fm_hold_reason_decode_stream | strip_axi_help
-    printf '\nheld (captain- or time-gated; an in-flight item that is also held appears in both groups):\n'
+    printf '\nheld (including parked ideas and outcomes; an in-flight item that is also held appears in both groups):\n'
     printf '%s\n' "$held" | fm_hold_reason_decode_stream | strip_axi_help
     printf '\nblocked queued:\n'
     printf '%s\n' "$blocked" | fm_hold_reason_decode_stream | strip_axi_help
-    printf '\nready queued (dispatchable now):\n'
+    printf '\nready queued (candidates; reconcile accepted scope and worker ownership):\n'
     print_ready_queued_bounded "$ready"
     return 0
   fi
@@ -747,15 +738,14 @@ stage bootstrap
 subsection "BOOTSTRAP"
 if [ "$READ_ONLY" -eq 1 ]; then
   BOOT_OUT=$(FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip \
-    FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
+    "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
 elif [ "$REEMIT" -eq 1 ]; then
   BOOT_OUT=$(FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_LOCKED=1 FM_BOOTSTRAP_NETWORK=skip \
-    FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
+    "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
 else
   BOOT_OUT=$(
     "$SCRIPT_DIR/fm-herdr-session-cleanup.sh" 2>&1 || true
-    FM_BOOTSTRAP_NETWORK=skip FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" \
-      "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1
+    FM_BOOTSTRAP_NETWORK=skip "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1
   )
 fi
 if [ -n "$BOOT_OUT" ]; then

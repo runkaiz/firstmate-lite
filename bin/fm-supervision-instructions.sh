@@ -242,6 +242,9 @@ if [ -n "$HOST_SNIPPET" ]; then
   printf '%s\n' '- Supervision host: on; it takes away-posture wakes and, where the dialog mirror is verified, eligible attended wakes itself, and hands the rest to you (protocol at the end of this block).'
 fi
 ordinary_wake_line
+if [ "$READ_ONLY" -eq 0 ]; then
+  printf '%s\n' '- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.'
+fi
 printf '\n'
 render_snippet
 printf '\n'

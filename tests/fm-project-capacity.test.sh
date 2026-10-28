@@ -242,6 +242,15 @@ test_exhausted_capacity_defers_without_leaving_anything_behind() {
   assert_contains "$out" "task task-c was not launched and its backlog item stays queued" \
     "the deferral did not say the task stays queued"
   assert_nothing_created "$case_dir" "$home" task-c "$before" "$worktrees"
+  if [ "$HAVE_TASKS_AXI" = 1 ]; then
+    [ "$(row_state "$home" task-c)" = queued ] || fail "capacity refusal changed queue state"
+    # These are synthetic fixture records, not live fleet endpoints.
+    rm "$home/state/live-a.meta"
+    rc=0
+    out=$(spawn_ship "$case_dir" task-c) || rc=$?
+    expect_code 0 "$rc" "reconsideration after capacity clearance refused the same task: $out"
+    [ "$(row_state "$home" task-c)" = in_flight ] || fail "reconsideration did not admit the original queued ID"
+  fi
   pass "a spawn beyond capacity is deferred before any record, brief, endpoint, worktree, or backlog move exists"
 }
 

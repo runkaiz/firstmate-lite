@@ -835,7 +835,7 @@ EOF
   printf '%s\n' "$holder_pid" > "$home/state/.lock"
 
   status=0
-  out=$(run_session_start "$home" "$root" "$fakebin:$BASE_PATH") || status=$?
+  out=$(FM_QUEUE_TEST_CLI="$home/missing-native-queue" run_session_start "$home" "$root" "$fakebin:$BASE_PATH") || status=$?
   kill "$holder_pid" 2>/dev/null || true
   wait "$holder_pid" 2>/dev/null || true
 
@@ -854,10 +854,8 @@ EOF
   assert_not_contains "$out" "run bin/fm-watch-arm.sh" "read-only guard printed a mutating watcher-arm instruction"
   assert_not_contains "$out" "git -C $root checkout main" "read-only bootstrap printed a state-changing checkout remediation"
 
-  # Detect-only bootstrap diagnostics still ran (the fakebin's PATH excludes
-  # tasks-axi, so bootstrap's own read-only tool-detection line fires
-  # deterministically regardless of what is installed on the test host).
-  assert_contains "$out" "MISSING: tasks-axi (install:" "detect-only bootstrap diagnostics did not run on the read-only path"
+  # A missing native backend is injected through the existing fixture seam.
+  assert_contains "$out" "MISSING: native queue" "detect-only bootstrap diagnostics did not run on the read-only path"
 
   # The mutating secondmate sweep must NOT have run: no SECONDMATE_SYNC/
   # NUDGE_SECONDMATES line, and the sowed secondmate meta's target dir is
@@ -1828,8 +1826,7 @@ SH
   pass "session start: a read-only session declares its skipped network checks rather than dropping them"
 }
 
-# The compatibility verdict costs three tasks-axi subprocesses and one session
-# start needs it twice. The digest must pay for it once.
+# Native startup performs queue reads but no external version/feature probes.
 test_tasks_axi_compatibility_is_probed_once() {
   local rec root home fakebin log probes
   rec=$(new_world tasks-axi-once)
@@ -1845,13 +1842,13 @@ EOF
   FM_FAKE_TASKS_AXI_LOG="$log" run_session_start "$home" "$root" "$fakebin:$BASE_PATH" >/dev/null
 
   probes=$(grep -c -- '--version' "$log" || true)
-  [ "$probes" -eq 1 ] \
-    || fail "tasks-axi was version-probed $probes times in one session start: $(cat "$log")"
+  [ "$probes" -eq 0 ] \
+    || fail "native startup probed an external version: $(cat "$log")"
   probes=$(grep -c -- 'update --help' "$log" || true)
-  [ "$probes" -eq 1 ] \
-    || fail "tasks-axi update --help ran $probes times in one session start: $(cat "$log")"
+  [ "$probes" -eq 0 ] \
+    || fail "native startup probed external update features: $(cat "$log")"
   assert_grep 'ready --file' "$log" "the backlog listing never ran, so the verdict was not actually reused"
-  pass "session start: the tasks-axi compatibility verdict is computed once and reused"
+  pass "session start: native queue reads run without external compatibility probes"
 }
 
 # --- fleet-state digest: compact backlog rendering --------------------------
@@ -2029,7 +2026,7 @@ EOF
   make_fake_ps_claude "$fakebin"
   write_long_body_backlog "$home/data/backlog.md"
 
-  out=$(run_session_start "$home" "$root" "$fakebin:$BASE_PATH")
+  out=$(FM_QUEUE_TEST_CLI="$home/missing-native-queue" run_session_start "$home" "$root" "$fakebin:$BASE_PATH")
 
   assert_contains "$out" "compact backlog listing (tasks-axi unavailable or incompatible; done rows omitted;" \
     "unavailable tasks-axi did not fall back to compact title-line rendering"

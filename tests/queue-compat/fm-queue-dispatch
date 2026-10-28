@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Existing fault fixtures prepend their legacy command double to PATH.
+# Without a double the adjacent compatibility executable runs the native queue.
+set -eu
+exec tasks-axi "$@"

@@ -67,7 +67,7 @@ FM_ROOT="${FM_ROOT_OVERRIDE:-$(CDPATH='' cd "$SCRIPT_DIR/.." && pwd -P)}"
 . "$SCRIPT_DIR/fm-tasks-axi-lib.sh"
 # shellcheck source=bin/fm-remote-herdr-owner-lib.sh
 . "$SCRIPT_DIR/fm-remote-herdr-owner-lib.sh"
-REQUIRED_TOOLS=(git jq herdr tasks-axi treehouse)
+REQUIRED_TOOLS=(git jq herdr python3 treehouse)
 HARNESS_TOOLS=(claude codex opencode pi pi-signed grok kimi)
 OPTIONAL_TOOLS=(tmux no-mistakes gh)
 LAUNCH_AGENT_LABEL=dev.firstmate.herdr.fm-remote
@@ -427,9 +427,9 @@ report_required_tools() {
   for tool in "${REQUIRED_TOOLS[@]}"; do
     resolved=$(command -v "$tool" 2>/dev/null || true)
     if [ -n "$resolved" ] && [ -x "$resolved" ]; then
-      if [ "$tool" = tasks-axi ] && ! fm_tasks_axi_compatible; then
-        printf 'required tasks-axi=MISSING (incompatible)\n'
-        MISSING+=(tasks-axi)
+      if [ "$tool" = python3 ] && ! fm_tasks_axi_compatible; then
+        printf 'required python3=MISSING (native queue unavailable)\n'
+        MISSING+=(python3)
       else
         printf 'required %s=%s\n' "$tool" "$resolved"
       fi
@@ -475,7 +475,7 @@ report_required_tools_from_worker() {
     fact=${line#required }
     name=${fact%%=*}
     value=${fact#*=}
-    case "$name" in git|jq|herdr|tasks-axi|treehouse|harness) ;; *) valid=0; continue ;; esac
+    case "$name" in git|jq|herdr|python3|treehouse|harness) ;; *) valid=0; continue ;; esac
     case "$seen" in *" $name "*) valid=0; continue ;; esac
     seen="$seen$name "
     count=$((count + 1))

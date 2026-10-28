@@ -52,7 +52,7 @@ It works in this order:
 1. It uses an existing task, or creates one when nothing exists to hold.
 2. It records the task's UTC hold-set timestamp as the leading line of the task body.
 3. When `--origin` is supplied, it records the origin on the task, replacing any previous association.
-4. It invokes the underlying tasks-axi hold operation.
+4. It invokes the native queue's hold operation.
 5. It verifies the hold and timestamp.
 
 Publishing the stamp first ensures a snapshot cannot observe a newly captain-held task without the timestamp that defines its age.
@@ -62,11 +62,11 @@ Repeat and edge cases:
 - Retries of an active hold preserve its hold-set timestamp.
 - Re-holding released work starts a new timestamped lifecycle.
 - A closed task is refused rather than reopened.
-- `--until` stores the captain's own deferral date through tasks-axi's date gate.
+- `--until` stores the captain's own deferral date; [Native work queue](queue.md#capture-and-pickup) owns its release semantics.
 - Before the backend hold runs, `--origin` records the origin the call is held for on its own `Captain hold origin:` body line, which `complete` and `verify` check using backend identities rather than alias spellings.
   If that write fails, the backend hold is not attempted.
 - The reason may contain parentheses, semicolons, quotes, and line breaks.
-  [`bin/fm-hold-reason-lib.sh`](../bin/fm-hold-reason-lib.sh) owns the storage encoding and compatibility rules; [`bin/fm-tasks-axi.sh --help`](../bin/fm-tasks-axi.sh) owns the public read commands and output contract.
+  [`bin/fm-hold-reason-lib.sh`](../bin/fm-hold-reason-lib.sh) owns the storage encoding and compatibility rules; [`bin/fm-queue.sh --help`](../bin/fm-queue.sh) owns the public read commands and output contract.
 
 ### Answering a call (`answer`)
 
@@ -81,9 +81,9 @@ It requires a non-empty captain decision file of at most 8192 bytes.
 It then works in this order:
 
 1. It durably writes a resolution block carrying the decision digest and a `Resolution mode:`.
-2. It retains the leading hold-set stamp until the selected `tasks-axi done` or `tasks-axi unhold` transition succeeds.
+2. It retains the leading hold-set stamp until the selected native `done` or `unhold` transition succeeds.
 3. It then restores the successful record's resolution-first body ordering.
-   The previous body remains preserved below the block and archived through tasks-axi `--archive-body`.
+   The previous body remains preserved below the block; [Native work queue](queue.md#one-authority-and-preserved-identity) owns body history.
 
 If the close is interrupted, the still-held task therefore keeps its original age basis.
 A matching retry also completes any resolution-first normalization left unfinished after the close itself succeeded.
@@ -94,11 +94,10 @@ A matching retry also completes any resolution-first normalization left unfinish
 - A drifted answer or a mode mismatch is rejected.
 - A re-held task accepts a new answer as a new record on top.
 
-On a task closed outside the script, `answer` records the missing block only when the captain-hold annotations tasks-axi preserves through a close prove the captain owned it.
+On a task closed outside the script, `answer` records the missing block only when the captain-hold annotations the native queue preserves through a close prove the captain owned it.
 It also verifies the task stays closed.
 
-A hold whose `--until` date has passed keeps those annotations while tasks-axi reports it no longer held.
-An expired deferral therefore remains answerable.
+A captain hold whose deferral date has passed remains answerable under the [queue's release contract](queue.md#capture-and-pickup).
 
 ### Recording a reviewed inventory (`complete`)
 
@@ -107,7 +106,7 @@ A post-teardown visual review can complete against the surviving report and dura
 
 `complete` accepts `--none` as an explicit semantic inventory result.
 `--none` is refused while the origin still has a lifecycle-open keyed status decision.
-Before recording completion, `complete` verifies every listed task against tasks-axi.
+Before recording completion, `complete` verifies every listed task against the native queue.
 The origin is never its own inventory entry, so a hold that failed cannot be vouched for by the origin row.
 For a historical inventory that names its own origin, hold a separate captain task with `--origin`, replace only the invalid entry in the final `decision_keys=` line of the origin metadata with that task id while preserving all other entries, and re-run `complete`.
 An entry whose recorded origin differs from the one being completed is refused.
@@ -149,7 +148,7 @@ After cleanup, and still under the task's own lock, teardown does three things:
 
 - It records one `Deliverable of the finished work: ...` line at the end of the task body.
 - It copies a supported pull request or canonical `data/<id>/report.md` into the row's structured artifact fields.
-- It runs `tasks-axi reopen`.
+- It runs the native queue's `reopen` operation.
 
 The row returns to Queued with its hold intact.
 It remains on the appropriate Captain's Call or Charted Next decision surface instead of reading as work still under way.
@@ -165,15 +164,11 @@ Replay then retires the record.
 
 ### Known retained-delivery gaps
 
-Two retained-delivery gaps remain bounded by tasks-axi 0.2.6.
-They are recorded for separate upstream work rather than representing defects introduced by this branch.
+Retention still limits structured artifacts in `bin/fm-backlog-transition-lib.sh`, independently of the native storage interface.
+A local-only delivery is retained in the deliverable body line, but retention does not forward it as a structured note.
+A relocated report is likewise retained in that body line, while `fm_backlog_row_artifact_supported` admits only the canonical report path into the structured field.
 
-- A retained local-only delivery cannot reach the row.
-  `--note` exists on `tasks-axi done` but not on `tasks-axi update`, while the durable pending-close record carrying that note is retired when retention completes.
-- A relocated retained report cannot reach the row, because tasks-axi accepts only `data/<id>/report.md`.
-  `done` reports `Task report link must be a data/<id>/report.md path`, and `update` reports `--report must be a data/<id>/report.md path`.
-
-When an interrupted retention leaves such a relocated report in the validated pending-close record, `answer` skips only that known-unsupported row artifact and closes normally.
+When an interrupted retention leaves such a relocated report in the validated pending-close record, `answer` skips that structured artifact and closes normally.
 The delivery then remains absent from Recently Landed instead of wedging the captain's answer.
 
 A pending-close record that fails validation outright is a different case, and it still refuses the answer.
@@ -345,8 +340,8 @@ For a main-home call, the reconcile option is the recovery path for whatever sti
 
 ### Fleet snapshot buckets
 
-`bin/fm-fleet-snapshot.sh` parses canonical tasks-axi `(hold: ...)`, `(hold-kind: ...)`, and `(hold-until: ...)` metadata alongside existing backlog fields.
-It resolves every repeated `blocked-by:` edge against structured Done records and keeps missing blockers unresolved.
+`bin/fm-fleet-snapshot.sh` uses the [native queue observation](queue.md#capture-and-pickup) for automatic homes and parses the Markdown file directly in manual mode.
+It resolves every repeated `blocked-by:` edge against the observation's completed identities and keeps missing blockers unresolved.
 It then assigns every captain hold exactly one `hold_bucket`.
 The bucket is decided only from structured fields: `hold_kind`, `state`, `hold_until`, `unresolved_blocker_ids`, and the machine-written hold-set timestamp.
 Hold reason and body prose are never matched, so no wording can hide, reveal, or reclassify a decision.
@@ -398,8 +393,7 @@ Re-holding through the wrapper with `--until` remains the durable fix rather tha
 ### Recently Landed notes
 
 [`bin/fm-landed-lib.sh`](../bin/fm-landed-lib.sh) owns Recently Landed's shared selection and artifact-display compatibility rules.
-A local-only landing's note is written by `tasks-axi done --note` as the last of the row's indented body lines rather than into the row title.
-The snapshot therefore reads that final line as the note as well as parsing the title, and the landing is published carrying its recorded note.
+The native queue records `local main` as a row artifact; the snapshot also accepts the final body-line form written by the legacy backend.
 A body that carries a captain resolution record is the captain's own prose and is never mined for that note, so a decision worded `local main` does not become a delivery artifact.
 The projection remains read-only and uses the canonical snapshot's structured fields, including the machine-written hold-set timestamp.
 
@@ -448,10 +442,10 @@ Three states are deliberately not divergence:
 
 ### Cost and scope
 
-Cost stays flat: one `tasks-axi list`, one key scan per status log, and the precise per-key fold only for a key that already names a still-open task.
+Cost stays flat: one native queue listing, one key scan per status log, and the precise per-key fold only for a key that already names a still-open task.
 The comparison is refused unless the status directory is the active home's own.
-Because tasks-axi reads that home's backlog, a mismatch would report one home's logs against another's tasks.
-If tasks-axi is unavailable or its listing cannot be parsed, the guard cannot read the structured record and prints nothing.
+Because the queue reader addresses that home's backlog, a mismatch would report one home's logs against another's tasks.
+If the native queue is unavailable or its listing cannot be parsed, the guard cannot read the structured record and prints nothing.
 
 ## Compatibility with pre-collapse installs
 
@@ -467,15 +461,8 @@ Three legacy inputs are resolved in place:
 
 ### Legacy ids on the Beads backend
 
-On the Beads backend, an attested legacy markdown id that resolves to no task is accepted through the row the markdown-to-beads hold migration produced.
-That row is found by the authoritative evidence first: a row whose notes carry the marker line `migrated from data/backlog.md id <legacy id>`, either alone or followed by ` on <date>` as fm-hold-migration wrote it on 2026-09-04.
-
-Only when no row carries that marker line is the legacy id tried under the configured beads prefix.
-That name-only guess is accepted solely for a single row still held for the captain.
-Two such rows refuse rather than attest.
-Because that acceptance rests on a name rather than on evidence, `complete` names the resolved row beside each prefix-attested legacy id in its completion line, so the guess is auditable after the fact.
-
-A markdown home keeps its legacy rows verbatim, so its resolution is unchanged.
+The old Beads migration helpers are unreachable through the native queue's backend resolver.
+See [existing-home compatibility and activation](queue.md#existing-homes-and-reversibility) before handling a home whose legacy identities live in another adapter.
 
 ### The `fm-decision-hold.sh` shim
 
@@ -522,7 +509,7 @@ The suite does not test the accepted merge-to-cleanup re-hold window or asynchro
 
 - A report-only unresolved captain call refuses `--none` completion before teardown can erase the source.
 - Non-forced scout teardown always requires the durable inventory verification.
-- The recorded-answer guard holds: a bare `tasks-axi done` close fails `verify` until `answer` records the captain's word, and an ordinary finished task cannot be dressed up as an answered call.
+- The recorded-answer guard holds: a direct queue close fails `verify` until `answer` records the captain's word, and an ordinary finished task cannot be dressed up as an answered call.
 
 ### Answers, stamps, and deferral
 
@@ -556,18 +543,8 @@ That latin-1 byte loss also reproduces natively on the fleet host carrying the o
 
 ### Markdown-to-beads migration family
 
-The markdown-to-beads migration family runs the same suite's beads fixture (bd-driven scratch graph, self-skipping on markdown-only tasks-axi installs).
-It proves:
-
-- `verify` and `complete` resolve an attested legacy id through a migrated row's marker note.
-- They resolve it through the configured prefix when no row carries a note, naming the resolved row in the completion line.
-- They resolve it through the marker note of a pre-collapse derived identity.
-- A marker-noted row wins over an unrelated captain-held row occupying the bare prefix namesake.
-- An unresolvable id is refused once naming the id (never an empty name).
-- The attested id stays in `decision_keys=` for idempotent re-verification.
-
-One case in that family needs no beads install and always runs.
-It uses a stubbed tasks-axi that fails any markdown file override, and proves the captain-hold hold, answer, and close mutations reach a beads-configured home without one.
+The retained migration fixtures skip under the native backend and provide no current Beads compatibility evidence.
+`tests/fm-backlog-atomicity.test.sh` and `tests/fm-queue.test.sh` cover unsupported-adapter refusal instead.
 
 ### Reconcile coverage
 

@@ -273,93 +273,52 @@ case "$(cat "$REQ_OUT")" in
 esac
 pass "the reconcile-requests intake stops loudly on a bound hit instead of refusing the row as absent"
 
-# The migrated-prefix scan is the resolution path whose exact and legacy ids
-# genuinely answer NOT_FOUND: only the prefixed migrated row wedges. A dropped
-# 124 there falls through to 'no captain-held task $entry resolves to nothing'
-# - the exact bound-hit-as-absence outcome the resolver's own 124 arm exists to
-# prevent - so the bound must survive the prefixed scan to verify_entry_durable.
-MIG="$TMP_ROOT/migrated"
-MIG_FAKEBIN=$(fm_fakebin "$MIG")
-mkdir -p "$MIG/data" "$MIG/state" "$MIG/config"
-cat > "$MIG_FAKEBIN/tasks-axi" <<'SH'
+# A missing exact id still tries the preserved legacy identity. A timeout on
+# that second read must propagate through verify rather than become absence.
+LEGACY="$TMP_ROOT/legacy"
+LEGACY_FAKEBIN=$(fm_fakebin "$LEGACY")
+mkdir -p "$LEGACY/data" "$LEGACY/state" "$LEGACY/config"
+cat > "$LEGACY_FAKEBIN/tasks-axi" <<'SH'
 #!/usr/bin/env bash
-set -u
-case "${1:-}" in
-  --version) printf '%s\n' '0.2.6'; exit 0 ;;
-  show)
-    [ -z "${2:-}" ] && { printf 'code: NOT_FOUND\n' >&2; exit 1; }
-    # Only the prefixed migrated candidates wedge; the exact and legacy ids
-    # answer NOT_FOUND promptly, the concrete path the prefix scan exists for.
-    case "$2" in $FM_TEST_PREFIXED_GLOB) sleep 300; exit 0 ;; esac
-    printf 'code: NOT_FOUND\n' >&2
-    exit 1
-    ;;
-  update)
-    [ "${2:-}" = --help ] || exit 0
-    printf '%s\n' 'usage: tasks-axi update <id> [flags]' '  --body-file <path>' '  --archive-body'
+if [ "${1:-}" = show ]; then
+  if [ "${2:-}" = wedged-origin-decision-legacy-entry ]; then
+    sleep 300
     exit 0
-    ;;
-  mv)
-    [ "${2:-}" = --help ] || exit 0
-    printf '%s\n' 'usage: tasks-axi mv <id> [<id>...] --to <path-or-dir>'
-    exit 0
-    ;;
-  hold)
-    [ "${2:-}" = --help ] || exit 0
-    printf '%s\n' 'usage: tasks-axi hold <id> [flags]' '  --kind captain' '  --until <date>'
-    exit 0
-    ;;
-  list)
-    printf 'count: 0\n'
-    printf 'tasks[0]{id,state,kind,repo,title,blocked_by,hold_kind,hold_reason}:\n'
-    exit 0
-    ;;
-esac
+  fi
+  printf 'code: NOT_FOUND\n' >&2
+  exit 1
+fi
 exit 0
 SH
-chmod +x "$MIG_FAKEBIN/tasks-axi"
-cat > "$MIG_FAKEBIN/bd" <<'SH'
-#!/usr/bin/env bash
-[ "${1:-}" = list ] && { printf '[]\n'; exit 0; }
-exit 1
-SH
-chmod +x "$MIG_FAKEBIN/bd"
-cat > "$MIG/.tasks.toml" <<'TOML'
-backend = "beads"
-
-[beads]
-prefix = "bd"
-path = "graph"
-binary = "bd"
-TOML
-printf '# Backlog\n' > "$MIG/data/backlog.md"
-fm_write_meta "$MIG/state/wedged-origin.meta" \
+chmod +x "$LEGACY_FAKEBIN/tasks-axi"
+fm_test_tasks_toml "$LEGACY/.tasks.toml"
+printf '# Backlog\n' > "$LEGACY/data/backlog.md"
+fm_write_meta "$LEGACY/state/wedged-origin.meta" \
   'window=firstmate:fm-wedged-origin' \
   'worktree=/nonexistent/wedged-origin' \
   'project=alpha' \
   'harness=claude' \
   'decisions_reviewed=1' \
-  'decision_keys=mig-entry'
+  'decision_keys=legacy-entry'
 
-VERIFY_MIG_OUT="$MIG/verify.out"
-VERIFY_MIG_STATUS=0
-PATH="$MIG_FAKEBIN:$BASE_PATH" FM_HOME="$MIG" \
-  FM_STATE_OVERRIDE="$MIG/state" FM_DATA_OVERRIDE="$MIG/data" \
-  FM_CONFIG_OVERRIDE="$MIG/config" FM_BACKLOG_ROW_TIMEOUT_SECS="$BOUND_SECS" \
-  FM_TEST_PREFIXED_GLOB='bd-*' \
-  "$ROOT/bin/fm-captain-hold.sh" verify wedged-origin > "$VERIFY_MIG_OUT" 2>&1 || VERIFY_MIG_STATUS=$?
+VERIFY_LEGACY_OUT="$LEGACY/verify.out"
+VERIFY_LEGACY_STATUS=0
+PATH="$LEGACY_FAKEBIN:$BASE_PATH" FM_HOME="$LEGACY" \
+  FM_STATE_OVERRIDE="$LEGACY/state" FM_DATA_OVERRIDE="$LEGACY/data" \
+  FM_CONFIG_OVERRIDE="$LEGACY/config" FM_BACKLOG_ROW_TIMEOUT_SECS="$BOUND_SECS" \
+  "$ROOT/bin/fm-captain-hold.sh" verify wedged-origin > "$VERIFY_LEGACY_OUT" 2>&1 || VERIFY_LEGACY_STATUS=$?
 
-[ "$VERIFY_MIG_STATUS" -ne 0 ] \
-  || fail "verify must not attest an inventory whose migrated-prefix read wedged: $(cat "$VERIFY_MIG_OUT")"
-case "$(cat "$VERIFY_MIG_OUT")" in
-  *'no captain-held task'*|*absent*) 
-    fail "the migrated-prefix bound hit was spent as an unresolved key: $(cat "$VERIFY_MIG_OUT")" ;;
+[ "$VERIFY_LEGACY_STATUS" -ne 0 ] \
+  || fail "verify must not attest an inventory whose legacy read wedged: $(cat "$VERIFY_LEGACY_OUT")"
+case "$(cat "$VERIFY_LEGACY_OUT")" in
+  *'no captain-held task'*|*absent*)
+    fail "the legacy bound hit was spent as an unresolved key: $(cat "$VERIFY_LEGACY_OUT")" ;;
 esac
-case "$(cat "$VERIFY_MIG_OUT")" in
-  *'exceeded its read bound resolving mig-entry') ;;
-  *) fail "verify must name the entry it could not read and the bound it hit, got: $(cat "$VERIFY_MIG_OUT")" ;;
+case "$(cat "$VERIFY_LEGACY_OUT")" in
+  *'exceeded its read bound resolving legacy-entry') ;;
+  *) fail "verify must name the entry it could not read and the bound it hit, got: $(cat "$VERIFY_LEGACY_OUT")" ;;
 esac
-pass "a bound hit in the migrated-prefix scan stops verify by name instead of resolving to nothing"
+pass "a bound hit reading a legacy identity stops verify by name instead of resolving to nothing"
 
 # --- half two: the digest still completes end to end ------------------------
 

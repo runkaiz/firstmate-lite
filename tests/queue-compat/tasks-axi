@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Test-only legacy executable spelling for existing synthetic queue fixtures.
+# This runs the shipped native backend; no external executable is installed.
+set -eu
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+exec "$ROOT/bin/fm-queue.py" "$@"

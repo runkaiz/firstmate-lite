@@ -58,16 +58,15 @@ cat > "$REMOTE_ROOT/bin/fm-probe-path.sh" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$PATH"
 SH
-cat > "$REMOTE_ROOT/bin/tasks-axi" <<SH
+PYTHON_BIN=$(command -v python3)
+cat > "$REMOTE_ROOT/bin/python3" <<SH
 #!/usr/bin/env bash
-printf '%s\n' "\${FM_REMOTE_JOB_ACTIVE:-absent}" >> "$TOOL_PROBE_LOG"
-case "\${1:-}:\${2:-}" in
-  --version:*) printf '0.2.6\n' ;;
-  update:--help) printf '%s\n' --archive-body ;;
-  mv:--help) printf '%s\n' 'usage: tasks-axi mv <id> [<id>...]' ;;
-esac
+if [ "\${1:-}" = -c ]; then
+  printf '%s\n' "\${FM_REMOTE_JOB_ACTIVE:-absent}" >> "$TOOL_PROBE_LOG"
+fi
+exec "$PYTHON_BIN" "\$@"
 SH
-cp "$ROOT/bin/fm-remote-doctor.sh" "$ROOT/bin/fm-tasks-axi-lib.sh" \
+cp "$ROOT/bin/fm-remote-doctor.sh" "$ROOT/bin/fm-queue.py" "$ROOT/bin/fm-tasks-axi-lib.sh" \
   "$ROOT/bin/fm-remote-herdr-owner-lib.sh" "$ROOT/bin/fm-backend.sh" "$REMOTE_ROOT/bin/"
 mkdir -p "$REMOTE_ROOT/bin/backends"
 cp "$ROOT/bin/backends/herdr.sh" "$REMOTE_ROOT/bin/backends/herdr.sh"
@@ -76,7 +75,7 @@ cat > "$REMOTE_ROOT/bin/fm-mutate.sh" <<'SH'
 printf 'mutation\n' >> "$1"
 SH
 chmod +x "$REMOTE_ROOT/bin"/*.sh
-chmod +x "$REMOTE_ROOT/bin/tasks-axi"
+chmod +x "$REMOTE_ROOT/bin/python3"
 git -C "$REMOTE_ROOT" init -q -b main
 git -C "$REMOTE_ROOT" config user.email test@example.com
 git -C "$REMOTE_ROOT" config user.name Test
@@ -397,8 +396,8 @@ rc=$?
 set -e
 [ "$rc" -ne 0 ] || fail "the remote doctor passed with a missing required tool"
 assert_contains "$out" 'required herdr=MISSING' "the remote doctor did not mark a missing required tool"
-assert_contains "$out" 'required tasks-axi=MISSING' "the remote doctor did not mark every missing required tool"
-assert_contains "$out" 'required tools do not resolve on the remote runtime PATH: herdr tasks-axi treehouse harness' "the remote doctor did not name the missing tools"
+assert_contains "$out" 'required treehouse=MISSING' "the remote doctor did not mark every missing required tool"
+assert_contains "$out" 'required tools do not resolve on the remote runtime PATH: herdr treehouse harness' "the remote doctor did not name the missing tools"
 assert_contains "$out" '.local/bin' "the remote doctor did not offer the wrapper escape hatch"
 ln -sf "$(command -v git)" "$DOCTOR_BIN/git"
 # The direct doctor fixture needs the complete required tool set. These stubs
@@ -406,17 +405,10 @@ ln -sf "$(command -v git)" "$DOCTOR_BIN/git"
 # lifecycle behavior against controlled launchctl fixtures.
 printf '#!/usr/bin/env bash\nexit 0\n' > "$DOCTOR_BIN/jq"
 printf '#!/usr/bin/env bash\nprintf "{\\\"server\\\":{\\\"running\\\":false}}\\n"\n' > "$DOCTOR_BIN/herdr"
-cat > "$DOCTOR_BIN/tasks-axi" <<'SH'
-#!/usr/bin/env bash
-case "${1:-}:${2:-}" in
-  --version:*) printf '0.2.6\n' ;;
-  update:--help) printf '%s\n' --archive-body ;;
-  mv:--help) printf '%s\n' 'usage: tasks-axi mv <id> [<id>...]' ;;
-esac
-SH
+ln -s "$PYTHON_BIN" "$DOCTOR_BIN/python3"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$DOCTOR_BIN/treehouse"
 printf '#!/usr/bin/env bash\nexit 0\n' > "$DOCTOR_BIN/claude"
-chmod +x "$DOCTOR_BIN/jq" "$DOCTOR_BIN/herdr" "$DOCTOR_BIN/tasks-axi" "$DOCTOR_BIN/treehouse" "$DOCTOR_BIN/claude"
+chmod +x "$DOCTOR_BIN/jq" "$DOCTOR_BIN/herdr" "$DOCTOR_BIN/treehouse" "$DOCTOR_BIN/claude"
 set +e
 out=$(HOME="$DOCTOR_HOME" PATH="$DOCTOR_BIN:/usr/bin:/bin:/usr/sbin:/sbin" "$ROOT/bin/fm-remote-doctor.sh" 2>&1)
 rc=$?
@@ -429,7 +421,7 @@ else
   assert_contains "$out" 'optional tmux=absent' "the remote doctor did not report an absent optional tool"
 fi
 assert_contains "$out" "required herdr=$DOCTOR_BIN/herdr" "the remote doctor did not require herdr"
-assert_contains "$out" "required tasks-axi=$DOCTOR_BIN/tasks-axi" "the remote doctor did not require compatible tasks-axi"
+assert_contains "$out" "required python3=$DOCTOR_BIN/python3" "the remote doctor did not require Python for the native queue"
 assert_contains "$out" "required treehouse=$DOCTOR_BIN/treehouse" "the remote doctor did not require treehouse"
 assert_contains "$out" "required harness=claude:$DOCTOR_BIN/claude" "the remote doctor did not require a verified harness"
 assert_not_contains "$out" 'required tools do not resolve' "a resolved required tool was still reported missing"
