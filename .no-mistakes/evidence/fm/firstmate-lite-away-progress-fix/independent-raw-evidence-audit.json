@@ -1,0 +1,80 @@
+{
+  "assessment": "go: accepted product behavior established by authorized same-run raw-evidence reassessment",
+  "head": "c63e3c1287cb6a3c337ffe31b0acedb11244a239",
+  "mode": "Read-only evidence ingestion. No new model, lifecycle, test-suite, lint or pipeline execution; no source or harness changes.",
+  "current_head_observation": {
+    "existing_delivery_lookup": true,
+    "unsafe_unknown_exit_refused": true,
+    "delivery_and_backlog_leases_claimed": true,
+    "existing_delivery_hold_verified_before_producer_report": true,
+    "surrogate_tasks_created": 0,
+    "visible_escalations": 1,
+    "unchanged_followup": "rechecked delivery hold, routine silent outcome",
+    "handled_turns": [
+      {
+        "return_code": 0,
+        "error": 0,
+        "acknowledged_rows": "1-32"
+      },
+      {
+        "return_code": 0,
+        "error": 0,
+        "acknowledged_rows": "33-34"
+      }
+    ],
+    "acknowledgement": "Actual owner/generation grants match acknowledgements and hash-verified empty queue snapshots",
+    "final_occupied_or_unconfirmed": 16,
+    "explicit_cap": 4,
+    "preserved_files": 50,
+    "preservation": "All hashes match retained files and both archives",
+    "original_cleanup_seconds": 52.383148278982844,
+    "cleanup_errors": [],
+    "later_absence_audit_seconds": 91.49487862997921,
+    "recorded_owned_processes_absent": 30,
+    "private_socket_absent": true
+  },
+  "earlier_positive_observation": {
+    "head": "05fc1a8d67a702f8ac7ab19aa6fa776ba9d55863",
+    "original_occupied": 16,
+    "archived_context_stop_receipts": 12,
+    "receipts": "Truthful legacy idle-shell bindings, not prior model spawns",
+    "admission": "Actual guarded relaunch; complete journal and matching archived fresh generation/transaction",
+    "worker_receipt": "Processed receipt matches preserved repair and unmerged bytes; arrives AFTER original NO-GO",
+    "preserved_files": 65,
+    "preservation": "All hashes match retained files and all three archives",
+    "supplemental_cleanup_seconds": 97.28266538400203,
+    "later_absence_audit_seconds": 119.31095983099658,
+    "recorded_owned_processes_absent": 60,
+    "private_socket_absent": true
+  },
+  "original_results_preserved": {
+    "current_negative": {
+      "verdict": "no-go",
+      "error": "NameError(\"name 'inventory' is not defined\")",
+      "seconds": 52.383148278982844,
+      "sha256": "34e64427b454892ab12e1581bf1c1e1ea082534bcd428180ccbe45b1e1be475b"
+    },
+    "earlier_positive": {
+      "verdict": "no-go",
+      "error": "AssertionError('granted wake rows remain')",
+      "seconds": 48.432555760024115,
+      "cleanup": "Original exit refused pending composer text; subsequent supported cleanup is separate",
+      "sha256": "19f2873fe16e53e9ffb2416fa16195c9c79cc18fa49b6b3cfa71047e5c55a23b"
+    }
+  },
+  "integrity": {
+    "positive_inventory_file_hashes_verified": 14,
+    "positive_stop_receipt_hashes_verified": 12,
+    "negative_historical_snapshot_hashes_verified": 50,
+    "positive_historical_snapshot_hashes_verified": 69,
+    "public_file_hashes_verified_per_bound_head": 594,
+    "selected_commands_and_results_matched_to_hash_bound_source_transcripts": {
+      "negative": 7,
+      "positive": 8
+    },
+    "current_head_frozen_and_delivered_prompt_match": true
+  },
+  "continuity": "Only bin/fm-branch-prompt.sh and tests/fm-branch-supervision.test.sh differ from the positive head. Fallback identity selection changed; reclamation decision and capacity/exit/relaunch/project admission/hold/lease/host mechanisms did not. Earlier positive behavior is relevant, not a current-head replay.",
+  "deterministic_evidence": "Retained targeted afk-contract, control, relaunch, branch-supervision and project-capacity checks passed; current-head producer/delivery regression passed in the prior Test turn. Provider fixtures and emitted-prompt assertions do not prove model obedience.",
+  "limitations": "Neither original harness attempt is relabeled passed. This review ran no product scenario; live execution was performed by the separately authorized outer driver in the same run. Broad regression and remaining pipeline phases are still required."
+}

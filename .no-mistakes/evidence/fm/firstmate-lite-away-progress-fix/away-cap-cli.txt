@@ -1,0 +1,70 @@
+Head: 072a4c788d97fca34e96a5c04c0b27579467a574
+Real record CLI; isolated disposable home; no provider or model launched.
+$ bin/fm-afk-contract.sh enter --words Finish 16 authorized checks with four staged contexts
+Away posture recorded at 2026-10-27T17:52:35Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: not set (no additional away limit).
+Away posture (recorded):
+  entered: 2026-10-27T17:52:35Z
+  expected return: not given
+  spend cap: not set (no additional away limit)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Finish 16 authorized checks with four staged contexts
+exit=0
+$ bin/fm-afk-contract.sh field spend_max_concurrent_workers
+-
+exit=0
+$ bin/fm-afk-contract.sh validate
+
+exit=0
+$ bin/fm-afk-contract.sh enter --words Continue authorized delivery --spend 4
+fm-afk-contract: replaced the earlier away posture; its record is archived at <disposable-home>/state/afk-contracts/1793123555-superseded-1793123555.afk-contract
+Away posture recorded at 2026-10-27T17:52:35Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-27T17:52:35Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Continue authorized delivery
+exit=0
+$ bin/fm-afk-contract.sh field spend_max_concurrent_workers
+4
+exit=0
+$ bin/fm-afk-contract.sh enter --words Continue 16 checks without changing limits
+fm-afk-contract: replaced the earlier away posture; its record is archived at <disposable-home>/state/afk-contracts/1793123555-superseded-1793123555-1916747.afk-contract
+Away posture recorded at 2026-10-27T17:52:35Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-27T17:52:35Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Continue 16 checks without changing limits
+exit=0
+$ bin/fm-afk-contract.sh field spend_max_concurrent_workers
+4
+exit=0
+$ bin/fm-afk-contract.sh enter --words Explicitly revised limit --spend 2
+fm-afk-contract: replaced the earlier away posture; its record is archived at <disposable-home>/state/afk-contracts/1793123555-superseded-1793123555-1916957.afk-contract
+Away posture recorded at 2026-10-27T17:52:35Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 2 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-27T17:52:35Z
+  expected return: not given
+  spend cap: 2 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Explicitly revised limit
+exit=0
+$ bin/fm-afk-contract.sh field spend_max_concurrent_workers
+2
+exit=0
+$ bin/fm-afk-contract.sh enter --spend 0
+fm-afk-contract: --spend must be a positive integer, got '0'
+exit=2
+$ bin/fm-afk-contract.sh field spend_max_concurrent_workers
+2
+exit=0
+$ bin/fm-afk-contract.sh validate
+
+exit=0
+Disposable home removed; no runtime started.

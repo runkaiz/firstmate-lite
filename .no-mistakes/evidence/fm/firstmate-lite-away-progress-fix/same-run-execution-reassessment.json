@@ -1,0 +1,74 @@
+{
+  "run": "01M5Z7HH87MVR9K988M9MEHRVD",
+  "assessed_head": "c63e3c1287cb6a3c337ffe31b0acedb11244a239",
+  "mode": "Independent read-only reassessment of actual same-run executions; no model, lifecycle, source, fixture or pipeline mutations.",
+  "prior_audit_sha256": "46a7fa636bb35e8840020c0ea991345c60ecbb9615e66dd5c837ca8bab05b904",
+  "observations": {
+    "current": {
+      "head": "c63e3c1287cb6a3c337ffe31b0acedb11244a239",
+      "source_files_verified": 594,
+      "execution_artifacts_verified": 6,
+      "historical_snapshots_verified": 50,
+      "raw_calls_and_results_verified": 7,
+      "preserved_files_verified_in_retained_home_and_archives": 50,
+      "archives_verified": 2,
+      "result_sha256": "34e64427b454892ab12e1581bf1c1e1ea082534bcd428180ccbe45b1e1be475b",
+      "original_verdict": "no-go",
+      "original_error": "NameError(\"name 'inventory' is not defined\")",
+      "original_elapsed_seconds": 52.383148278982844,
+      "cleanup_error_count": 0,
+      "recorded_absence_audit": {
+        "processes": 30,
+        "elapsed_seconds": 91.49487862997921,
+        "socket_absent": true,
+        "fresh_runtime_probe_in_reassessment": false
+      },
+      "existing_delivery_held_before_producer_report": true,
+      "surrogate_task_created": false,
+      "visible_escalations": 1,
+      "unchanged_followup_silent": true,
+      "handled_turns": 2,
+      "acknowledged_rows": [
+        "1-32",
+        "33-34"
+      ],
+      "unknown_holders_remain_charged": 16,
+      "finite_cap_unchanged": 4,
+      "original_cleanup_errors": [],
+      "actual_owner_and_turn_grant_bytes_match_historical_snapshots": true
+    },
+    "earlier": {
+      "head": "05fc1a8d67a702f8ac7ab19aa6fa776ba9d55863",
+      "source_files_verified": 594,
+      "execution_artifacts_verified": 5,
+      "historical_snapshots_verified": 69,
+      "raw_calls_and_results_verified": 8,
+      "preserved_files_verified_in_retained_home_and_archives": 65,
+      "archives_verified": 3,
+      "result_sha256": "19f2873fe16e53e9ffb2416fa16195c9c79cc18fa49b6b3cfa71047e5c55a23b",
+      "original_verdict": "no-go",
+      "original_error": "AssertionError('granted wake rows remain')",
+      "original_elapsed_seconds": 48.432555760024115,
+      "cleanup_error_count": 1,
+      "releases_verified": 12,
+      "eventual_matching_worker_receipt": true,
+      "receipt_after_original_no_go": true,
+      "supplemental_cleanup_seconds": 97.28266538400203,
+      "recorded_absence_audit": {
+        "processes": 60,
+        "elapsed_seconds": 119.31095983099658,
+        "socket_absent": true,
+        "fresh_runtime_probe_in_reassessment": false
+      }
+    }
+  },
+  "continuity": {
+    "changed_files_since_positive": [
+      "bin/fm-branch-prompt.sh",
+      "tests/fm-branch-supervision.test.sh"
+    ],
+    "unchanged": "capacity, exit, relaunch, project admission, hold, lease, host, acknowledgement mechanisms and positive reclamation decision rule",
+    "limit": "Earlier positive execution is not a current-head replay. Original harness NO-GOs remain unchanged; sub-scenario observations are assessed independently."
+  },
+  "non_live_support": "Provider-backed Herdr absence regression and generated-prompt assertions remain deterministic supporting evidence only."
+}

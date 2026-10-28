@@ -1,0 +1,15 @@
+READ-ONLY EVIDENCE REVIEW; NO SCENARIO REPLAY
+Current target: 05fc1a8d67a702f8ac7ab19aa6fa776ba9d55863
+The observation below belongs to an earlier head, not the current target.
+This Test turn verified original result and archive hashes against the retained execution receipt, and independently checked all 50 selected archived fixture files: zero hash mismatches.
+No fresh runtime observation, cleanup, or model invocation was performed.
+
+Synthetic same-run real-host observation at exact head 072a4c788d97fca34e96a5c04c0b27579467a574.
+Original runner exit 1, verdict NO-GO, elapsed including immediate cleanup check 57.477449836966116 seconds.
+Functional observations: two real host-handled turns, supervisor-created durable delivery hold before the first escalation, exactly one escalation, unchanged follow-up routine+silent, real host-granted rows consumed, all 50 selected fixture-file hashes unchanged, cap four unchanged, unknown worker records and primary endpoint inventory preserved.
+Cleanup: full synthetic fixture archive was created before teardown. Immediate post-shutdown primary process identity still matched, so runner refused fixture removal and retained lab/archive. A later read-only check found every recorded process absent. Precise elapsed time from experiment start to the supplemental absence is UNKNOWN: no exact start wall timestamp was recorded, and only the experiment's monotonic duration and later wall timestamp are available. The original NO-GO is unchanged.
+No positive live parking/relaunch or all Test scenarios are claimed by this negative-path result. No retry or model replay occurred. The exact-run/head evidence must be consumed through normal Test; no waiver/skip/exception is requested.
+
+CURRENT TEST STEP
+At target 05fc1a8d67a702f8ac7ab19aa6fa776ba9d55863, deterministic checks passed for away cap selection, lifecycle control, relaunch, branch supervision, project capacity, and supervision host. All used the existing fixture facilities; none establishes a fresh live model or vendor-lifecycle result. The host check first reached the selected 170-second timeout; its isolated deterministic recheck passed in 244.833 seconds under a 480-second bound.
+The current fix therefore has fixture evidence for positive capacity reclamation and relaunch, but no current-head live supervisor proof of choosing that recovery. The earlier negative ownership-blocker result cannot supply it. MAIN must rebind the changed head and determine the separately authorized outer-driver evidence action; this Test agent performed no replay or cleanup of the retained private fixture.
