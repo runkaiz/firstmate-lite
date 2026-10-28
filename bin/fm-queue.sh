@@ -62,7 +62,7 @@ for arg in "$@"; do
   fi
   case "$arg" in
     --file|--file=*)
-      fail "this command always addresses this home's backlog at $DATA; drop --file, or run tasks-axi directly for another backlog"
+      fail "this command always addresses this home's backlog at $DATA; drop --file, or use bin/fm-queue.py --file for an explicitly selected separate backlog"
       ;;
     --start)
       case "${1:-}" in
@@ -94,7 +94,7 @@ fi
 
 if [ -n "$FM_BACKLOG_AXI_FILE" ]; then
   if [ -L "$FM_BACKLOG_AXI_FILE" ]; then
-    fail "$FM_BACKLOG_AXI_FILE is a symlink; a tasks-axi write would replace it with a regular file and fork the backlog - make it this home's real file"
+    fail "$FM_BACKLOG_AXI_FILE is a symlink; native writes replace files atomically - make it this home's real file to avoid forking the backlog"
   fi
   export FM_QUEUE_FILE="$FM_BACKLOG_AXI_FILE"
   unset TASKS_AXI_FILE
