@@ -684,6 +684,42 @@ def lifecycle_refresh():
 status = lifecycle_refresh()
 assert status["enabled"] and status["known_sources"] == 0, status
 assert "no_native_sources_observed_usage_unknown" in status["gaps"], status
+for i, (policy, switches, roots_mode) in enumerate([
+    ("default-on", {}, "set"), ("opt-in", {"FM_SENTINEL_LIVE": "1"}, "set"),
+    ("opt-in", {"FM_LIVE": "1"}, "set"), ("default-on", {"FM_SENTINEL_LIVE": "1"}, "set"),
+    ("default-on", {}, "unset"), ("default-on", {}, "empty"),
+]):
+    child_home = root / f"gated-home-{i}"
+    for part in ("state", "data", "config"):
+        (child_home / part).mkdir(parents=True)
+    for meta in (home / "state").glob("*.meta"):
+        (child_home / "state" / meta.name).write_bytes(meta.read_bytes())
+    child_env = dict(env, FM_HOME=str(child_home), CODEX_HOME=str(ambient / ".codex"),
+                     CLAUDE_CONFIG_DIR=str(ambient / ".claude"),
+                     PI_CODING_AGENT_DIR=str(ambient / ".pi/agent"), NM_HOME=str(ambient / ".no-mistakes"))
+    for key in synthetic:
+        if roots_mode == "unset":
+            child_env.pop(key)
+        elif roots_mode == "empty":
+            child_env[key] = ""
+    for key in ("FM_LIVE", "FM_SENTINEL_LIVE"):
+        child_env.pop(key, None)
+    child_env.update(switches)
+    result = subprocess.run(["bash", "-c", '''
+set -euo pipefail
+. "$1/tests/lib.sh"
+fm_live_gate "$2" FM_SENTINEL_LIVE python3
+for var in CODEX_HOME CLAUDE_CONFIG_DIR PI_CODING_AGENT_DIR NM_HOME; do
+    [ "${!var}" = "$FM_TEST_USAGE_ROOTS/$var" ] || exit 1
+done
+bash "$1/bin/fm-usage-refresh.sh" --force
+python3 "$1/bin/fm-usage-auto.py" status
+''', "_", str(repo), policy], env=child_env, capture_output=True, text=True)
+    assert result.returncode == 0, (policy, switches, result.stdout, result.stderr)
+    gated_status = json.loads(result.stdout)
+    assert gated_status["enabled"] and gated_status["known_sources"] == 0, gated_status
+    assert gated_status["metadata_bytes_read"] == 0, gated_status
+    assert {"codex_native_index_unavailable", "pipeline_native_scope_unavailable"} <= set(gated_status["gaps"])
 # The same enabled collection still discovers sessions in the synthetic roots.
 claude_session(synthetic["CLAUDE_CONFIG_DIR"] / "projects", str(workers["claude"]))
 status = lifecycle_refresh()
