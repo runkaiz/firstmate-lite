@@ -10,20 +10,9 @@ Only the Markdown backend is supported. Other adapters fail before mutation.
 Rows retain the existing Markdown representation. Active/archive/note files
 are one authority, protected by a queue lock and a recoverable transaction.
 Every body replacement archives its predecessor. Archived IDs stay reserved.
-The archive is completed history: legacy repeated `## Archived <date>`
-sections are read in place, and newly archived rows are appended in that same
-section shape. No record is merged, renumbered or dropped. An ID repeated in
-the archive is one task's history only when note-history links name each
-predecessor and successor record by exact digest and occurrence (`#N`
-among identical records) in one complete chain; its
-latest record then answers lookup. Anything else (unlinked, dangling,
-competing or cyclic links) is refused with record locations rather than
-guessed. `show <id> --history` lists every record and digest read-only, and
-`link` previews (`--dry-run`) or records one explicit link. Reopening any
-archived task keeps its records and links the continuation's completion.
-Archived edits append linked revisions, retaining the completion metadata;
-identical repeated evidence does not append another revision.
-Dependencies on any archived ID are satisfied and the ID stays reserved.
+See docs/queue.md for archive preservation, identity resolution and move limits.
+`show <id> --history --json` exposes record digests for `link`; plain
+`--history` shows locations, states, completion dates and titles only.
 Migration needs no rewrite: `migrate --dry-run` validates existing records;
 `migrate --backup-dir DIR` also creates an exclusive byte-for-byte backup.
 Neither command activates a home or installs anything. Never run two writers
