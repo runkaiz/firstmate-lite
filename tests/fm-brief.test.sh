@@ -223,10 +223,10 @@ test_ship_modes_generate_clean_briefs() {
 
 # --forge forgejo is the Forgejo value of the project's registered forge binding
 # (bin/fm-project-mode.sh --forge), passed at intake exactly like --mode. It
-# names tea instead of gh-axi in the ship brief's forge-CLI rule and in the
+# names tea instead of gh in the ship brief's forge-CLI rule and in the
 # direct-PR Definition of done's own open-a-PR line, and it marks the delivery
 # contract line so bin/fm-spawn.sh can check it against the registry. A brief
-# with no --forge renders the unchanged gh-axi wording. The forge is a ship
+# with no --forge renders the unchanged gh wording. The forge is a ship
 # input only, and the closed set refuses anything else.
 test_forge_selection_renders_correct_cli() {
   local home brief out rc
@@ -236,11 +236,11 @@ test_forge_selection_renders_correct_cli() {
   FM_HOME="$home" "$ROOT/bin/fm-brief.sh" brief-forge-default some-proj --mode direct-PR >/dev/null 2>&1 \
     || fail "a ship brief with no --forge should still scaffold"
   brief="$home/data/brief-forge-default/brief.md"
-  assert_grep "3. Use gh-axi for GitHub operations and chrome-devtools-axi for browser operations." "$brief" \
-    "a brief with no --forge must render the exact pre-existing gh-axi Rule 3 line"
+  assert_grep "3. Use native gh for GitHub operations with complete selective --json fields" "$brief" \
+    "a brief with no --forge must render the exact pre-existing gh Rule 3 line"
   # shellcheck disable=SC2016 # Backticks are literal generated brief text.
-  assert_grep 'open a PR with `gh-axi`' "$brief" \
-    "a direct-PR brief with no --forge must still tell the worker to open the PR with gh-axi"
+  assert_grep 'open a PR with `gh`' "$brief" \
+    "a direct-PR brief with no --forge must still tell the worker to open the PR with gh"
   grep -qx "Delivery contract: mode=direct-PR" "$brief" \
     || fail "a brief with no --forge must keep the bare delivery contract line"
 
@@ -373,10 +373,10 @@ test_pr_based_dod_requires_non_draft() {
       continue
     fi
     # shellcheck disable=SC2016  # single quotes are deliberate: the backticks must stay literal
-    assert_grep 'confirm it is not a draft (`gh-axi pr view <number>` must print `draft: no`' "$brief" \
+    assert_grep 'confirm it is not a draft (`gh pr view <url> --json url,isDraft` must return the reported PR URL and boolean `isDraft: false`' "$brief" \
       "$mode: done must require reading the PR back from the forge as non-draft"
     # shellcheck disable=SC2016  # single quotes are deliberate: the backticks must stay literal
-    assert_grep 'mark it ready with `gh-axi pr ready <number>`' "$brief" \
+    assert_grep 'mark it ready with `gh pr ready <url>`' "$brief" \
       "$mode: a draft must be marked ready before done"
     assert_grep "If you deliberately keep the PR a draft, append \`paused" "$brief" \
       "$mode: a deliberate draft must declare a wait instead of done"
@@ -1001,7 +1001,7 @@ test_base_branch_is_rendered_and_bounded() {
   base=$(fm_brief_base_branches "$brief")
   [ "$base" = feature/hub ] || fail "the direct-PR brief recorded base '$base', not feature/hub"
   # shellcheck disable=SC2016  # literal backticks in rendered prose must stay unexpanded
-  assert_grep 'open a PR with `gh-axi` that is ready for review, not a draft, against the base branch `feature/hub` (`--base feature/hub`)' "$brief" \
+  assert_grep 'open a PR with `gh` that is ready for review, not a draft, against the base branch `feature/hub` (`--base feature/hub`)' "$brief" \
     "the direct-PR definition of done does not target the base branch"
   # shellcheck disable=SC2016
   assert_grep 'Never push to the base branch `feature/hub` or the default branch' "$brief" \

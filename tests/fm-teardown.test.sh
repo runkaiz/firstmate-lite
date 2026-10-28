@@ -104,24 +104,19 @@ SH
 # tmux kill-window etc.: succeed silently.
 exit 0
 SH
-  # Default gh-axi mock: no PR is associated with the branch, and viewing any PR
-  # number fails. This keeps the landed-work check hermetic (never reaching the real
-  # gh-axi) and represents the common "no GitHub PR" baseline. Tests that need a
-  # merged PR or a lookup error override this file with the helpers below.
+  # A wrapper call is always a regression in this cleanup path.
   cat > "$fakebin/gh-axi" <<'SH'
 #!/usr/bin/env bash
-case "${1:-} ${2:-}" in
-  "pr list") printf '%s\n' "count: 0 (showing first 0)" "pull_requests[]: []" ; exit 0 ;;
-  "pr view") echo "error: pull request not found" >&2 ; exit 1 ;;
-esac
-exit 0
+printf '%s\n' "$*" >> "$(dirname "$0")/../wrapper.log"
+exit 99
 SH
   cat > "$fakebin/gh" <<'SH'
 #!/usr/bin/env bash
 case "${1:-} ${2:-}" in
+  "pr list") printf '%s\n' '[]'; exit 0 ;;
   "pr view") echo "error: pull request not found" >&2 ; exit 1 ;;
 esac
-exit 0
+exit 1
 SH
   # Default hermetic no-mistakes stub: `axi status` answers FM_FAKE_AXI_STATUS
   # verbatim (empty by default, i.e. no active run - the pre-teardown run-abort
@@ -265,19 +260,13 @@ land_on_origin_main() {
 # Override GitHub lookups to report PR 7 as merged with the supplied head.
 add_gh_pr_merged_for_head() {
   local case_dir=$1 head=$2
-  cat > "$case_dir/fakebin/gh-axi" <<'SH'
-#!/usr/bin/env bash
-case "${1:-} ${2:-}" in
-  "pr list")
-    printf '%s\n' "count: 1 (showing first 1)" "pull_requests[1]{number,state}:" "  7,merged" ; exit 0 ;;
-  "pr view")
-    printf '%s\n' "pull_request:" "  number: 7" "  state: merged" '  merged: "2026-06-26T00:00:00Z"' ; exit 0 ;;
-esac
-exit 0
-SH
   cat > "$case_dir/fakebin/gh" <<SH
 #!/usr/bin/env bash
 case "\${1:-} \${2:-}" in
+  "pr list")
+    [ "\$*" = 'pr list --state all --head fm/task-x1 --limit 2 --json number,url,headRefName' ] || exit 90
+    printf '%s\n' '[{"number":7,"url":"https://github.com/example/repo/pull/7","headRefName":"fm/task-x1"}]'
+    exit 0 ;;
   "pr view")
     case " \$* " in
       *"state,headRefOid,url"*) printf '%s\t%s\t%s\n' 'MERGED' '$head' 'https://github.com/example/repo/pull/7' ; exit 0 ;;
@@ -955,7 +944,6 @@ test_no_pr_recorded_discovers_merged_pr_by_branch_allows() {
   wt_commit_file "$case_dir" feature.txt hello "add feature"
   local_head=$(git -C "$case_dir/wt" rev-parse HEAD)
   pr_head=$(commit_tree_from_wt_head "$case_dir" "$local_head" "no-mistakes auto-fix")
-  land_on_origin_main "$case_dir" feature.txt hello
   add_gh_pr_merged_for_head "$case_dir" "$pr_head"
   seed_backlog_in_flight "$case_dir"
   # No append_pr_meta_* call: state/task-x1.meta has no pr= or pr_head= line.
@@ -972,7 +960,56 @@ test_no_pr_recorded_discovers_merged_pr_by_branch_allows() {
   ! grep -q REFUSED "$case_dir/stderr" || fail "no-pr-branch-discovery: teardown printed a REFUSED line"
   assert_grep 'https://github.com/example/repo/pull/7' "$case_dir/data/backlog.md" \
     "no-pr-branch-discovery: resolved PR URL was not recorded on completion"
+  [ ! -e "$case_dir/wrapper.log" ] || fail "native discovery invoked gh-axi"
   pass "teardown discovers a merged PR by branch name and tears down when no pr= was ever recorded"
+}
+
+# Full production teardown with synthetic native JSON; unlanded content makes
+# every rejected discovery observable before cleanup can remove task records.
+test_native_branch_discovery_rejects_unproved_results() {
+  local label payload case_dir rc
+  while IFS='|' read -r label payload; do
+    case_dir=$(make_case "native-discovery-$label")
+    write_meta "$case_dir" no-mistakes ship
+    wt_commit_file "$case_dir" feature.txt hello "add feature"
+    printf '%s\n' "$payload" > "$case_dir/payload.json"
+    cat > "$case_dir/fakebin/gh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$FM_TEST_NATIVE_LOG"
+[ "$*" = 'pr list --state all --head fm/task-x1 --limit 2 --json number,url,headRefName' ] || exit 90
+[ "$FM_TEST_DISCOVERY_LABEL" != api-error ] || { echo 'synthetic auth/API failure' >&2; exit 1; }
+cat "$FM_TEST_DISCOVERY_PAYLOAD"
+SH
+    chmod +x "$case_dir/fakebin/gh"
+    set +e
+    FM_TEST_NATIVE_LOG="$case_dir/native.log" FM_TEST_WRAPPER_LOG="$case_dir/wrapper.log" \
+      FM_TEST_DISCOVERY_LABEL="$label" FM_TEST_DISCOVERY_PAYLOAD="$case_dir/payload.json" \
+      run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr"
+    rc=$?
+    set -e
+    expect_code 1 "$rc" "native discovery $label must refuse unproved landing"
+    [ -f "$case_dir/state/task-x1.meta" ] || fail "$label: task records must survive refusal"
+    assert_grep 'pr list --state all --head fm/task-x1 --limit 2 --json number,url,headRefName' \
+      "$case_dir/native.log" "$label: discovery must request complete selective fields"
+    assert_no_grep 'pr view' "$case_dir/native.log" "$label: invalid discovery must not select a PR"
+    [ ! -e "$case_dir/wrapper.log" ] || fail "$label: cleanup invoked gh-axi"
+  done <<'ROWS'
+empty|[]
+multiple|[{"number":7,"url":"https://github.com/example/repo/pull/7","headRefName":"fm/task-x1"},{"number":8,"url":"https://github.com/example/repo/pull/8","headRefName":"fm/task-x1"}]
+absent|
+malformed|not-json
+documents|[] []
+null|null
+object|{"number":7}
+missing-number|[{"url":"https://github.com/example/repo/pull/7","headRefName":"fm/task-x1"}]
+missing-url|[{"number":7,"headRefName":"fm/task-x1"}]
+missing-head|[{"number":7,"url":"https://github.com/example/repo/pull/7"}]
+wrong-head|[{"number":7,"url":"https://github.com/example/repo/pull/7","headRefName":"other"}]
+wrong-url|[{"number":7,"url":"https://github.com/example/repo/pull/8","headRefName":"fm/task-x1"}]
+string-number|[{"number":"7","url":"https://github.com/example/repo/pull/7","headRefName":"fm/task-x1"}]
+api-error|[{"number":7,"url":"https://github.com/example/repo/pull/7","headRefName":"fm/task-x1"}]
+ROWS
+  pass "native discovery rejects empty, ambiguous, malformed, incomplete and failed reads"
 }
 
 test_squash_merged_pr_allows_replayed_unpushed_patch() {
@@ -4693,6 +4730,7 @@ test_teardown_retains_v1_journal_when_workspace_query_ambiguous
 test_squash_merged_branch_deleted_allows
 test_squash_merged_pr_allows_when_head_ancestor_of_pr_head
 test_no_pr_recorded_discovers_merged_pr_by_branch_allows
+test_native_branch_discovery_rejects_unproved_results
 test_squash_merged_pr_allows_replayed_unpushed_patch
 test_merged_pr_with_later_local_commit_refuses
 test_squash_merged_rebased_branch_allows
