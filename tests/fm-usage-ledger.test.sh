@@ -212,3 +212,206 @@ with tempfile.TemporaryDirectory(prefix='fm-usage-test-') as tmp:
     print('PASS: native counters/cache, cumulative deltas, copies/retries/resume/reset/rotation/partial, joins, privacy, coverage')
 PY
 pass 'usage ledger public CLI'
+
+# Automatic lifecycle attachment uses only scoped native metadata and private state.
+python3 - "$ROOT" <<'PY'
+import fcntl
+import json
+import os
+from pathlib import Path
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import time
+
+repo = Path(sys.argv[1])
+auto = repo / "bin/fm-usage-auto.py"
+ledger = repo / "bin/fm-usage-ledger.py"
+secret = "DO_NOT_PERSIST_PROMPT_TOOL_ARGS_729846"
+with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
+    root = Path(tmp)
+    home = root / "home"
+    for part in ("state", "data", "config"):
+        (home / part).mkdir(parents=True)
+    codex, claude, pi, nm = [root / n for n in ("codex", "claude", "pi", "nm")]
+    for d in (codex, claude, pi, nm): d.mkdir()
+    env = dict(os.environ, FM_HOME=str(home), CODEX_HOME=str(codex), CLAUDE_CONFIG_DIR=str(claude),
+               PI_CODING_AGENT_DIR=str(pi), NM_HOME=str(nm))
+    for key in ("FM_DATA_OVERRIDE", "FM_STATE_OVERRIDE", "FM_CONFIG_OVERRIDE"):env.pop(key, None)
+    store = home / "data/usage-ledger"
+    index = sqlite3.connect(codex / "state_5.sqlite")
+    index.execute("create table threads (id text primary key, rollout_path text, cwd text)")
+    index.commit()
+    pipeline = sqlite3.connect(nm / "state.sqlite")
+    pipeline.executescript("create table repos(id text, working_path text); "
+                          "create table runs(id text, repo_id text, branch text, created_at integer, worktree_dir text);")
+    project, worktree, validation = root / "project", root / "worker", root / "validation"
+    start = 1792922400  # 2026-10-25T10:00:00Z
+    meta = home / "state/job.meta"
+    def metadata(g, h="codex"):
+        meta.write_text(f"spawn_gen=s{g}.123.456\nworktree={worktree}\nharness={h}\nkind=ship\n"
+                        f"branch=fm/job\nproject={project}\naccount={secret}\n")
+    metadata(start)
+    pipeline.execute("insert into repos values (?,?)", ("p", str(project)))
+    pipeline.execute("insert into runs values (?,?,?,?,?)", ("r", "p", "fm/job", start, str(validation)))
+    pipeline.commit()
+    def write(path, rows, mode="w"):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open(mode) as out:
+            for row in rows:out.write(json.dumps(row) + "\n")
+    def command(*args, ok=True):
+        p = subprocess.run([sys.executable, str(auto), *map(str,args)], env=env, capture_output=True, text=True)
+        assert (p.returncode == 0) == ok, (p.returncode,p.stdout,p.stderr)
+        assert secret not in p.stdout+p.stderr
+        return json.loads(p.stdout) if p.stdout else None
+    def refresh(*args):return command("refresh", "--force", *args)
+    def report():
+        p = subprocess.run([sys.executable,str(ledger),"summary","--db",str(store/"usage.sqlite")],
+                           capture_output=True,text=True,check=True)
+        return json.loads(p.stdout)
+    def total():return sum(g["tokens"]["input"]["reported"] for g in report()["groups"])
+    def cx(name, cwd, when, amount=7):
+        path = root / "logs" / (name + ".jsonl")
+        write(path,[dict(type="session_meta",payload=dict(id=name,cwd=str(cwd),timestamp=when)),
+                    dict(type="turn_context",payload=dict(model="test-model",turn_id=name)),
+                    dict(type="response_item",timestamp=when,payload=dict(type="function_call",call_id=name,
+                         name="PRIVATE_TOOL_NAME",arguments=secret)),
+                    dict(type="event_msg",timestamp=when,payload=dict(type="token_count",info=dict(
+                         total_token_usage=dict(input_tokens=amount,output_tokens=2),
+                         last_token_usage=dict(input_tokens=amount,output_tokens=2))))])
+        index.execute("insert into threads values (?,?,?)", (name,str(path),str(cwd)));index.commit()
+        return path
+    cx("old",worktree,"2026-10-24T10:00:00Z",900)
+    cx("worker",worktree,"2026-10-25T10:00:01Z")
+    cx("supervisor",home,"2026-10-25T10:00:02Z",11)
+    cx("foreign",root/"foreign","2026-10-25T10:00:03Z",1000)
+    cx("validation",validation,"2026-10-25T10:00:04Z",13)
+    first = refresh("--remember","job")
+    assert first["enabled"] and first["known_sources"] == 3,first
+    assert total() == 31,report()
+    assert {g["group"]["task"] for g in report()["groups"]} == {"job","firstmate"}
+    assert refresh()["bytes_read"] == 0
+    # Newly created sessions are found without editing any manifest.
+    cx("new",worktree,"2026-10-25T10:00:05Z",17)
+    assert refresh()["known_sources"] == 4
+    assert total() == 48
+    # Partial tail is held until complete, then included exactly once.
+    path = root/"logs/new.jsonl"
+    entry = dict(type="event_msg",timestamp="2026-10-25T10:00:06Z",payload=dict(type="token_count",info=dict(
+        total_token_usage=dict(input_tokens=20,output_tokens=3),last_token_usage=dict(input_tokens=3,output_tokens=1))))
+    with path.open("a") as out:out.write(json.dumps(entry))
+    assert "unread_bytes" in refresh()["gaps"]
+    assert total() == 48
+    with path.open("a") as out:out.write("\n")
+    refresh();assert total() == 51
+    # A cleanup handoff is durable even with an overlapping collector lock.
+    with (store/".lock").open("w") as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        assert refresh("--retire","job")["deferred"] == "overlapping_refresh"
+        assert list((store/"pending").glob("*.json"))
+        meta.unlink()
+    refresh()
+    assert any(g["group"]["task"] == "job" for g in report()["groups"])
+    assert json.loads((store/"catalog.json").read_text())["generations"]
+    # Reused paths exclude sessions older than the new generation.
+    metadata(start+100, "codex")
+    cx("relaunch",worktree,"2026-10-25T10:02:00Z",19)
+    refresh("--remember","job");assert total() == 70
+    # Native Pi store uses exact cwd header, not the encoded directory alone.
+    import re
+    pd = pi/"sessions"/("--"+re.sub(r"[/\\:]","-",str(home).lstrip("/\\"))+"--")
+    ph = dict(type="session",version=3,id="pi-supervisor",cwd=str(home),timestamp="2026-10-25T10:00:00Z")
+    usage = dict(input=2,output=1,cacheRead=3,totalTokens=6)
+    msg = dict(type="message",id="pm",timestamp="2026-10-25T10:00:07Z",message=dict(role="assistant",
+        model="pi-model",usage=usage,content=[dict(type="text",text=secret)]))
+    write(pd/"one.jsonl",[ph,msg])
+    refresh();assert total() == 72
+    write(pd/"two.jsonl",[dict(ph,id="pi-next"),dict(msg,id="pn",timestamp="2026-10-25T10:00:08Z")])
+    refresh();assert total() == 74
+    write(pd/"foreign.jsonl",[dict(ph,cwd=str(root/"unrelated")),dict(msg,id="pf")])
+    refresh();assert total() == 74
+    # Unsupported/partial headers are retried without needing a directory change.
+    partial = pd/"partial.jsonl"
+    partial.write_text(json.dumps(dict(ph,id="partial")))
+    assert "native_metadata_unavailable" in refresh()["gaps"]
+    with partial.open("a") as out:out.write("\n"+json.dumps(dict(msg,id="partial-msg"))+"\n")
+    refresh();assert total() == 76
+    # Auxiliary and nested usage have their own native identities and unknown models.
+    write(pd/"one.jsonl",[
+        dict(type="usage",id="warm",timestamp="2026-10-25T10:00:09Z",kind="cache_warm",model="pi-model",usage=usage),
+        dict(type="compaction",id="compact",timestamp="2026-10-25T10:00:10Z",usage=usage,summary=secret),
+        dict(type="message",id="nested",timestamp="2026-10-25T10:00:11Z",message=dict(role="toolResult",usage=usage,content=secret))],"a")
+    refresh();assert total() == 82
+    assert any(g["group"]["model"] is None for g in report()["groups"])
+    # Bounded discovery continues across pages; source scans rotate fairly.
+    for i in range(40):cx(f"bulk-{i:03}",worktree,f"2026-10-25T10:03:{i:02}Z",1)
+    for _ in range(80):
+        refresh("--max-candidates","7")
+        if total() == 122:break
+    assert total() == 122,total()
+    # Claude prelude records do not prevent native session metadata discovery.
+    cd = claude/"projects"/re.sub(r"[^a-zA-Z0-9]","-",str(home))
+    write(cd/"claude.jsonl",[dict(type="file-history-snapshot",snapshot={"text":secret}),
+        dict(type="assistant",sessionId="claude-native",cwd=str(home),timestamp="2026-10-25T10:05:00Z",
+             message=dict(role="assistant",id="claude-message",model="claude-test",
+                          usage=dict(input_tokens=5,output_tokens=2),content=secret))])
+    refresh();assert total() == 127
+    # Persistent partial headers cannot starve later completed metadata retries.
+    for i in range(35):
+        (pd/f"retry-{i:03}.jsonl").write_text(json.dumps(dict(ph,id=f"retry-{i}")))
+    for _ in range(4):refresh()
+    completed = pd/"retry-034.jsonl"
+    with completed.open("a") as out:
+        out.write("\n"+json.dumps(dict(msg,id="retry-completed"))+"\n")
+    for _ in range(4):
+        retry_result = refresh()
+        if total() == 129:break
+    assert total() == 129,total()
+    assert "native_metadata_unavailable" in retry_result["gaps"]
+    assert "metadata_retry_backlog" in retry_result["gaps"]
+    # Replaced files cannot adopt a foreign session under an old source join.
+    original = (cd/"claude.jsonl").read_text()
+    write(cd/"claude.jsonl",[dict(type="assistant",sessionId="foreign-native",cwd=str(root/"foreign"),
+        timestamp="2026-10-25T10:05:00Z",message=dict(role="assistant",id="foreign-msg",
+            model="claude-test",usage=dict(input_tokens=900),content=secret))])
+    assert "source_metadata_changed_or_unavailable" in refresh()["gaps"]
+    assert total() == 129
+    (cd/"claude.jsonl").write_text(original)
+    refresh();assert total() == 129
+    # Actual overlapping subprocesses either defer or serialize their offsets.
+    commands = [[sys.executable,str(auto),"refresh","--force"] for _ in range(2)]
+    children = [subprocess.Popen(c,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True) for c in commands]
+    for child in children:
+        stdout,stderr=child.communicate(timeout=10)
+        assert child.returncode == 0,(stdout,stderr)
+    assert total() == 129
+    # A failed collection reports unknown coverage, without changing a foreign DB.
+    foreign = root/"foreign-store"
+    foreign.mkdir(mode=0o700)
+    with sqlite3.connect(foreign/"usage.sqlite") as f:f.execute("create table unrelated (secret text)")
+    result=command("refresh","--force","--store",foreign,ok=False)
+    assert "automatic_refresh_failed_or_deadline" in result["gaps"]
+    assert command("status","--store",foreign)["gaps"] == result["gaps"]
+    # Explicit disable leaves the old ledger unchanged and reports unknown coverage.
+    flag = home/"config/usage-ledger"
+    flag.write_text("off\n")
+    previous = (store/"usage.sqlite").read_bytes()
+    assert not refresh()["enabled"]
+    assert (store/"usage.sqlite").read_bytes() == previous
+    flag.unlink()
+    metadata(start+200,"opencode")
+    assert "unsupported_worker_reader_opencode" in refresh()["gaps"]
+    # Failed native index is a visible gap; it never creates a replacement index.
+    index.close();(codex/"state_5.sqlite").unlink()
+    assert "codex_native_index_unavailable" in refresh()["gaps"]
+    assert not (codex/"state_5.sqlite").exists()
+    # Privacy covers catalog/index/status and persistent DB, not just summaries.
+    for f in store.rglob("*"):
+        assert f.stat().st_mode & 0o077 == 0,(f,oct(f.stat().st_mode))
+        if f.is_file():
+            assert secret.encode() not in f.read_bytes(),f
+            assert b"PRIVATE_TOOL_NAME" not in f.read_bytes(),f
+    print("PASS: automatic defaults, exact discovery, future sessions, generation handoff, overlapping refresh, partial tail, pipeline copies, bounded continuation, auxiliary usage, disable, failures, privacy")
+PY
+pass 'automatic native usage lifecycle'

@@ -169,6 +169,8 @@ class Reader:
                  basis=basis)
 
     def tool(self, native, when, name=None, status=None, duration=None, is_call=False):
+        if getattr(self, "usage_only", False):
+            return
         if not isinstance(native, str) or not native:
             self.gap("tool_id_unavailable")
             return
@@ -196,6 +198,15 @@ class Reader:
             return
         if self.state.get("unsupported"):
             return
+        if h == "pi" and t in ("usage", "compaction", "branch_summary"):
+            if isinstance(row.get("usage"), dict) and row.get("id"):
+                self.state["model"] = label(row.get("model"))
+                if self.state["model"] is None:
+                    self.gap("pi_auxiliary_usage_model_unknown")
+                self.usage([row["id"], when], when, row["usage"])
+            elif t in ("compaction", "branch_summary"):
+                self.gap("pi_auxiliary_usage_unavailable")
+            return
         m = row.get("message")
         if not isinstance(m, dict):
             return
@@ -217,6 +228,14 @@ class Reader:
                 self.usage(key, when, m["usage"])
             else:
                 self.gap("assistant_usage_unavailable")
+        if h == "pi" and m.get("role") == "toolResult" and isinstance(m.get("usage"), dict):
+            # Nested model work has no authoritative physical model on this message.
+            self.state["model"] = None
+            self.gap("pi_nested_usage_model_unknown")
+            if row.get("id"):
+                self.usage([row["id"], when], when, m["usage"])
+            else:
+                self.gap("usage_identity_unavailable")
         content = m.get("content")
         if isinstance(content, list):
             for block in content:
@@ -311,7 +330,7 @@ def anchor(stream, offset):
     return hashlib.sha256(stream.read(min(offset, 256))).hexdigest()
 
 
-def collect(db, specs, budget):
+def collect(db, specs, budget, usage_only=False):
     read_bytes = 0
     for spec in specs:
         sid = identity(os.path.abspath(spec["path"]))
@@ -321,6 +340,7 @@ def collect(db, specs, budget):
         if saved and (saved["harness"] != spec["harness"] or saved["joins"] != joins):
             raise ValueError("source reader/joins changed; use a separate ledger")
         reader = Reader(db, spec, saved)
+        reader.usage_only = usage_only
         reader.gap("selected_logs_only_not_a_billing_export")
         saved.update(harness=spec["harness"], joins=joins, current=[])
         try:
@@ -440,6 +460,7 @@ def main():
                 raise ValueError("max-bytes must exceed the record limit (4194304)")
             specs = manifest(args.manifest)
             with database(args.db) as db:
+                db.execute("BEGIN IMMEDIATE")
                 result = collect(db, specs, args.max_bytes)
         else:
             groups = args.group_by.split(",")
