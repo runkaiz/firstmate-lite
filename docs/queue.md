@@ -17,9 +17,13 @@ The archive is append-only completed history: existing repeated `## Archived <da
 An ID that appears in more than one archived record is one task's history only when explicit links in the note history name each predecessor and successor record by exact digest and occurrence, forming one complete chain; its latest record then answers ordinary lookup.
 Dates, positions and body prose never stand in for a link, so unlinked, dangling, competing, cyclic or malformed links make `show`, `reopen` and other single-task commands refuse the ID with each record's location.
 `show <id> --history` lists every record and its digest read-only, including a refused one; the ID stays reserved, and a dependency on it is satisfied because every record is complete.
-`link <id> --predecessor <digest> --successor <digest>` records one explicit link after an operator has reviewed the evidence, and `--dry-run` previews it without writing; nothing infers or bulk-creates links.
-Reopening a linked history keeps every archived record, and completing the reopened task links its new record to the previous latest one.
-`reopen` moves an archived task back to the active queue with its original identity, body, hold provenance and artifact links.
+Legacy repeated IDs without structured provenance require a one-time reviewed linkage before identity-selecting operations; matching titles, kinds or ordered dates alone do not resolve them.
+Unique archived IDs need no linkage step, and native lifecycle operations record subsequent provenance automatically rather than requiring ongoing manual administration.
+`link <id> --predecessor <digest> --successor <digest>` records one explicit link after an operator has reviewed the evidence, and `--dry-run` uses the same validation to preview it without changing queue, archive or note contents; nothing infers or bulk-creates links.
+Preview uses normal native locking and may leave the native lock file behind.
+Reopening any archived task, including a single record, keeps every archived record and links an active continuation with its original identity, body, hold provenance and artifact links.
+Archiving the continuation's completion appends and links its new record to the previous latest one.
+Edits to an archived completion, including late PR, report or note evidence, append a linked revision that preserves the original completion date and verb and every predecessor; repeating identical evidence adds no revision.
 Creation refuses identities found in either active storage or the archive, including conflicts between them.
 Replacing a body automatically archives the superseded record in the existing note history.
 `rm` archives only already-complete work and retains its identity; unfinished work stays in the queue and can be parked without implying that its dependents are unblocked.
@@ -47,9 +51,9 @@ Compatibility does not authorize activation or a live-home rewrite.
 The current operating backend remains authoritative until an operator explicitly chooses to activate the validated native replacement.
 Never run native and external writers concurrently against the same files: their lock protocols differ.
 
-With writers stopped, run the native `migrate --dry-run` compatibility check on the explicitly selected home.
+Run pre-cutover compatibility checks and proposed-link previews only on copies of the selected home's queue, archive, note history and configuration, with paths explicitly pinned to those copies.
 The supported Markdown format requires no rewrite.
-Use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
+With writers stopped, use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
 The backup refuses an existing destination and does not switch configuration, install a CLI, start a home or import data into another store.
 If rollback is necessary, stop native writers first, then delete the empty `<backlog>.lock` file the native queue leaves behind, because the earlier writer treats any existing lock file as held; restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
 Keep any subsequent native work separately preserved before restoring an older snapshot.

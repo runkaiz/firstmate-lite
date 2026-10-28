@@ -19,8 +19,10 @@ among identical records) in one complete chain; its
 latest record then answers lookup. Anything else (unlinked, dangling,
 competing or cyclic links) is refused with record locations rather than
 guessed. `show <id> --history` lists every record and digest read-only, and
-`link` previews (`--dry-run`) or records one explicit link. Reopening a
-linked history keeps its records and links the continuation's completion.
+`link` previews (`--dry-run`) or records one explicit link. Reopening any
+archived task keeps its records and links the continuation's completion.
+Archived edits append linked revisions, retaining the completion metadata;
+identical repeated evidence does not append another revision.
 Dependencies on any archived ID are satisfied and the ID stays reserved.
 Migration needs no rewrite: `migrate --dry-run` validates existing records;
 `migrate --backup-dir DIR` also creates an exclusive byte-for-byte backup.
@@ -30,6 +32,7 @@ using different lock protocols against the same queue during activation.
 
 import argparse
 import contextlib
+import copy
 import datetime as dt
 import hashlib
 import fcntl
@@ -834,6 +837,7 @@ def execute(options, stores):
         return
     require(verb in ("add", "show", "start", "done", "reopen", "update", "hold", "unhold", "block", "unblock", "rm", "authorize"), f"unsupported native queue command: {verb}")
     require(items, f"{verb} requires a task ID")
+    predecessor = None
     if verb == "add":
         require(len(items) == 2, 'add <id> "<title>"')
         identifier, title = items
@@ -872,6 +876,9 @@ def execute(options, stores):
         if verb == "show":
             output(task, store, options)
             return
+        if task.archived:
+            predecessor = task
+            task = copy.deepcopy(task)
         if verb in ("update", "authorize"):
             if verb == "update" and options.kind is not None and options.kind != task.meta.get("kind"):
                 require(task.meta.get("kind") not in ("idea", "outcome") and options.kind not in ("idea", "outcome"), "retained context kind cannot be changed by update; use authorize for a parked idea")
@@ -904,13 +911,9 @@ def execute(options, stores):
                 store.history(task, "Reopened with identity preserved")
             elif not was_done and any(key in task.meta for key in ("done", "merged", "reported")):
                 store.history(task, "Prior completion context retained")
-            # Completion evidence on an archived record keeps its recorded place.
             settled = task.archived and verb in ("done", "rm")
-            if verb == "reopen" and task.archived and len(store.records[task.id]) > 1:
-                # A linked history keeps every archived record; the reopened
-                # copy continues it from the recorded latest completion.
+            if verb == "reopen" and task.archived:
                 store.link(task.id, task.identity, "active")
-                task = Task.parse(re.split(r"(?<=\n)", task.render()), "done")
             elif not settled:
                 store.remove(task)
             task.state = "in_flight" if verb == "start" else "queued" if verb == "reopen" else "done"
@@ -924,9 +927,7 @@ def execute(options, stores):
                 task.meta.pop("reported", None)
             if not settled:
                 task.archived = verb == "rm"
-                if task.archived:
-                    store.archive_tasks([task])
-                else:
+                if not task.archived:
                     store.active.insert(task)
         elif verb == "hold":
             require(options.reason and options.reason.strip() and not any(c in options.reason for c in "\n\r()"), "hold requires a single-line --reason without parentheses")
@@ -959,7 +960,7 @@ def execute(options, stores):
             require("\n" not in link and "\r" not in link, "artifact link must be one line")
             task.links.append(link)
             task.dirty = True
-    if verb == "done" and (options.pr or options.report):
+    if verb == "done" and predecessor is None and (options.pr or options.report):
         completed = task.completion()["date"]
         if completed:
             for key in ("done", "merged", "reported"):
@@ -970,10 +971,15 @@ def execute(options, stores):
         if options.note == "local main":
             if options.note not in task.links:
                 task.links.append(options.note)
-        elif options.note not in task.body.split("\n"):
+        elif "\n" + options.note + "\n" not in "\n" + task.body + "\n":
             store.history(task, "Completion note added")
             task.body = task.body + "\n\n" + options.note if task.body else options.note
         task.dirty = True
+    if task.archived:
+        if predecessor is None or task.snapshot_metadata() != predecessor.snapshot_metadata() or any(getattr(task, field) != getattr(predecessor, field) for field in ("title", "body", "links")):
+            store.archive_tasks([task])
+        else:
+            task = predecessor
     if verb == "done" and not options.no_prune:
         keep = store.keep if options.keep is None else options.keep
         require(keep >= 0, "keep must be nonnegative")
