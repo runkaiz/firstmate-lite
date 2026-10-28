@@ -314,7 +314,7 @@ fm_backlog_transition_applies() {  # <config-dir> <data-dir> <kind>
     return 2
   fi
   if ! fm_tasks_axi_compatible; then
-    FM_BACKLOG_TRANSITION_ERROR="automatic backlog transitions require tasks-axi ${FM_TASKS_AXI_MIN:-(unknown minimum)} or newer with the required update and mv features"
+    FM_BACKLOG_TRANSITION_ERROR="automatic backlog transitions require python3 and the shipped native queue"
     return 2
   fi
   return 0
@@ -339,9 +339,9 @@ fm_tasks_axi_timeout_expired() {  # <status>
 fm_tasks_axi() {
   local bound=${FM_TASKS_AXI_TIMEOUT:-}
   if [ -z "$bound" ]; then
-    exec tasks-axi "$@"
+    exec "$FM_QUEUE_CLI" "$@"
   fi
-  fm_exec_timed "$bound" "$bound" tasks-axi "$@"
+  fm_exec_timed "$bound" "$bound" "$FM_QUEUE_CLI" "$@"
 }
 
 # Print one row's `tasks-axi show` output (plus stderr) from the addressing
@@ -389,8 +389,8 @@ fm_backlog_row_show() {  # <resolved-data-dir> <id> [flag...]
     set -- "$@" --file "$FM_BACKLOG_AXI_FILE"
   fi
   # shellcheck disable=SC2016  # Expansion is deliberately deferred to the child shell.
-  out=$(fm_run_timed "$secs" bash -c 'cd "$1" 2>/dev/null || exit 1; shift; exec tasks-axi show "$@"' \
-    _ "$FM_BACKLOG_AXI_ROOT" "$id" "$@" 2>&1)
+  out=$(fm_run_timed "$secs" bash -c 'cd "$1" 2>/dev/null || exit 1; shift; queue_cli=$1; shift; exec "$queue_cli" show "$@"' \
+    _ "$FM_BACKLOG_AXI_ROOT" "$FM_QUEUE_CLI" "$id" "$@" 2>&1)
   status=$?
   # A backend that wrote a header or a progress line before wedging leaves that
   # fragment as the first output line, and every caller reads the first line as

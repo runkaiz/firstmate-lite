@@ -331,67 +331,35 @@ While the home runs the host, main's lease-checked commands also take the per-ta
 
 ## Backlog backend (.tasks.toml / config/backlog-backend)
 
-The tracked `.tasks.toml` pins the default `tasks-axi` markdown backend to `data/backlog.md`, with `done_keep = 10` and an archive at `data/done-archive.md`.
-A home may instead select another tasks-axi adapter such as Beads through its own `.tasks.toml` or `TASKS_AXI_BACKEND`; firstmate still uses only tasks-axi verbs for routine backlog reads and mutations, and the adapter maps `start` and evidence-bearing `done` transitions to its native statuses and evidence fields.
-
-### Captain holds on Beads
-
-Captain-hold row creation is owned by [`bin/fm-captain-hold.sh`](../bin/fm-captain-hold.sh) `hold`: when no work item exists, it creates an ordinary backlog row (`--kind captain` metadata; Beads native type `task`) and then applies the captain hold.
-Captain rows have no Beads due semantics, so that create path waives a Beads `due.required` setting rather than passing a synthetic `--due`; `--until` remains the optional hold deferral.
-
-Do not register a Beads `types.custom` `captain` type for this: captain is a hold kind, and the fleet Beads `due.required` policy for ordinary work stays in the federated beads config.
+The shipped native queue owns `data/backlog.md`, its completed-task archive and its note history.
+The tracked `.tasks.toml` retains the compatible Markdown paths, `done_keep = 10` and `data/done-archive.md`; it is no longer an external tasks-axi adapter configuration.
+See [Native work queue](queue.md) for current behavior, compatibility checks, backups and activation boundaries.
+Python 3.9 or newer is required; the queue uses only its standard library.
+Non-Markdown adapters are refused before mutation rather than redirected to another writable store.
 
 ### Automatic dispatch and completion
 
 When the automatic transition gate applies, dispatch and completion each move the work item in the same run that creates or removes its task record.
 The ordinary successful path therefore keeps the backlog and live task set in sync ([`bin/fm-backlog-transition-lib.sh`](../bin/fm-backlog-transition-lib.sh)).
 Under that gate, dispatch accepts only an unheld, unblocked Queued or In flight item in this home; a missing, Done, held, or dependency-blocked item is refused before any endpoint or local copy is created.
-
-[`bin/fm-tasks-axi.sh`](../bin/fm-tasks-axi.sh) refuses `add --start` and its `create --start` alias.
-Either would place a row In flight without a task record, status file, or inbox, counting it as live work that nobody is doing.
-The wrapper still passes through the documented direct transition `tasks-axi start <id>`.
+[`bin/fm-queue.sh`](../bin/fm-queue.sh) refuses `add --start` and `create --start`: `fm-spawn.sh` owns the task record, status file and inbox needed for dispatch.
 Completion refuses to report success until the item is closed, and session start reconciles this home's own books after an interrupted run.
+Interrupted launch delivery is re-read under the same per-task lock before preservation is reported; the native queue also recovers interrupted storage transactions under its queue lock.
+The lifecycle invariant and crash-replay mechanisms remain owned by the [transition library](../bin/fm-backlog-transition-lib.sh).
 
-When a spawn is interrupted after launch delivery began, its exit path re-reads the paired task record and the backlog row under the same per-task lock as the commit, repairs a row the commit believed it had moved, and reports only what was verified or honestly attempted, never intent phrased as outcome ([`bin/fm-spawn.sh`](../bin/fm-spawn.sh); [`tests/fm-backlog-atomicity.test.sh`](../tests/fm-backlog-atomicity.test.sh)).
+### Home addressing and manual mode
 
-### Which backlog receives a transition
+Run routine backlog commands through [`bin/fm-queue.sh`](../bin/fm-queue.sh), which addresses this home's queue and archive from any working directory.
+The existing [`bin/fm-tasks-axi.sh`](../bin/fm-tasks-axi.sh) spelling forwards to that native entry point for compatibility.
+Automatic transitions run from the configured data directory's parent and pin `<data>/backlog.md`; relative report links remain rooted there.
+A symlinked target is refused, and bootstrap continues to report a code-root shadow queue that differs from the operational home's queue.
 
-Automatic transitions run from the configured data directory's parent, letting that home's effective tasks-axi configuration address its selected adapter while keeping relative scout-report links rooted there.
-A markdown backlog is additionally addressed by an explicit `--file` at `<data>/backlog.md`, so the change lands in the home that owns the task regardless of the caller's working directory.
+The automatic transition gate does not apply to `config/backlog-backend=manual` or a home without a backlog file.
+A manual home keeps its file hand-edited and receives the existing completion reminder.
+Absent configuration, `native`, or the legacy `tasks-axi` value selects the native queue; the legacy value never invokes the external tool.
+An unreadable configuration, unsupported adapter, unresolvable data directory, control byte, corrupt record or ambiguous identity is an actionable refusal rather than a silent fallback.
+Neither a configuration compatibility check nor merging this code authorizes rewriting or activating an existing operating home.
 
-Any other configured adapter is addressed by that root alone, because `--file` would override the adapter's own workspace path.
-
-### Exemptions and refusal conditions
-
-The gate does not apply to manual-backend homes or markdown homes without a backlog file.
-Those retain their existing manual or ad-hoc lifecycle behavior.
-Configured non-markdown adapters remain active without that file.
-Migrated-hold resolution on a beads home reads its graph path, binary, and prefix from the root `.tasks.toml` `[beads]` section only, and refuses (rc=2) when the beads backend is selected elsewhere (a `TASKS_AXI_BACKEND` override or user-level config) with no root-level `[beads]` section.
-
-On an automatic-backend home, missing or incompatible `tasks-axi`, an unresolvable configured data directory, or one containing a control byte fails lifecycle work before mutation.
-An unreadable backend configuration can refuse lifecycle work before the no-backlog exemption applies; repair the configuration named in the diagnostic ([backend resolution contract](../bin/fm-tasks-axi-lib.sh)).
-
-### Required tools and manual mode
-
-Compatible means the installed build passes the shared version and feature probe owned by [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh), including the atomic multi-ID move required by handoff delegation.
-Bootstrap requires compatible `tasks-axi` for the automatic backlog backend; see "Toolchain" below for missing-tool reporting and silent default-backend behavior.
-
-Set the local, gitignored `config/backlog-backend` file to `manual` to force manual backlog editing and suppress the verbose `BOOTSTRAP_INFO: tasks-axi available` fact, not missing-tool reporting.
-A `manual` home owns its backlog file outright: the lifecycle transitions above are skipped there, dispatch and completion never fail over the file's contents, and a completed teardown prints the hand edit that is owed instead.
-
-Absent or `tasks-axi` selects the tasks-axi path.
-On the default markdown adapter, tasks-axi and manual edits produce the same `## In flight`, `## Queued`, and `## Done` sections.
-
-### Using a separate operational home
-
-The tracked `.tasks.toml` paths resolve against the directory tasks-axi runs in, not `FM_HOME`, so a bare `tasks-axi` run from the code root addresses the code root's `data/` whenever the home lives elsewhere.
-tasks-axi replaces its target by renaming a temporary file over it.
-If the target is a symlink, the write replaces it with a regular file.
-Linking the code-root copy into the home therefore forks the queue on the first write instead of keeping the copies in sync.
-
-Run every routine Firstmate backlog command through [`bin/fm-tasks-axi.sh`](../bin/fm-tasks-axi.sh).
-Like lifecycle transitions, it addresses this home's backlog and archive from any working directory.
-Bootstrap reports a code-root `data/backlog.md` or `data/done-archive.md` that is not this home's own file as a `BACKLOG_RECONCILE: code-root ...` line, even in a read-only session.
 
 ## Runtime backend (config/backend / FM_BACKEND)
 
@@ -1286,7 +1254,7 @@ Bootstrap selects delivery prerequisites from the project registry and recorded 
 | Direct-PR delivery | `gh` with GitHub authentication and compatible `gh-axi`. |
 | No-mistakes or conditional delivery | GitHub tooling plus `no-mistakes` v1.46.0 or newer. |
 | Missing, unreadable or unknown delivery input | Conservative GitHub and no-mistakes prerequisites. |
-| Automatic backlog backend | Compatible `tasks-axi`; explicit manual mode does not require it. |
+| Automatic backlog backend | Shipped native queue and Python 3.9+; no external tasks-axi executable. |
 | Configured crew dispatch | `jq` and compatible `quota-axi`. |
 | Browser work | `chrome-devtools-axi` and a compatible browser when that feature is used. |
 | Visual boards | Compatible `lavish-axi`; plain-text work may continue without it. |
@@ -1294,7 +1262,7 @@ Bootstrap selects delivery prerequisites from the project registry and recorded 
 These checks select prerequisites rather than installing them or changing a project's delivery policy.
 A tool needed by a later, newly selected workflow must be installed before using that workflow; its absence during an unrelated local task does not authorize bypassing its guards.
 `workflow_delivery_tools` and the tool detection in [`bin/fm-bootstrap.sh`](../bin/fm-bootstrap.sh) own exact selection and diagnostics.
-That script owns the AXI-family floor policy and the `gh-axi` and `lavish-axi` floors; [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh) and [`bin/fm-quota-axi-lib.sh`](../bin/fm-quota-axi-lib.sh) own their tools' floors.
+That script owns the AXI-family floor policy and the `gh-axi` and `lavish-axi` floors; [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh) retains native queue compatibility aliases, and [`bin/fm-quota-axi-lib.sh`](../bin/fm-quota-axi-lib.sh) owns its tool's floor.
 
 **Backend requirements**
 
@@ -1326,7 +1294,7 @@ A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the
 
 Compatibility checks apply when the corresponding workflow above is selected.
 
-- An absent or incompatible `tasks-axi` reports `MISSING: tasks-axi (install: npm install -g tasks-axi)`; when `config/backlog-backend` is not `manual`, a home with a configured non-markdown adapter or a markdown backlog refuses lifecycle mutation until compatible `tasks-axi` is on `PATH`, while a manual-backend home keeps its backlog hand-edited.
+- A missing native queue or Python runtime reports `MISSING: native queue`; automatic lifecycle mutation stays refused, while a manual-backend home keeps its backlog hand-edited.
 - An absent or incompatible `gh-axi` reports `MISSING: gh-axi (install: npm install -g gh-axi && gh-axi setup hooks)`.
 - An absent or board-incompatible `lavish-axi` reports `PRESENTATION_UNAVAILABLE` with the 0.1.77 compatibility floor, install command, and explicit text fallback; compatible versions below 0.1.80 retain legacy board replies and report an upgrade recommendation for synchronous acceptance, while [`bootstrap-diagnostics`](../.agents/skills/bootstrap-diagnostics/SKILL.md) owns diagnostic handling.
 - An absent or too-old `quota-axi` reports `MISSING: quota-axi (install: npm install -g quota-axi)`; firstmate cannot resolve a profile array without a compatible binary.
@@ -1949,7 +1917,7 @@ FM_BACKLOG_ROW_TIMEOUT_SECS=10   # seconds bounding each backlog row read (bin/f
 FM_BOOTSTRAP_DETECT_ONLY=0   # internal/read-only session-start mode: skip bootstrap's mutating sweeps and print advisory TANGLE wording
 FM_BOOTSTRAP_NETWORK=all   # internal session-start phase split: all, skip (local steps only), or only (network steps only); see bin/fm-bootstrap.sh
 FM_STARTUP_NETWORK_TIMEOUT=120   # seconds bounding the deferred inactive-outcome scan plus network checks, including the lock waits the worker makes before them; hitting it prints an actionable NETWORK_CHECKS line, and a lock a live process still holds at the deadline ends the worker with a failed-rerun record (publication and delivery are bounded by FM_SESSION_START_TIMEOUT the same way)
-FM_TASKS_AXI_COMPATIBLE=   # internal one-hop handoff of an already-computed tasks-axi compatibility verdict (0 or 1); consumed when bin/fm-tasks-axi-lib.sh is sourced
+FM_TASKS_AXI_COMPATIBLE=   # legacy compatibility variable, consumed and cleared by bin/fm-tasks-axi-lib.sh; native availability is checked directly
 FM_GUARD_READ_ONLY=0    # internal/read-only guard mode: keep alarms but suppress drain, supervision repair, and checkout repair commands
 FM_GUARD_CONTINUE_LINE='This is a supervision warning only; the guarded operation WILL still run.'   # banner continuation line; fm-send.sh overrides it to name the requested message specifically
 FM_POLL=15              # seconds between watcher poll cycles

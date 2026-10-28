@@ -527,153 +527,11 @@ test_verify_resolves_a_pre_collapse_key_through_its_derived_marker() {
 # calls reach tasks-axi with no markdown file override. Fully portable - the
 # stubbed tasks-axi fakes the beads backend, so no bd or beads-capable install
 # is needed.
-test_captain_hold_mutations_address_the_beads_backend() {
-  local home id fb log
-  home="$TMP_ROOT/captain-stub-beads/home"
-  mkdir -p "$home/data" "$home/config" "$home/projects" "$home/state"
-  cat > "$home/.tasks.toml" <<'EOF'
-backend = "beads"
-
-[beads]
-path = "graph/.beads"
-binary = "bd"
-prefix = "fm"
-EOF
-  id=fm-stub-held-row
-  fb=$(fm_fakebin "$home")
-  log="$home/tasks-axi-calls"
-  cat > "$fb/tasks-axi" <<'SH'
-#!/usr/bin/env bash
-printf '%s\n' "$*" >> "@LOG@"
-case "${1:-}" in
-  --version) printf '%s\n' '0.2.6' ;;
-  update)
-    if [ "${2:-}" = --help ]; then
-      printf '%s\n' '--archive-body'
-      exit 0
-    fi
-    case " $* " in
-      *" --file "*)
-        printf '%s\n' 'error: beads update received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    stub_prev=
-    stub_path=
-    for stub_arg in "$@"; do
-      if [ "$stub_prev" = --body-file ]; then stub_path=$stub_arg; fi
-      stub_prev=$stub_arg
-    done
-    [ -n "$stub_path" ] && cp -- "$stub_path" "@HOME@/last-body"
-    printf 'ok: update %s\n' "${2:-}"
-    ;;
-  mv)
-    [ "${2:-}" = --help ] || exit 1
-    printf '%s\n' 'usage: tasks-axi mv [<id>...]'
-    ;;
-  hold)
-    case " $* " in
-      *" --help "*) printf '%s\n' '  --kind captain' ; exit 0 ;;
-      *" --file "*)
-        printf '%s\n' 'error: beads hold received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    printf 'ok: hold %s\n' "${2:-}"
-    ;;
-  done)
-    [ "${2:-}" = "@ID@" ] || exit 1
-    case " $* " in
-      *" --file "*)
-        printf '%s\n' 'error: beads done received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    printf 'ok: done %s\n' "${2:-}"
-    ;;
-  show)
-    [ "${2:-}" = "@ID@" ] || exit 1
-    case " $* " in
-      *" --file "*)
-        printf '%s\n' 'error: beads show received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    printf '%s\n' 'task:'
-    printf '  id: %s\n' "@ID@"
-    printf '%s\n' '  state: queued' '  held: yes' '  blocked: no' \
-      '  hold_kind: captain'
-    if [ -f "@HOME@/last-body" ]; then
-      printf '%s' '  body: '
-      perl -MJSON::PP -e 'local $/; print encode_json(<STDIN>)' < "@HOME@/last-body"
-      printf '\n'
-    else
-      printf '%s\n' '  body: ""'
-    fi
-    ;;
-  *) exit 1 ;;
-esac
-SH
-  sed -i.bak "s|@HOME@|$home|g; s|@ID@|$id|g; s|@LOG@|$log|g" "$fb/tasks-axi"
-  rm -f "$fb/tasks-axi.bak"
-  chmod +x "$fb/tasks-axi"
-
-  PATH="$fb:$PATH" REAL_TASKS_AXI="$TASKS_AXI_BIN" \
-    FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" \
-    FM_DATA_OVERRIDE="$home/data" FM_CONFIG_OVERRIDE="$home/config" \
-    "$ROOT/bin/fm-captain-hold.sh" hold "$id" --reason "captain must decide" >/dev/null \
-    || fail "holding on a beads-configured home failed without a markdown backlog"
-  assert_grep "hold $id" "$log" \
-    "the captain-hold mutation never reached the configured backend"
-
-  decision="$home/captain-decision.txt"
-  printf 'Ship the gold-only plan.\n' > "$decision"
-  PATH="$fb:$PATH" REAL_TASKS_AXI="$TASKS_AXI_BIN" \
-    FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" \
-    FM_DATA_OVERRIDE="$home/data" FM_CONFIG_OVERRIDE="$home/config" \
-    "$ROOT/bin/fm-captain-hold.sh" answer "$id" --decision-file "$decision" >/dev/null \
-    || fail "answering on a beads-configured home failed without a markdown backlog"
-  assert_grep "update $id --body-file" "$log" \
-    "the captain answer never reached the configured backend"
-  assert_grep "done $id" "$log" \
-    "the captain answer close never reached the configured backend"
-  assert_no_grep " --file " "$log" \
-    "a captain-hold mutation passed a markdown file override to a beads home"
-  pass "captain-hold mutations address the beads backend without a markdown override"
-}
 
 # A Beads workspace with due.required and no types.custom captain type is the
 # live fleet shape. hold must still create a fresh captain row there: waive
 # due rather than invent one, and map to native type task rather than register
 # a Beads captain issue type.
-test_hold_creates_a_captain_row_when_beads_requires_due_without_custom_type() {
-  local fixture home beads id show issue_type
-  require_tasks_axi_beads "captain-hold create under due.required without types.custom" || return 0
-  fixture=$(make_beads_home due-required-no-custom-type)
-  home=${fixture%%|*}
-  beads=${fixture##*|}
-  printf '\ndue:\n    required: true\n' >> "$beads/config.yaml"
-  if bdrow "$beads" create "raw task" --id fm-raw-task --type task --json >/dev/null 2>&1; then
-    fail "bd created a task without --due; the due.required fixture is not in force"
-  fi
-  if bdrow "$beads" create "raw captain" --id fm-raw-captain --type captain --due 2099-01-01 --json >/dev/null 2>&1; then
-    fail "bd accepted --type captain; the fixture still has a types.custom captain registration"
-  fi
-  id=fm-fresh-captain-call
-  run_captain "$home" hold "$id" --title "Choose the sample route" \
-    --reason "captain must decide" --repo sample >/dev/null \
-    || fail "hold could not create a captain row under due.required without types.custom"
-  show=$(tasks_in "$home" show "$id") || fail "the created captain row is missing"
-  assert_contains "$show" "hold_kind: captain" \
-    "the created row is not captain-held"
-  assert_contains "$show" "kind: captain" \
-    "the created row lost its captain backlog kind"
-  issue_type=$(bdrow "$beads" show "$id" --json \
-    | jq -r 'if type == "array" then .[0].issue_type else .issue_type end')
-  [ "$issue_type" = task ] \
-    || fail "create did not map to native Beads type task, got ${issue_type:-empty}"
-  pass "hold creates a captain row when Beads requires due and has no captain type"
-}
 
 # Reproduces the loss exactly with privacy-safe synthetic names: the investigation
 # and visual review have ended, the only genuine unresolved captain call is report
@@ -4473,6 +4331,20 @@ SH
   pass "marked hold reasons round-trip through public reads, fleet, startup, and return without changing other fields"
 }
 
+test_native_hold_refuses_unsupported_adapter_without_forking() {
+  local home before out rc=0
+  home=$(make_home native-adapter-refusal)
+  before=$(cat "$home/data/backlog.md")
+  printf '%s\n' 'backend = "beads"' > "$home/.tasks.toml"
+  out=$(run_captain "$home" hold native-question --title "Actual question" --reason "Choose scope" 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail "native hold accepted an unsupported adapter"
+  assert_contains "$out" 'native queue supports Markdown only' "hold lost the compatibility diagnostic"
+  assert_equals "$before" "$(cat "$home/data/backlog.md")" "hold forked or rewrote unsupported storage"
+  assert_absent "$home/data/done-archive.md" "hold created a parallel native archive"
+  pass "native captain holds refuse unsupported adapters without creating another queue"
+}
+
+test_native_hold_refuses_unsupported_adapter_without_forking
 test_hold_reason_round_trips_awkward_characters
 test_hold_origins_precede_backend_holds
 test_historical_self_inventory_has_workable_repair
@@ -4530,5 +4402,3 @@ test_marker_noted_row_wins_over_a_prefix_namesake
 test_complete_accepts_a_migrated_inventory_on_beads
 test_verify_names_the_unresolvable_legacy_id_once
 test_verify_resolves_a_pre_collapse_key_through_its_derived_marker
-test_captain_hold_mutations_address_the_beads_backend
-test_hold_creates_a_captain_row_when_beads_requires_due_without_custom_type

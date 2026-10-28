@@ -71,9 +71,9 @@
 # `answer` records the missing resolution block (the old `repair` path) only
 # when the task still carries the captain-hold provenance tasks-axi preserves
 # through a close, so an ordinary finished task cannot be dressed up as an
-# answered captain call. A hold that expired by date (`--until` in the past) is
-# still answerable: the surviving hold annotations, not tasks-axi's live
-# `held:` bit, prove the captain owned it.
+# answered captain call. A deferred hold whose `--until` date has passed is
+# still held and answerable in the native queue: its date never supplies the
+# missing answer or authorizes execution.
 #
 # ONE KEYED-ANSWER INTAKE, FED BY EVERY CHANNEL.
 # "A keyed answer resolves its matching captain-held task" is a single
@@ -342,16 +342,15 @@ tasks_axi() {
   backend=$(fm_tasks_axi_backend "$root") || return 2
   if [ "$backend" = markdown ]; then
     file=$(fm_backlog_file "$data") || fail "$FM_BACKLOG_TRANSITION_ERROR"
-    (cd "$root" && tasks-axi "$@" --file "$file")
+    (cd "$root" && "$FM_QUEUE_CLI" "$@" --file "$file")
   else
-    (cd "$root" && tasks-axi "$@")
+    (cd "$root" && "$FM_QUEUE_CLI" "$@")
   fi
 }
 
 require_tasks_axi() {
-  fm_tasks_axi_compatible || fail "compatible tasks-axi is required"
-  tasks-axi hold --help 2>&1 | grep -F -- '--kind captain' >/dev/null \
-    || fail "tasks-axi does not expose the captain-hold contract"
+  fm_tasks_axi_compatible || fail "native queue and python3 are required"
+
 }
 
 # Read one row into TASK_SHOW_OUTPUT; a non-zero return means the row is
@@ -1904,7 +1903,7 @@ command_diverged() {
   # A read-only listing on a per-wake path, so it skips the mutation-oriented
   # compatibility floor and its extra probes: a listing this parser cannot read
   # simply yields no candidates and the report stays silent.
-  command -v tasks-axi >/dev/null 2>&1 || return 0
+  fm_tasks_axi_compatible || return 0
   ids=$(open_task_ids) || return 0
   [ -n "$ids" ] || return 0
   resolve=${FM_CLASSIFY_RESOLVE_VERB:-$FM_CLASSIFY_RESOLVE_VERB_DEFAULT}
@@ -1989,7 +1988,7 @@ command_open() {  # <task-id> [--identity] [--distinguish-absent]
       return 1
     fi
   fi
-  fm_tasks_axi_compatible || { printf 'fm-captain-hold: compatible tasks-axi is required\n' >&2; exit 2; }
+  fm_tasks_axi_compatible || { printf 'fm-captain-hold: native queue and python3 are required\n' >&2; exit 2; }
   if fm_backlog_row_probe "$data" "$id"; then
     state=${FM_BACKLOG_ROW_STATE%% *}
     if [ "$state" != "done" ] && [ "$FM_BACKLOG_ROW_HOLD_KIND" = captain ]; then

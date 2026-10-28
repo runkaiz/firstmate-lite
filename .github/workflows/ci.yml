@@ -109,11 +109,12 @@ jobs:
           set -eu
           bin/fm-install-actionlint.sh "$RUNNER_TEMP/bin"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Install tasks-axi
+      - name: Enable native queue compatibility fixture
         run: |
           set -eu
-          npm install -g tasks-axi
-          tasks-axi --version
+          python3 --version
+          echo "$GITHUB_WORKSPACE/tests/queue-compat" >> "$GITHUB_PATH"
+          bin/fm-queue.py --version
       - name: Install the Pi package for the Pi extension tests
         run: |
           set -eu
@@ -153,11 +154,12 @@ jobs:
           set -eu
           bin/fm-install-actionlint.sh "$RUNNER_TEMP/bin"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Install tasks-axi
+      - name: Enable native queue compatibility fixture
         run: |
           set -eu
-          npm install -g tasks-axi
-          tasks-axi --version
+          python3 --version
+          echo "$GITHUB_WORKSPACE/tests/queue-compat" >> "$GITHUB_PATH"
+          bin/fm-queue.py --version
       - name: Run portable parallel shard 2
         run: |
           set -eu
@@ -210,11 +212,12 @@ jobs:
             exit 1
           }
           tmux -V
-      - name: Install tasks-axi for backlog-handoff delegation
+      - name: Enable native queue compatibility fixture
         run: |
           set -eu
-          npm install -g tasks-axi
-          tasks-axi --version
+          python3 --version
+          echo "$GITHUB_WORKSPACE/tests/queue-compat" >> "$GITHUB_PATH"
+          bin/fm-queue.py --version
       # The Pi extension tests read the installed Pi package's own types and
       # runtime, so without it they gate-skip and pass silently. It is a public
       # npm package and needs no credential, so CI can hold the real thing.
@@ -439,11 +442,10 @@ jobs:
           done < "$shell_inventory"
           [ "$parse_fail" -eq 0 ] || { echo "::error::stock macOS Bash 3.2 parse sweep failed"; exit 1; }
 
-          command -v npm >/dev/null || { echo "::error::npm is required to install tasks-axi"; exit 1; }
-          npm install -g tasks-axi@0.2.6 >/dev/null
-          PATH="$(npm prefix -g)/bin:$PATH"
+          command -v python3 >/dev/null || { echo "::error::python3 is required for native queue regressions"; exit 1; }
+          PATH="$PWD/tests/queue-compat:$PATH"
           export PATH
-          command -v tasks-axi >/dev/null || { echo "::error::tasks-axi is required for the stock Bash regressions"; exit 1; }
+          bin/fm-queue.py --version
 
           snapshot_output=$(/bin/bash tests/fm-fleet-snapshot-view.test.sh)
           printf '%s\n' "$snapshot_output"

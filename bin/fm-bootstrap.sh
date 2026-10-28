@@ -265,7 +265,7 @@ install_cmd() {
     treehouse) echo "curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh" ;;
     no-mistakes) echo "curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh" ;;
     gh-axi|chrome-devtools-axi|lavish-axi) echo "npm install -g $1 && $1 setup hooks" ;;
-    tasks-axi|quota-axi) echo "npm install -g $1" ;;
+    quota-axi) echo "npm install -g $1" ;;
     *) return 1 ;;
   esac
 }
@@ -335,7 +335,7 @@ workflow_delivery_tools() {
   return 0
 }
 COMMON_TOOLS="node git $(workflow_delivery_tools | tr '\n' ' ')"
-if ! fm_backlog_backend_manual "$CONFIG"; then COMMON_TOOLS="$COMMON_TOOLS tasks-axi"; fi
+if ! fm_backlog_backend_manual "$CONFIG"; then COMMON_TOOLS="$COMMON_TOOLS python3"; fi
 if [ -e "$CONFIG/crew-dispatch.json" ] || [ -L "$CONFIG/crew-dispatch.json" ]; then
   COMMON_TOOLS="$COMMON_TOOLS jq quota-axi"
 fi
@@ -787,8 +787,8 @@ detect_local_tools() {
   if fm_backend_list_contains "$COMMON_TOOLS" quota-axi && command -v quota-axi >/dev/null 2>&1 && ! fm_quota_axi_compatible; then
     echo "MISSING: quota-axi (install: $(install_cmd quota-axi))"
   fi
-  if fm_backend_list_contains "$COMMON_TOOLS" tasks-axi && command -v tasks-axi >/dev/null 2>&1 && ! fm_tasks_axi_compatible; then
-    echo "MISSING: tasks-axi (install: $(install_cmd tasks-axi))"
+  if ! fm_backlog_backend_manual "$CONFIG" && ! fm_tasks_axi_compatible; then
+    echo "MISSING: native queue (requires python3 and bin/fm-queue.py)"
   fi
 }
 
@@ -821,7 +821,7 @@ detect_local_config() {
   crew_dispatch_validate
   if [ "${FM_BOOTSTRAP_VERBOSE_FACTS:-0}" = 1 ] \
     && ! fm_backlog_backend_manual "$CONFIG" && fm_tasks_axi_compatible; then
-    echo "BOOTSTRAP_INFO: tasks-axi available"
+    echo "BOOTSTRAP_INFO: native queue available"
   fi
   detect_code_root_backlog_fork
   detect_home_summary_publication

@@ -538,6 +538,14 @@
     {
       "path": ".agents/skills/validation-supervision/SKILL.md",
       "audience": "agent-runtime"
+    },
+    {
+      "path": ".agents/skills/work-queue/SKILL.md",
+      "audience": "agent-runtime"
+    },
+    {
+      "path": "docs/queue.md",
+      "audience": "operator-current"
     }
   ]
 }

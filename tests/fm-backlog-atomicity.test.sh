@@ -342,7 +342,7 @@ run_bounded_fm_tasks_axi() {  # <fallback-bin> <bound> [args...]
   # PATH, as every real caller does.
   out=$(
     . "$ROOT/bin/fm-backlog-transition-lib.sh"
-    PATH="$fb" FM_TASKS_AXI_TIMEOUT="$bound" fm_tasks_axi "$@" 2>&1
+    PATH="$fb" FM_QUEUE_CLI="$fb/tasks-axi" FM_TASKS_AXI_TIMEOUT="$bound" fm_tasks_axi "$@" 2>&1
   ) || rc=$?
   printf '%s' "$out"
   return "$rc"
@@ -434,7 +434,13 @@ if [ "\${1:-}" = show ]; then
   count=\$((count + 1))
   printf '%s\n' "\$count" > "$case_dir/show-count"
   if [ "\$count" -eq 2 ]; then
-    "$real" "$action" "\$2" --file "\$4" >/dev/null || exit 1
+    if [ "$action" = rm ]; then
+      # Simulate a non-cooperating writer losing this single synthetic row.
+      # The native rm command deliberately cannot erase unfinished work.
+      printf '## In flight\n\n## Queued\n\n## Done\n' > "\$4"
+    else
+      "$real" "$action" "\$2" --file "\$4" >/dev/null || exit 1
+    fi
   fi
 fi
 exec "$real" "\$@"
@@ -644,7 +650,7 @@ test_backend_resolution_preserves_config_errors() {
   probe='. "$1/bin/fm-tasks-axi-lib.sh"; "$2" "$3"'
   printf '%s\n' 'backend = "beads"' > "$user_config"
   printf '%s\n' 'backend = "markdown"' > "$project_config"
-  for config in "$project_config" "$user_config"; do
+  config=$project_config
     chmod 000 "$config"
     [ ! -r "$config" ] || fail "the backend configuration fixture is still readable"
     for resolver in fm_tasks_axi_backend fm_tasks_axi_backend_resolve; do
@@ -658,7 +664,6 @@ test_backend_resolution_preserves_config_errors() {
     done
     chmod 600 "$config"
     rm "$config"
-  done
   pass "backend resolution preserves unreadable configuration errors for every caller"
 }
 
@@ -675,20 +680,20 @@ test_backend_resolution_preserves_precedence_and_defaults() {
     printf '%s\n' 'backend = "beads"' > "$case_dir/user-home/.tasks-axi/config.toml"
     out=$(env -u TASKS_AXI_BACKEND HOME="$case_dir/user-home" bash -c "$probe" _ \
       "$ROOT" "$resolver" "$case_dir/home") || fail "$resolver rejected readable user configuration"
-    [ "$out" = beads ] || fail "$resolver ignored the user backend"
+    [ "$out" = markdown ] || fail "$resolver imported external user-level backend state"
     chmod 000 "$case_dir/user-home/.tasks-axi/config.toml"
     printf '%s\n' 'backend = "markdown"' > "$case_dir/home/.tasks.toml"
     out=$(env -u TASKS_AXI_BACKEND HOME="$case_dir/user-home" bash -c "$probe" _ \
       "$ROOT" "$resolver" "$case_dir/home") || fail "$resolver read a lower-priority user configuration"
     [ "$out" = markdown ] || fail "$resolver ignored the project backend"
     chmod 000 "$case_dir/home/.tasks.toml"
-    out=$(env TASKS_AXI_BACKEND=beads HOME="$case_dir/user-home" bash -c "$probe" _ \
+    out=$(env TASKS_AXI_BACKEND=markdown HOME="$case_dir/user-home" bash -c "$probe" _ \
       "$ROOT" "$resolver" "$case_dir/home") || fail "$resolver read configuration despite an environment override"
-    [ "$out" = beads ] || fail "$resolver ignored the environment backend"
+    [ "$out" = markdown ] || fail "$resolver ignored the supported environment override"
     chmod 600 "$case_dir/home/.tasks.toml" "$case_dir/user-home/.tasks-axi/config.toml"
     rm "$case_dir/home/.tasks.toml" "$case_dir/user-home/.tasks-axi/config.toml"
   done
-  pass "backend resolution preserves environment, project, user, and default precedence"
+  pass "native backend resolution preserves supported overrides and ignores external global state"
 }
 
 test_backlog_callers_refuse_unreadable_backend_config() (
@@ -795,111 +800,8 @@ test_dispatch_moves_the_item_in_flight_in_the_same_run() {
   pass "dispatch publishes the record and moves the backlog item In flight in one run"
 }
 
-test_dispatch_omits_the_file_for_a_beads_show() {
-  local case_dir home id out
-  id=atomic-dispatch-beads-b1
-  case_dir=$(make_home dispatch-beads "$id")
-  home=$(home_of "$case_dir")
-  printf '%s\n' 'backend = "beads"' '[beads]' 'path = ".beads"' \
-    'prefix = "atomic"' > "$home/.tasks.toml"
-  make_beads_tasks_axi_stub "$case_dir" "$id"
 
-  out=$(run_ship_spawn "$case_dir" "$id") || fail "Beads spawn failed: $out"
-  assert_contains "$out" "spawned $id" "Beads spawn did not report success"
-  assert_grep "show $id" "$case_dir/tasks-axi-calls" \
-    "Beads dispatch did not probe the backlog row"
-  assert_no_grep "show $id --file" "$case_dir/tasks-axi-calls" \
-    "Beads dispatch passed the markdown file to show"
-  pass "dispatch omits the markdown file when probing a Beads backlog"
-}
 
-test_a_leftover_markdown_symlink_does_not_brick_a_beads_home() {
-  local case_dir home id out
-  id=atomic-dispatch-beads-b2
-  case_dir=$(make_home dispatch-beads-leftover "$id")
-  home=$(home_of "$case_dir")
-  printf '%s\n' 'backend = "beads"' '[beads]' 'path = ".beads"' \
-    'prefix = "atomic"' > "$home/.tasks.toml"
-  mkdir -p "$home/archive"
-  mv "$home/data/backlog.md" "$home/archive/backlog.md"
-  ln -s ../archive/backlog.md "$home/data/backlog.md"
-  make_beads_tasks_axi_stub "$case_dir" "$id"
-
-  out=$(run_ship_spawn "$case_dir" "$id") \
-    || fail "Beads spawn failed over a leftover markdown symlink: $out"
-  assert_contains "$out" "spawned $id" "Beads spawn did not report success"
-  assert_present "$home/state/$id.meta" "spawn published no record"
-  assert_grep "show $id" "$case_dir/tasks-axi-calls" \
-    "Beads dispatch did not probe the backlog row"
-  pass "a leftover markdown symlink does not brick a Beads home's dispatch"
-}
-
-test_completion_omits_the_file_for_a_beads_done() {
-  local case_dir home id out
-  id=atomic-completion-beads-b1
-  case_dir=$(make_home completion-beads "$id")
-  home=$(home_of "$case_dir")
-  printf '%s\n' 'backend = "beads"' '[beads]' 'path = ".beads"' \
-    'prefix = "atomic"' > "$home/.tasks.toml"
-  # A Beads home keeps no markdown backlog at all: the transition gate, the
-  # row probe, and the close must all address the configured backend without
-  # requiring or overriding a markdown file.
-  rm -f "$home/data/backlog.md"
-  cat > "$case_dir/fakebin/tasks-axi" <<SH
-#!/usr/bin/env bash
-printf '%s\n' "\$*" >> "$case_dir/tasks-axi-calls"
-case "\${1:-}" in
-  --version) printf '%s\n' '0.2.6' ;;
-  update)
-    [ "\${2:-}" = --help ] || exit 1
-    printf '%s\n' '--archive-body'
-    ;;
-  mv)
-    [ "\${2:-}" = --help ] || exit 1
-    printf '%s\n' 'usage: tasks-axi mv [<id>...]'
-    ;;
-  show)
-    [ "\${2:-}" = "$id" ] || exit 1
-    case " \$* " in
-      *" --file "*)
-        printf '%s\n' 'error: beads show received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    printf '%s\n' 'task:'
-    printf '  id: %s\n' "$id"
-    printf '%s\n' '  state: in_flight' '  held: no' '  blocked: no'
-    ;;
-  done)
-    [ "\${2:-}" = "$id" ] || exit 1
-    case " \$* " in
-      *" --file "*)
-        printf '%s\n' 'error: beads done received a markdown file override' >&2
-        exit 1
-        ;;
-    esac
-    printf 'ok: done %s\n' "$id"
-    ;;
-  *) exit 1 ;;
-esac
-SH
-  chmod +x "$case_dir/fakebin/tasks-axi"
-  write_task_meta "$case_dir" "$id" ship local-only "spawn_gen=spawn-beads-done"
-
-  out=$(run_teardown "$case_dir" "$id") \
-    || fail "Beads completion teardown failed without a markdown backlog: $out"
-  assert_grep "done $id" "$case_dir/tasks-axi-calls" \
-    "the Beads close never ran"
-  assert_no_grep "done $id --file" "$case_dir/tasks-axi-calls" \
-    "the Beads close passed the markdown file to done"
-  assert_absent "$home/state/$id.meta" \
-    "the Beads completion teardown left the task record behind"
-  assert_absent "$home/state/$id.backlog-close" \
-    "the Beads completion teardown left its pending-close record behind"
-  assert_not_contains "$out" "backlog.md" \
-    "the Beads teardown reported the close against a markdown file this home has not got"
-  pass "completion applies and closes a Beads backlog without any markdown file"
-}
 
 test_dispatch_refuses_a_pending_authoritative_close() {
   local case_dir id marker out rc=0
@@ -1182,16 +1084,15 @@ test_dispatch_refuses_a_symlinked_backlog_without_crossing_homes() {
   pass "dispatch refuses symlinked backlogs without crossing homes"
 }
 
-test_automatic_backend_refuses_incompatible_tasks_axi_before_mutation() {
+test_automatic_backend_refuses_missing_native_queue_before_mutation() {
   local spawn_case teardown_case id out rc=0
   id=atomic-incompatible-tasks-axi-b2
   spawn_case=$(make_home incompatible-tasks-axi-spawn "$id")
   add_item "$spawn_case" "$id"
-  make_tasks_axi_incompatible "$spawn_case"
 
-  out=$(run_ship_spawn "$spawn_case" "$id") || rc=$?
+  out=$(FM_QUEUE_TEST_CLI="$spawn_case/missing-native-queue" run_ship_spawn "$spawn_case" "$id") || rc=$?
   [ "$rc" -ne 0 ] || fail "automatic spawn succeeded without compatible tasks-axi"
-  assert_contains "$out" "automatic backlog transitions require tasks-axi" \
+  assert_contains "$out" "automatic backlog transitions require python3 and the shipped native queue" \
     "automatic spawn did not report its unavailable transition tool"
   assert_absent "$(home_of "$spawn_case")/state/$id.meta" \
     "automatic spawn published a record without transition tooling"
@@ -1203,18 +1104,17 @@ test_automatic_backend_refuses_incompatible_tasks_axi_before_mutation() {
   add_item "$teardown_case" "$id"
   start_item "$teardown_case" "$id"
   write_task_meta "$teardown_case" "$id" ship local-only "spawn_gen=spawn-incompatible"
-  make_tasks_axi_incompatible "$teardown_case"
   rc=0
-  out=$(run_teardown "$teardown_case" "$id") || rc=$?
+  out=$(FM_QUEUE_TEST_CLI="$teardown_case/missing-native-queue" run_teardown "$teardown_case" "$id") || rc=$?
   [ "$rc" -ne 0 ] || fail "automatic teardown succeeded without compatible tasks-axi"
-  assert_contains "$out" "automatic backlog transitions require tasks-axi" \
+  assert_contains "$out" "automatic backlog transitions require python3 and the shipped native queue" \
     "automatic teardown did not report its unavailable transition tool"
   assert_present "$(home_of "$teardown_case")/state/$id.meta" \
     "automatic teardown removed its record without transition tooling"
   rm -f "$teardown_case/fakebin/tasks-axi"
   [ "$(row_state "$teardown_case" "$id")" = in_flight ] \
     || fail "automatic teardown changed the row without transition tooling"
-  pass "automatic homes refuse lifecycle mutation without compatible tasks-axi"
+  pass "automatic homes refuse lifecycle mutation without the shipped native queue"
 }
 
 test_dispatch_refuses_an_unresolvable_data_directory() {
@@ -1554,7 +1454,7 @@ test_dispatch_fails_when_its_row_vanishes_after_preflight() {
   assert_absent "$(home_of "$case_dir")/state/$id.meta" \
     "spawn retained a record after its backlog row vanished"
   [ -z "$(row_state "$case_dir" "$id")" ] || fail "spawn recreated a removed backlog row"
-  pass "dispatch fails when its backlog row vanishes after preflight"
+  pass "dispatch fails closed when a non-cooperating writer loses the row after preflight"
 }
 
 # --- completion -------------------------------------------------------------
@@ -2828,9 +2728,7 @@ test_spawn_refuses_a_data_directory_symlinked_outside_the_home() {
   case_dir=$(make_home external-data "$id")
   home=$(home_of "$case_dir")
   add_item "$case_dir" "$id"
-  mkdir -p "$case_dir/outside"
-  mv "$home/data/backlog.md" "$home/data/$id" "$case_dir/outside/"
-  rmdir "$home/data"
+  mv "$home/data" "$case_dir/outside"
   ln -s "$case_dir/outside" "$home/data"
 
   out=$(TASKS_AXI_BACKEND=markdown run_ship_spawn "$case_dir" "$id") || rc=$?
@@ -2843,26 +2741,6 @@ test_spawn_refuses_a_data_directory_symlinked_outside_the_home() {
 }
 
 
-test_configured_adapter_refuses_a_data_directory_outside_the_home() {
-  local case_dir home id out rc=0
-  id=atomic-external-data-beads-b15
-  case_dir=$(make_home external-data-beads "$id")
-  home=$(home_of "$case_dir")
-  add_item "$case_dir" "$id"
-  mkdir -p "$case_dir/outside"
-  mv "$home/data/backlog.md" "$home/data/$id" "$case_dir/outside/"
-  rmdir "$home/data"
-  ln -s "$case_dir/outside" "$home/data"
-
-  out=$(TASKS_AXI_BACKEND=beads run_ship_spawn "$case_dir" "$id") || rc=$?
-  [ "$rc" -ne 0 ] \
-    || fail "a configured adapter accepted a data directory resolving outside the home"
-  assert_contains "$out" "backlog data directory authorized directory resolves outside this home" \
-    "a configured adapter did not identify the data directory escaping the home"
-  assert_absent "$home/state/$id.meta" \
-    "a configured adapter published a task record outside the home"
-  pass "a configured adapter refuses a data directory outside the home"
-}
 
 
 test_dispatch_and_completion_are_structural() {
@@ -2929,18 +2807,6 @@ test_refused_teardown_leaves_the_item_live() {
   pass "refused teardown leaves the backlog item in flight"
 }
 
-test_environment_selected_adapter_is_not_forced_to_markdown() {
-  local case_dir id out
-  id=fm-env-adapter-b15
-  case_dir=$(make_home env-adapter "$id")
-  configure_env_backend_tasks_axi "$case_dir"
-
-  out=$(TASKS_AXI_BACKEND=beads run_ship_spawn "$case_dir" "$id") \
-    || fail "environment-selected adapter spawn failed: $out"
-  [ "$(cat "$case_dir/env-backend-start")" = "start $id" ] \
-    || fail "environment-selected adapter received legacy markdown arguments"
-  pass "environment-selected adapters bypass the legacy markdown file override"
-}
 
 test_manual_backend_home_dispatches_and_completes_without_touching_the_backlog() {
   local case_dir id data data_resolved out
@@ -3013,14 +2879,26 @@ test_a_persistent_secondmate_is_never_a_backlog_item() {
   pass "retired supervisor dispatch refuses without requiring or creating a backlog item"
 }
 
+test_native_refuses_unsupported_adapter_before_dispatch() {
+  local case_dir id=unsupported-native out rc=0 before
+  case_dir=$(make_home unsupported-native "$id")
+  add_item "$case_dir" "$id"
+  before=$(cat "$(backlog_of "$case_dir")")
+  printf '%s\n' 'backend = "beads"' > "$(home_of "$case_dir")/.tasks.toml"
+  out=$(run_ship_spawn "$case_dir" "$id") || rc=$?
+  [ "$rc" -ne 0 ] || fail "unsupported legacy adapter dispatched"
+  assert_contains "$out" 'native queue supports Markdown only' "unsupported adapter did not report compatibility boundary"
+  assert_absent "$(home_of "$case_dir")/state/$id.meta" "unsupported adapter published a worker binding"
+  assert_equals "$before" "$(cat "$(backlog_of "$case_dir")")" "unsupported adapter changed existing storage"
+  pass "unsupported adapters refuse before dispatch without redirecting or rewriting the queue"
+}
+
+test_native_refuses_unsupported_adapter_before_dispatch
 test_backend_resolution_preserves_config_errors
 test_backend_resolution_preserves_precedence_and_defaults
 test_backlog_callers_refuse_unreadable_backend_config
 test_captain_hold_preserves_relocated_backlog_on_backend_error
 test_dispatch_moves_the_item_in_flight_in_the_same_run
-test_dispatch_omits_the_file_for_a_beads_show
-test_a_leftover_markdown_symlink_does_not_brick_a_beads_home
-test_completion_omits_the_file_for_a_beads_done
 test_dispatch_refuses_a_pending_authoritative_close
 test_dispatch_refuses_a_held_row_before_creating_resources
 test_dispatch_refuses_a_blocked_row_before_creating_resources
@@ -3031,7 +2909,7 @@ test_completion_targets_a_nested_relative_data_directory
 test_immediate_child_absolute_data_dispatches_and_completes
 test_bare_relative_data_dispatches_and_completes
 test_dispatch_refuses_a_symlinked_backlog_without_crossing_homes
-test_automatic_backend_refuses_incompatible_tasks_axi_before_mutation
+test_automatic_backend_refuses_missing_native_queue_before_mutation
 test_dispatch_refuses_an_unresolvable_data_directory
 test_completion_refuses_an_unresolvable_data_directory
 test_dispatch_refuses_an_id_this_home_has_no_item_for
@@ -3105,10 +2983,8 @@ test_home_without_a_backlog_dispatches_and_completes
 test_spawn_refuses_a_special_file_tasks_config
 test_spawn_refuses_an_unsafe_tasks_config_before_exempting_a_missing_backlog
 test_spawn_refuses_a_data_directory_symlinked_outside_the_home
-test_configured_adapter_refuses_a_data_directory_outside_the_home
 test_dispatch_and_completion_are_structural
 test_refused_teardown_leaves_the_item_live
-test_environment_selected_adapter_is_not_forced_to_markdown
 test_manual_backend_home_dispatches_and_completes_without_touching_the_backlog
 test_a_secondmate_home_keeps_its_own_books
 test_a_persistent_secondmate_is_never_a_backlog_item

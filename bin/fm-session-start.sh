@@ -516,24 +516,24 @@ print_ready_queued_bounded() {
 
 print_backlog_tasks_axi_compact() {
   local path=$1 in_flight held blocked ready err
-  if ! in_flight=$(tasks-axi list --file "$path" --state in_flight --fields "$BACKLOG_FIELDS" 2>&1); then
+  if ! in_flight=$("$FM_QUEUE_CLI" list --file "$path" --state in_flight --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$in_flight
-  elif ! held=$(tasks-axi list --file "$path" --state held --fields "$BACKLOG_FIELDS" 2>&1); then
+  elif ! held=$("$FM_QUEUE_CLI" list --file "$path" --state held --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$held
-  elif ! blocked=$(tasks-axi list --file "$path" --state queued --blocked --fields "$BACKLOG_FIELDS" 2>&1); then
+  elif ! blocked=$("$FM_QUEUE_CLI" list --file "$path" --state queued --blocked --fields "$BACKLOG_FIELDS" 2>&1); then
     err=$blocked
-  elif ! ready=$(tasks-axi ready --file "$path" 2>&1); then
+  elif ! ready=$("$FM_QUEUE_CLI" ready --file "$path" 2>&1); then
     err=$ready
   else
     printf 'compact backlog listing (tasks-axi; done rows omitted; every in-flight, held, and blocked row shown in full; ready queued bounded to %s; task bodies omitted)\n' \
       "$QUEUED_LIMIT"
     printf '\nin flight:\n'
     printf '%s\n' "$in_flight" | fm_hold_reason_decode_stream | strip_axi_help
-    printf '\nheld (captain- or time-gated; an in-flight item that is also held appears in both groups):\n'
+    printf '\nheld (including parked ideas and outcomes; an in-flight item that is also held appears in both groups):\n'
     printf '%s\n' "$held" | fm_hold_reason_decode_stream | strip_axi_help
     printf '\nblocked queued:\n'
     printf '%s\n' "$blocked" | fm_hold_reason_decode_stream | strip_axi_help
-    printf '\nready queued (dispatchable now):\n'
+    printf '\nready queued (candidates; reconcile accepted scope and worker ownership):\n'
     print_ready_queued_bounded "$ready"
     return 0
   fi

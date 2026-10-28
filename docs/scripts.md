@@ -94,8 +94,10 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-supervision-lib.sh`  | Shared in-flight-work-without-fresh-watcher-beacon predicate                         |
 | `fm-ff-lib.sh`           | Shared guarded fast-forward helper for local code updates |
 | `fm-lock-lib.sh`         | Shared "is this git lock provably abandoned?" proof used by teardown and fleet-sync   |
-| `fm-tasks-axi.sh`        | Run `tasks-axi` against this home's backlog from any working directory               |
-| `fm-tasks-axi-lib.sh`    | Shared backlog-backend selector and `tasks-axi` compatibility probe                  |
+| `fm-queue.sh`            | Address the native queue for this home from any working directory                   |
+| `fm-queue.py`            | Native Markdown storage, archive identities, transactions and compatibility backups  |
+| `fm-tasks-axi.sh`        | Deprecated native queue entry-point alias                                           |
+| `fm-tasks-axi-lib.sh`    | Native queue availability and legacy backend-selection aliases                  |
 | `fm-backlog-transition-lib.sh` | Pair task-record changes with their backlog transitions and replay interrupted closes |
 | `fm-quota-axi-lib.sh`    | Shared `quota-axi` compatibility floor and quota snapshot schema validation           |
 | `fm-quota-choose.sh`     | Choose the first candidate with known positive quota from an ordered harness:model list |

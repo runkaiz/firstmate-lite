@@ -8,6 +8,8 @@ metadata:
 
 # Session-start recovery
 
+After reconciling the digest's recovery inputs, use `work-queue` before selecting work from the native queue; preserve existing IDs and worker bindings.
+
 The digest itself makes no external-network call and never waits for one.
 Every network check a session start owes - GitHub auth and project clone refresh - runs off the digest's blocking path in a bounded worker owned by `bin/fm-startup-network.sh` and is reported in the digest's own `NETWORK CHECKS` section.
 The locked startup inactive-outcome scan joins that worker so a slow local current-state read cannot block the digest; its findings use the ordinary durable wake queue.
