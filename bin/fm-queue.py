@@ -13,10 +13,15 @@ Every body replacement archives its predecessor. Archived IDs stay reserved.
 The archive is completed history: legacy repeated `## Archived <date>`
 sections are read in place, and newly archived rows are appended in that same
 section shape. No record is merged, renumbered or dropped. An ID repeated in
-the archive has no structured provenance proving one task, so lookup and
-mutation refuse it with record locations rather than guess; `show <id>
---history` lists every record read-only, the ID stays reserved, and
-dependencies on it are satisfied because every record is complete.
+the archive is one task's history only when note-history links name each
+predecessor and successor record by exact digest and occurrence (`#N`
+among identical records) in one complete chain; its
+latest record then answers lookup. Anything else (unlinked, dangling,
+competing or cyclic links) is refused with record locations rather than
+guessed. `show <id> --history` lists every record and digest read-only, and
+`link` previews (`--dry-run`) or records one explicit link. Reopening a
+linked history keeps its records and links the continuation's completion.
+Dependencies on any archived ID are satisfied and the ID stays reserved.
 Migration needs no rewrite: `migrate --dry-run` validates existing records;
 `migrate --backup-dir DIR` also creates an exclusive byte-for-byte backup.
 Neither command activates a home or installs anything. Never run two writers
@@ -44,6 +49,8 @@ ROW = re.compile(r"^[-*] (?:\[([ xX])\] ([^\s]+)|\*\*([^*]+)\*\*) - (.*)$")
 ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 META = re.compile(r"\s+\((repo|kind|priority|hold|hold-kind|hold-until):\s*([^)]*)\)|\s+\((since|merged|reported|done)\s+([^)]*)\)")
 ARCHIVED = re.compile(r"Archived \d{4}-\d{2}-\d{2}")
+LINK = re.compile(r"^## (\S+) - Completion history link - [^\n]*\n", re.M)
+LINK_BODY = re.compile(r"\n  predecessor: (sha256:[0-9a-f]{64}#[1-9][0-9]*)\n  successor: (sha256:[0-9a-f]{64}#[1-9][0-9]*|active)\n")
 TODAY = dt.datetime.now(dt.timezone.utc).date().isoformat()
 
 
@@ -217,7 +224,7 @@ class Task:
         self.dirty = not raw
         self.archived = False
         self.block_reason = ""
-        self.line = self.block = self.section = None
+        self.line = self.block = self.section = self.identity = None
 
     @classmethod
     def parse(cls, lines, state):
@@ -386,6 +393,62 @@ class Document:
         return "".join(part.render() if isinstance(part, Task) else part for part in self.parts)
 
 
+def digest(task):
+    """Identity of one exact record: its bytes without trailing blank lines."""
+    lines = task.render().split("\n")
+    while lines and not lines[-1].strip():
+        lines.pop()
+    return "sha256:" + hashlib.sha256(("\n".join(lines) + "\n").encode("utf-8")).hexdigest()
+
+
+def identify(records, earlier=()):
+    # Exact bytes plus their occurrence among identical records of this ID in
+    # append order, so a same-day identical re-completion stays distinct.
+    seen = [task.identity.split("#")[0] for task in earlier]
+    for task in records:
+        value = digest(task)
+        seen.append(value)
+        task.identity = f"{value}#{seen.count(value)}"
+
+
+def chain(records, entries):
+    """Order one ID's archived records by explicit history links.
+
+    Returns (ordered records, failure reason or None, reopened predecessor
+    digests). Only a single complete predecessor chain resolves; dates,
+    positions and prose never stand in for a link.
+    """
+    digests = {task.identity: task for task in records}
+    if None in entries:
+        return records, "malformed history link", set()
+    edges, reopened = set(), set()
+    for predecessor, successor in entries:
+        if any(value != "active" and value not in digests for value in (predecessor, successor)):
+            return records, "dangling history link", set()
+        if successor == "active":
+            reopened.add(predecessor)
+        else:
+            edges.add((predecessor, successor))
+    following, preceding = {}, {}
+    for predecessor, successor in edges:
+        if predecessor == successor:
+            return records, "cyclic history links", reopened
+        if predecessor in following or successor in preceding:
+            return records, "competing history links", reopened
+        following[predecessor], preceding[successor] = successor, predecessor
+    heads = [value for value in digests if value not in preceding]
+    if len(edges) < len(records) - 1:
+        return records, "unlinked records", reopened
+    if len(heads) != 1:
+        return records, "cyclic history links", reopened
+    order = [heads[0]]
+    while order[-1] in following:
+        order.append(following[order[-1]])
+    if len(order) != len(records):
+        return records, "cyclic history links", reopened
+    return [digests[value] for value in order], None, reopened
+
+
 def locate(path, task):
     completion = task.completion()
     where = f"{path.name}:{task.line}" if task.line else f"{path.name}:pending"
@@ -410,7 +473,7 @@ class Store:
     def index(self):
         # Records are never merged or dropped: `all` names each identity's
         # current record, and `records` keeps every archived predecessor.
-        self.all, self.records, self.ambiguous = {}, {}, {}
+        self.all, self.records, self.ambiguous, self.reasons = {}, {}, {}, {}
         for task in self.active.tasks():
             require(task.id not in self.all, f"duplicate active identity: {task.id}")
             task.archived = False
@@ -419,15 +482,26 @@ class Store:
             require(task.state == "done", f"non-complete archived record: {task.id}")
             task.archived = True
             self.records.setdefault(task.id, []).append(task)
+        self.links = {}
+        for match in LINK.finditer(self.note_text):
+            body = LINK_BODY.match(self.note_text, match.end())
+            self.links.setdefault(match[1], []).append(body.groups() if body else None)
         for identifier, records in self.records.items():
+            identify(records)
             where = ", ".join(locate(self.archive, task) for task in records)
-            # Dates and positions do not prove that two records are one task:
-            # no existing structured field links a completion to its predecessor.
-            if len(records) > 1:
-                self.ambiguous[identifier] = "repeated archived records without structured provenance linking them; records: " + where
+            # Dates, positions and prose do not prove that two records are one
+            # task; only explicit note-history links between exact records do.
+            ordered, reason, reopened = chain(records, self.links.get(identifier, []))
+            self.records[identifier] = ordered
+            if reason:
+                self.reasons[identifier] = reason
+                self.ambiguous[identifier] = f"archived history is not one linked chain ({reason}); records: {where}"
             if identifier in self.all:
-                raise QueueError(f"duplicate active/archive identity: {identifier}; records: {where}, {locate(self.path, self.all[identifier])}")
-            self.all[identifier] = records[-1]
+                # Beside archived history, an active record must be the recorded
+                # reopen of that history's unique latest record.
+                require(not reason and ordered[-1].identity in reopened, f"duplicate active/archive identity: {identifier}; records: {where}, {locate(self.path, self.all[identifier])}")
+            else:
+                self.all[identifier] = ordered[-1]
 
     def find(self, identifier):
         if identifier not in self.all:
@@ -438,7 +512,10 @@ class Store:
     def history_of(self, identifier):
         if identifier not in self.all:
             raise NotFound(f'Task "{identifier}" not found in this backlog or archive')
-        return self.records.get(identifier) or [self.all[identifier]]
+        records = list(self.records.get(identifier, []))
+        if not self.all[identifier].archived:
+            records.append(self.all[identifier])
+        return records
 
     def remove(self, task):
         (self.past if task.archived else self.active).parts.remove(task)
@@ -446,13 +523,25 @@ class Store:
     def history(self, task, reason="Body replaced"):
         self.note_text += f"\n## {task.id} - {reason} - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n" + task.render() + "\n"
 
+    def link(self, identifier, predecessor, successor):
+        self.note_text += f"\n## {identifier} - Completion history link - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n  predecessor: {predecessor}\n  successor: {successor}\n"
+
+    def archive_tasks(self, tasks):
+        # A reopened continuation of archived history links its completion.
+        latest = {task.id: self.records[task.id][-1].identity for task in tasks if task.id in self.records}
+        self.past.append(tasks)
+        for task in tasks:
+            if task.id in latest:
+                identify([task], self.records[task.id])
+                self.link(task.id, latest[task.id], task.identity)
+
     def prune(self, keep):
         done = [task for task in self.active.tasks() if task.state == "done"]
         for task in done[keep:]:
             self.active.parts.remove(task)
             task.archived = True
         if done[keep:]:
-            self.past.append(done[keep:])
+            self.archive_tasks(done[keep:])
 
     def changes(self):
         result = {self.path: self.active.render(), self.archive: self.past.render(), self.notes: self.note_text}
@@ -615,6 +704,7 @@ def parser():
        [--keep N | --no-prune]    reopen <id>
   prune [--keep N]    rm <completed-id>
   mv <id> [<id>...] --to <queue-file-or-directory>
+  link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
 Dates are UTC. Captain holds require an answer/release even after their date.
@@ -624,7 +714,7 @@ add/create --start because fm-spawn owns the worker binding.
 '''
     p.add_argument("command", nargs="?", default="list")
     p.add_argument("items", nargs="*")
-    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir"):
+    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir", "predecessor", "successor"):
         p.add_argument("--" + flag)
     p.add_argument("--priority", choices=list("01234"))
     p.add_argument("--state", choices=("queued", "in_flight", "done", "held"))
@@ -708,6 +798,8 @@ def execute(options, stores):
         destination = stores[1]
         identifiers = list(dict.fromkeys(items))
         moving = [store.find(identifier) for identifier in identifiers]
+        for identifier in identifiers:
+            require(len(store.history_of(identifier)) == 1, f"move would split the linked history of {identifier}")
         require(not any(identifier in destination.all for identifier in identifiers), "destination has an active or archived identity conflict")
         for task in moving:
             require(all(dep in identifiers or dep in destination.all for dep in task.deps), f"move would strand dependency of {task.id}")
@@ -723,6 +815,22 @@ def execute(options, stores):
             destination.past.append([task for task in moving if task.archived])
         commit(stores)
         print(json.dumps({"ok": True, "moved": identifiers}))
+        return
+    if verb == "link":
+        require(len(items) == 1 and options.predecessor and options.successor, "link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]")
+        identifier, link = items[0], (options.predecessor, options.successor)
+        records = store.records.get(identifier, [])
+        require(len(records) > 1 and not (identifier in store.all and not store.all[identifier].archived), f"{identifier} has no repeated archived records to link")
+        require(all(value in [task.identity for task in records] for value in link) and link[0] != link[1], "--predecessor and --successor must each name a different archived record; see show --history")
+        require(link not in store.links.get(identifier, []), "history link already recorded")
+        store.link(identifier, *link)
+        store.index()
+        reason = store.reasons.get(identifier)
+        require(reason in (None, "unlinked records"), f"link would leave {identifier} with {reason}")
+        if not options.dry_run:
+            commit(stores)
+        print(json.dumps({"ok": True, "id": identifier, "recorded": not options.dry_run, "resolved": reason is None,
+                          "order": [locate(store.archive, task) for task in store.records[identifier]]}, ensure_ascii=False))
         return
     require(verb in ("add", "show", "start", "done", "reopen", "update", "hold", "unhold", "block", "unblock", "rm", "authorize"), f"unsupported native queue command: {verb}")
     require(items, f"{verb} requires a task ID")
@@ -751,7 +859,7 @@ def execute(options, stores):
             # Read-only: every record, oldest first, even when ambiguous.
             records = store.history_of(items[0])
             ambiguity = store.ambiguous.get(items[0])
-            rows = [dict(record.data(store.all), location=locate(store.archive if record.archived else store.path, record)) for record in records]
+            rows = [dict(record.data(store.all), location=locate(store.archive if record.archived else store.path, record), digest=record.identity or digest(record)) for record in records]
             if options.json:
                 print(json.dumps({"ok": True, "id": items[0], "ambiguous": ambiguity, "records": rows}, ensure_ascii=False))
             else:
@@ -798,7 +906,12 @@ def execute(options, stores):
                 store.history(task, "Prior completion context retained")
             # Completion evidence on an archived record keeps its recorded place.
             settled = task.archived and verb in ("done", "rm")
-            if not settled:
+            if verb == "reopen" and task.archived and len(store.records[task.id]) > 1:
+                # A linked history keeps every archived record; the reopened
+                # copy continues it from the recorded latest completion.
+                store.link(task.id, task.identity, "active")
+                task = Task.parse(re.split(r"(?<=\n)", task.render()), "done")
+            elif not settled:
                 store.remove(task)
             task.state = "in_flight" if verb == "start" else "queued" if verb == "reopen" else "done"
             if task.state == "done" and not was_done:
@@ -812,7 +925,7 @@ def execute(options, stores):
             if not settled:
                 task.archived = verb == "rm"
                 if task.archived:
-                    store.past.append([task])
+                    store.archive_tasks([task])
                 else:
                     store.active.insert(task)
         elif verb == "hold":

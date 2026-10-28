@@ -14,8 +14,11 @@ Malformed records, duplicate identities, conflicting recovery data and unsupport
 
 `show` finds active and archived tasks by original ID.
 The archive is append-only completed history: existing repeated `## Archived <date>` sections are read in place, and newly archived rows are appended as another such section, so records are never normalized, reordered, merged or renumbered.
-An ID that appears in more than one archived record has no structured field proving those records are one task, so `show`, `reopen` and other single-task commands refuse it with each record's location instead of choosing by date or position.
-`show <id> --history` lists every record for an ID read-only, including a refused one; the ID stays reserved, and a dependency on it is satisfied because every record is complete.
+An ID that appears in more than one archived record is one task's history only when explicit links in the note history name each predecessor and successor record by exact digest and occurrence, forming one complete chain; its latest record then answers ordinary lookup.
+Dates, positions and body prose never stand in for a link, so unlinked, dangling, competing, cyclic or malformed links make `show`, `reopen` and other single-task commands refuse the ID with each record's location.
+`show <id> --history` lists every record and its digest read-only, including a refused one; the ID stays reserved, and a dependency on it is satisfied because every record is complete.
+`link <id> --predecessor <digest> --successor <digest>` records one explicit link after an operator has reviewed the evidence, and `--dry-run` previews it without writing; nothing infers or bulk-creates links.
+Reopening a linked history keeps every archived record, and completing the reopened task links its new record to the previous latest one.
 `reopen` moves an archived task back to the active queue with its original identity, body, hold provenance and artifact links.
 Creation refuses identities found in either active storage or the archive, including conflicts between them.
 Replacing a body automatically archives the superseded record in the existing note history.

@@ -524,7 +524,7 @@ class QueueTests(unittest.TestCase):
                 for command in (("show", "dup"), ("reopen", "dup"), ("update", "dup", "--body", "Guess"),
                                 ("done", "dup", "--pr", "https://example.test/x/pull/3"), ("rm", "dup"), ("hold", "dup", "--reason", "Guess")):
                     error = self.call(*command, good=False).stderr
-                    self.assertIn("ambiguous archived identity dup: repeated archived records", error)
+                    self.assertIn("ambiguous archived identity dup: archived history is not one linked chain (unlinked records)", error)
                     self.assertIn("done-archive.md:3", error)
                     self.assertNotIn("Private", error)
                 self.assertIn("already exists", self.call("add", "dup", "Reuse", good=False).stderr)
@@ -538,6 +538,108 @@ class QueueTests(unittest.TestCase):
                 self.call("done", "other", "--keep", "0")
                 self.assertTrue(self.archive.read_text().startswith(archive))
                 self.assertTrue(self.task("other")["archived"])
+
+    def snapshot(self):
+        return [path.read_bytes() if path.exists() else None for path in (self.file, self.archive, self.home / "data/note-archive.md")]
+
+    def digests(self, identifier):
+        return [row["digest"] for row in self.history(identifier)["records"]]
+
+    def link(self, identifier, predecessor, successor, *flags, good=True):
+        return self.call("link", identifier, "--predecessor", predecessor, "--successor", successor, *flags, good=good)
+
+    def test_explicit_history_link_resolves_latest_and_reopen_continues_it(self):
+        self.legacy()
+        first, latest = self.digests("alpha")
+        before = self.snapshot()
+        preview = json.loads(self.link("alpha", first, latest, "--dry-run").stdout)
+        self.assertEqual((preview["recorded"], preview["resolved"]), (False, True))
+        self.assertEqual(self.snapshot(), before)
+        self.call("show", "alpha", good=False)
+        for predecessor, successor in ((first, first), (first, "sha256:" + "0" * 64 + "#1"), (first.split("#")[0], latest), ("prose", latest)):
+            self.link("alpha", predecessor, successor, good=False)
+        self.assertIn("no repeated archived records", self.link("beta", first, latest, good=False).stderr)
+        self.assertEqual(self.snapshot(), before)
+        self.assertTrue(json.loads(self.link("alpha", first, latest).stdout)["resolved"])
+        self.assertIn("already recorded", self.link("alpha", first, latest, good=False).stderr)
+        self.assertEqual(self.archive.read_text(), LEGACY_ARCHIVE, "linking rewrote archived records")
+        alpha = self.task("alpha")
+        self.assertEqual((alpha["title"], alpha["archived"], alpha["closed"]), ("Follow-up delivery", True, "2026-01-09"))
+        history = self.history("alpha")
+        self.assertIsNone(history["ambiguous"])
+        self.assertEqual([row["title"] for row in history["records"]], ["First delivery", "Follow-up delivery"])
+        self.assertEqual(json.loads(self.call("migrate", "--dry-run").stdout)["ambiguous_histories"], [])
+        backup = self.home / "backup"
+        self.call("migrate", "--backup-dir", str(backup))
+        self.assertEqual([(backup / name).read_bytes() for name in ("0-backlog.md", "1-done-archive.md", "2-note-archive.md")], self.snapshot())
+        self.call("reopen", "alpha")
+        self.assertEqual(self.archive.read_text(), LEGACY_ARCHIVE, "reopen dropped a linked archived record")
+        reopened = self.task("alpha")
+        self.assertEqual((reopened["state"], reopened["archived"], reopened["title"]), ("queued", False, "Follow-up delivery"))
+        self.assertEqual([row["archived"] for row in self.history("alpha")["records"]], [True, True, False])
+        self.call("add", "alpha", "Reuse", good=False)
+        self.call("mv", "alpha", "--to", str(self.home / "other/data/backlog.md"), good=False)
+        self.call("start", "alpha")
+        self.call("done", "alpha", "--keep", "0")
+        self.assertTrue(self.archive.read_text().startswith(LEGACY_ARCHIVE))
+        history = self.history("alpha")
+        self.assertIsNone(history["ambiguous"])
+        self.assertEqual([row["closed"] for row in history["records"]], ["2026-01-04", "2026-01-09", TODAY])
+        self.assertEqual(self.task("alpha")["closed"], TODAY)
+        self.call("reopen", "alpha")
+        self.call("done", "alpha", "--no-prune")
+        result = self.call("prune", "--keep", "0", extra_env={"FM_QUEUE_TEST_CRASH_AFTER_WRITES": "2"}, good=False)
+        self.assertEqual(result.returncode, 91)
+        history = self.history("alpha")
+        self.assertFalse(Path(str(self.file) + ".transaction").exists())
+        self.assertIsNone(history["ambiguous"])
+        self.assertEqual(len(history["records"]), 4)
+        self.assertTrue(all(row["archived"] for row in history["records"]))
+
+    def test_bad_history_links_stay_ambiguous(self):
+        archive = LEGACY_ARCHIVE + "\n## Archived 2026-01-11\n- [x] alpha - Third delivery (done 2026-01-11)\n\n## Archived 2026-01-12\n- [x] twin - Same bytes (done 2026-01-12)\n\n## Archived 2026-01-13\n- [x] twin - Same bytes (done 2026-01-12)\n"
+        self.legacy("## Queued\n- [ ] other - Uses alpha blocked-by: alpha\n", archive)
+        first, second, third = self.digests("alpha")
+        notes = self.home / "data/note-archive.md"
+
+        def entry(identifier, predecessor, successor):
+            return f"\n## {identifier} - Completion history link - 2026-01-20T00:00:00+00:00\n\n  predecessor: {predecessor}\n  successor: {successor}\n"
+        cases = {
+            "dangling history link": entry("alpha", first, "sha256:" + "1" * 64 + "#1") + entry("alpha", second, third),
+            "competing history links": entry("alpha", first, second) + entry("alpha", first, third),
+            "cyclic history links": entry("alpha", first, second) + entry("alpha", second, first),
+            "malformed history link": entry("alpha", first, second) + "\n## alpha - Completion history link - 2026-01-20\n\n  predecessor: guessed\n",
+            "unlinked records": entry("alpha", first, second),
+        }
+        for reason, text in cases.items():
+            with self.subTest(reason=reason):
+                notes.write_text(text)
+                before = self.snapshot()
+                for command in (("show", "alpha"), ("reopen", "alpha"), ("update", "alpha", "--title", "Guess")):
+                    self.assertIn("(" + reason + ")", self.call(*command, good=False).stderr)
+                self.call("add", "alpha", "Reuse", good=False)
+                self.assertEqual(self.ready(), ["other"])
+                self.assertEqual(self.snapshot(), before)
+        notes.write_text(entry("alpha", first, second))
+        self.assertIn("competing history links", self.link("alpha", first, third, good=False).stderr)
+        self.assertIn("cyclic history links", self.link("alpha", second, first, good=False).stderr)
+        self.link("alpha", second, third)
+        self.assertEqual(self.task("alpha")["title"], "Third delivery")
+        self.assertIn("unlinked records", self.call("show", "twin", good=False).stderr)
+        twin_first, twin_second = self.digests("twin")
+        self.assertEqual(twin_first.split("#")[0], twin_second.split("#")[0])
+        self.link("twin", twin_first, twin_first, good=False)
+        notes.write_text(notes.read_text() + entry("twin", twin_first, twin_second.split("#")[0] + "#3"))
+        self.assertIn("dangling history link", self.call("show", "twin", good=False).stderr)
+
+    def test_concurrent_history_links_record_once(self):
+        self.legacy()
+        first, latest = self.digests("alpha")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            codes = list(pool.map(lambda _: self.link("alpha", first, latest, good=None).returncode, range(4)))
+        self.assertEqual(codes.count(0), 1)
+        self.assertEqual((self.home / "data/note-archive.md").read_text().count("Completion history link"), 1)
+        self.assertEqual(self.task("alpha")["title"], "Follow-up delivery")
 
     def test_active_record_beside_archived_history_stays_refused(self):
         before = self.legacy("## Queued\n- [ ] beta - Active reuse\n- [ ] other - Unrelated\n")
