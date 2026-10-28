@@ -67,6 +67,7 @@ Calm hides these rows:
 - Collapsed thinking labels.
 - The mid-turn assistant working-note blocks governed by the [shared preservation rule](#shared-preservation-rule-for-assistant-text) above.
 - The shells for the Pi built-in tool names Calm owns.
+- Codemode call and text-result shells with both renderer slots, when Pi provides `registerToolRenderer`.
 - Firstmate-owned tool shells listed in the [Pi tool audit](calm-mode-feasibility.md#firstmate-pi-tool-audit).
 - Canonically classified Firstmate operational user rows.
 
@@ -112,7 +113,7 @@ These rows remain visible:
 - Generic status notices.
 - Other arbitrary custom-tool or extension rows.
 
-These are supported-API boundaries rather than hidden-content failures.
+These rows are outside Calm's supported presentation coverage.
 
 ## Pi compatibility
 
@@ -124,6 +125,20 @@ It never refuses Pi solely because its version is newer than a previously verifi
 When Calm loads, the collapsed-thinking, operational-user-row, and queued-operational-row presentation adapters probe the exact Pi API seam they patch.
 If Pi removes one of those seams, Calm logs a diagnostic naming the unavailable adapter and skips only that adapter.
 `/calm`, the other adapters, and unrelated Pi extensions remain available.
+
+### Codemode renderers
+
+Pi 1.4.0 exposes `registerToolRenderer`, which Calm uses only for the registered tool name `codemode`, wrapping its existing call and result renderers without registering or replacing its execution.
+The resolver is installed while Calm is off as well, so those rows can hide on the first toggle and restore when Calm turns off, including restored-session rows.
+Codemode's script, nested-call status, and text output use this path.
+Codemode retains normal rendering when either renderer slot or this API is unavailable.
+Unrelated custom tools retain their original renderers.
+Tool images remain outside the renderer slots and stay visible.
+An earlier extension renderer resolver that does not delegate can take precedence over Calm.
+
+An installation must load the updated extension with that API available before this coverage applies.
+After updating the checkout from which Pi loads Firstmate extensions, use Pi's `/reload` or restart and resume the session.
+Changing `config/calm` alone does not replace code already loaded by a running Pi process.
 
 ### Session check for queued inputs
 

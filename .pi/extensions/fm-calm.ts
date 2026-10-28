@@ -9,7 +9,7 @@
 // newer Pi solely for its version. The collapsed-thinking, operational-user, and
 // queued-operational presentation adapters probe the exact API they patch and degrade
 // independently with a diagnostic (see installCalmPresentationAdapter below) if a future
-// Pi removes it; Pi still exposes no global renderer for arbitrary built-in or custom rows.
+// Pi removes it. Pi 1.4.0 also supports presentation-only tool renderer resolvers.
 // docs/configuration.md owns the home-local Calm preference contract.
 //
 // Pi has one first-registration-wins ToolDefinition per tool name, with no merge or
@@ -242,13 +242,25 @@ export default function (pi: ExtensionAPI) {
     };
 
     const original = definitionFor(process.cwd());
+    return {
+      ...original,
+      ...wrapRenderers(original),
+      async execute(toolCallId, params, signal, onUpdate, ctx) {
+        return definitionFor(ctx.cwd).execute(toolCallId, params, signal, onUpdate, ctx);
+      },
+    };
+  }
+
+  function wrapRenderers<TParams extends TSchema, TDetails, TState>(
+    original: Pick<ToolDefinition<TParams, TDetails, TState>, "renderShell" | "renderCall" | "renderResult">,
+  ): Pick<ToolDefinition<TParams, TDetails, TState>, "renderShell" | "renderCall" | "renderResult"> {
     const originalRenderCall = original.renderCall;
     const originalRenderResult = original.renderResult;
     const originalSelfShell = original.renderShell === "self";
     const standardShells = new WeakMap<object, StandardShellState>();
 
     if (!originalRenderCall || !originalRenderResult) {
-      throw new Error(`Firstmate calm mode requires both render slots for Pi built-in tool ${original.name}`);
+      return original;
     }
 
     const shellStateFor = (
@@ -273,9 +285,10 @@ export default function (pi: ExtensionAPI) {
         : context.isError
           ? (text: string) => theme.bg("toolErrorBg", text)
           : (text: string) => theme.bg("toolSuccessBg", text);
-      const shell = state.shell ?? new Box(1, 1, background);
+      const shell = state.shell ?? new Box(context.outputPad ?? 1, 1, background);
       state.shell = shell;
       shell.setBgFn(background);
+      shell.setPaddingX(context.outputPad ?? 1);
       shell.clear();
       if (state.call) shell.addChild(state.call);
       if (state.result) shell.addChild(state.result);
@@ -283,12 +296,7 @@ export default function (pi: ExtensionAPI) {
     };
 
     return {
-      ...original,
       renderShell: "self",
-
-      async execute(toolCallId, params, signal, onUpdate, ctx) {
-        return definitionFor(ctx.cwd).execute(toolCallId, params, signal, onUpdate, ctx);
-      },
 
       renderCall(
         args: RenderArgs<TParams, TDetails, TState>,
@@ -297,15 +305,14 @@ export default function (pi: ExtensionAPI) {
       ) {
         rememberCalmToolRow(context.state as object, context.invalidate);
         if (exportRendering) return originalRenderCall(args, theme, context);
-        if (calmPresentationHides("assistant-tool-call")) return new Container();
-        if (originalSelfShell) return originalRenderCall(args, theme, context);
 
         const state = shellStateFor(context);
         state.call = originalRenderCall(args, theme, {
           ...context,
           lastComponent: state.call,
         });
-        return refreshStandardShell(state, theme, context);
+        if (calmPresentationHides("assistant-tool-call")) return new Container();
+        return originalSelfShell ? state.call : refreshStandardShell(state, theme, context);
       },
 
       renderResult(
@@ -316,14 +323,14 @@ export default function (pi: ExtensionAPI) {
       ) {
         rememberCalmToolRow(context.state as object, context.invalidate);
         if (exportRendering) return originalRenderResult(result, options, theme, context);
-        if (calmPresentationHides("tool-result")) return new Container();
-        if (originalSelfShell) return originalRenderResult(result, options, theme, context);
 
         const state = shellStateFor(context);
         state.result = originalRenderResult(result, options, theme, {
           ...context,
           lastComponent: state.result,
         });
+        if (calmPresentationHides("tool-result")) return new Container();
+        if (originalSelfShell) return state.result;
         refreshStandardShell(state, theme, context);
         return new Container();
       },
@@ -342,6 +349,17 @@ export default function (pi: ExtensionAPI) {
     wrapBuiltIn(createFindToolDefinition),
     wrapBuiltIn(createLsToolDefinition),
   ];
+
+  // Resolve presentation independently of execution, including codemode and late
+  // registrations. Keep the legacy built-in path below for older Pi releases.
+  // Missing render slots retain Pi's normal fallback rather than guessing its UI.
+  if (typeof pi.registerToolRenderer === "function") {
+    pi.registerToolRenderer((name, next) => {
+      const original = next();
+      if (!original || name !== "codemode") return original;
+      return wrapRenderers(original);
+    });
+  }
 
   // True once this extension has handled built-in registration for its lifetime:
   // either all seven synchronously at load, or only the uncontested subset during
