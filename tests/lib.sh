@@ -334,6 +334,33 @@ trap 'fm_test_cleanup; exit 143' TERM
 trap 'fm_test_cleanup; exit 129' HUP
 trap 'fm_test_cleanup; exit 131' QUIT
 
+# Lifecycle fixtures run bin/fm-usage-auto.py's default-on collection, which
+# reads these native metadata roots. Point them at an empty suite-owned
+# directory so deterministic cases never read the operator's real stores;
+# fm_live_gate restores the ambient roots for deliberate live-harness guards.
+FM_TEST_USAGE_ROOT_VARS=(CODEX_HOME CLAUDE_CONFIG_DIR PI_CODING_AGENT_DIR NM_HOME)
+FM_TEST_USAGE_ROOTS=$(fm_test_tmproot fm-test-usage-roots) || return 1
+for _fm_usage_var in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
+  if [ -n "${!_fm_usage_var+x}" ]; then
+    printf -v "FM_TEST_AMBIENT_$_fm_usage_var" '%s' "${!_fm_usage_var}"
+  fi
+  mkdir -p "$FM_TEST_USAGE_ROOTS/$_fm_usage_var" || return 1
+  export "$_fm_usage_var=$FM_TEST_USAGE_ROOTS/$_fm_usage_var"
+done
+unset _fm_usage_var
+
+fm_test_restore_ambient_usage_roots() {
+  local var saved
+  for var in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
+    saved=FM_TEST_AMBIENT_$var
+    if [ -n "${!saved+x}" ]; then
+      export "$var=${!saved}"
+    else
+      unset "$var"
+    fi
+  done
+}
+
 # fm_test_reap_orphans: best-effort sweep for fixture roots left behind by a
 # prior run that was killed hard enough to skip the traps above (e.g. a
 # SIGKILL timeout). Only removes directories carrying the .fm-test-fixture
@@ -405,7 +432,9 @@ fi
 #
 # Every path that lets a live run proceed also exports DISABLE_AUTOUPDATER=1,
 # so a live harness invocation never lets Claude Code's auto-updater rewrite
-# the installed binary out from under the host.
+# the installed binary out from under the host, and restores the ambient native
+# roots this library otherwise isolates, so a credentialed harness keeps its
+# real configuration.
 
 fm_live_gate() {
   local policy=$1 vars=$2
@@ -470,6 +499,7 @@ fm_live_gate() {
   done
 
   export DISABLE_AUTOUPDATER=1
+  fm_test_restore_ambient_usage_roots
   return 0
 }
 

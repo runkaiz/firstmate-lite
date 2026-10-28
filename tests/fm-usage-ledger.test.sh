@@ -415,3 +415,74 @@ with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
     print("PASS: automatic defaults, exact discovery, future sessions, generation handoff, overlapping refresh, partial tail, pipeline copies, bounded continuation, auxiliary usage, disable, failures, privacy")
 PY
 pass 'automatic native usage lifecycle'
+
+# Suites sourcing tests/lib.sh keep default-on lifecycle collection enabled but
+# confined to the library's synthetic native roots, never the ambient defaults.
+USAGE_ROOTS_TMP=$(fm_test_tmproot fm-usage-roots) || fail 'could not create usage-roots fixture'
+python3 - "$ROOT" "$USAGE_ROOTS_TMP" <<'PY' || fail 'synthetic suites discovered ambient native usage roots'
+import json, os, re, sqlite3, subprocess, sys, time
+from pathlib import Path
+
+repo, root = Path(sys.argv[1]), Path(sys.argv[2])
+synthetic = {v: Path(os.environ[v]) for v in ("CODEX_HOME", "CLAUDE_CONFIG_DIR", "PI_CODING_AGENT_DIR", "NM_HOME")}
+ambient = root / "ambient-home"  # stands in for the operator's real default roots
+for v, path in synthetic.items():
+    assert path.is_absolute() and path.is_dir() and not any(path.iterdir()), (v, path)
+    assert not path.is_relative_to(ambient), (v, path)
+home, start = root / "home", int(time.time()) - 60
+for part in ("state", "data", "config"):
+    (home / part).mkdir(parents=True)
+when = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(start + 1))
+
+def jsonl(path, rows):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+def claude_session(directory, cwd):
+    jsonl(directory / (re.sub(r"[^a-zA-Z0-9]", "-", cwd) + "/s.jsonl"),
+          [dict(type="assistant", sessionId="c-" + Path(cwd).name, cwd=cwd, timestamp=when,
+                message=dict(role="assistant", id="m", model="fixture",
+                             usage=dict(input_tokens=5, output_tokens=1)))])
+
+workers = {h: root / ("worker-" + h) for h in ("claude", "codex", "pi")}
+for h, cwd in workers.items():
+    (home / f"state/job-{h}.meta").write_text(
+        f"spawn_gen=s{start}.1.1\nworktree={cwd}\nharness={h}\nkind=ship\n"
+        f"branch=fm/job-{h}\nproject={root / 'project'}\n")
+# Matching native sessions exist only under the ambient default roots.
+claude_session(ambient / ".claude/projects", str(workers["claude"]))
+pi_cwd = str(workers["pi"])
+jsonl(ambient / ".pi/agent/sessions" / ("--" + re.sub(r"[/\\:]", "-", pi_cwd.lstrip("/")) + "--") / "s.jsonl",
+      [dict(type="session", version=3, id="p", cwd=pi_cwd, timestamp=when)])
+rollout = ambient / ".codex/sessions/x.jsonl"
+jsonl(rollout, [dict(type="session_meta", payload=dict(id="x", cwd=str(workers["codex"]), timestamp=when))])
+index = sqlite3.connect(ambient / ".codex/state_5.sqlite")
+index.execute("create table threads (id text primary key, rollout_path text, cwd text)")
+index.execute("insert into threads values ('x', ?, ?)", (str(rollout), str(workers["codex"])))
+index.commit()
+(ambient / ".no-mistakes").mkdir()
+nm = sqlite3.connect(ambient / ".no-mistakes/state.sqlite")
+nm.executescript("create table repos(id text, working_path text); "
+                 "create table runs(id text, repo_id text, branch text, created_at integer, worktree_dir text);")
+nm.execute("insert into repos values ('p', ?)", (str(root / "project"),))
+nm.execute("insert into runs values ('r', 'p', 'fm/job-codex', ?, ?)", (start, str(workers["claude"])))
+nm.commit()
+
+env = dict(os.environ, HOME=str(ambient), FM_HOME=str(home))
+for key in ("FM_DATA_OVERRIDE", "FM_STATE_OVERRIDE", "FM_CONFIG_OVERRIDE"):
+    env.pop(key, None)
+def lifecycle_refresh():
+    subprocess.run([str(repo / "bin/fm-usage-refresh.sh"), "--force"], env=env, check=True)
+    out = subprocess.run([sys.executable, str(repo / "bin/fm-usage-auto.py"), "status"],
+                         env=env, check=True, capture_output=True, text=True).stdout
+    return json.loads(out)
+
+status = lifecycle_refresh()
+assert status["enabled"] and status["known_sources"] == 0, status
+assert "no_native_sources_observed_usage_unknown" in status["gaps"], status
+# The same enabled collection still discovers sessions in the synthetic roots.
+claude_session(synthetic["CLAUDE_CONFIG_DIR"] / "projects", str(workers["claude"]))
+status = lifecycle_refresh()
+assert status["enabled"] and status["known_sources"] == 1, status
+PY
+pass 'suite fixtures confine default-on usage collection to synthetic native roots'
