@@ -88,7 +88,7 @@ done
 fm_tasks_axi_compatible || fail "native queue requires python3 and the shipped bin/fm-queue.py"
 
 FM_BACKLOG_TRANSITION_ERROR=
-if ! fm_backlog_tasks_axi_addressing "$DATA"; then
+if ! fm_backlog_tasks_axi_addressing "$DATA" ${ARGS[@]+"${ARGS[@]}"}; then
   fail "${FM_BACKLOG_TRANSITION_ERROR:-data directory cannot be resolved: $DATA}"
 fi
 

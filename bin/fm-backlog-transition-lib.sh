@@ -266,12 +266,12 @@ fm_backlog_source_present() {  # <data-dir> <authorized-data-dir> [root authoriz
 # - the bound wrapper execs, so a nested subshell here would add a process
 # layer between tasks-axi and the caller, which the lock-holding callers'
 # interruption contract counts on not existing.
-fm_backlog_tasks_axi_addressing() {  # <data-dir>
+fm_backlog_tasks_axi_addressing() {  # <data-dir> [queue-cli-args...]
   FM_BACKLOG_AXI_FILE=
   local data root backend
   data=$(fm_backlog_data_absolute "$1") || return $?
   root=$(fm_backlog_root "$data") || return $?
-  backend=$(fm_tasks_axi_backend "$root" 2>&1) || {
+  backend=$(fm_tasks_axi_backend "$root" "${@:2}" 2>&1) || {
     FM_BACKLOG_TRANSITION_ERROR=$backend
     return 2
   }

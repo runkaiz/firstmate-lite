@@ -30,23 +30,24 @@ fm_tasks_axi_compatible_probe() { fm_tasks_axi_compatible; }
 fm_tasks_axi_update_has_archive_body() { fm_tasks_axi_compatible; }
 fm_tasks_axi_mv_has_multi_id() { fm_tasks_axi_compatible; }
 
-fm_tasks_axi_backend_resolve() {  # <tasks-axi-working-directory>
-  python3 - "$1" "$(dirname "${BASH_SOURCE[0]}")/fm-queue.py" <<'PYTHON'
+fm_tasks_axi_backend_resolve() {  # <tasks-axi-working-directory> [queue-cli-args...]
+  python3 - "$1" "$(dirname "${BASH_SOURCE[0]}")/fm-queue.py" "${@:2}" <<'PYTHON'
 import runpy
 import sys
 from pathlib import Path
 
 queue = runpy.run_path(sys.argv[2])
 try:
-    print(queue["resolve_backend"](Path(sys.argv[1]) / ".tasks.toml"))
+    override = queue["parser"]().parse_intermixed_args(sys.argv[3:]).backend
+    print(queue["resolve_backend"](Path(sys.argv[1]) / ".tasks.toml", override))
 except (queue["QueueError"], OSError, UnicodeError) as error:
     print(str(error), file=sys.stderr)
     sys.exit(2)
 PYTHON
 }
 
-fm_tasks_axi_backend() {  # <tasks-axi-working-directory>
-  fm_tasks_axi_backend_resolve "$1"
+fm_tasks_axi_backend() {  # <tasks-axi-working-directory> [queue-cli-args...]
+  fm_tasks_axi_backend_resolve "$@"
 }
 
 fm_backlog_backend_value() {

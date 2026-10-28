@@ -153,6 +153,31 @@ class QueueTests(unittest.TestCase):
                   extra_env={"FM_QUEUE_BACKEND": "beads", "TASKS_AXI_BACKEND": "beads"})
         self.assertFalse((self.home / "ignored").exists())
 
+    def test_wrapper_cli_backend_precedence(self):
+        self.call("add", "stable", "Existing")
+        before = self.file.read_bytes()
+        for wrapper in ("fm-queue.sh", "fm-tasks-axi.sh"):
+            for variable in ("FM_QUEUE_BACKEND", "TASKS_AXI_BACKEND"):
+                env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT),
+                           **{variable: "beads"})
+                for flags in (["--backend", "markdown"], ["--backend=markdown"],
+                              ["--backend", "beads", "--backend", "markdown"],
+                              ["--body=--backend=beads", "--backend", "markdown"]):
+                    with self.subTest(wrapper=wrapper, variable=variable, flags=flags):
+                        result = subprocess.run(["bash", str(ROOT / "bin" / wrapper), "list", "--json", *flags],
+                                                cwd=self.home, env=env, text=True, capture_output=True, timeout=20)
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual([task["id"] for task in json.loads(result.stdout)["tasks"]], ["stable"])
+                for flags, source in (([], variable), (["--body=--backend=markdown"], variable),
+                                      (["--backend", "markdown", "--backend=beads"], "--backend")):
+                    with self.subTest(wrapper=wrapper, variable=variable, flags=flags):
+                        result = subprocess.run(["bash", str(ROOT / "bin" / wrapper), "list", *flags],
+                                                cwd=self.home, env=env, text=True, capture_output=True, timeout=20)
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn(source, result.stderr)
+                        self.assertIn("Markdown only", result.stderr)
+                self.assertEqual(self.file.read_bytes(), before)
+
     def test_ready_and_start_agree_for_ordinary_kinds(self):
         self.call("add", "followup", "Accepted follow-up", "--kind", "public-followup")
         self.assertEqual(self.ready(), ["followup"])
