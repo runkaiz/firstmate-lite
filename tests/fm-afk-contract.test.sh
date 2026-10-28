@@ -127,7 +127,7 @@ test_enter_writes_a_v2_record_in_one_step_and_announces_hold_for_return() {
   assert_contains "$out" 'hold-for-return only. No phone channel is configured; anything that needs you waits for your return.' 'announcement says hold-for-return only, aloud'
   assert_contains "$out" 'Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return.' 'announcement says the words will be carried out'
   assert_contains "$out" 'Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.' 'announcement states the never-set'
-  assert_contains "$out" 'Expected return: not given. Spend cap: 4 concurrent workers.' 'announcement carries the defaults'
+  assert_contains "$out" 'Expected return: not given. Spend cap: not set (no additional away limit).' 'announcement carries the defaults'
   assert_contains "$out" 'Away posture (recorded):' 'the read-back follows the entry'
   assert_contains "$out" '    merge it when green' 'the read-back carries the words'
   assert_not_contains "$out" 'Say go' 'entry must never ask for a go'
@@ -622,6 +622,26 @@ test_away_entry_over_quiet_mode_becomes_away_and_quiet_never_masks_away() {
   pass "an away entry over quiet mode records away, and a quiet entry never masks a standing away record"
 }
 
+test_cap_is_user_selected_and_replacements_preserve_finite_limits() {
+  local home out
+  home=$(make_home cap-selection)
+  out=$(contract "$home" enter --words 'finish the authorized handoff' 2>&1) || fail "$out"
+  [ "$(contract "$home" field spend_max_concurrent_workers)" = - ] || fail 'entry invented a concurrency cap'
+  assert_contains "$out" 'spend cap: not set (no additional away limit)' 'entry hides unspecified cap'
+  contract "$home" validate || fail 'uncapped record is invalid'
+  contract "$home" enter --words 'finish the handoff with a finite limit' --spend 2 >/dev/null || fail 'explicit cap failed'
+  [ "$(contract "$home" field spend_max_concurrent_workers)" = 2 ] || fail 'explicit cap lost'
+  contract "$home" enter --words 'continue the same authorized work' >/dev/null || fail 'replacement failed'
+  [ "$(contract "$home" field spend_max_concurrent_workers)" = 2 ] || fail 'new words silently relaxed finite cap'
+  contract "$home" enter --words 'continue with revised explicit limit' --spend 3 >/dev/null || fail 'explicit revision failed'
+  [ "$(contract "$home" field spend_max_concurrent_workers)" = 3 ] || fail 'explicit revision lost'
+  home=$(make_home legacy-cap-selection)
+  write_v1_record "$home" 'finish authorized work'
+  contract "$home" enter --words 'continue authorized work' >/dev/null || fail 'legacy replacement failed'
+  [ "$(contract "$home" field spend_max_concurrent_workers)" = 3 ] || fail 'legacy finite cap silently relaxed'
+  pass 'AFK: no invented default; explicit and legacy finite caps survive replacement words'
+}
+
 test_readback_renders_words_verbatim_with_the_record_scalars
 test_words_preserve_final_newline_shape
 test_enter_writes_a_v2_record_in_one_step_and_announces_hold_for_return
@@ -642,3 +662,5 @@ test_version_1_record_is_replaced_by_a_version_2_record
 test_record_changes_refuse_while_a_reader_holds_the_lock
 test_quiet_record_reads_as_a_present_captain_holding_nothing
 test_away_entry_over_quiet_mode_becomes_away_and_quiet_never_masks_away
+
+test_cap_is_user_selected_and_replacements_preserve_finite_limits

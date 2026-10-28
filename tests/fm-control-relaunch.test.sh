@@ -1819,6 +1819,10 @@ if [ -f "$D/herdr-stopped" ]; then
 fi
 case "${1:-} ${2:-}" in
   'pane get')
+    if [ -f "$D/herdr-pane-response" ]; then
+      cat "$D/herdr-pane-response"
+      exit 1
+    fi
     if [ "${3:-}" = "$(cat "$D/herdr-pane")" ]; then
       printf '{"result":{"pane":{"pane_id":"%s","foreground_cwd":"%s"}}}\n' \
         "${3:-}" "$(cat "$D/cwd")"
@@ -2284,20 +2288,99 @@ words: -
 EOF
 }
 
+test_afk_verified_gone_herdr_worker_releases_capacity() {
+  local dir out rc before receipt scenario
+  herdr_case_or_skip afk-gone afk-gone fmlab '%none' || {
+    echo 'skip - Herdr capacity regression needs jq'
+    return 0
+  }
+  dir=$HERDR_CASE_DIR
+  afk_relaunch_fixture "$dir" 1
+  printf 'spawn_gen=original\n' >> "$dir/home/state/afk-gone.meta"
+  printf 'preserve unmerged bytes\n' > "$dir/wt/unmerged.txt"
+  before=$(cat "$dir/home/state/afk-gone.meta")
+  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
+  assert_contains "$out" 'caps concurrent workers at 1' 'absence without a stop receipt released capacity'
+  out=$(run_control "$dir" afk-gone exit) || fail "verified exit failed: $out"
+  assert_contains "$out" endpoint-gone 'exit did not prove the exact endpoint gone'
+  [ "$(meta_field "$dir" afk-gone afk_worker_stopped)" = original ] || fail 'matching owner receipt absent'
+  receipt=$(cat "$dir/home/state/afk-gone.meta")
+
+  # One-variable counterfactual: the same receipt with a visible, agent-free pane.
+  printf '%%7' > "$dir/fake/herdr-pane"
+  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
+  assert_not_contains "$out" 'caps concurrent workers' 'visible agent-free pane retained its slot'
+  printf '%%none' > "$dir/fake/herdr-pane"
+  : > "$dir/fake/herdr-log"
+  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off); rc=$?
+  expect_code 1 "$rc" 'admission probe must stop at missing project validation'
+  assert_not_contains "$out" 'caps concurrent workers' 'verified gone worker retained its slot'
+  assert_contains "$out" 'project' 'probe did not reach ordinary argument validation'
+  assert_not_contains "$(cat "$dir/fake/herdr-log")" 'server ' 'capacity counting started a server'
+  assert_contains "$(cat "$dir/fake/herdr-log")" 'pane get %7 --session fmlab' 'absence proof did not address the recorded session and pane'
+  [ "$(cat "$dir/home/state/afk-gone.meta")" = "$receipt" ] || fail 'admission changed the receipt'
+  [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/afk-gone.meta")" = "$before" ] || fail 'exit changed task identity'
+  [ "$(cat "$dir/wt/unmerged.txt")" = 'preserve unmerged bytes' ] || fail 'unmerged work changed'
+  [ ! -e "$dir/home/state/newcomer.meta" ] || fail 'admission probe published a task'
+
+  for scenario in stopped unreadable malformed wrong-pane live stale foreign session no-receipt; do
+    case "$scenario" in
+      stopped) : > "$dir/fake/herdr-stopped" ;;
+      unreadable) printf '{"error":{"code":"session_not_found"}}\n' > "$dir/fake/herdr-pane-response" ;;
+      malformed) printf 'transport failure\n' > "$dir/fake/herdr-pane-response" ;;
+      wrong-pane) printf '{"result":{"pane":{"pane_id":"%%other"}}}\n' > "$dir/fake/herdr-pane-response" ;;
+      live)
+        printf '%%7' > "$dir/fake/herdr-pane"
+        : > "$dir/fake/herdr-agent-live"
+        ;;
+      stale) awk '/^spawn_gen=/ { $0 = "spawn_gen=replacement" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      foreign) awk '/^endpoint_task_id=/ { $0 = "endpoint_task_id=other" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      session) awk '/^herdr_session=/ { $0 = "herdr_session=other" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      no-receipt) printf '%s\n' "$before" > "$dir/home/state/afk-gone.meta" ;;
+    esac
+    : > "$dir/fake/herdr-log"
+    out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off); rc=$?
+    expect_code 1 "$rc" "unsafe admission succeeded: $scenario"
+    assert_contains "$out" 'caps concurrent workers at 1' "unsafe evidence released capacity: $scenario"
+    assert_not_contains "$(cat "$dir/fake/herdr-log")" 'server ' "counting started a server: $scenario"
+    if [ "$scenario" = stopped ]; then
+      [ -f "$dir/fake/herdr-stopped" ] || fail 'counting restarted the stopped server'
+    fi
+    rm -f "$dir/fake/herdr-stopped" "$dir/fake/herdr-pane-response" "$dir/fake/herdr-agent-live"
+    printf '%%none' > "$dir/fake/herdr-pane"
+    printf '%s\n' "$receipt" > "$dir/home/state/afk-gone.meta"
+  done
+  out=$(run_control "$dir" afk-gone relaunch --note 'Continue preserved delivery'); rc=$?
+  expect_code 0 "$rc" "verified gone worker could not reacquire capacity: $out"
+  [ -z "$(meta_field "$dir" afk-gone afk_worker_stopped)" ] || fail 'relaunch retained stop receipt'
+  [ -f "$dir/fake/herdr-agent-live" ] || fail 'replacement never launched'
+  [ "$(meta_field "$dir" afk-gone worktree)" = "$dir/wt" ] || fail 'relaunch changed preserved worktree'
+  [ "$(cat "$dir/wt/unmerged.txt")" = 'preserve unmerged bytes' ] || fail 'relaunch changed unmerged work'
+  assert_contains "$(cat "$dir/home/data/afk-gone/brief.md")" 'Continue preserved delivery' 'continuation note lost'
+  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
+  assert_contains "$out" 'caps concurrent workers at 1' 'replacement failed to occupy its slot'
+  pass 'AFK: owner-verified exact Herdr absence releases capacity without deleting preserved work'
+}
+
 test_afk_relaunch_reacquires_a_released_slot() {
   local dir out rc
   dir=$(new_case afk-resume)
   add_ship_task "$dir" afk-resume
   afk_relaunch_fixture "$dir"
   out=$(run_control "$dir" afk-resume exit) || fail "initial stop failed: $out"
-  printf 'kind=scout\n' > "$dir/home/state/other.meta"
+  sed -e 's/^window=.*/window=fmses:fm-other/' -e 's/^endpoint_task_id=.*/endpoint_task_id=other/' \
+    -e '/^afk_worker_stopped=/d' "$dir/home/state/afk-resume.meta" > "$dir/home/state/other.meta"
+  [ "$(meta_field "$dir" other worktree)" = "$dir/wt" ] || fail 'holder fixture changed worktree path'
+  [ "$(meta_field "$dir" other project)" = "$dir/proj" ] || fail 'holder fixture changed project path'
+  printf 'fm-other\n' >> "$dir/fake/windows"
   out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
   expect_code 1 "$rc" 'released worker must reacquire a full AFK slot'
   assert_contains "$out" 'caps concurrent workers at 1' 'relaunch bypassed full cap'
   [ "$(cat "$dir/fake/command")" = zsh ] || fail 'denied relaunch started an agent'
   [ -n "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'denial lost stopped receipt'
-  # Only the disposable fixture record is removed, simulating available room.
-  rm "$dir/home/state/other.meta"
+  # Free the holder through the real lifecycle interface, preserving its record.
+  out=$(run_control "$dir" other exit) || fail "parking holder failed: $out"
+  [ -f "$dir/home/state/other.meta" ] || fail 'parking removed historical record'
   out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
   expect_code 0 "$rc" 'relaunch with an available slot must succeed'
   [ -z "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'relaunch retained released occupancy'
@@ -2341,6 +2424,7 @@ test_afk_relaunch_serializes_with_fresh_admission() {
   pass 'AFK: concurrent admission cannot pass a relaunch while its provider is still starting'
 }
 
+test_afk_verified_gone_herdr_worker_releases_capacity
 test_afk_relaunch_reacquires_a_released_slot
 test_afk_relaunch_serializes_with_fresh_admission
 test_exit_and_relaunch_remove_the_dialog_file

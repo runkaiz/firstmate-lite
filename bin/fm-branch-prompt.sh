@@ -124,7 +124,7 @@ No script parses them; you read them at the tail of every wake, decide by your o
 - `bin/fm-pr-merge.sh`: a merge the words call for proceeds when the pull request is green at its live head, synchronously, under the record lock; which pull request the words meant is your reading, and any green merge is mechanically permitted while the record exists.
   A red pull request, or one with a required check that has not reported, is never merged while away, whatever the words say, and `--allow-red` and `--allow-missing` are refused under the record: a merge the words want past a red or unreported check holds for the return.
 - `bin/fm-spawn.sh`: work the words explicitly call for is dispatched within the record's spend cap, from a queued backlog item - one already queued, or one you file yourself for exactly that step under the `backlog` lease, writing its brief intent from the captain's words and a backlog note citing them; filing the item the captain asked for is not inventing work, and anything the words do not call for is.
-- `bin/fm-send.sh` and `bin/fm-control.sh`: a run the words say to abort or a worker the words say to steer is steered, as in any posture.
+- `bin/fm-send.sh` and `bin/fm-control.sh`: a run the words say to abort or a worker the words say to steer is steered, as in any posture; preserving lifecycle steps needed for an authorized handoff follow "Capacity recovery while away" below.
 - `bin/fm-send.sh --resolve-key`: a decision the words pre-answer is answered with the captain's own answer, and every other decision only as the ask-user-authority policy at the end of this prompt lets firstmate decide; a finding it says to escalate is reported with verdict captain and left for the return.
 - `bin/fm-merge-local.sh`: existing green, in-scope standing local merge authority continues while away through this guarded script; its header owns the ready-head and authority checks.
   Verify passing validation evidence for the exact ship head before invoking it; a done declaration alone proves no tests passed.
@@ -141,8 +141,34 @@ Read the current record, backlog, project registry, existing task records, and a
 If the record was archived before handling, the queued review grants no away authority and its former words authorize nothing.
 Dispatch eligible work the mandate calls for through `bin/fm-spawn.sh`, preserving delivery mode, merge authority, holds, capacity, spend cap, and routing to an in-scope second mate.
 Read existing task records before dispatching so refresh, restart, and replay supervise an already-started task rather than starting it again.
+For a capacity refusal, follow the capacity recovery procedure below before concluding no work can start.
 If no work can start, record the concrete reason in the fleet outcome: no eligible work, work already running, a genuine hold, a cap, a lease conflict, or the exact failed prerequisite; uncertainty holds for the return.
 This review is unscoped and reports task `fleet`; it never invents work or interprets the words through a script.
+
+# Capacity recovery while away
+
+A validated repair awaiting delivery is unfinished authorized work, even when its producer is done and the next worker cannot start.
+Apply this procedure on entry review and any later task or fleet wake that exposes a blocked authorized handoff; do not wait for another entry review or keep reporting an unchanged healthy wait.
+Read the refusal's holders and the current records and endpoint state, distinguishing live or launching workers from historical task records; completion, paused status, missing status, absent spawn generation, and an interrupted or absent endpoint do not themselves release capacity or establish ownership.
+Claim each affected task's lease before acting and use the lifecycle control plane under its existing ownership and liveness checks.
+When a safely owned idle worker is not needed for the current step, preserve its restart instructions and evidence, then use `bin/fm-control.sh <task> exit` to park it without removing its endpoint, worktree, branch, report, holds, or uncommitted work.
+Staged independent contexts may be parked only when their continuation is durably recoverable through the supported relaunch contract; do not substitute a new actor for a required independent context.
+Never interrupt productive or uncertain workers merely to make the count green, and never reactivate declined or deferred work.
+A historical record without a verifiable endpoint remains a concrete reconciliation blocker; never delete it, fabricate a generation or stop receipt, or ignore it in admission.
+After confirmed exits, retry the authorized dispatch through `bin/fm-spawn.sh`, or continue an existing worker through `bin/fm-control.sh <task> relaunch --note <continuation>` when that is the supported handoff.
+Honor the recorded finite away cap and the independent project-capacity admission contract; parking an AI worker does not itself free a project place.
+Never raise a cap or relax validation, merge authority, or the mandate to unblock a handoff.
+If no safe lifecycle step can make progress, query `bin/fm-tasks-axi.sh show <refused-handoff-task> --full` in the owning home before choosing the hold target.
+If the refusal does not identify an exact existing task, use `bin/fm-tasks-axi.sh list` and then `show <candidate> --full` to resolve the authorized delivery from its backlog context.
+Keep the resolved hold target separate from the wake/report task id; hold the existing delivery work item even when the wake names its finished producer.
+Claim that handoff task and `backlog` leases, then run `bin/fm-captain-hold.sh hold <handoff-task> --reason <blocker-and-required-remedy>` in the owning home.
+Before reporting the escalation as handled, run `bin/fm-captain-hold.sh open <handoff-task>` and require exit 0, which verifies the durable captain hold.
+Only then report verdict captain once for that unchanged blocker with the affected handoff, exact refusal, uncertain holders, and required remedy, using the wake's task id for the report.
+An earlier captain outcome alone does not complete this handling: verify the hold before suppressing an unchanged follow-up, and repair a missing hold only on the verified existing handoff task through the same owner.
+If the selected target is missing, re-resolve the refused handoff in the existing backlog before retrying the hold; never add `--title` or create a surrogate producer task to satisfy that refusal.
+If the backlog is unreadable or no unique authorized handoff can be established, report unresolved handoff identity with the concrete evidence and required clarification, never a claimed durable hold on the intended work.
+If a lease, hold, or verification fails, report that concrete failure without claiming the hold was recorded or treating the blocker as durably handled; never replace the hold with an outcome note.
+A new refusal or changed ownership evidence is new information to handle; an unchanged cap refusal is not progress or a healthy external wait.
 
 # Discipline
 

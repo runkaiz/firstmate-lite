@@ -1211,6 +1211,63 @@ test_afk_slots_require_a_verified_stop_and_preserve_evidence() {
   pass 'AFK: completion/PR/holds do not imply stopped; confirmed stop frees capacity and preserves evidence'
 }
 
+test_afk_staged_contexts_and_history_block_handoff_until_parked() {
+  local dir out id n before before_status
+  dir=$(new_case afk-staged-handoff)
+  write_afk_fixture "$dir" 4
+  # Five independent staged contexts, ten unreconciled deferred records and
+  # one validated repair awaiting delivery: none yet has a stopped receipt.
+  for n in {1..16}; do
+    id="context-$n"
+    add_task "$dir" "$id" claude scout
+    printf 'spawn_gen=incarnation-%s\n' "$n" >> "$dir/home/state/$id.meta"
+    if [ "$n" -le 5 ]; then
+      printf 'paused: staged context\n' > "$dir/home/state/$id.status"
+    else
+      printf 'done: deferred unmerged work\n' > "$dir/home/state/$id.status"
+    fi
+    printf 'independent continuation %s\n' "$n" > "$dir/home/data/$id/report.md"
+    printf 'unmerged change %s\n' "$n" > "$dir/wt-$id/uncommitted.txt"
+  done
+  for n in {1..16}; do printf 'fm-context-%s\n' "$n"; done > "$dir/fake/windows"
+  printf 'done: repair validated; delivery pending\n' > "$dir/home/state/context-16.status"
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_contains "$out" 'caps concurrent workers at 4; 16 AI worker slot(s)' 'workload did not reproduce the handoff refusal'
+  # One-variable counterfactual: no additional away cap does not interpret
+  # mandate text or change the conservative population; admission passes it.
+  write_afk_fixture "$dir" -
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_not_contains "$out" 'caps concurrent workers' 'unspecified cap blocked the handoff'
+  write_afk_fixture "$dir" 4
+  # First park the ten deferred workers through their owner. They become
+  # historical records with receipts, distinct from the six remaining holders.
+  # Then park three staged contexts to admit delivery under the unchanged cap.
+  for n in {6..15} {1..3}; do
+    if [ "$n" -eq 1 ]; then
+      out=$(afk_fresh_attempt "$dir") || :
+      assert_contains "$out" 'caps concurrent workers at 4; 6 AI worker slot(s)' 'parked history still occupied slots'
+      assert_contains "$out" '(context-1, context-16, context-2, context-3, context-4, context-5)' 'parked history and remaining workers were not distinguished'
+    fi
+    id="context-$n"
+    before=$(cat "$dir/home/state/$id.meta")
+    before_status=$(cat "$dir/home/state/$id.status")
+    out=$(run_control "$dir" "$id" exit) || fail "parking $id failed: $out"
+    [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/$id.meta")" = "$before" ] || fail 'parking changed identity'
+    [ "$(cat "$dir/home/data/$id/report.md")" = "independent continuation $n" ] || fail 'continuation lost'
+    [ "$(cat "$dir/wt-$id/uncommitted.txt")" = "unmerged change $n" ] || fail 'unmerged copy changed'
+    [ "$(cat "$dir/home/state/$id.status")" = "$before_status" ] || fail 'parking reactivated deferred work'
+  done
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_not_contains "$out" 'caps concurrent workers' 'supported parking did not admit delivery'
+  # One unknown historical owner is still charged, even with no incarnation
+  # or endpoint: this is a genuine reconciliation blocker, not free capacity.
+  printf 'kind=scout\n' > "$dir/home/state/unattributed.meta"
+  out=$(afk_fresh_attempt "$dir") || :
+  assert_contains "$out" 'caps concurrent workers at 4; 4 AI worker slot(s)' 'unknown owner silently freed capacity'
+  assert_contains "$out" 'unattributed' 'refusal did not identify the unresolved holder'
+  pass 'AFK: staged contexts plus historical records reproduce refusal; supported parking admits delivery without cleanup; unknown ownership still blocks'
+}
+
 test_afk_late_unknown_and_stale_workers_count_conservatively() {
   local dir out command
   dir=$(new_case afk-uncertain)
@@ -1360,3 +1417,5 @@ test_grok_interrupt_without_acknowledgement_reports_unconfirmed
 test_grok_idle_footer_does_not_confirm_cancellation
 test_secondmate_control_command_carries_no_marker
 test_fm_send_still_marks_the_same_secondmate_task
+
+test_afk_staged_contexts_and_history_block_handoff_until_parked
