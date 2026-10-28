@@ -678,9 +678,13 @@ test_backend_resolution_preserves_precedence_and_defaults() {
       "$ROOT" "$resolver" "$case_dir/home") || fail "$resolver rejected absent configuration"
     [ "$out" = markdown ] || fail "$resolver changed the unconfigured default"
     printf '%s\n' 'backend = "beads"' > "$case_dir/user-home/.tasks-axi/config.toml"
-    out=$(env -u TASKS_AXI_BACKEND HOME="$case_dir/user-home" bash -c "$probe" _ \
-      "$ROOT" "$resolver" "$case_dir/home") || fail "$resolver rejected readable user configuration"
-    [ "$out" = markdown ] || fail "$resolver imported external user-level backend state"
+    if out=$(env -u TASKS_AXI_BACKEND HOME="$case_dir/user-home" bash -c "$probe" _ \
+      "$ROOT" "$resolver" "$case_dir/home" 2>"$case_dir/stderr"); then
+      fail "$resolver accepted an unsupported user-level backend"
+    fi
+    [ -z "$out" ] || fail "$resolver returned a fallback backend"
+    assert_grep 'native queue supports Markdown only' "$case_dir/stderr" \
+      "$resolver did not explain the unsupported backend"
     chmod 000 "$case_dir/user-home/.tasks-axi/config.toml"
     printf '%s\n' 'backend = "markdown"' > "$case_dir/home/.tasks.toml"
     out=$(env -u TASKS_AXI_BACKEND HOME="$case_dir/user-home" bash -c "$probe" _ \
@@ -693,7 +697,7 @@ test_backend_resolution_preserves_precedence_and_defaults() {
     chmod 600 "$case_dir/home/.tasks.toml" "$case_dir/user-home/.tasks-axi/config.toml"
     rm "$case_dir/home/.tasks.toml" "$case_dir/user-home/.tasks-axi/config.toml"
   done
-  pass "native backend resolution preserves supported overrides and ignores external global state"
+  pass "native backend resolution preserves supported overrides and refuses unsupported global selection"
 }
 
 test_backlog_callers_refuse_unreadable_backend_config() (

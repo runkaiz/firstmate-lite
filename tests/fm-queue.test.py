@@ -22,6 +22,7 @@ class QueueTests(unittest.TestCase):
         (self.home / ".tasks.toml").write_text('backend = "markdown"\n[markdown]\npath = "data/backlog.md"\narchive = "data/done-archive.md"\ndone_keep = 100\n')
         self.file = self.home / "data/backlog.md"
         self.env = {key: value for key, value in os.environ.items() if not key.startswith(("FM_QUEUE_", "TASKS_AXI_"))}
+        self.env["HOME"] = str(self.home)
 
     def call(self, *args, good=True, path=None, extra_env=None):
         env = dict(self.env, **(extra_env or {}))
@@ -37,6 +38,151 @@ class QueueTests(unittest.TestCase):
 
     def ready(self):
         return [task["id"] for task in json.loads(self.call("ready", "--json").stdout)["tasks"]]
+
+    def test_user_backend_refusal_preserves_existing_and_absent_queues(self):
+        self.call("add", "stable", "Existing", "--body", "Original intent")
+        self.call("update", "stable", "--body", "Revised intent")
+        self.call("add", "archived", "Delivered")
+        self.call("done", "archived")
+        self.call("prune", "--keep", "0")
+        (self.home / ".tasks.toml").unlink()
+        global_config = self.home / ".tasks-axi/config.toml"
+        global_config.parent.mkdir()
+        global_config.write_text('backend = "beads"\n[beads]\npassword = "private-value"\n')
+        env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT))
+        commands = []
+        for entry in ([str(CLI)], ["bash", str(ROOT / "bin/fm-queue.sh")]):
+            commands.extend([entry + ["list"], entry + ["add", "new", "New"],
+                             entry + ["hold", "stable", "--reason", "Choose"]])
+        for identifier in ("stable", "new-question"):
+            commands.append(["bash", str(ROOT / "bin/fm-captain-hold.sh"), "hold", identifier,
+                             "--title", "Question", "--reason", "Choose scope"])
+        for existing in (True, False):
+            if not existing:
+                for path in (self.home / "data").iterdir():
+                    path.unlink()
+            before = {str(path.relative_to(self.home)): path.read_bytes()
+                      for path in self.home.rglob("*") if path.is_file()}
+            for command in commands:
+                with self.subTest(existing=existing, command=command):
+                    result = subprocess.run(command, cwd=self.home, env=env, text=True, capture_output=True)
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn("Markdown only", result.stderr)
+                    self.assertNotIn("private-value", result.stdout + result.stderr)
+                    after = {str(path.relative_to(self.home)): path.read_bytes()
+                             for path in self.home.rglob("*") if path.is_file()}
+                    self.assertEqual(after, before)
+
+    def test_malformed_or_unreadable_effective_backend_refuses(self):
+        project_config = self.home / ".tasks.toml"
+        global_config = self.home / ".tasks-axi/config.toml"
+        global_config.parent.mkdir()
+        env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT))
+        probe = '. "$1/bin/fm-tasks-axi-lib.sh"; "$2" "$3"'
+        commands = [[str(CLI), "add", "new", "Task"],
+                    ["bash", str(ROOT / "bin/fm-queue.sh"), "list"],
+                    ["bash", str(ROOT / "bin/fm-captain-hold.sh"), "hold", "new", "--title", "Question", "--reason", "Choose"]]
+        for resolver in ("fm_tasks_axi_backend", "fm_tasks_axi_backend_resolve"):
+            commands.append(["bash", "-c", probe, "_", str(ROOT), resolver, str(self.home)])
+        for config in (project_config, global_config):
+            project_config.unlink(missing_ok=True)
+            for case in ("unquoted", "duplicate", "invalid-utf8", "directory", "dangling", "permissions"):
+                if case == "permissions" and os.geteuid() == 0:
+                    continue
+                with self.subTest(config=config, case=case):
+                    if case == "directory":
+                        config.mkdir()
+                    elif case == "dangling":
+                        config.symlink_to("missing-config")
+                    else:
+                        content = {"unquoted": b'backend = secret-invalid-value\n',
+                                   "duplicate": b'backend = "markdown"\nbackend = "beads"\n',
+                                   "invalid-utf8": b'backend = "\xff"\n',
+                                   "permissions": b'backend = "beads"\n'}[case]
+                        config.write_bytes(content)
+                        if case == "permissions":
+                            config.chmod(0)
+                    try:
+                        for command in commands:
+                            result = subprocess.run(command, cwd=self.home, env=env, text=True, capture_output=True)
+                            self.assertNotEqual(result.returncode, 0, result.stdout)
+                            self.assertIn("configuration" if case in ("invalid-utf8", "directory", "dangling", "permissions") else "selection", result.stderr)
+                            self.assertNotIn("secret-invalid-value", result.stdout + result.stderr)
+                            self.assertFalse(self.file.exists())
+                            self.assertEqual(list((self.home / "data").iterdir()), [])
+                    finally:
+                        if case == "directory":
+                            config.rmdir()
+                        else:
+                            if case == "permissions":
+                                config.chmod(0o600)
+                            config.unlink()
+
+    def test_backend_selection_precedence_and_native_defaults(self):
+        project_config = self.home / ".tasks.toml"
+        global_config = self.home / ".tasks-axi/config.toml"
+        global_config.parent.mkdir()
+        probe = '. "$1/bin/fm-tasks-axi-lib.sh"; "$2" "$3"'
+        cases = [
+            (None, None, {}),
+            ('[markdown]\npath = "data/backlog.md"\n', 'backend = "markdown"\n[markdown]\npath = "ignored/backlog.md"\n', {}),
+            ('backend = "markdown"\n', 'backend = "beads"\n', {}),
+            ('backend = "markdown"\n', 'backend = invalid\n', {}),
+            ('backend = "beads"\n', 'backend = "beads"\n', {"TASKS_AXI_BACKEND": "markdown"}),
+            (None, 'backend = "beads"\n', {"TASKS_AXI_BACKEND": "markdown"}),
+            (None, 'backend = invalid\n', {"FM_QUEUE_BACKEND": "markdown", "TASKS_AXI_BACKEND": "beads"}),
+        ]
+        for project, legacy, overrides in cases:
+            with self.subTest(project=project, legacy=legacy, overrides=overrides):
+                for path, content in ((project_config, project), (global_config, legacy)):
+                    if content is None:
+                        path.unlink(missing_ok=True)
+                    else:
+                        path.write_text(content)
+                env = dict(self.env, FM_HOME=str(self.home), FM_ROOT_OVERRIDE=str(ROOT), **overrides)
+                for entry in ([str(CLI)], ["bash", str(ROOT / "bin/fm-queue.sh")]):
+                    result = subprocess.run(entry + ["list", "--json"], cwd=self.home, env=env, text=True, capture_output=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(json.loads(result.stdout)["tasks"], [])
+                for resolver in ("fm_tasks_axi_backend", "fm_tasks_axi_backend_resolve"):
+                    result = subprocess.run(["bash", "-c", probe, "_", str(ROOT), resolver, str(self.home)],
+                                            env=env, text=True, capture_output=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stdout.strip(), "markdown")
+        self.call("add", "explicit", "Explicit choice", "--backend", "markdown",
+                  extra_env={"FM_QUEUE_BACKEND": "beads", "TASKS_AXI_BACKEND": "beads"})
+        self.assertFalse((self.home / "ignored").exists())
+
+    def test_ready_and_start_agree_for_ordinary_kinds(self):
+        self.call("add", "followup", "Accepted follow-up", "--kind", "public-followup")
+        self.assertEqual(self.ready(), ["followup"])
+        self.call("add", "prerequisite", "Required work")
+        self.call("block", "followup", "--by", "prerequisite")
+        self.assertNotIn("followup", self.ready())
+        self.call("start", "followup", good=False)
+        self.call("done", "prerequisite")
+        self.call("hold", "followup", "--kind", "captain", "--reason", "Choose scope")
+        self.assertNotIn("followup", self.ready())
+        self.call("start", "followup", good=False)
+        self.call("unhold", "followup")
+        self.assertEqual(self.ready(), ["followup"])
+        self.call("start", "followup")
+        self.assertEqual(self.task("followup")["state"], "in_flight")
+
+    def test_removed_commands_and_flags_refuse_without_rewriting(self):
+        self.file.write_text("## Queued\n- [ ] stable - Original (kind: ship, repo: project)\n\n  Accepted intent\n")
+        archive = self.file.parent / "done-archive.md"
+        archive.write_text("## Done\n- [x] old - Delivered (done 2026-01-01)\n\n  Historical intent\n")
+        notes = self.file.parent / "note-archive.md"
+        notes.write_text("Existing body history\n")
+        before = [path.read_bytes() for path in (self.file, archive, notes)]
+        self.call("render", good=False)
+        for verb in ("add", "create"):
+            for flags in (("--mint",), ("--prefix", "task"), ("--queue",), ("--queue", "--start")):
+                self.call(verb, "new", "New task", *flags, good=False)
+        self.assertEqual([path.read_bytes() for path in (self.file, archive, notes)], before)
+        self.call("create", "new", "New task")
+        self.assertEqual(self.task("new")["state"], "queued")
 
     def test_capture_authorization_and_restart(self):
         self.call("add", "outcome", "Outcome", "--outcome", "--body", "Members: idea, accepted")

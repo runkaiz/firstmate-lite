@@ -3,7 +3,7 @@
 # Legacy filename/function spellings are source-compatible entry points only;
 # every execution addresses the shipped Python standard-library backend.
 # .tasks.toml and legacy environment pins remain compatibility inputs.
-# No external tasks-axi executable, global config, install or version is used.
+# No external tasks-axi executable, install or version is used.
 # config/backlog-backend=manual retains the existing manual transition opt-out.
 # Native Markdown compatibility/backup mechanics are owned by fm-queue.py.
 
@@ -30,69 +30,19 @@ fm_tasks_axi_compatible_probe() { fm_tasks_axi_compatible; }
 fm_tasks_axi_update_has_archive_body() { fm_tasks_axi_compatible; }
 fm_tasks_axi_mv_has_multi_id() { fm_tasks_axi_compatible; }
 
-fm_tasks_axi_backend_from_toml() {  # <toml-path>
-  local toml=$1
-  [ -f "$toml" ] || return 1
-  LC_ALL=C awk '
-    function trim(value) {
-      sub(/^[[:space:]]+/, "", value)
-      sub(/[[:space:]]+$/, "", value)
-      return value
-    }
-    BEGIN { root=1; found=0; single=sprintf("%c", 39) }
-    {
-      line=$0
-      sub(/[[:space:]]*#.*/, "", line)
-      line=trim(line)
-      if (line ~ /^\[[^]]+\]$/) {
-        root=0
-        next
-      }
-      if (root && line ~ /^backend[[:space:]]*=/) {
-        sub(/^backend[[:space:]]*=[[:space:]]*/, "", line)
-        line=trim(line)
-        if ((substr(line, 1, 1) == "\"" && substr(line, length(line), 1) == "\"") ||
-            (substr(line, 1, 1) == single && substr(line, length(line), 1) == single)) {
-          print substr(line, 2, length(line) - 2)
-          found=1
-          exit
-        }
-      }
-    }
-    END { if (!found) exit 1 }
-  ' "$toml"
-}
-
-# Refuse unsupported legacy adapters before any caller derives an exemption.
-fm_queue_backend_supported() {
-  case "$1" in
-    markdown) printf '%s\n' markdown ;;
-    *) printf 'native queue supports Markdown only; configured backend %s requires an explicit compatible export before activation\n' "$1" >&2; return 2 ;;
-  esac
-}
-
-# Native override, legacy override, then this root's compatibility configuration.
 fm_tasks_axi_backend_resolve() {  # <tasks-axi-working-directory>
-  local root=$1 backend
-  if [ "${FM_QUEUE_BACKEND+x}" = x ]; then
-    fm_queue_backend_supported "$FM_QUEUE_BACKEND"
-    return $?
-  fi
-  if [ "${TASKS_AXI_BACKEND+x}" = x ]; then
-    fm_queue_backend_supported "$TASKS_AXI_BACKEND"
-    return $?
-  fi
-  local config="$root/.tasks.toml"
-  if { [ -d "${config%/*}" ] && [ ! -x "${config%/*}" ]; } ||
-    { { [ -e "$config" ] || [ -L "$config" ]; } && { [ ! -f "$config" ] || [ ! -r "$config" ]; }; }; then
-    printf 'tasks-axi backend configuration cannot be read at %s\n' "$config" >&2
-    return 2
-  fi
-  if backend=$(fm_tasks_axi_backend_from_toml "$config"); then
-    fm_queue_backend_supported "$backend"
-    return $?
-  fi
-  printf '%s\n' markdown
+  python3 - "$1" "$(dirname "${BASH_SOURCE[0]}")/fm-queue.py" <<'PYTHON'
+import runpy
+import sys
+from pathlib import Path
+
+queue = runpy.run_path(sys.argv[2])
+try:
+    print(queue["resolve_backend"](Path(sys.argv[1]) / ".tasks.toml"))
+except (queue["QueueError"], OSError, UnicodeError) as error:
+    print(str(error), file=sys.stderr)
+    sys.exit(2)
+PYTHON
 }
 
 fm_tasks_axi_backend() {  # <tasks-axi-working-directory>

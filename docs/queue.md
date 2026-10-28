@@ -49,6 +49,8 @@ If rollback is necessary, stop native writers first and restore those original f
 Keep any subsequent native work separately preserved before restoring an older snapshot.
 
 The existing `.tasks.toml` Markdown paths and retention are accepted as compatibility configuration.
-There is no implicit import from external user-level tasks-axi configuration.
+Backend selection checks the explicit CLI option, `FM_QUEUE_BACKEND`, `TASKS_AXI_BACKEND`, the owning root's `.tasks.toml`, then legacy `~/.tasks-axi/config.toml`, in that order.
+Only the effective legacy backend selection is inspected; user-level paths and other settings are not imported.
+An unreadable or malformed effective selection refuses access before queue reads or writes.
 Legacy non-Markdown adapters are refused rather than silently migrated or kept behind the native wrapper; their export/activation needs a separately approved compatible path.
 Synthetic compatibility, identity, concurrency and crash-recovery checks run through `bash tests/fm-queue.test.sh`; they do not claim live agent execution or home activation.

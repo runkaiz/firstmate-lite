@@ -20,11 +20,11 @@ import argparse
 import contextlib
 import datetime as dt
 import hashlib
+import fcntl
 import json
 import os
 from pathlib import Path
 import re
-import secrets
 import shutil
 import sys
 import tempfile
@@ -90,20 +90,56 @@ def atomic(path, text):
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(name, path)
-        if os.name != "nt":
-            directory = os.open(str(path.parent), os.O_RDONLY)
-            try:
-                os.fsync(directory)
-            finally:
-                os.close(directory)
+        directory = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
     finally:
         if os.path.exists(name):
             os.unlink(name)
 
 
+def backend_from_config(path):
+    try:
+        if path.parent.is_dir() and not os.access(path.parent, os.X_OK):
+            raise OSError()
+        content = read(path)
+    except (OSError, UnicodeError, QueueError) as error:
+        raise QueueError(f"tasks-axi backend configuration cannot be read at {path}") from error
+    selected = None
+    for line in (content or "").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if re.fullmatch(r"\[[^\[\]]+\]\s*(?:#.*)?", line):
+            break
+        match = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_-]*)\s*=\s*(.+)", line)
+        require(match is not None, f"unsupported or malformed backend selection in {path}")
+        if match[1] == "backend":
+            value = re.fullmatch(r'(\"[^\"\\]*\"|\x27[^\x27]*\x27)\s*(?:#.*)?', match[2])
+            require(value is not None and selected is None, f"unsupported or malformed backend selection in {path}")
+            selected = value[1][1:-1]
+    return selected
+
+
+def resolve_backend(cfg, override=None):
+    selected = override
+    if selected is None:
+        selected = os.environ.get("FM_QUEUE_BACKEND", os.environ.get("TASKS_AXI_BACKEND"))
+    if selected is None:
+        selected = backend_from_config(cfg)
+    if selected is None and os.environ.get("HOME"):
+        selected = backend_from_config(Path(os.environ["HOME"]) / ".tasks-axi/config.toml")
+    if selected is None:
+        selected = "markdown"
+    require(selected == "markdown", "native queue supports Markdown only; configured backend requires an explicit compatible export before activation")
+    return selected
+
+
 def config(file=None, backend=None):
     # Preserve the existing file layout, not the external CLI's global state.
-    settings = {"backend": "markdown", "path": "data/backlog.md", "archive": None, "done_keep": 10}
+    settings = {"path": "data/backlog.md", "archive": None, "done_keep": 10}
     section = ""
     cwd = Path.cwd().resolve()
     cfg = cwd / ".tasks.toml"
@@ -119,6 +155,7 @@ def config(file=None, backend=None):
             cfg = found[0]
         else:
             cfg = candidate.parent / ".tasks.toml"
+    resolve_backend(cfg, backend)
     content = read(cfg)
     if content is not None:
         # This intentionally supports the existing bounded Markdown schema,
@@ -133,11 +170,10 @@ def config(file=None, backend=None):
             match = re.fullmatch(r'(backend|path|archive|done_keep)\s*=\s*("[^"\n]*"|\x27[^\x27\n]*\x27|\d+)\s*(?:#.*)?', line)
             if match and (section == "markdown" or (section == "" and match[1] == "backend")):
                 key, value = match.groups()
-                settings[key] = int(value) if key == "done_keep" else value[1:-1]
+                if key != "backend":
+                    settings[key] = int(value) if key == "done_keep" else value[1:-1]
             elif section in ("", "markdown"):
                 raise QueueError(f"unsupported or malformed queue configuration in {cfg}: {line}")
-    selected = backend if backend is not None else os.environ.get("FM_QUEUE_BACKEND", os.environ.get("TASKS_AXI_BACKEND", settings["backend"]))
-    require(selected == "markdown", f"native queue supports Markdown only; backend {selected!r} requires an explicit compatible export before activation")
     require(settings["path"] and settings["archive"] != "", "queue and archive paths must not be empty")
     path = canonical(pin or cfg.parent / settings["path"])
     archive = Path(settings["archive"]) if settings["archive"] else path.parent / "done-archive.md"
@@ -364,24 +400,10 @@ def locks(paths):
             regular(lock)
             stream = open(lock, "a+b")
             streams.append(stream)
-            if os.name == "nt":
-                import msvcrt
-                stream.seek(0)
-                if not stream.read(1):
-                    stream.write(b"\0")
-                    stream.flush()
-                stream.seek(0)
-                msvcrt.locking(stream.fileno(), msvcrt.LK_LOCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(stream, fcntl.LOCK_EX)
+            fcntl.flock(stream, fcntl.LOCK_EX)
         yield
     finally:
         for stream in reversed(streams):
-            if os.name == "nt":
-                import msvcrt
-                stream.seek(0)
-                msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
             stream.close()
 
 
@@ -517,7 +539,7 @@ def parser():
   block/unblock <id> --by <other-id>
   start <id>    done/close <id> [--pr URL] [--report PATH] [--note TEXT]
        [--keep N | --no-prune]    reopen <id>
-  prune [--keep N]    rm <completed-id>    render
+  prune [--keep N]    rm <completed-id>
   mv <id> [<id>...] --to <queue-file-or-directory>
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
@@ -528,7 +550,7 @@ add/create --start because fm-spawn owns the worker binding.
 '''
     p.add_argument("command", nargs="?", default="list")
     p.add_argument("items", nargs="*")
-    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "prefix", "fields", "backup-dir"):
+    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir"):
         p.add_argument("--" + flag)
     p.add_argument("--priority", choices=list("01234"))
     p.add_argument("--state", choices=("queued", "in_flight", "done", "held"))
@@ -536,7 +558,7 @@ add/create --start because fm-spawn owns the worker binding.
     p.add_argument("--by", action="append", default=[])
     p.add_argument("--limit", type=int)
     p.add_argument("--keep", type=int)
-    for flag in ("json", "full", "archive-body", "start", "queue", "blocked", "include-held", "mint", "idea", "outcome", "dry-run", "no-prune"):
+    for flag in ("json", "full", "archive-body", "start", "blocked", "include-held", "idea", "outcome", "dry-run", "no-prune"):
         p.add_argument("--" + flag, action="store_true")
     p.add_argument("--version", "-V", action="version", version=VERSION)
     return p
@@ -586,7 +608,7 @@ def execute(options, stores):
             tasks = [task for task in tasks if task.blocked(store.all)]
         held = [task for task in tasks if task.held()]
         if verb == "ready":
-            tasks = [task for task in tasks if task.state == "queued" and not task.held() and not task.blocked(store.all) and task.meta.get("kind") not in ("idea", "outcome", "public-followup")]
+            tasks = [task for task in tasks if task.state == "queued" and not task.held() and not task.blocked(store.all) and task.meta.get("kind") not in ("idea", "outcome")]
             tasks.sort(key=lambda task: int(task.meta.get("priority", "2")))
         if options.limit is not None:
             require(options.limit >= 0, "limit must be nonnegative")
@@ -598,12 +620,6 @@ def execute(options, stores):
             table("ready" if verb == "ready" else "tasks", tasks, fields, store.all)
             if verb == "ready" and options.include_held:
                 table("held", held, fields, store.all)
-        return
-    if verb == "render":
-        for task in store.active.tasks() + store.past.tasks():
-            task.dirty = True
-        commit(stores)
-        print("ok: rendered")
         return
     if verb == "prune":
         require(options.state in (None, "done"), "only completed work may be archived")
@@ -634,13 +650,8 @@ def execute(options, stores):
     require(verb in ("add", "show", "start", "done", "reopen", "update", "hold", "unhold", "block", "unblock", "rm", "authorize"), f"unsupported native queue command: {verb}")
     require(items, f"{verb} requires a task ID")
     if verb == "add":
-        if options.mint:
-            title = " ".join(items)
-            stem = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:45] or "task"
-            identifier = (options.prefix or stem) + "-" + secrets.token_hex(3)
-        else:
-            require(len(items) == 2, 'add <id> "<title>"')
-            identifier, title = items
+        require(len(items) == 2, 'add <id> "<title>"')
+        identifier, title = items
         require(identifier not in store.all, f"identity already exists in active queue or archive: {identifier}")
         idea = options.idea or options.kind == "idea"
         outcome = options.outcome or options.kind == "outcome"
