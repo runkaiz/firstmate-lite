@@ -2333,9 +2333,9 @@ test_afk_verified_gone_herdr_worker_releases_capacity() {
         printf '%%7' > "$dir/fake/herdr-pane"
         : > "$dir/fake/herdr-agent-live"
         ;;
-      stale) sed 's/^spawn_gen=.*/spawn_gen=replacement/' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
-      foreign) sed 's/^endpoint_task_id=.*/endpoint_task_id=other/' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
-      session) sed 's/^herdr_session=.*/herdr_session=other/' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      stale) awk '/^spawn_gen=/ { $0 = "spawn_gen=replacement" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      foreign) awk '/^endpoint_task_id=/ { $0 = "endpoint_task_id=other" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
+      session) awk '/^herdr_session=/ { $0 = "herdr_session=other" } { print }' <<< "$receipt" > "$dir/home/state/afk-gone.meta" ;;
       no-receipt) printf '%s\n' "$before" > "$dir/home/state/afk-gone.meta" ;;
     esac
     : > "$dir/fake/herdr-log"

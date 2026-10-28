@@ -71,7 +71,7 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
   esac
   # This checks the generated agent interface, not whether a model follows it.
   case "$out_a" in
-    *'`bin/fm-tasks-axi.sh show <refused-handoff-task> --full`'*'Keep the resolved hold target separate from the wake/report task id'*'re-resolve the refused handoff in the existing backlog'*'never add `--title` or create a surrogate producer task'*'report unresolved handoff identity'*) ;;
+    *"\`bin/fm-tasks-axi.sh show <refused-handoff-task> --full\`"*'Keep the resolved hold target separate from the wake/report task id'*'re-resolve the refused handoff in the existing backlog'*"never add \`--title\` or create a surrogate producer task"*'report unresolved handoff identity'*) ;;
     *) fail "emitted capacity recovery rule lacks backlog resolution and missing-target safeguards" ;;
   esac
   pass "branch prompt is byte-stable across homes, cwd, timezone, and time, above the cache floor"
@@ -83,6 +83,8 @@ test_delivery_hold_is_independent_of_the_producer_report_scope() (
   local home="$TMP_ROOT/delivery-hold" out rc before held
   mkdir -p "$home/state" "$home/data" "$home/config"
   fm_test_tasks_toml "$home/.tasks.toml"
+  # This fixture deliberately exports only inside its isolated subshell.
+  # shellcheck disable=SC2030
   export FM_HOME="$home" PI_CODING_AGENT=true FM_SUPERVISION_ACTOR=branch
   export FM_LEASE_HOLDER_PID=$$ FM_BRANCH_REPORT_TURN=delivery-hold
   printf '%s\n' "$$" > "$home/state/.lock"
@@ -730,6 +732,8 @@ test_outcome_processed_marker_is_sequence_bound() {
 
 test_lease_exclusivity_release_stale_and_sweep() {
   local home out status
+  # Assign a fresh value; do not inherit the earlier fixture's subshell export.
+  # shellcheck disable=SC2031
   local -x PI_CODING_AGENT=true
   home="$TMP_ROOT/lease-home"
   mkdir -p "$home/state"
