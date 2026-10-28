@@ -58,10 +58,15 @@
 # or a clean content-in-default tree match. Anything else refuses.
 # The PR itself is resolved from the task's recorded pr= when present, or - when
 # no pr= was ever recorded (e.g. a yolo-authorized merge on a repo with no PR CI,
-# where the usual "checks green" fm-pr-check.sh trigger never fires) - by looking
-# up a merged PR whose head branch matches the worktree's branch, fetching its head
-# via refs/pull/<n>/head when the branch itself was deleted. So a missing pr= never
-# by itself causes a false refusal of landed work.
+# where the usual "checks green" fm-pr-check.sh trigger never fires) - through
+# native gh in the worktree's repository context. Discovery requests up to two
+# PRs across all states with --json number,url,headRefName and accepts exactly
+# one result with the matching branch and a valid PR URL matching its number.
+# Empty, ambiguous, malformed, incomplete, or failed reads prove neither absence
+# nor landing. The discovered URL is then checked for merged state and head
+# containment, fetching refs/pull/<n>/head when the branch itself was deleted.
+# A missing pr= alone does not refuse landed work: inconclusive discovery may
+# still use the independent content proof below.
 # A failed lookup for a recorded PR refuses. Only an unrecorded PR may use
 # the content fallback, which also refuses when inconclusive.
 # Uncommitted changes are never landed; dirty refusals distinguish untracked-only
@@ -907,10 +912,7 @@ remove_pr_poll_artifacts() {
     "$state_dir/$id.merge-authority" "$state_dir/$id.check-trust" || return 1
 }
 
-# Resolve one PR URL for a worktree branch using native gh's repository context.
-# Request two rows so a reused branch cannot silently select one of several PRs.
-# Invalid, missing, ambiguous, or failed reads prove neither absence nor landing;
-# the caller may still independently prove content landed in the default branch.
+# PR-discovery requirements and fallback authority are owned by the header above.
 pr_url_from_branch() {
   local branch=$1 out
   [ -n "$branch" ] && [ "$branch" != HEAD ] || return 1
