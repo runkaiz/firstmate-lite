@@ -378,11 +378,6 @@ PRIMARY_HARNESS=$("$SCRIPT_DIR/fm-harness.sh" 2>/dev/null || printf unknown)
 # shellcheck source=bin/fm-hold-reason-lib.sh
 . "$SCRIPT_DIR/fm-hold-reason-lib.sh"
 
-# This verdict selects the digest's listing path. Bootstrap checks native
-# availability independently; fm-tasks-axi-lib.sh consumes and clears the legacy
-# handoff variable so it does not leak into an agent's environment.
-if fm_tasks_axi_compatible; then TASKS_AXI_COMPATIBLE=1; else TASKS_AXI_COMPATIBLE=0; fi
-
 STATUS_TAIL=${FM_SESSION_START_STATUS_TAIL:-5}
 case "$STATUS_TAIL" in ''|*[!0-9]*) STATUS_TAIL=5 ;; esac
 QUEUED_LIMIT=${FM_SESSION_START_QUEUED_LIMIT:-20}
@@ -743,15 +738,14 @@ stage bootstrap
 subsection "BOOTSTRAP"
 if [ "$READ_ONLY" -eq 1 ]; then
   BOOT_OUT=$(FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip \
-    FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
+    "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
 elif [ "$REEMIT" -eq 1 ]; then
   BOOT_OUT=$(FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_LOCKED=1 FM_BOOTSTRAP_NETWORK=skip \
-    FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
+    "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1)
 else
   BOOT_OUT=$(
     "$SCRIPT_DIR/fm-herdr-session-cleanup.sh" 2>&1 || true
-    FM_BOOTSTRAP_NETWORK=skip FM_TASKS_AXI_COMPATIBLE="$TASKS_AXI_COMPATIBLE" \
-      "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1
+    FM_BOOTSTRAP_NETWORK=skip "$SCRIPT_DIR/fm-bootstrap.sh" 2>&1
   )
 fi
 if [ -n "$BOOT_OUT" ]; then

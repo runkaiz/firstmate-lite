@@ -18,9 +18,8 @@
 # override, blank-env defaulting, partial-output relay, and pre-launch timeout
 # scan.
 # Dedicated network-phase cases pin FM_BOOTSTRAP_NETWORK as a true partition of
-# one run into its local and network halves, and the one-hop tasks-axi
-# compatibility handoff that keeps a session start from paying for that verdict
-# twice.
+# one run into its local and network halves, and native queue independence from
+# legacy tasks-axi compatibility verdicts.
 set -u
 
 # shellcheck source=tests/lib.sh disable=SC1091
@@ -1085,7 +1084,7 @@ test_network_phases_record_per_step_elapsed_times() {
   pass "bootstrap: each deferred network phase, secondmate, and clone records its own elapsed time"
 }
 
-test_tasks_axi_verdict_handoff_is_consumed_once() {
+test_native_queue_ignores_external_compatibility_verdicts() {
   local case_dir fakebin log out verdict
   case_dir="$TMP_ROOT/tasks-axi-handoff"
   mkdir -p "$case_dir/home/config"
@@ -1097,18 +1096,16 @@ printf '%s\n' "$*" >> "${FM_FAKE_TASKS_AXI_LOG:?}"
 exit 97
 SH
   chmod +x "$fakebin/tasks-axi"
-  for verdict in '' 1 yes; do
+  for verdict in '' 0 1 yes; do
     : > "$log"
     out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
       FM_FAKE_TASKS_AXI_LOG="$log" FM_FAKE_TREEHOUSE_LEASE_HELP=1 \
-      FM_TASKS_AXI_COMPATIBLE="$verdict" "$ROOT/bin/fm-bootstrap.sh")
+      FM_TASKS_AXI_COMPATIBLE="$verdict" "$ROOT/bin/fm-bootstrap.sh") || fail "native bootstrap failed"
     assert_not_contains "$out" 'MISSING: tasks-axi' 'external compatibility verdict affected native availability'
+    assert_not_contains "$out" 'MISSING: native queue' 'legacy verdict hid the available native queue'
     [ ! -s "$log" ] || fail "native bootstrap executed an external queue probe"
   done
-  out=$(FM_TASKS_AXI_COMPATIBLE=1 bash -c '. "$1"; printf "%s\n" "${FM_TASKS_AXI_COMPATIBLE-unset}"' \
-    _ "$ROOT/bin/fm-tasks-axi-lib.sh")
-  [ "$out" = unset ] || fail "legacy verdict leaked to a child"
-  pass "bootstrap ignores and consumes external compatibility verdicts without running that tool"
+  pass "bootstrap ignores external compatibility verdicts without running that tool"
 }
 
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info() {
@@ -1293,6 +1290,6 @@ test_routine_bootstrap_contract_runs_under_system_bash
 test_network_phase_partitions_the_run
 test_network_sweeps_recheck_lock_ownership
 test_network_phases_record_per_step_elapsed_times
-test_tasks_axi_verdict_handoff_is_consumed_once
+test_native_queue_ignores_external_compatibility_verdicts
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info
 test_crew_dispatch_validation
