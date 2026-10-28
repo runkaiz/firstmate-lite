@@ -85,7 +85,6 @@ check() {  # <harness> <version> <root>
 
 # The harness process records its own pid as the session lock, then execs the
 # harness, so the lock holder is the harness that fires the hooks.
-LOCKED_EXEC='printf "%s\n" "$$" > state/.lock; exec "$@"'
 
 # These bare tmux launches have no native agent-idle event. Require tmux's
 # Claude-scoped busy read and the shared composer classifier to agree on idle.
@@ -132,7 +131,7 @@ run_interactive() {  # <harness> <command> [arguments...]
   root="$LAB/$harness"
   [ -d "$root" ] || root=$(make_primary "$harness")
   tmux -L "$SOCKET-$harness" new-session -d -s "$harness" -x 200 -y 50 -c "$root" \
-    "sh -c '$LOCKED_EXEC' sh $command $*" || fail "$harness $version: the tmux session did not start"
+    "printf '%s\\n' \"\$\$\" > state/.lock; exec $(fm_test_credentialed_command "$root/config" "$command" "$@")" || fail "$harness $version: the tmux session did not start"
   i=0
   while [ "$i" -lt 60 ]; do
     screen=$(tmux -L "$SOCKET-$harness" capture-pane -p -t "$harness" 2>/dev/null)

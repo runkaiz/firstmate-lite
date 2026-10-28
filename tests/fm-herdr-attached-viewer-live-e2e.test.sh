@@ -32,8 +32,9 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+LAB_HOME_HELPER=${LAB_HOME_HELPER:-$ROOT/bin/fm-lab-home.sh}
 
-fm_live_gate default-on FM_HERDR_ATTACHED_VIEWER_LIVE_E2E herdr jq python3
+fm_live_gate default-on FM_HERDR_ATTACHED_VIEWER_LIVE_E2E herdr jq python3 lsof
 
 [ -x "$LAB_HELPER" ] || { echo "skip: Herdr lab helper not executable at $LAB_HELPER"; exit 0; }
 
@@ -43,11 +44,16 @@ FOCUS_SWITCH_CONTROL="$TMP_ROOT/focus-switch"
 ORIGINAL_PATH=$PATH
 LAB_SESSION=$("$LAB_HELPER" name fm-herdr-attached-viewer)
 export LAB_HELPER LAB_SESSION ORIGINAL_PATH FOCUS_SWITCH_CONTROL
+SPAWN_FIXTURE_ROOT=
+SPAWN_FIXTURE_HOME=
 
 cleanup() {
   local status=$?
   env PATH="$ORIGINAL_PATH" "$LAB_HELPER" viewer stop "$LAB_SESSION" >/dev/null 2>&1 || status=1
   env PATH="$ORIGINAL_PATH" "$LAB_HELPER" teardown "$LAB_SESSION" || status=1
+  if [ -n "$SPAWN_FIXTURE_ROOT" ]; then
+    "$LAB_HOME_HELPER" teardown "$SPAWN_FIXTURE_HOME" || status=1
+  fi
   fm_test_cleanup
   exit "$status"
 }
@@ -157,6 +163,8 @@ REASON=$(foreground_reason) || fail "could not probe the session's foreground cl
 REASON=$(foreground_reason) || fail "could not probe the session's foreground client"
 [ "$REASON" = cleared ] \
   || fail "the attached pty viewer did not register as a foreground client (reason=$REASON)"
+CLIENT_VERSION=$(lab status --json | jq -r '.client.version // "unknown"')
+printf '# runtime: herdr=%s\n' "$CLIENT_VERSION"
 pass "attached viewer: a pty sized before the fork registers as a real Herdr foreground client"
 
 # A fresh tab can echo input while shell startup still consumes it. Prove an
@@ -180,6 +188,121 @@ for attempt in 1 2 3; do
   [ "$(cat "$READY_LOG")" = prepared ] || fail "preparation did not execute exactly once"
 done
 pass "attached viewer: fresh shells acknowledge execution before one-shot preparation"
+
+SPAWN_FIXTURE_ROOT="$TMP_ROOT/spawn-fixture"
+SPAWN_FIXTURE_HOME="$SPAWN_FIXTURE_ROOT/home"
+"$LAB_HOME_HELPER" create "$SPAWN_FIXTURE_HOME" >/dev/null || fail "could not mark fixture home"
+mkdir -p "$SPAWN_FIXTURE_ROOT/project"
+git -C "$SPAWN_FIXTURE_ROOT/project" init -q -b main || fail "could not initialize fixture"
+printf 'fixture\n' > "$SPAWN_FIXTURE_ROOT/project/README.md"
+git -C "$SPAWN_FIXTURE_ROOT/project" add . || fail "could not stage fixture"
+git -C "$SPAWN_FIXTURE_ROOT/project" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid \
+  commit -qm fixture || fail "could not commit fixture"
+git clone -q --bare "$SPAWN_FIXTURE_ROOT/project" "$SPAWN_FIXTURE_ROOT/origin.git" || fail "could not create local origin"
+git -C "$SPAWN_FIXTURE_ROOT/project" remote add origin "file://$SPAWN_FIXTURE_ROOT/origin.git" || fail "could not bind local origin"
+printf 'off\n' > "$SPAWN_FIXTURE_HOME/config/herdr-presentation-spaces"
+printf 'manual\n' > "$SPAWN_FIXTURE_HOME/config/backlog-backend"
+printf 'git\n' > "$SPAWN_FIXTURE_HOME/config/worktree-allocator"
+printf '%s\n' "$SPAWN_FIXTURE_ROOT/native" > "$SPAWN_FIXTURE_HOME/config/git-worktree-root"
+printf -- '- project [local-only]\n' > "$SPAWN_FIXTURE_HOME/data/projects.md"
+INITIAL=$(git -C "$SPAWN_FIXTURE_ROOT/project" rev-parse HEAD)
+REMOTE=$(printf 'remote divergence\n' | git -C "$SPAWN_FIXTURE_ROOT/project" \
+  -c user.name='Firstmate Tests' -c user.email=tests@example.invalid commit-tree "$INITIAL^{tree}" -p "$INITIAL")
+git -C "$SPAWN_FIXTURE_ROOT/project" update-ref refs/heads/remote-fixture "$REMOTE" || fail 'could not create remote fixture ref'
+git -C "$SPAWN_FIXTURE_ROOT/origin.git" fetch -q "$SPAWN_FIXTURE_ROOT/project" refs/heads/remote-fixture:refs/heads/main \
+  || fail 'could not transfer remote fixture commit'
+printf 'accepted locally\n' > "$SPAWN_FIXTURE_ROOT/project/local-only"
+git -C "$SPAWN_FIXTURE_ROOT/project" add local-only
+git -C "$SPAWN_FIXTURE_ROOT/project" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid commit -qm local-accepted \
+  || fail 'could not commit accepted local history'
+LOCAL_HEAD=$(git -C "$SPAWN_FIXTURE_ROOT/project" rev-parse HEAD)
+export FM_NATIVE_GIT_ADD_LOG="$SPAWN_FIXTURE_ROOT/native-adds"
+export FM_NATIVE_GIT_INTERRUPT_FILE="$SPAWN_FIXTURE_ROOT/interrupt-after-add"
+{
+  printf '#!/usr/bin/env bash\nset -eu\nreal=%q\n' "$(command -v git)"
+  cat <<'SH'
+case "$*" in
+  *' worktree add '*)
+    printf 'add\n' >> "$FM_NATIVE_GIT_ADD_LOG"
+    "$real" "$@"
+    if [ -f "$FM_NATIVE_GIT_INTERRUPT_FILE" ]; then
+      rm "$FM_NATIVE_GIT_INTERRUPT_FILE"
+      # The parent is this fixture's synchronous fm-spawn invocation.
+      kill -TERM "$PPID"
+    fi
+    ;;
+  *) exec "$real" "$@" ;;
+esac
+SH
+} > "$FAKEBIN/git"
+chmod +x "$FAKEBIN/git"
+
+native_spawn() { # <id> <marker> <worker-hold-seconds>
+  local raw
+  mkdir -p "$SPAWN_FIXTURE_HOME/data/$1"
+  cat > "$SPAWN_FIXTURE_HOME/data/$1/brief.md" <<'MD'
+# Task
+## Captain's intent
+Verify the isolated fixture launch boundary.
+
+## Firstmate spec
+Write only the harmless worker cwd marker.
+MD
+  # shellcheck disable=SC2016
+  printf -v raw 'bash -c '\''pwd -P >> "$1"; sleep "$2"'\'' _ %q %q' "$2" "$3"
+  env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID -u HERDR_SOCKET_PATH \
+    -u FM_STATE_OVERRIDE -u FM_DATA_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_PROJECTS_OVERRIDE \
+    PATH="$FAKEBIN:$ORIGINAL_PATH" HERDR_SESSION="$LAB_SESSION" \
+    FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$SPAWN_FIXTURE_HOME" FM_SPAWN_NO_GUARD=1 \
+    GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false SSH_ASKPASS=/bin/false \
+    bash "$ROOT/bin/fm-spawn.sh" "$1" "$SPAWN_FIXTURE_ROOT/project" "$raw" --scout --backend herdr 2>&1
+}
+
+NATIVE_ID="native-interrupted-$$"
+FM_TEST_CLEANUP_DIRS+=("/tmp/fm-$NATIVE_ID")
+NATIVE_MARKER="$SPAWN_FIXTURE_ROOT/native-worker"
+touch "$FM_NATIVE_GIT_INTERRUPT_FILE"
+OUT=$(native_spawn "$NATIVE_ID" "$NATIVE_MARKER" 60)
+STATUS=$?
+[ "$STATUS" != 0 ] || fail 'interrupted native spawn unexpectedly completed'
+[ -f "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.git-worktree" ] || fail 'interruption lost native reservation'
+[ ! -e "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.meta" ] && [ ! -e "$NATIVE_MARKER" ] \
+  || fail 'interrupted native allocation launched a worker'
+OUT=$(native_spawn "$NATIVE_ID" "$NATIVE_MARKER" 60) || fail "native recovery failed: $OUT"
+NATIVE_WT=$(sed -n 's/^worktree=//p' "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.meta")
+for _ in $(seq 1 30); do [ ! -s "$NATIVE_MARKER" ] || break; sleep 0.1; done
+[ "$(cat "$NATIVE_MARKER")" = "$NATIVE_WT" ] || fail 'native worker did not execute once in its recorded copy'
+[ "$(git -C "$NATIVE_WT" rev-parse HEAD)" = "$LOCAL_HEAD" ] || fail 'native scout selected divergent origin instead of local main'
+[ "$(cat "$FM_NATIVE_GIT_ADD_LOG")" = add ] || fail 'native recovery allocated more than once'
+if OUT=$(native_spawn "$NATIVE_ID" "$NATIVE_MARKER" 60); then fail 'duplicate native worker was launched'; fi
+[ "$(cat "$FM_NATIVE_GIT_ADD_LOG")" = add ] || fail 'duplicate native spawn allocated'
+
+# Keep the normal scout report/completion gate; no fabricated ship contract.
+printf 'Private fixture verification complete.\n' > "$SPAWN_FIXTURE_HOME/data/$NATIVE_ID/report.md"
+FM_HOME="$SPAWN_FIXTURE_HOME" bash "$ROOT/bin/fm-captain-hold.sh" complete "$NATIVE_ID" --none >/dev/null 2>&1 \
+  || fail 'could not inventory fixture scout report'
+native_teardown() {
+  env PATH="$FAKEBIN:$ORIGINAL_PATH" FM_HOME="$SPAWN_FIXTURE_HOME" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_TEARDOWN_GUARD_DONE=1 bash "$ROOT/bin/fm-teardown.sh" "$NATIVE_ID" 2>&1
+}
+if OUT=$(native_teardown); then fail 'native teardown killed a busy owner'; fi
+[ -d "$NATIVE_WT" ] && [ -f "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.meta" ] || fail 'busy refusal lost copy/metadata'
+NATIVE_PANE=$(sed -n 's/^herdr_pane_id=//p' "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.meta")
+lab pane send-keys "$NATIVE_PANE" ctrl+c >/dev/null || fail 'could not stop the owned marker hold'
+for _ in $(seq 1 30); do
+  STATE=$(drive fm_backend_herdr_agent_state "$LAB_SESSION:$NATIVE_PANE")
+  [ "$STATE" != dead ] || break
+  sleep 0.1
+done
+[ "$STATE" = dead ] || fail 'owned native marker did not return to agent-free shell'
+printf 'preserve\n' > "$NATIVE_WT/untracked"
+if OUT=$(native_teardown); then fail 'native teardown discarded untracked work'; fi
+[ "$(cat "$NATIVE_WT/untracked")" = preserve ] || fail 'native refusal lost untracked bytes'
+rm "$NATIVE_WT/untracked"
+OUT=$(native_teardown) || fail "clean native teardown failed: $OUT"
+[ ! -e "$NATIVE_WT" ] && [ ! -e "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.meta" ] \
+  && [ ! -e "$SPAWN_FIXTURE_HOME/state/$NATIVE_ID.git-worktree" ] || fail 'native cleanup left owned copy or records'
+pass 'native scout: divergent local history, interrupted allocation recovery, one worker, busy/dirty refusal and complete owned teardown'
 
 # --- scenario 3: a viewer on the target tab blocks the close ---------------
 

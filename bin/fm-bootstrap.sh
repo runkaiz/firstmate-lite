@@ -539,7 +539,7 @@ crew_dispatch_validate() {
 # snapshot's classifier and the local snapshot classifier stay as
 # backstops for what this cannot see. Never reads or writes another home.
 backlog_record_reconcile() {
-  local marker meta control_lock meta_lock id row label has_record=0 gate_status
+  local marker meta control_lock meta_lock id row label has_record=0 gate_status backlog_applies=1
   # A fresh home with no state directory has no physical task records to pair.
   # Keep bootstrap diagnostics working without creating state just for a no-op.
   [ -e "$STATE" ] || [ -L "$STATE" ] || return 0
@@ -555,7 +555,7 @@ backlog_record_reconcile() {
       echo "error: backlog reconciliation cannot access configured data directory $DATA ($FM_BACKLOG_TRANSITION_ERROR)" >&2
       return 2
     fi
-    return 0
+    backlog_applies=0
   fi
   # Keep the wake/lock library's source-time state-directory creation inside
   # this mutating sweep, so FM_BOOTSTRAP_DETECT_ONLY remains read-only.
@@ -570,6 +570,10 @@ backlog_record_reconcile() {
       return 2
     fi
     label=$(basename "$marker" .backlog-close)
+    if [ "$backlog_applies" = 0 ]; then
+      fm_backlog_close_marker_validate "$marker" "$DATA" "$label" "$STATE" || continue
+      [ "$FM_BACKLOG_CLOSE_VALIDATED_MODE" = remove ] || continue
+    fi
     control_lock="$STATE/.control-$label.lock"
     meta_lock=$(fm_meta_lock_path "$STATE/$label.meta") || continue
     fm_lock_try_acquire "$control_lock" || continue
@@ -602,6 +606,7 @@ backlog_record_reconcile() {
     fm_lock_release "$control_lock"
   done
 
+  [ "$backlog_applies" = 1 ] || return 0
   # A home that owns no records has nothing to pair, so it never pays for a
   # backlog read. A pending close remains authoritative even when replay failed:
   # the record sweep below must not start that item while its marker survives.

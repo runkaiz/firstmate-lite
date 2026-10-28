@@ -728,6 +728,13 @@ if [ "$READ_ONLY" -eq 0 ]; then
   [ "$REEMIT" -eq 0 ] || NETWORK_STAGE_LOCKED=0
   "$SCRIPT_DIR/fm-startup-network.sh" start \
     --locked "$NETWORK_STAGE_LOCKED" --harvest-pid $$ >/dev/null 2>&1 || true
+  subsection "LOCAL USAGE"
+  if [ "$REEMIT" -eq 0 ]; then
+    FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+      "$SCRIPT_DIR/fm-usage-refresh.sh" --force || true
+  fi
+  FM_HOME="$FM_HOME" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+    python3 "$SCRIPT_DIR/fm-usage-auto.py" status 2>/dev/null || true
 fi
 
 # --- 2. bootstrap --------------------------------------------------------

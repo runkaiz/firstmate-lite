@@ -139,7 +139,7 @@ printf '%s\n' '{"compaction":{"keepRecentTokens":200}}' > "$PROJECT/.pi/settings
 
 tmux -L "$TMUX_SOCKET" new-session -d -s "$TMUX_SESSION" -c "$PROJECT" -x 220 -y 55 \
   -e "FM_HOME=$HOME_DIR" -e "FM_ROOT_OVERRIDE=$PROJECT" -e "FM_GATE_REFUSE_BYPASS=1" \
-  pi --no-tools -e "$PROJECT/.pi/extensions/fm-primary-turnend-guard.ts" \
+  "$(fm_test_credentialed_command "$HOME_DIR/config" pi --no-tools -e "$PROJECT/.pi/extensions/fm-primary-turnend-guard.ts")" \
   || fail "could not start isolated Pi session"
 
 # Pi may ask for project trust before project-local context files and extensions

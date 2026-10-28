@@ -1199,6 +1199,8 @@ test_take_over_preserves_downtime_from_watcher_self_exit() {
   home="$dir/home"
   mkdir -p "$home"
   state="$dir/state"
+  # Keep watcher-cycle usage records outside the home this case must keep empty.
+  local -x FM_DATA_OVERRIDE="$dir/data"
   fakebin="$dir/fakebin"
   armout="$dir/arm.out"
   start_rearm_arm "$home" "$state" "$fakebin" "$dir/owner.out" "$$"

@@ -19,12 +19,14 @@
 # bin/fm-fleet-snapshot.sh's classifier and bin/fm-secondmate-reconcile.sh's
 # cross-home nudge stay defense in depth, not the primary mechanism.
 #
-# SCOPE. fm_backlog_transition_applies is the single gate. It excludes
+# SCOPE. fm_backlog_transition_applies gates paired backlog mutations. It excludes
 # secondmates (persistent agents are never backlog items, AGENTS.md section 10),
 # homes whose configured backlog backend is manual and markdown homes that keep
 # no backlog file. Those return-1 exemptions are never errors; an
 # unresolvable configured data directory, a backend resolution error, or
 # unavailable native queue instead returns 2 so callers refuse before mutation.
+# Native task-record retirement also uses the marker/replay owner below when
+# this gate exempts the backlog; it does not mutate a manual backlog.
 #
 # ADDRESSING. Every call runs from the configured data directory's parent so
 # that home's `.tasks.toml` supplies the adapter selection, done_keep, and the
@@ -54,6 +56,13 @@
 # closes a row that reads as an open captain call. An answer that closes the row
 # first applies any supported retained artifact from the validated record, then
 # replay simply retires the record.
+# For native copies, native_reservation binds the exact ownership record by
+# SHA-256. Keep it until metadata retirement and any paired backlog operation
+# succeed; marker removal verifies that the owned copy/container is absent
+# before retiring that reservation. With metadata still present, native replay
+# refuses and requires guarded teardown to finish its cleanup checks.
+# mode=remove is the native metadata-only retirement path for exempt backlogs;
+# it takes no backlog arguments. Bootstrap replays it even for manual backlogs.
 
 # Set by fm_backlog_transition_applies for a return-1 exemption.
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
@@ -68,7 +77,7 @@ FM_BACKLOG_ROW_ERROR=
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
 FM_BACKLOG_ROW_HOLD_KIND=
 # Set by fm_backlog_close_marker_replay: closed | closed_incomplete | retained |
-# retained_incomplete | answered | stale | noop.
+# retained_incomplete | answered | stale | retired | noop.
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
 FM_BACKLOG_CLOSE_REPLAY_RESULT=
 
@@ -832,7 +841,7 @@ fm_backlog_close_transition() {
   shift 5
   [ -z "$meta" ] || fm_backlog_record_remove "$meta" "task record" "$state" || return 1
   fm_backlog_done "$data" "$id" "$@" || return 1
-  fm_backlog_record_remove "$marker" "pending-close record" "$state"
+  fm_backlog_close_marker_remove "$marker" "$state"
 }
 
 # The captain-held twin of the close transition: same record, same ordering,
@@ -842,7 +851,7 @@ fm_backlog_retain_transition() {
   shift 5
   [ -z "$meta" ] || fm_backlog_record_remove "$meta" "task record" "$state" || return 1
   fm_backlog_retain "$data" "$id" "$@" || return 1
-  fm_backlog_record_remove "$marker" "pending-close record" "$state"
+  fm_backlog_close_marker_remove "$marker" "$state"
 }
 
 fm_backlog_atomic_transition() {
@@ -869,12 +878,14 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
   local url_tail url_authority url_path url_host url_port host_rest host_label host_valid
   local percent_tail percent_valid
   local id_count=0 data_count=0 spawn_gen_count=0 cleanup_incomplete_count=0 mode_count=0
+  local native_reservation='' native_count=0
   local args=()
   FM_BACKLOG_CLOSE_VALIDATED_ID=
   FM_BACKLOG_CLOSE_VALIDATED_DATA=
   FM_BACKLOG_CLOSE_VALIDATED_SPAWN_GEN=
   FM_BACKLOG_CLOSE_VALIDATED_CLEANUP_INCOMPLETE=0
   FM_BACKLOG_CLOSE_VALIDATED_MODE=close
+  FM_BACKLOG_CLOSE_VALIDATED_NATIVE=
   FM_BACKLOG_CLOSE_VALIDATED_ARGS=()
   fm_backlog_record_present "$marker" "pending-close record" "$state" || return 1
   raw_bytes=$(fm_backlog_bytes_of_file "$marker" 2>/dev/null) || {
@@ -892,6 +903,7 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
       spawn_gen=*) marker_spawn_gen=${line#spawn_gen=}; spawn_gen_count=$((spawn_gen_count + 1)) ;;
       cleanup_incomplete=*) cleanup_incomplete=${line#cleanup_incomplete=}; cleanup_incomplete_count=$((cleanup_incomplete_count + 1)) ;;
       mode=*) mode=${line#mode=}; mode_count=$((mode_count + 1)) ;;
+      native_reservation=*) native_reservation=${line#native_reservation=}; native_count=$((native_count + 1)) ;;
       arg=*) args+=("${line#arg=}") ;;
       *) FM_BACKLOG_TRANSITION_ERROR="unreadable pending-close record $marker"; return 1 ;;
     esac
@@ -901,12 +913,20 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
     return 1
   fi
   case "$mode" in
-    close|retain) ;;
+    close|retain|remove) ;;
     *)
       FM_BACKLOG_TRANSITION_ERROR="invalid transition mode in pending-close record $marker"
       return 1
       ;;
   esac
+  if [ "$native_count" -gt 1 ] || { [ "$native_count" = 1 ] && ! [[ "$native_reservation" =~ ^[0-9a-f]{64}$ ]]; }; then
+    FM_BACKLOG_TRANSITION_ERROR="invalid native reservation identity in $marker"
+    return 1
+  fi
+  if [ "$mode" = remove ] && { [ "$native_count" != 1 ] || [ "${#args[@]}" != 0 ]; }; then
+    FM_BACKLOG_TRANSITION_ERROR="invalid native retirement record $marker"
+    return 1
+  fi
   case "$id" in
     ''|.*|*[!A-Za-z0-9._-]*)
       FM_BACKLOG_TRANSITION_ERROR="invalid task identity in pending-close record $marker"
@@ -1032,15 +1052,16 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
   FM_BACKLOG_CLOSE_VALIDATED_SPAWN_GEN=$marker_spawn_gen
   FM_BACKLOG_CLOSE_VALIDATED_CLEANUP_INCOMPLETE=$cleanup_incomplete
   FM_BACKLOG_CLOSE_VALIDATED_MODE=$mode
+  FM_BACKLOG_CLOSE_VALIDATED_NATIVE=$native_reservation
   FM_BACKLOG_CLOSE_VALIDATED_ARGS=("${args[@]+"${args[@]}"}")
 }
 
 # A leading `--retain` flag records the captain-held transition (`mode=retain`)
 # instead of a close; the remaining flags are the same completion links either
 # transition records.
-fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen> <state-dir> <cleanup-incomplete: 0|1> [--retain] [flag...]
+fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen> <state-dir> <cleanup-incomplete: 0|1> [--retain|--remove] [flag...]
   local tmp=$1 id=$2 data spawn_gen=$4 state=$5 cleanup_incomplete=$6 arg previous_arg=''
-  local mode=close serialized_args=()
+  local mode=close native_reservation='' serialized_args=()
   data=$(fm_backlog_data_absolute "$3") || {
     FM_BACKLOG_TRANSITION_ERROR="data directory cannot be resolved: $3"
     return 1
@@ -1055,9 +1076,17 @@ fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen
     *) FM_BACKLOG_TRANSITION_ERROR="invalid pending-close cleanup state"; return 1 ;;
   esac
   shift 6
-  if [ "${1:-}" = --retain ]; then
-    mode=retain
+  if [ "${1:-}" = --retain ] || [ "${1:-}" = --remove ]; then
+    mode=${1#--}
     shift
+  fi
+  if [ -e "$state/$id.git-worktree" ] || [ -L "$state/$id.git-worktree" ]; then
+    # shellcheck source=bin/fm-git-worktree-lib.sh
+    . "${BASH_SOURCE[0]%/*}/fm-git-worktree-lib.sh"
+    fm_git_worktree_identity "$state" "$id" "${FM_HOME:-}" \
+      "$(fm_git_worktree_field "$state/$id.meta" project)" \
+      "$(fm_git_worktree_field "$state/$id.meta" worktree)" || return 1
+    native_reservation=$(perl -MDigest::SHA=sha256_hex -0777 -ne 'print sha256_hex($_)' "$state/$id.git-worktree") || return 1
   fi
   for arg in "$@"; do
     if [ "$previous_arg" = --note ] && [ "$arg" = "local main" ]; then
@@ -1073,6 +1102,7 @@ fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen
     printf 'spawn_gen=%s\n' "$spawn_gen"
     printf 'cleanup_incomplete=%s\n' "$cleanup_incomplete"
     [ "$mode" = close ] || printf 'mode=%s\n' "$mode"
+    [ -z "$native_reservation" ] || printf 'native_reservation=%s\n' "$native_reservation"
     for arg in "${serialized_args[@]+"${serialized_args[@]}"}"; do
       printf 'arg=%s\n' "$arg"
     done
@@ -1103,6 +1133,29 @@ fm_backlog_close_marker_mark_cleanup_incomplete() {  # <state-dir> <marker-path>
 }
 
 fm_backlog_close_marker_remove() {  # <marker-path> <state-dir>
+  local marker=$1 state=$2 id hash project path
+  id=${marker##*/}
+  id=${id%.backlog-close}
+  [ -e "$marker" ] || [ -L "$marker" ] || return 0
+  fm_backlog_record_present "$marker" "pending-close record" "$state" || return 1
+  if { [ -e "$state/$id.git-worktree" ] || [ -L "$state/$id.git-worktree" ]; } \
+     && [ ! -e "$state/$id.meta" ] && [ ! -L "$state/$id.meta" ]; then
+    # shellcheck source=bin/fm-git-worktree-lib.sh
+    . "${BASH_SOURCE[0]%/*}/fm-git-worktree-lib.sh"
+    hash=$(fm_git_worktree_field "$marker" native_reservation) || {
+      FM_BACKLOG_TRANSITION_ERROR="native reservation has no recorded retirement identity; preserving it"
+      return 1
+    }
+    project=$(fm_git_worktree_field "$state/$id.git-worktree" project) || return 1
+    path=$(fm_git_worktree_field "$state/$id.git-worktree" path) || return 1
+    if ! fm_git_worktree_identity "$state" "$id" "${FM_HOME:-}" "$project" "$path" \
+       || [ -e "${path%/worktree}" ] || [ -L "${path%/worktree}" ] \
+       || [ "$hash" != "$(perl -MDigest::SHA=sha256_hex -0777 -ne 'print sha256_hex($_)' "$state/$id.git-worktree")" ]; then
+      FM_BACKLOG_TRANSITION_ERROR="native reservation retirement cannot prove the exact removed copy; preserving it"
+      return 1
+    fi
+    fm_backlog_record_remove "$state/$id.git-worktree" "native reservation" "$state" || return 1
+  fi
   fm_backlog_atomic_transition remove "$1" "pending-close record" "$2"
 }
 
@@ -1118,7 +1171,7 @@ fm_backlog_close_marker_clear() {  # <state-dir> <id>
 # any meta or backlog mutation.
 fm_backlog_close_marker_replay() {  # <state-dir> <marker-path> <authorized-data-dir>
   local state=$1 marker=$2 marker_name expected_id
-  local id data marker_spawn_gen meta meta_spawn_gen row_state cleanup_incomplete mode
+  local id data marker_spawn_gen meta meta_spawn_gen row_state cleanup_incomplete mode native_reservation
   local args=() mode_flags=()
   FM_BACKLOG_CLOSE_REPLAY_RESULT=noop
   fm_backlog_directory_present "$state" "state directory" || return 1
@@ -1134,7 +1187,8 @@ fm_backlog_close_marker_replay() {  # <state-dir> <marker-path> <authorized-data
   marker_spawn_gen=$FM_BACKLOG_CLOSE_VALIDATED_SPAWN_GEN
   cleanup_incomplete=$FM_BACKLOG_CLOSE_VALIDATED_CLEANUP_INCOMPLETE
   mode=$FM_BACKLOG_CLOSE_VALIDATED_MODE
-  [ "$mode" = close ] || mode_flags=(--retain)
+  native_reservation=$FM_BACKLOG_CLOSE_VALIDATED_NATIVE
+  [ "$mode" = close ] || mode_flags=("--$mode")
   args=("${FM_BACKLOG_CLOSE_VALIDATED_ARGS[@]+"${FM_BACKLOG_CLOSE_VALIDATED_ARGS[@]}"}")
   if [ "${args[0]-}" = --note ]; then
     args[1]="local main"
@@ -1152,12 +1206,21 @@ fm_backlog_close_marker_replay() {  # <state-dir> <marker-path> <authorized-data
       FM_BACKLOG_CLOSE_REPLAY_RESULT=stale
       return 0
     fi
+    if [ -n "$native_reservation" ] || [ -e "$state/$id.git-worktree" ] || [ -L "$state/$id.git-worktree" ]; then
+      FM_BACKLOG_TRANSITION_ERROR="native task cleanup is unfinished; rerun guarded teardown for $id"
+      return 1
+    fi
     fm_backlog_close_marker_mark_cleanup_incomplete "$state" "$marker" "$id" "$data" \
       "$marker_spawn_gen" "${mode_flags[@]+"${mode_flags[@]}"}" "${args[@]+"${args[@]}"}" \
       || return 1
     cleanup_incomplete=1
     fm_backlog_atomic_transition remove "$meta" "the interrupted task record" "$state" \
       || return 1
+  fi
+  if [ "$mode" = remove ]; then
+    fm_backlog_close_marker_remove "$marker" "$state" || return 1
+    FM_BACKLOG_CLOSE_REPLAY_RESULT=retired
+    return 0
   fi
   if fm_backlog_row_probe "$data" "$id"; then
     row_state=$FM_BACKLOG_ROW_STATE

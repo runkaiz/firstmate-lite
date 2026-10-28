@@ -2260,7 +2260,7 @@ SH
 # --- context re-emit (--reemit) ----------------------------------------------
 
 test_reemit_skips_startup_sweeps_but_keeps_the_wake_drain() {
-  local rec root home fakebin network_report reemit sequence generation
+  local rec root home fakebin network_report reemit sequence generation usage_before
   rec=$(new_world reemit)
   IFS='|' read -r root home fakebin <<EOF
 $rec
@@ -2279,11 +2279,15 @@ EOF
   assert_not_contains "$network_report" "SECONDMATE_LIVENESS" \
     "startup attempted a retired supervisor sweep"
 
+  usage_before=$(cat "$home/data/usage-ledger/status.json") || fail 'startup did not publish usage status'
   append_wake "$home/state" signal task-r "done: queued after the re-emit too" || fail "seed second wake failed"
   reemit=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_FAKE_HARNESS_PID=$$ PATH="$fakebin:$BASE_PATH" \
     env -u CLAUDECODE -u PI_CODING_AGENT -u FM_PI_HARNESS -u GROK_AGENT \
     "$SESSION_START" --reemit)
 
+  [ "$(cat "$home/data/usage-ledger/status.json")" = "$usage_before" ] \
+    || fail '--reemit forced another usage refresh'
+  assert_contains "$reemit" "LOCAL USAGE" 'usage status lacked its own subsection'
   assert_contains "$reemit" "SESSION START (CONTEXT RE-EMIT) - $home" "--reemit did not label itself"
   assert_not_contains "$reemit" "SECONDMATE_LIVENESS" "--reemit repeated a mutating sweep startup already ran"
   assert_contains "$reemit" "done: queued after the re-emit too" "--reemit did not drain the wake queue"

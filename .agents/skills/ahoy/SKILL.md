@@ -72,6 +72,7 @@ For a contribution wake or linked-issue filing, go directly to Contribution foll
 2. **Compose the four-section chat digest from the fresh snapshot.**
    The gather step is deterministic; your judgment is scoped to ranking the command's facts by what matters right now and writing scannable captain-facing prose.
    Fold useful conversation continuity into the same task rows, retaining full source PR URLs and avoiding duplicate reports.
+   At natural accounting outcomes, use the installed native usage status/summary workflow in [usage-ledger.md](../../../docs/usage-ledger.md) and include a concise observed subtotal with freshness and gaps in the relevant task row; keep pipeline-spend separate.
    The chat response uses the four complete sections in the chat-response contract below, in the same order, each always present.
    Plain mode stops here and writes no report artifact.
 

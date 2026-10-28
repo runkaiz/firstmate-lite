@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# Spawn a ship or scout worker in an isolated Treehouse or Orca worktree.
+# Spawn a ship or scout worker in an isolated native Git, Treehouse or Orca copy.
+# config/worktree-allocator=git opts NEW tmux/Herdr tasks into native copies;
+# absent/treehouse preserves pooled allocation. config/git-worktree-root is
+# required for native tasks. bin/fm-git-worktree-lib.sh owns reservations and
+# copy identity. allocator=git metadata pins recovery/cleanup even after config
+# changes. Native local-only ships and registered local-only scouts start from
+# refs/heads/<base/default>, without an origin fetch. Other native tasks keep
+# origin freshness semantics; relaunch never reallocates or refreshes its copy.
 # Usage: fm-spawn.sh <task-id> <project-dir> --mode <no-mistakes|direct-PR|local-only> --yolo <on|off> [--branch-prefix <prefix>] [--base-branch <branch>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>] [--herdr-resume-lock-wait]
 #        fm-spawn.sh <task-id> <project-dir> --scout [--base-branch <branch>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>] [--herdr-resume-lock-wait]
 #   --mode and --yolo are this task's delivery contract, REQUIRED for every ship
@@ -718,6 +725,8 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 . "$SCRIPT_DIR/fm-backend.sh"
 # shellcheck source=bin/fm-control-lib.sh
 . "$SCRIPT_DIR/fm-control-lib.sh"
+# shellcheck source=bin/fm-git-worktree-lib.sh
+. "$SCRIPT_DIR/fm-git-worktree-lib.sh"
 # shellcheck source=bin/fm-gate-refuse-lib.sh
 . "$SCRIPT_DIR/fm-gate-refuse-lib.sh"
 # shellcheck source=bin/fm-busy-lib.sh
@@ -3374,6 +3383,55 @@ if [ -e "$STATE/$ID.backlog-close" ] || [ -L "$STATE/$ID.backlog-close" ]; then
 fi
 
 W="fm-$ID"
+WORKTREE_ALLOCATOR=treehouse
+if [ "$RELAUNCH" -eq 1 ]; then
+  WORKTREE_ALLOCATOR=$(fm_git_worktree_meta_allocator "$RELAUNCH_META" "$STATE/$ID.git-worktree") || exit 1
+elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ]; then
+  WORKTREE_ALLOCATOR=$(fm_git_worktree_config "$CONFIG") || exit 1
+fi
+case "$WORKTREE_ALLOCATOR" in treehouse|git) ;; *) echo 'error: unknown recorded allocator' >&2; exit 1 ;; esac
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  case "$BACKEND" in tmux|herdr) ;; *) echo 'error: native Git allocator requires tmux or herdr ownership checks' >&2; exit 1 ;; esac
+  if [ "$RELAUNCH" -eq 1 ]; then
+    fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ_ABS" "$RELAUNCH_WT" || exit 1
+  else
+    native_local=0
+    [ "$MODE" != local-only ] || native_local=1
+    if [ "$KIND" = scout ]; then
+      native_posture=$("$FM_ROOT/bin/fm-project-mode.sh" --raw "$(basename "$PROJ_ABS")") || exit 1
+      [ "${native_posture%% *}" != local-only ] || native_local=1
+    fi
+    native_base=$BASE_BRANCH
+    native_ref=
+    if [ "$native_local" = 1 ]; then
+      [ -n "$native_base" ] || native_base=$(default_branch "$PROJ_ABS") || exit 1
+      native_ref="refs/heads/$native_base"
+    elif spawn_worktree_has_origin_config "$PROJ_ABS"; then
+      git -C "$PROJ_ABS" fetch --quiet origin || exit 1
+      if [ -z "$native_base" ]; then
+        git -C "$PROJ_ABS" remote set-head origin --auto >/dev/null || exit 1
+        native_base=$(default_branch "$PROJ_ABS") || exit 1
+      fi
+      native_ref="refs/remotes/origin/$native_base"
+    else
+      [ -z "$native_base" ] || { echo 'error: native named remote base requires origin' >&2; exit 1; }
+      native_base=$(default_branch "$PROJ_ABS") || exit 1
+      native_ref="refs/heads/$native_base"
+    fi
+    native_commit=$(git -C "$PROJ_ABS" rev-parse --verify "$native_ref^{commit}") || exit 1
+    [ -f "$CONFIG/git-worktree-root" ] && [ ! -L "$CONFIG/git-worktree-root" ] || {
+      echo 'error: git allocator requires config/git-worktree-root' >&2; exit 1;
+    }
+    native_root=$(cat "$CONFIG/git-worktree-root") || exit 1
+    fm_git_worktree_allocate "$STATE" "$ID" "$FM_HOME" "$PROJ_ABS" "$native_root" "$native_commit" "$native_ref" || exit 1
+    WT=$FM_GIT_WORKTREE_PATH
+    echo "native allocation task=$ID source_ref=$native_ref base=$(fm_git_worktree_field "$STATE/$ID.git-worktree" base) worktree=$WT"
+    validate_spawn_worktree 'native Git allocation' native
+  fi
+elif [ "$RELAUNCH" -eq 0 ] && { [ -e "$STATE/$ID.git-worktree" ] || [ -L "$STATE/$ID.git-worktree" ]; }; then
+  echo 'error: retained native reservation requires native recovery; refusing another allocator' >&2
+  exit 1
+fi
 if [ "$RELAUNCH" -eq 1 ]; then
   # A secondmate's home already resolved WT above through the same validation a
   # fresh secondmate spawn uses; every other kind takes the recorded worktree.
@@ -3751,11 +3809,16 @@ spawn_send_key() { # <target> <key>
 # out of the primary checkout. The same explicit cd gives every backend one
 # launch boundary and makes a dropped or ignored cwd change a refusal.
 spawn_enter_recorded_worktree() {
-
-  spawn_send_text_line "$WT_TARGET" "cd -- $(shell_quote "$WT")" || {
+  local enter_command
+  enter_command="cd -- $(shell_quote "$WT")"
+  if [ "${WORKTREE_ALLOCATOR:-treehouse}" = git ] && [ "$BACKEND" = herdr ] && [ "$RELAUNCH" = 0 ]; then
+    fm_backend_herdr_prepare_shell "$WT_TARGET" "$enter_command" || exit 1
+  else
+    spawn_send_text_line "$WT_TARGET" "$enter_command" || {
     echo "error: task $ID's endpoint could not be moved into its recorded worktree '$WT'; refusing to launch outside the copy holding its work" >&2
     exit 1
-  }
+    }
+  fi
 }
 
 # Verify the endpoint's cwd after the explicit handoff but before any harness
@@ -4106,7 +4169,7 @@ elif [ "$RELAUNCH" -eq 1 ]; then
     fi
   fi
   validate_spawn_worktree "relaunch" "$T"
-elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ]; then
+elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
   if [ "$BACKEND" = herdr ]; then
     fm_backend_herdr_prepare_shell "$WT_TARGET" 'treehouse get' || {
       echo "error: task $ID's shell could not confirm readiness and submit allocation; inspect window $T" >&2
@@ -4195,7 +4258,7 @@ elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ]; then
     SPAWN_SLOT_CLAIMED=1
   fi
 fi
-if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ]; then
+if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
   freshen_spawn_worktree_base "$WT" "$BASE_BRANCH" || exit 1
 fi
 
@@ -4869,6 +4932,11 @@ fi
 
 META_WINDOW=$T
 [ "$BACKEND" = orca ] && META_WINDOW=$W
+# Preserve the retiring generation before relaunch publishes its replacement.
+if [ "$RELAUNCH" -eq 1 ]; then
+  FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+    "$SCRIPT_DIR/fm-usage-refresh.sh" --retire "$ID" || true
+fi
 SPAWN_GEN="s$(date +%s).${BASHPID:-$$}.$RANDOM"
 SPAWN_META_PATH="$STATE/$ID.meta"
 if [ "$SPAWN_META_LOCK_HELD" != 1 ]; then
@@ -4886,7 +4954,7 @@ SPAWN_META_PATH=$SPAWN_META_TMP
 preserve_relaunch_meta() {
   awk -F= '
     BEGIN {
-      split("window endpoint_task_id worktree project harness kind mode yolo branch tasktmp base_branch upstream_consent model effort launch_model_control launch_effort_control launch_service_control effective_profile account account_provider busy_gen spawn_gen traceparent backend herdr_session herdr_workspace_id herdr_tab_id herdr_pane_id zellij_session zellij_tab_id zellij_pane_id orca_worktree_id terminal cmux_workspace_id cmux_surface_id home projects control_relaunch_tx", keys, " ")
+      split("allocator window endpoint_task_id worktree project harness kind mode yolo branch tasktmp base_branch upstream_consent model effort launch_model_control launch_effort_control launch_service_control effective_profile account account_provider busy_gen spawn_gen traceparent backend herdr_session herdr_workspace_id herdr_tab_id herdr_pane_id zellij_session zellij_tab_id zellij_pane_id orca_worktree_id terminal cmux_workspace_id cmux_surface_id home projects control_relaunch_tx", keys, " ")
       for (i in keys) owned[keys[i]] = 1
     }
     !($1 in owned)
@@ -4896,6 +4964,7 @@ preserve_relaunch_meta() {
   echo "window=$META_WINDOW"
   echo "endpoint_task_id=$ID"
   echo "worktree=$WT"
+  [ "$WORKTREE_ALLOCATOR" != git ] || echo 'allocator=git'
   echo "project=$PROJ_ABS"
   echo "harness=$HARNESS"
   echo "kind=$KIND"
@@ -5554,6 +5623,9 @@ if [ -n "$SPAWN_DEFERRED_SIGNAL" ]; then
 fi
 fm_lock_release "$SPAWN_META_LOCK"
 SPAWN_META_LOCK_HELD=0
+
+FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+    "$SCRIPT_DIR/fm-usage-refresh.sh" --remember "$ID" || true
 
 SPAWN_DELIVERY=
 [ -z "$MODE" ] || SPAWN_DELIVERY=" mode=$MODE yolo=$YOLO"

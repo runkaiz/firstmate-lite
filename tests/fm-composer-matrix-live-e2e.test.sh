@@ -81,7 +81,7 @@ check_harness_idle_empty() {  # <name> <launch-cmd...>
   local name=$1 win="hx-$1" verdict='' i=0 budget=${FM_COMPOSER_MATRIX_LIVE_POLLS:-45} version dismissed=0 startup_screen
   shift
   version=$(harness_version "$1")
-  tmux -L "$SOCKET" new-window -d -t "$SESSION:" -n "$win" -c "$ROOT" -- "$@" \
+  tmux -L "$SOCKET" new-window -d -t "$SESSION:" -n "$win" -c "$ROOT" "$(fm_test_credentialed_command "$SHIM_DIR/$name-config" "$@")" \
     || fail "$name ($version): could not launch in the isolated tmux server"
   while [ "$i" -lt "$budget" ]; do
     verdict=$(fm_tmux_composer_state "$SESSION:$win")

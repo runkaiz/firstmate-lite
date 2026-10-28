@@ -8,7 +8,7 @@ Firstmate requires Herdr protocol 14 or newer.
 Broad backend verification covers versions 0.7.1, 0.7.3, 0.7.4, 0.7.5, and 0.8.0.
 Protocol-16 features remain gated by availability.
 Default-on presentation spaces have a higher floor of Herdr 0.8.0 for the reason given under [Presentation spaces](#presentation-spaces).
-Herdr provides the terminal session while Treehouse continues to provide task worktrees.
+Herdr provides the terminal session; [task allocator configuration](configuration.md#task-worktree-allocator-configworktree-allocator) owns worktree provider selection.
 [`configuration.md`](configuration.md#runtime-backend-configbackend--fm_backend) owns shared backend selection and metadata semantics.
 
 ## Find a topic
@@ -60,9 +60,9 @@ An auto-detected Herdr spawn stays silent, matching the verified tmux default pa
 Spawn stops before creating a Herdr container or acquiring a task worktree when `herdr`, `jq`, or the protocol floor is unavailable.
 No separate first-run provisioning is required.
 
-Before fresh task allocation, Firstmate confirms that the new shell can execute a harmless readiness probe.
+Before pooled task allocation or entry into a newly allocated native copy, Firstmate confirms that the new shell can execute a harmless readiness probe.
 This prevents interactive shell startup programs from consuming the one-shot Treehouse command before the prompt is ready.
-A shell that never acknowledges readiness fails before allocation; `bin/backends/herdr.sh` owns the bounded probe and cleanup mechanics.
+A shell that never acknowledges readiness fails before submitting the allocation or entry command; `bin/backends/herdr.sh` owns the bounded probe and cleanup mechanics.
 
 The required CI lane uses the pinned installers in `bin/fm-install-herdr.sh` and `bin/fm-install-treehouse.sh`.
 Those script headers own release assets, checksums, download bounds, and post-install gates.

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Firstmate native usage summary v1",
+  "type": "object",
+  "required": ["schema_version", "coverage", "pricing", "tool_token_allocation", "sources", "groups", "empty_means"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "coverage": {"const": "partial"},
+    "pricing": {"type": "null"},
+    "tool_token_allocation": {"type": "null"},
+    "empty_means": {"type": "string"},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "harness", "gaps", "current"],
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "harness": {"enum": ["claude", "codex", "pi"]},
+          "gaps": {"type": "array", "items": {"type": "string"}},
+          "current": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["group", "usage_records", "tool_calls", "tokens", "tools", "raw_counter_totals"],
+        "properties": {
+          "group": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
+          "usage_records": {"type": "integer", "minimum": 0},
+          "tool_calls": {"type": "integer", "minimum": 0},
+          "tokens": {
+            "type": "object",
+            "required": ["input", "output", "cache_read", "cache_write", "reasoning", "total"],
+            "additionalProperties": {"$ref": "#/$defs/counter"}
+          },
+          "tools": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["calls", "status", "duration_ms", "unknown_duration_calls"],
+              "properties": {
+                "calls": {"type": "integer", "minimum": 0},
+                "status": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+                "duration_ms": {"type": "number", "minimum": 0},
+                "unknown_duration_calls": {"type": "integer", "minimum": 0}
+              },
+              "additionalProperties": false
+            }
+          },
+          "raw_counter_totals": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "counter": {
+      "type": "object",
+      "required": ["reported", "unknown_records"],
+      "properties": {
+        "reported": {"type": "number", "minimum": 0},
+        "unknown_records": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  }
+}

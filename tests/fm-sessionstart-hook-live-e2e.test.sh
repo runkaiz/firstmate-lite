@@ -203,7 +203,7 @@ probe_process_opens() {  # <harness> <version> <lab> <expect-resume> <cold-argv.
   rm -f "$marker" "$lab/state/.startup-network."*
   out=$( cd "$lab" && FM_LIVE_RECORD="$record" FM_LIVE_NONCE="$LIVE_NONCE" FM_ROOT_OVERRIDE="$lab" FM_HOME="$lab" \
     FM_LIVE_DETACH_MARKER="$marker" \
-    "${cold[@]}" "$ASK" < /dev/null 2>&1 )
+    fm_test_credentialed_run "$lab/config" "${cold[@]}" "$ASK" < /dev/null 2>&1 )
   source=$(head -n 1 "$record")
   [ -n "$source" ] \
     || fail "$harness $version: the tracked session-open registration never invoked the wrapper on a cold open"
@@ -226,7 +226,7 @@ probe_process_opens() {  # <harness> <version> <lab> <expect-resume> <cold-argv.
 
   : > "$record"
   ( cd "$lab" && FM_LIVE_RECORD="$record" FM_LIVE_NONCE="$LIVE_NONCE" FM_ROOT_OVERRIDE="$lab" FM_HOME="$lab" \
-    "${resume[@]}" 'Say only OK.' < /dev/null >/dev/null 2>&1 ) || true
+    fm_test_credentialed_run "$lab/config" "${resume[@]}" 'Say only OK.' < /dev/null >/dev/null 2>&1 ) || true
   source=$(head -n 1 "$record")
   [ -n "$source" ] \
     || fail "$harness $version: a context-preserving reopen invoked no session-open hook at all"
@@ -251,7 +251,7 @@ probe_context_reset() {  # <harness> <version> <lab> <clear-command> <launch-arg
   tmux -L "$SOCKET" new-session -d -s "$session" -c "$lab" -x 200 -y 50 \
     -e FM_LIVE_RECORD="$record" -e FM_ROOT_OVERRIDE="$lab" -e FM_HOME="$lab" \
     -e FM_LIVE_NONCE="$LIVE_NONCE" \
-    "$*" \
+    "$(fm_test_credentialed_command "$lab/config" "$@")" \
     || fail "$harness $version: could not start an interactive lab session"
 
   # Every run-tier TUI asks whether it trusts a folder it has not seen, and the
