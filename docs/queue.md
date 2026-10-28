@@ -10,13 +10,27 @@ The storage executable's header and help own exact command and file mechanics.
 The native queue retains the existing Markdown task representation, configured active file, completed-task archive and note history.
 The archive and note history are parts of that queue, not independent writable planning lists.
 Normal reads, identity checks and mutations share locking; multi-file writes have a recoverable transaction so interruption does not silently lose a task.
-Malformed records, duplicate identities, conflicting recovery data and unsupported adapters fail with a diagnostic before a new mutation is committed.
+Malformed records, duplicate active identities, unproven active/archive collisions, conflicting recovery data and unsupported adapters fail with a diagnostic before a new mutation is committed.
 
 `show` finds active and archived tasks by original ID.
-`reopen` moves an archived task back to the active queue with its original identity, body, hold provenance and artifact links.
+The archive is append-only completed history: existing repeated `## Archived <date>` sections are read in place, and newly archived rows are appended as another such section, so records are never normalized, reordered, merged or renumbered.
+An ID that appears in more than one archived record is one task's history only when explicit links in the note history name each predecessor and successor record by exact digest and occurrence (`#N` among identical records of that ID in append order), forming one complete chain; its latest record then answers ordinary lookup.
+Dates, positions and body prose never stand in for a link, so unlinked, dangling, competing, cyclic or malformed links make `show`, `reopen` and other single-task commands refuse the ID with each record's location.
+`show <id> --history --json` exposes the full history for operator review, including records whose identity is refused; an ID with only archived records stays reserved and satisfies dependencies even when its history is ambiguous.
+Legacy repeated IDs without structured provenance require a one-time reviewed linkage before identity-selecting operations; matching titles, kinds or ordered dates alone do not resolve them.
+Unique archived IDs need no linkage step, and native lifecycle operations record subsequent provenance automatically rather than requiring ongoing manual administration.
+`link <id> --predecessor <digest> --successor <digest>` records one explicit link after an operator has reviewed the evidence, and `--dry-run` uses the same validation to preview it without changing queue, archive or note contents; nothing infers or bulk-creates links.
+Preview uses normal native locking and may leave the native lock file behind.
+Reopening any archived task, including a single record, keeps every archived record and links an active continuation with its original identity, body, hold provenance and artifact links.
+Archiving the continuation's completion appends and links its new record to the previous latest one.
+Edits to an archived completion, including late PR, report or note evidence, append a linked revision that preserves the original completion date and verb and every predecessor; repeating identical evidence adds no revision.
 Creation refuses identities found in either active storage or the archive, including conflicts between them.
 Replacing a body automatically archives the superseded record in the existing note history.
 `rm` archives only already-complete work and retains its identity; unfinished work stays in the queue and can be parked without implying that its dependents are unblocked.
+
+Cross-queue `mv` supports single-record identities only; linked completion histories, including reopened tasks and revised archived completions, are unsupported and refuse before either queue's records change, including in a multi-ID request.
+These tasks continue to support reopen, resume, completion and late evidence within their existing queue.
+This native backend does not provide complete external tasks-axi API parity; the same-home authority cutover uses compatible files and backups, not cross-queue history transfer.
 
 ## Capture and pickup
 
@@ -41,11 +55,12 @@ Compatibility does not authorize activation or a live-home rewrite.
 The current operating backend remains authoritative until an operator explicitly chooses to activate the validated native replacement.
 Never run native and external writers concurrently against the same files: their lock protocols differ.
 
-With writers stopped, run the native `migrate --dry-run` compatibility check on the explicitly selected home.
+Run pre-cutover compatibility checks and proposed-link previews only on copies of the selected home's queue, archive, note history and configuration, with paths explicitly pinned to those copies.
 The supported Markdown format requires no rewrite.
-Use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
+The migration check reports record and identity counts and lists ambiguous histories without failing solely because they exist; a successful compatibility check does not resolve those histories for single-task operations.
+With writers stopped, use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
 The backup refuses an existing destination and does not switch configuration, install a CLI, start a home or import data into another store.
-If rollback is necessary, stop native writers first and restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
+If rollback is necessary, stop native writers first, then delete the empty `<backlog>.lock` file the native queue leaves behind, because the earlier writer treats any existing lock file as held; restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
 Keep any subsequent native work separately preserved before restoring an older snapshot.
 
 The existing `.tasks.toml` Markdown paths and retention are accepted as compatibility configuration.

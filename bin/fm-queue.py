@@ -10,6 +10,9 @@ Only the Markdown backend is supported. Other adapters fail before mutation.
 Rows retain the existing Markdown representation. Active/archive/note files
 are one authority, protected by a queue lock and a recoverable transaction.
 Every body replacement archives its predecessor. Archived IDs stay reserved.
+See docs/queue.md for archive preservation, identity resolution and move limits.
+`show <id> --history --json` exposes record digests for `link`; plain
+`--history` shows locations, states, completion dates and titles only.
 Migration needs no rewrite: `migrate --dry-run` validates existing records;
 `migrate --backup-dir DIR` also creates an exclusive byte-for-byte backup.
 Neither command activates a home or installs anything. Never run two writers
@@ -18,6 +21,7 @@ using different lock protocols against the same queue during activation.
 
 import argparse
 import contextlib
+import copy
 import datetime as dt
 import hashlib
 import fcntl
@@ -36,6 +40,9 @@ HEADINGS = {v: k for k, v in SECTIONS.items()}
 ROW = re.compile(r"^[-*] (?:\[([ xX])\] ([^\s]+)|\*\*([^*]+)\*\*) - (.*)$")
 ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 META = re.compile(r"\s+\((repo|kind|priority|hold|hold-kind|hold-until):\s*([^)]*)\)|\s+\((since|merged|reported|done)\s+([^)]*)\)")
+ARCHIVED = re.compile(r"Archived \d{4}-\d{2}-\d{2}")
+LINK = re.compile(r"^## (\S+) - Completion history link - [^\n]*\n", re.M)
+LINK_BODY = re.compile(r"\n  predecessor: (sha256:[0-9a-f]{64}#[1-9][0-9]*)\n  successor: (sha256:[0-9a-f]{64}#[1-9][0-9]*|active)\n")
 TODAY = dt.datetime.now(dt.timezone.utc).date().isoformat()
 
 
@@ -65,10 +72,12 @@ def regular(path):
 
 def read(path):
     regular(path)
-    if not path.exists():
+    try:
+        with path.open(encoding="utf-8", newline="") as stream:
+            return stream.read()
+    except FileNotFoundError:
+        # Absent, including a journal another writer finished before our lock.
         return None
-    with path.open(encoding="utf-8", newline="") as stream:
-        return stream.read()
 
 
 def validate_metadata(metadata):
@@ -207,6 +216,7 @@ class Task:
         self.dirty = not raw
         self.archived = False
         self.block_reason = ""
+        self.line = self.block = self.section = self.identity = None
 
     @classmethod
     def parse(cls, lines, state):
@@ -307,28 +317,37 @@ class Task:
 
 
 class Document:
-    def __init__(self, text):
+    def __init__(self, text, archive=False):
         self.parts = []
         require(not any(ord(char) < 32 and char not in "\t\r\n" for char in text or ""), "queue contains a control byte")
-        section = None
-        lines = re.split(r"(?<=\n)", text or "## In flight\n\n## Queued\n\n## Done\n")
+        section = label = None
+        default = "" if archive else "## In flight\n\n## Queued\n\n## Done\n"
+        lines = re.split(r"(?<=\n)", text or default)
         if lines[-1] == "":
             lines.pop()
         index = 0
         seen_sections = set()
+        blocks = 0
         while index < len(lines):
             line = lines[index]
             heading = re.fullmatch(r"##\s+([^\r\n]+)\s*\n?", line)
             if heading:
-                section = SECTIONS.get(heading[1].strip())
-                if section:
+                label = heading[1].strip()
+                section = SECTIONS.get(label)
+                # Each dated archive section is one append, so it may repeat.
+                if archive and ARCHIVED.fullmatch(label):
+                    section = "done"
+                elif section:
                     require(section not in seen_sections, f"duplicate section: {section}")
                     seen_sections.add(section)
+                blocks += 1
             if ROW.fullmatch(line.rstrip("\r\n")):
                 end = index + 1
                 while end < len(lines) and (lines[end].startswith(("  ", "\t")) or not lines[end].strip()):
                     end += 1
-                self.parts.append(Task.parse(lines[index:end], section))
+                task = Task.parse(lines[index:end], section)
+                task.line, task.block, task.section = index + 1, blocks, label
+                self.parts.append(task)
                 index = end
                 continue
             require(not re.match(r"^[-*]\s+\[[ xX]\]", line), f"malformed task row: {line.rstrip()}")
@@ -354,8 +373,78 @@ class Document:
             start = end = len(self.parts)
         self.parts.insert(start if task.state == "done" else end, task)
 
+    def append(self, tasks):
+        # The existing archive writer's shape: one dated section per append.
+        self.parts.extend(["\n", f"## Archived {TODAY}\n"])
+        for task in tasks:
+            self.parts.append(task)
+            if not task.render().endswith("\n"):
+                self.parts.append("\n")
+
     def render(self):
         return "".join(part.render() if isinstance(part, Task) else part for part in self.parts)
+
+
+def digest(task):
+    """Identity of one exact record: its bytes without trailing blank lines."""
+    lines = task.render().split("\n")
+    while lines and not lines[-1].strip():
+        lines.pop()
+    return "sha256:" + hashlib.sha256(("\n".join(lines) + "\n").encode("utf-8")).hexdigest()
+
+
+def identify(records, earlier=()):
+    # Exact bytes plus their occurrence among identical records of this ID in
+    # append order, so a same-day identical re-completion stays distinct.
+    seen = [task.identity.split("#")[0] for task in earlier]
+    for task in records:
+        value = digest(task)
+        seen.append(value)
+        task.identity = f"{value}#{seen.count(value)}"
+
+
+def chain(records, entries):
+    """Order one ID's archived records by explicit history links.
+
+    Returns (ordered records, failure reason or None, reopened predecessor
+    digests). Only a single complete predecessor chain resolves; dates,
+    positions and prose never stand in for a link.
+    """
+    digests = {task.identity: task for task in records}
+    if None in entries:
+        return records, "malformed history link", set()
+    edges, reopened = set(), set()
+    for predecessor, successor in entries:
+        if any(value != "active" and value not in digests for value in (predecessor, successor)):
+            return records, "dangling history link", set()
+        if successor == "active":
+            reopened.add(predecessor)
+        else:
+            edges.add((predecessor, successor))
+    following, preceding = {}, {}
+    for predecessor, successor in edges:
+        if predecessor == successor:
+            return records, "cyclic history links", reopened
+        if predecessor in following or successor in preceding:
+            return records, "competing history links", reopened
+        following[predecessor], preceding[successor] = successor, predecessor
+    heads = [value for value in digests if value not in preceding]
+    if len(edges) < len(records) - 1:
+        return records, "unlinked records", reopened
+    if len(heads) != 1:
+        return records, "cyclic history links", reopened
+    order = [heads[0]]
+    while order[-1] in following:
+        order.append(following[order[-1]])
+    if len(order) != len(records):
+        return records, "cyclic history links", reopened
+    return [digests[value] for value in order], None, reopened
+
+
+def locate(path, task):
+    completion = task.completion()
+    where = f"{path.name}:{task.line}" if task.line else f"{path.name}:pending"
+    return f"{where} ({task.section or 'new section'}, kind {task.meta.get('kind', 'task')}, {completion['verb'] or 'undated'} {completion['date'] or ''})".replace(" )", ")")
 
 
 class Store:
@@ -368,21 +457,57 @@ class Store:
 
     def load(self):
         self.active = Document(read(self.path))
-        self.past = Document(read(self.archive) or "## Done\n")
+        self.past = Document(read(self.archive), archive=True)
         self.note_text = read(self.notes) or ""
         self.original = {path: read(path) for path in (self.path, self.archive, self.notes)}
-        self.all = {}
-        for archived, document in ((False, self.active), (True, self.past)):
-            for task in document.tasks():
-                require(task.id not in self.all, f"duplicate active/archive identity: {task.id}")
-                require(not archived or task.state == "done", f"non-complete archived record: {task.id}")
-                task.archived = archived
-                self.all[task.id] = task
+        self.index()
+
+    def index(self):
+        # Records are never merged or dropped: `all` names each identity's
+        # current record, and `records` keeps every archived predecessor.
+        self.all, self.records, self.ambiguous, self.reasons = {}, {}, {}, {}
+        for task in self.active.tasks():
+            require(task.id not in self.all, f"duplicate active identity: {task.id}")
+            task.archived = False
+            self.all[task.id] = task
+        for task in self.past.tasks():
+            require(task.state == "done", f"non-complete archived record: {task.id}")
+            task.archived = True
+            self.records.setdefault(task.id, []).append(task)
+        self.links = {}
+        for match in LINK.finditer(self.note_text):
+            body = LINK_BODY.match(self.note_text, match.end())
+            self.links.setdefault(match[1], []).append(body.groups() if body else None)
+        for identifier, records in self.records.items():
+            identify(records)
+            where = ", ".join(locate(self.archive, task) for task in records)
+            # Dates, positions and prose do not prove that two records are one
+            # task; only explicit note-history links between exact records do.
+            ordered, reason, reopened = chain(records, self.links.get(identifier, []))
+            self.records[identifier] = ordered
+            if reason:
+                self.reasons[identifier] = reason
+                self.ambiguous[identifier] = f"archived history is not one linked chain ({reason}); records: {where}"
+            if identifier in self.all:
+                # Beside archived history, an active record must be the recorded
+                # reopen of that history's unique latest record.
+                require(not reason and ordered[-1].identity in reopened, f"duplicate active/archive identity: {identifier}; records: {where}, {locate(self.path, self.all[identifier])}")
+            else:
+                self.all[identifier] = ordered[-1]
 
     def find(self, identifier):
         if identifier not in self.all:
             raise NotFound(f'Task "{identifier}" not found in this backlog or archive')
+        require(identifier not in self.ambiguous, f"ambiguous archived identity {identifier}: {self.ambiguous.get(identifier)}; inspect with show --history")
         return self.all[identifier]
+
+    def history_of(self, identifier):
+        if identifier not in self.all:
+            raise NotFound(f'Task "{identifier}" not found in this backlog or archive')
+        records = list(self.records.get(identifier, []))
+        if not self.all[identifier].archived:
+            records.append(self.all[identifier])
+        return records
 
     def remove(self, task):
         (self.past if task.archived else self.active).parts.remove(task)
@@ -390,12 +515,25 @@ class Store:
     def history(self, task, reason="Body replaced"):
         self.note_text += f"\n## {task.id} - {reason} - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n" + task.render() + "\n"
 
+    def link(self, identifier, predecessor, successor):
+        self.note_text += f"\n## {identifier} - Completion history link - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n  predecessor: {predecessor}\n  successor: {successor}\n"
+
+    def archive_tasks(self, tasks):
+        # A reopened continuation of archived history links its completion.
+        latest = {task.id: self.records[task.id][-1].identity for task in tasks if task.id in self.records}
+        self.past.append(tasks)
+        for task in tasks:
+            if task.id in latest:
+                identify([task], self.records[task.id])
+                self.link(task.id, latest[task.id], task.identity)
+
     def prune(self, keep):
         done = [task for task in self.active.tasks() if task.state == "done"]
         for task in done[keep:]:
             self.active.parts.remove(task)
             task.archived = True
-            self.past.insert(task)
+        if done[keep:]:
+            self.archive_tasks(done[keep:])
 
     def changes(self):
         result = {self.path: self.active.render(), self.archive: self.past.render(), self.notes: self.note_text}
@@ -462,19 +600,21 @@ def commit(stores):
     for store in stores:
         # An input must not serialize into metadata or a second task identity.
         # Validate before publishing a transaction, including unchanged siblings.
-        identities = set()
-        for document in (store.active, store.past):
-            for task in document.tasks():
-                require(task.id not in identities, f"duplicate queue identity: {task.id}")
-                identities.add(task.id)
+        for archive, document in ((False, store.active), (True, store.past)):
+            tasks = document.tasks()
+            for task in tasks:
                 if task.dirty:
                     require(not META.search(" " + task.title) and "blocked-by:" not in task.title, "title contains reserved queue metadata")
                     validate_metadata(task.meta)
-            parsed = {task.id: task for task in Document(document.render()).tasks()}
-            for task in document.tasks():
+            parsed = Document(document.render(), archive).tasks()
+            require([task.id for task in parsed] == [task.id for task in tasks], "task identity does not round-trip; ambiguous queue representation")
+            for task, reparsed in zip(tasks, parsed):
                 if task.dirty:
-                    require(parsed[task.id].meta == task.meta, "metadata does not round-trip; use the encoded hold owner for literal reasons")
-                    require(all(getattr(parsed[task.id], field) == getattr(task, field) for field in ("title", "body", "links", "deps", "state")), "task content does not round-trip; ambiguous queue representation")
+                    require(reparsed.meta == task.meta, "metadata does not round-trip; use the encoded hold owner for literal reasons")
+                    require(all(getattr(reparsed, field) == getattr(task, field) for field in ("title", "body", "links", "deps", "state")), "task content does not round-trip; ambiguous queue representation")
+        previous = set(store.ambiguous)
+        store.index()
+        require(set(store.ambiguous) <= previous, "change would make an archived identity history ambiguous: " + ", ".join(sorted(set(store.ambiguous) - previous)))
         for path, text in store.changes().items():
             files.append({"path": str(path), "before": store.original[path], "after": text})
     if not files:
@@ -546,7 +686,7 @@ def parser():
     p.epilog = '''Commands (aliases share the same authority):
   add/create <id> "<title>" [--body-file PATH] [--idea | --outcome]
   authorize <id> --body-file PATH [--kind ship|scout|task]
-  show/view <id> [--full]    list [--state STATE] [--fields a,b]
+  show/view <id> [--full | --history]    list [--state STATE] [--fields a,b]
   ready [--repo NAME] [--include-held]
   update/edit <id> [--body-file PATH] [--title TEXT] [--priority 0-4]
   hold <id> --reason TEXT [--kind captain|external|load|parked|future]
@@ -555,7 +695,8 @@ def parser():
   start <id>    done/close <id> [--pr URL] [--report PATH] [--note TEXT]
        [--keep N | --no-prune]    reopen <id>
   prune [--keep N]    rm <completed-id>
-  mv <id> [<id>...] --to <queue-file-or-directory>
+  mv <id> [<id>...] --to <queue-file-or-directory> (single-record identities only)
+  link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
 Dates are UTC. Captain holds require an answer/release even after their date.
@@ -565,7 +706,7 @@ add/create --start because fm-spawn owns the worker binding.
 '''
     p.add_argument("command", nargs="?", default="list")
     p.add_argument("items", nargs="*")
-    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir"):
+    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir", "predecessor", "successor"):
         p.add_argument("--" + flag)
     p.add_argument("--priority", choices=list("01234"))
     p.add_argument("--state", choices=("queued", "in_flight", "done", "held"))
@@ -573,7 +714,7 @@ add/create --start because fm-spawn owns the worker binding.
     p.add_argument("--by", action="append", default=[])
     p.add_argument("--limit", type=int)
     p.add_argument("--keep", type=int)
-    for flag in ("json", "full", "archive-body", "start", "blocked", "include-held", "idea", "outcome", "dry-run", "no-prune"):
+    for flag in ("json", "full", "archive-body", "start", "blocked", "include-held", "idea", "outcome", "dry-run", "no-prune", "history"):
         p.add_argument("--" + flag, action="store_true")
     p.add_argument("--version", "-V", action="version", version=VERSION)
     return p
@@ -607,7 +748,7 @@ def execute(options, stores):
                     shutil.copy2(path, target)
                     manifest.append({"source": str(path), "backup": target.name, "sha256": hashlib.sha256(target.read_bytes()).hexdigest()})
             atomic(backup / "manifest.json", json.dumps(manifest, indent=2))
-        print(json.dumps({"ok": True, "records": len(store.all), "format": "compatible-markdown", "rewrite_required": False, "activated": False}))
+        print(json.dumps({"ok": True, "records": len(store.active.tasks()) + len(store.past.tasks()), "identities": len(store.all), "ambiguous_histories": sorted(store.ambiguous), "format": "compatible-markdown", "rewrite_required": False, "activated": False}))
         return
     if verb in ("list", "ready"):
         tasks = store.active.tasks()
@@ -649,6 +790,8 @@ def execute(options, stores):
         destination = stores[1]
         identifiers = list(dict.fromkeys(items))
         moving = [store.find(identifier) for identifier in identifiers]
+        for identifier in identifiers:
+            require(len(store.history_of(identifier)) == 1, f"unsupported cross-queue move for {identifier}: linked completion histories must remain in their current queue")
         require(not any(identifier in destination.all for identifier in identifiers), "destination has an active or archived identity conflict")
         for task in moving:
             require(all(dep in identifiers or dep in destination.all for dep in task.deps), f"move would strand dependency of {task.id}")
@@ -656,14 +799,34 @@ def execute(options, stores):
             require(task.id in identifiers or task.state == "done" or not any(dep in identifiers for dep in task.deps), f"move would strand dependent {task.id}")
         for task in moving:
             store.remove(task)
-            (destination.past if task.archived else destination.active).insert(task)
+            if not task.archived:
+                destination.active.insert(task)
             destination.all[task.id] = task
             del store.all[task.id]
+        if any(task.archived for task in moving):
+            destination.past.append([task for task in moving if task.archived])
         commit(stores)
         print(json.dumps({"ok": True, "moved": identifiers}))
         return
+    if verb == "link":
+        require(len(items) == 1 and options.predecessor and options.successor, "link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]")
+        identifier, link = items[0], (options.predecessor, options.successor)
+        records = store.records.get(identifier, [])
+        require(len(records) > 1 and not (identifier in store.all and not store.all[identifier].archived), f"{identifier} has no repeated archived records to link")
+        require(all(value in [task.identity for task in records] for value in link) and link[0] != link[1], "--predecessor and --successor must each name a different archived record; see show --history")
+        require(link not in store.links.get(identifier, []), "history link already recorded")
+        store.link(identifier, *link)
+        store.index()
+        reason = store.reasons.get(identifier)
+        require(reason in (None, "unlinked records"), f"link would leave {identifier} with {reason}")
+        if not options.dry_run:
+            commit(stores)
+        print(json.dumps({"ok": True, "id": identifier, "recorded": not options.dry_run, "resolved": reason is None,
+                          "order": [locate(store.archive, task) for task in store.records[identifier]]}, ensure_ascii=False))
+        return
     require(verb in ("add", "show", "start", "done", "reopen", "update", "hold", "unhold", "block", "unblock", "rm", "authorize"), f"unsupported native queue command: {verb}")
     require(items, f"{verb} requires a task ID")
+    predecessor = None
     if verb == "add":
         require(len(items) == 2, 'add <id> "<title>"')
         identifier, title = items
@@ -685,10 +848,26 @@ def execute(options, stores):
         store.active.insert(task)
     else:
         require(len(items) == 1, f"{verb} requires exactly one task ID")
+        if verb == "show" and options.history:
+            # Read-only: every record, oldest first, even when ambiguous.
+            records = store.history_of(items[0])
+            ambiguity = store.ambiguous.get(items[0])
+            rows = [dict(record.data(store.all), location=locate(store.archive if record.archived else store.path, record), digest=record.identity or digest(record)) for record in records]
+            if options.json:
+                print(json.dumps({"ok": True, "id": items[0], "ambiguous": ambiguity, "records": rows}, ensure_ascii=False))
+            else:
+                print(f"ambiguous: {scalar(ambiguity)}")
+                print(f"records[{len(rows)}]{{location,state,closed,title}}:")
+                for row in rows:
+                    print("  " + ",".join(json.dumps(row[key], ensure_ascii=False) if row[key] is not None else '"-"' for key in ("location", "state", "closed", "title")))
+            return
         task = store.find(items[0])
         if verb == "show":
             output(task, store, options)
             return
+        if task.archived:
+            predecessor = task
+            task = copy.deepcopy(task)
         if verb in ("update", "authorize"):
             if verb == "update" and options.kind is not None and options.kind != task.meta.get("kind"):
                 require(task.meta.get("kind") not in ("idea", "outcome") and options.kind not in ("idea", "outcome"), "retained context kind cannot be changed by update; use authorize for a parked idea")
@@ -721,7 +900,11 @@ def execute(options, stores):
                 store.history(task, "Reopened with identity preserved")
             elif not was_done and any(key in task.meta for key in ("done", "merged", "reported")):
                 store.history(task, "Prior completion context retained")
-            store.remove(task)
+            settled = task.archived and verb in ("done", "rm")
+            if verb == "reopen" and task.archived:
+                store.link(task.id, task.identity, "active")
+            elif not settled:
+                store.remove(task)
             task.state = "in_flight" if verb == "start" else "queued" if verb == "reopen" else "done"
             if task.state == "done" and not was_done:
                 for key in ("merged", "reported"):
@@ -731,8 +914,10 @@ def execute(options, stores):
                 task.meta.pop("done", None)
                 task.meta.pop("merged", None)
                 task.meta.pop("reported", None)
-            task.archived = verb == "rm" or (task.archived and verb == "done")
-            (store.past if task.archived else store.active).insert(task)
+            if not settled:
+                task.archived = verb == "rm"
+                if not task.archived:
+                    store.active.insert(task)
         elif verb == "hold":
             require(options.reason and options.reason.strip() and not any(c in options.reason for c in "\n\r()"), "hold requires a single-line --reason without parentheses")
             require(options.kind in (None, "captain", "external", "load", "parked", "future"), "invalid hold kind")
@@ -764,7 +949,7 @@ def execute(options, stores):
             require("\n" not in link and "\r" not in link, "artifact link must be one line")
             task.links.append(link)
             task.dirty = True
-    if verb == "done" and (options.pr or options.report):
+    if verb == "done" and predecessor is None and (options.pr or options.report):
         completed = task.completion()["date"]
         if completed:
             for key in ("done", "merged", "reported"):
@@ -775,10 +960,15 @@ def execute(options, stores):
         if options.note == "local main":
             if options.note not in task.links:
                 task.links.append(options.note)
-        elif options.note not in task.body.split("\n"):
+        elif "\n" + options.note + "\n" not in "\n" + task.body + "\n":
             store.history(task, "Completion note added")
             task.body = task.body + "\n\n" + options.note if task.body else options.note
         task.dirty = True
+    if task.archived:
+        if predecessor is None or task.snapshot_metadata() != predecessor.snapshot_metadata() or any(getattr(task, field) != getattr(predecessor, field) for field in ("title", "body", "links")):
+            store.archive_tasks([task])
+        else:
+            task = predecessor
     if verb == "done" and not options.no_prune:
         keep = store.keep if options.keep is None else options.keep
         require(keep >= 0, "keep must be nonnegative")
