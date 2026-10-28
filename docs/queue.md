@@ -28,6 +28,10 @@ Creation refuses identities found in either active storage or the archive, inclu
 Replacing a body automatically archives the superseded record in the existing note history.
 `rm` archives only already-complete work and retains its identity; unfinished work stays in the queue and can be parked without implying that its dependents are unblocked.
 
+Cross-queue `mv` supports single-record identities only; linked completion histories, including reopened tasks and revised archived completions, are unsupported and refuse before either queue's records change, including in a multi-ID request.
+These tasks continue to support reopen, resume, completion and late evidence within their existing queue.
+This native backend does not provide complete external tasks-axi API parity; the same-home authority cutover uses compatible files and backups, not cross-queue history transfer.
+
 ## Capture and pickup
 
 An ordinary queued task represents accepted work whose scope is retained in its body.

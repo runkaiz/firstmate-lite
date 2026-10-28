@@ -706,7 +706,7 @@ def parser():
   start <id>    done/close <id> [--pr URL] [--report PATH] [--note TEXT]
        [--keep N | --no-prune]    reopen <id>
   prune [--keep N]    rm <completed-id>
-  mv <id> [<id>...] --to <queue-file-or-directory>
+  mv <id> [<id>...] --to <queue-file-or-directory> (single-record identities only)
   link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
@@ -802,7 +802,7 @@ def execute(options, stores):
         identifiers = list(dict.fromkeys(items))
         moving = [store.find(identifier) for identifier in identifiers]
         for identifier in identifiers:
-            require(len(store.history_of(identifier)) == 1, f"move would split the linked history of {identifier}")
+            require(len(store.history_of(identifier)) == 1, f"unsupported cross-queue move for {identifier}: linked completion histories must remain in their current queue")
         require(not any(identifier in destination.all for identifier in identifiers), "destination has an active or archived identity conflict")
         for task in moving:
             require(all(dep in identifiers or dep in destination.all for dep in task.deps), f"move would strand dependency of {task.id}")

@@ -831,6 +831,38 @@ class QueueTests(unittest.TestCase):
         self.assertFalse(Path(str(self.file) + ".transaction").exists())
         self.call("add", "stable", "Duplicate", good=False)
 
+    def test_cross_queue_history_moves_refuse_without_changing_either_store(self):
+        self.legacy()
+        first, latest = self.digests("alpha")
+        self.link("alpha", first, latest)
+        self.call("reopen", "gamma")
+        self.call("done", "beta", "--report", "data/beta/extra.md")
+        self.call("add", "movable", "Single-record task")
+        target = self.home / "other/data/backlog.md"
+        self.call("add", "resident", "Destination history", "--body", "Original scope", path=target)
+        self.call("edit", "resident", "--body", "Revised scope", path=target)
+        self.call("done", "resident", "--keep", "0", path=target)
+        self.call("add", "waiting", "Destination active work", path=target)
+        for destination in (target, self.home / "empty/data/backlog.md"):
+            paths = [queue.parent / name for queue in (self.file, destination)
+                     for name in ("backlog.md", "done-archive.md", "note-archive.md", "backlog.md.transaction")]
+            before = [path.read_bytes() if path.exists() else None for path in paths]
+            for identifier in ("alpha", "gamma", "beta"):
+                for identifiers in ((identifier,), ("movable", identifier), (identifier, "movable")):
+                    with self.subTest(destination=destination, identifiers=identifiers):
+                        result = self.call("mv", *identifiers, "--to", str(destination), good=False)
+                        self.assertIn(f"unsupported cross-queue move for {identifier}", result.stderr)
+                        self.assertEqual([path.read_bytes() if path.exists() else None for path in paths], before)
+                        self.assertIsNone(self.history(identifier)["ambiguous"])
+        self.call("start", "gamma")
+        self.call("done", "gamma", "--keep", "0")
+        self.call("done", "gamma", "--note", "Late completion evidence")
+        self.assertEqual(len(self.history("gamma")["records"]), 3)
+        self.assertEqual(self.task("gamma")["body"], "Late completion evidence")
+        self.call("mv", "movable", "--to", str(target))
+        self.call("mv", "movable", "--to", str(self.file), path=target)
+        self.assertEqual(self.task("movable")["state"], "queued")
+
     def test_multi_id_handoff_and_destination_recovery(self):
         target = self.home / "other/data/backlog.md"
         target.parent.mkdir(parents=True)
