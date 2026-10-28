@@ -19,12 +19,14 @@
 # bin/fm-fleet-snapshot.sh's classifier and bin/fm-secondmate-reconcile.sh's
 # cross-home nudge stay defense in depth, not the primary mechanism.
 #
-# SCOPE. fm_backlog_transition_applies is the single gate. It excludes
+# SCOPE. fm_backlog_transition_applies gates paired backlog mutations. It excludes
 # secondmates (persistent agents are never backlog items, AGENTS.md section 10),
 # homes whose configured backlog backend is manual and markdown homes that keep
 # no backlog file. Those return-1 exemptions are never errors; an
 # unresolvable configured data directory, a backend resolution error, or
 # unavailable native queue instead returns 2 so callers refuse before mutation.
+# Native task-record retirement also uses the marker/replay owner below when
+# this gate exempts the backlog; it does not mutate a manual backlog.
 #
 # ADDRESSING. Every call runs from the configured data directory's parent so
 # that home's `.tasks.toml` supplies the adapter selection, done_keep, and the
@@ -54,6 +56,13 @@
 # closes a row that reads as an open captain call. An answer that closes the row
 # first applies any supported retained artifact from the validated record, then
 # replay simply retires the record.
+# For native copies, native_reservation binds the exact ownership record by
+# SHA-256. Keep it until metadata retirement and any paired backlog operation
+# succeed; marker removal verifies that the owned copy/container is absent
+# before retiring that reservation. With metadata still present, native replay
+# refuses and requires guarded teardown to finish its cleanup checks.
+# mode=remove is the native metadata-only retirement path for exempt backlogs;
+# it takes no backlog arguments. Bootstrap replays it even for manual backlogs.
 
 # Set by fm_backlog_transition_applies for a return-1 exemption.
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
@@ -68,7 +77,7 @@ FM_BACKLOG_ROW_ERROR=
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
 FM_BACKLOG_ROW_HOLD_KIND=
 # Set by fm_backlog_close_marker_replay: closed | closed_incomplete | retained |
-# retained_incomplete | answered | stale | noop.
+# retained_incomplete | answered | stale | retired | noop.
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
 FM_BACKLOG_CLOSE_REPLAY_RESULT=
 
@@ -1050,7 +1059,7 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
 # A leading `--retain` flag records the captain-held transition (`mode=retain`)
 # instead of a close; the remaining flags are the same completion links either
 # transition records.
-fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen> <state-dir> <cleanup-incomplete: 0|1> [--retain] [flag...]
+fm_backlog_close_marker_stage() {  # <temporary-path> <id> <data-dir> <spawn-gen> <state-dir> <cleanup-incomplete: 0|1> [--retain|--remove] [flag...]
   local tmp=$1 id=$2 data spawn_gen=$4 state=$5 cleanup_incomplete=$6 arg previous_arg=''
   local mode=close native_reservation='' serialized_args=()
   data=$(fm_backlog_data_absolute "$3") || {

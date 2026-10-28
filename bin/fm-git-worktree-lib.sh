@@ -10,7 +10,11 @@
 # base, source_ref. Metadata allocator=git selects this lifecycle permanently;
 # absent allocator means legacy Treehouse, independently of current config.
 # Removal requires matching identity, no dirt/untracked (including ignored),
-# and HEAD contained in the current recorded source ref. Never deletes a branch.
+# and HEAD contained in the current recorded source ref. Remote source checks
+# refresh only the recorded origin branch and refuse on fetch failure; local
+# refs are not fetched. Never deletes a branch. Task-record retirement/replay
+# in fm-backlog-transition-lib.sh owns final reservation retirement when task
+# metadata or a pending-close marker remains after copy removal.
 
 fm_git_worktree_error() { printf 'error: native worktree: %s\n' "$*" >&2; return 1; }
 

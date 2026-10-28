@@ -46,7 +46,8 @@ A pipeline sharing its worker's cwd has unknown activity separation; absent nati
 `fm-pipeline-spend.sh` remains the sole owner of invocation deltas and task-purpose accounting, including resumed validation sessions.
 Its opt-in flag is independent and is never removed or overridden by native collection.
 
-Refreshes serialize with a nonblocking local file lock, throttle routine ticks, prioritize active discovery scopes while rotating ended scopes, and bound metadata retries, native byte reads and candidate counts.
+Refreshes serialize with a nonblocking local file lock, throttle routine ticks, prioritize active discovery scopes while rotating historical scopes, and bound metadata retries, native byte reads and candidate counts.
+Pipeline scopes retain open attribution windows for late or resumed sessions, but receive active discovery priority only while a current worker generation matches their task, project and branch.
 Fully consumed sources with unchanged file identity and timestamps do not consume source refresh slots.
 The two-second refresh deadline and vendor-query deadline keep collection from taking over supervision.
 Backlog, partial tails, unsupported sources, and refresh failures are visible in `status`; subsequent ordinary lifecycle calls continue bounded work without a model turn.
@@ -196,5 +197,5 @@ It checks exact native counts, cache semantics, cumulative deltas, duplicate/cop
 Automatic fixtures also exercise new-source discovery, generation handoffs, overlapping collection, pipeline copies, bounded continuation, partial headers/tails, disable, failures, and persistent metadata privacy.
 No live collection, model request, or global runtime configuration change is part of that regression.
 Cold scans remain linear in selected bytes; incremental scans read only appended bytes plus a bounded checkpoint per selected file.
-Summary work grows with accumulated sanitized events, so long-running ledgers should be selected by trial or period rather than treated as an unbounded service.
+For manual trials, select ledgers by trial or period; automatic collection retains the stable home ledger described above.
 Use a modest local measurement envelope of 5 seconds wall, 4 seconds CPU, and 96 MiB peak RSS for a fixed 6,000-request synthetic sample; report the actual sample and machine measurements privately rather than claiming those bounds hold on every machine.

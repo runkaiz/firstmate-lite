@@ -72,7 +72,7 @@ state/               runtime records and signals; gitignored
   <id>.muse-session  muse busy-source binding (sessions root plus task worktree) written by fm-spawn; removed by teardown
   <id>.cursor-session  cursor busy-source binding (projects root, task worktree, prior conversations) written by fm-spawn; removed by teardown
   <id>.git-hooks/    per-task git hooksPath that strips AI commit trailers at the commit object unless config/keep-ai-trailers is present; written by fm-spawn, removed by teardown (bin/fm-git-strip-ai-trailers.sh)
-  <id>.backlog-close  the exact backlog transition a teardown recorded before removing the task's record, so an interrupted cleanup can still be finished at the next session start; bin/fm-backlog-transition-lib.sh owns its format and replay, and a landed transition removes it
+  <id>.backlog-close  pending task-record retirement and any paired backlog transition; bin/fm-backlog-transition-lib.sh owns its format, native reservation retirement and guarded replay
   <id>.inbox/          durable steering inbox: sequenced firstmate instruction records the worker acknowledges by moving them into its handled/ subdirectory; written by fm-send, with ordinary records re-rung and escalated by the watcher while explicit fire-and-forget records are excluded from that ladder, and removed by teardown (bin/fm-task-inbox-lib.sh)
   <id>.meta          task metadata; each producer script's header owns its exact fields and mutation contract, with docs/configuration.md routing operator-facing backend and trace-context details
   <id>.git-worktree   native task-copy reservation and ownership; bin/fm-git-worktree-lib.sh owns its schema and guarded lifecycle

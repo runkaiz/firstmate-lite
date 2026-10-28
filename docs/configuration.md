@@ -375,7 +375,7 @@ Each task receives its own new copy without pooling or reuse across task identit
 `bin/fm-git-worktree-lib.sh` owns the path, reservation schema and recovery/removal mechanics.
 
 Local-only ships and scouts of registered local-only projects select accepted local history, including when origin has diverged.
-Other fresh allocations select current origin history; interrupted allocations and relaunch retain their recorded copy.
+Other fresh allocations select current origin history when origin is configured, otherwise the local default branch; interrupted allocations and relaunch retain their recorded copy.
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 
 Native cleanup conservatively requires exact ancestry in the recorded source ref and no dirty or untracked content, including ignored files, even for scouts.
@@ -396,7 +396,7 @@ For spawn-capable adapters, the runtime session-provider backend controls where 
 | `orca` | Experimental; no dedicated real-backend CI lane | [`docs/orca-backend.md`](orca-backend.md) |
 | `cmux` | Experimental; no dedicated real-backend CI lane | [`docs/cmux-backend.md`](cmux-backend.md) |
 
-Treehouse remains the worktree provider for tmux, herdr, zellij, and cmux, since herdr, zellij, and cmux are session providers only; Orca provides both the task worktree and terminal endpoint.
+Worktree providers are selected separately as described in [Task worktree allocator](#task-worktree-allocator-configworktree-allocator); Orca provides both the task worktree and terminal endpoint.
 
 ### Backend selection order
 
@@ -1301,13 +1301,13 @@ The per-backend delta is required only for the backend resolved from `FM_BACKEND
 | `cmux` | `cmux`, `jq`, `treehouse` |
 
 The JSON-emitting adapters (`herdr`, `zellij`, `cmux`) need `jq` because their spawn and liveness paths parse backend JSON.
-Every session-provider-only backend (`tmux`, `herdr`, `zellij`, `cmux`) uses `treehouse` for worktrees.
+These backend prerequisite checks still require `treehouse` even when [native task allocation](#task-worktree-allocator-configworktree-allocator) is selected.
 
 Backend tool availability uses the adapter's own executable resolver, so bootstrap and spawn agree on supported non-`PATH` locations such as cmux's bundled CLI.
 An unknown resolved backend emits `BACKEND_INVALID` and blocks dispatch instead of silently dropping its dependency delta or falling back to tmux.
 
 Orca provides both the task worktree and terminal endpoint (see "Runtime backend" above), so `backend=orca` requires only `orca` on top of the universal toolchain and skips both `treehouse` and every other backend's session CLI.
-A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the `treehouse` durable-lease upgrade check runs only for the backends that actually use treehouse.
+A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the `treehouse` durable-lease upgrade check follows the backend prerequisites above.
 
 **Feature-specific requirements**
 
