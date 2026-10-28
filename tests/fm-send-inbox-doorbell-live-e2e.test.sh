@@ -84,10 +84,12 @@ harness_version() {  # <binary>
 # interactive approval.
 launch_cmd() {  # <name>
   case "$1" in
-    claude) printf '%s' 'CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false CLAUDE_CODE_SEND_FEEDBACK=0 claude --dangerously-skip-permissions --settings '\''{"feedbackDrafts":"off"}'\''' ;;
-    codex) printf '%s' 'codex --dangerously-bypass-approvals-and-sandbox' ;;
+    claude)
+      printf '%s' 'CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false CLAUDE_CODE_SEND_FEEDBACK=0 '
+      fm_test_credentialed_command "$LAB/claude-home/config" claude --dangerously-skip-permissions --settings '{"feedbackDrafts":"off"}' ;;
+    codex) fm_test_credentialed_command "$LAB/codex-home/config" codex --dangerously-bypass-approvals-and-sandbox ;;
     opencode) printf '%s' "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' opencode" ;;
-    pi|pi-signed) printf '%s' "$1" ;;
+    pi|pi-signed) fm_test_credentialed_command "$LAB/$1-home/config" "$1" ;;
     grok) printf '%s' 'grok --always-approve' ;;
     kimi) printf '%s' 'kimi --auto' ;;
     muse) printf '%s' 'MUSE_EXPERIMENTAL_FOREIGN_PERSONAL_CONTEXT_KILL=on muse --yolo' ;;

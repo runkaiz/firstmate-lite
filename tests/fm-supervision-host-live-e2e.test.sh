@@ -67,6 +67,10 @@ FM_HOME="$FM" "$FM/bin/fm-afk-contract.sh" enter --words 'Watch the fleet. Merge
 export FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999
 unset FM_SUPERVISION_ENGINE_CLAUDE_BIN FM_SUPERVISION_ACTOR FM_BRANCH_REPORT_TURN FM_LEASE_HOLDER_PID
 unset FM_ROOT_OVERRIDE FM_STATE_OVERRIDE FM_CONFIG_OVERRIDE PI_CODING_AGENT
+printf '#!/usr/bin/env bash\nexec %s "$@"\n' \
+  "$(fm_test_credentialed_command "$FM/config" "$(command -v claude)")" > "$LAB/credentialed-claude"
+chmod +x "$LAB/credentialed-claude"
+export FM_SUPERVISION_ENGINE_CLAUDE_BIN="$LAB/credentialed-claude"
 
 FM_HOME="$FM" PATH="$LAB/tmuxbin:$PATH" "$FAKE_CLAUDE" -c '
   printf "%s\n" "$$" > "$FM_HOME/state/.lock"

@@ -197,5 +197,7 @@ fm_git_worktree_remove() { # same arguments as safe; caller proved endpoint gone
     git -C "$4" worktree remove -- "$FM_GIT_WORKTREE_PATH" || return 1
   fi
   if [ -d "$container" ]; then rmdir -- "$container" || return 1; fi
-  rm -- "$1/$2.git-worktree"
+  if [ ! -e "$1/$2.meta" ] && [ ! -L "$1/$2.meta" ]; then
+    rm -- "$1/$2.git-worktree" || return 1
+  fi
 }

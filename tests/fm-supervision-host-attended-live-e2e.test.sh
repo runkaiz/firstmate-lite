@@ -48,7 +48,8 @@ CONTROL_REF=${FM_SUPERVISION_HOST_ATTENDED_LIVE_CONTROL_REF:-}
 LAB=$(fm_test_tmproot fm-sh-attended-live)
 LAB=$(cd -P "$LAB" && pwd -P)
 SOCKET="fmshal-$$"
-PROJECTS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects"
+PROJECTS="${FM_TEST_AMBIENT_CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects"
+REAL_CLAUDE=$(command -v claude)
 TURN_POLLS=${FM_SUPERVISION_HOST_ATTENDED_LIVE_POLLS:-1800}
 CONTROL_QUIET_SECONDS=${FM_SUPERVISION_HOST_ATTENDED_LIVE_CONTROL_SECONDS:-90}
 unset FM_HOME FM_ROOT_OVERRIDE FM_STATE_OVERRIDE FM_CONFIG_OVERRIDE FM_DATA_OVERRIDE TMUX TMUX_PANE PI_CODING_AGENT NO_MISTAKES_GATE
@@ -138,6 +139,9 @@ shift 2
 exec "$fm/bin/fm-remote-entrypoint.sh" "\$@"
 SH
   chmod +x "$lab/bin/tmux" "$lab/bin/ssh"
+  printf '#!/usr/bin/env bash\nexec %s "$@"\n' \
+    "$(fm_test_credentialed_command "$fm/config" "$REAL_CLAUDE")" > "$lab/bin/claude"
+  chmod +x "$lab/bin/claude"
   cat > "$lab/env" <<ENV
 export FM_HOME='$fm'
 export FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999

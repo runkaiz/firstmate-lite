@@ -120,7 +120,7 @@ run_ahoy_case() {
   local label=$1 preceding=$2 expected=$3 out status=0
   out=$(
     cd "$PROJECT" &&
-      pi --print --approve --no-session --no-context-files --no-extensions \
+      fm_test_credentialed_run "$HOME_DIR/config" pi --print --approve --no-session --no-context-files --no-extensions \
         --no-skills --skill .agents/skills --tools read \
         --model openai-codex/gpt-5.6-sol --thinking low \
         "$preceding" "/ahoy"
@@ -216,7 +216,7 @@ run_native_ahoy_regressions() {
 
   first_out=$(
     cd "$AHOY_PROJECT" &&
-      FM_HOME="$first_home" pi --print --approve --no-session --no-context-files --no-extensions \
+      FM_HOME="$first_home" fm_test_credentialed_run "$first_home/config" pi --print --approve --no-session --no-context-files --no-extensions \
         -e .pi/extensions/fm-primary-turnend-guard.ts \
         --no-skills --skill .agents/skills \
         --model openai-codex/gpt-5.6-sol --thinking low \
@@ -229,7 +229,7 @@ run_native_ahoy_regressions() {
 
   later_out=$(
     cd "$AHOY_PROJECT" &&
-      FM_HOME="$later_home" pi --print --approve --no-session --no-context-files --no-extensions \
+      FM_HOME="$later_home" fm_test_credentialed_run "$later_home/config" pi --print --approve --no-session --no-context-files --no-extensions \
         -e .pi/extensions/fm-primary-turnend-guard.ts \
         --no-skills --skill .agents/skills \
         --model openai-codex/gpt-5.6-sol --thinking low \
@@ -270,7 +270,7 @@ chmod +x "$PROJECT/bin/fm-operational-input.sh"
 mkdir -p "$HOME_DIR/state" "$HOME_DIR/config"
 
 "$TMUX" -L "$SOCKET" new-session -d -s "$SESSION" -c "$PROJECT" \
-  "env FM_HOME='$HOME_DIR' FM_ROOT_OVERRIDE='$PROJECT' FM_POLL=1 FM_SIGNAL_GRACE=0 FM_HEARTBEAT=600 bash -lc 'printf \"%s\\n\" \"\$\$\" > \"\$FM_HOME/state/.lock\"; pi --approve --no-session --no-context-files --no-extensions -e .pi/extensions/fm-calm.ts -e .pi/extensions/fm-primary-turnend-guard.ts -e .pi/extensions/fm-primary-pi-watch.ts --model openai-codex/gpt-5.6-sol --thinking low; rc=\$?; printf \"PI_EXIT=%s\\n\" \"\$rc\"; sleep 300'"
+  "export FM_HOME=$(printf '%q' "$HOME_DIR") FM_ROOT_OVERRIDE=$(printf '%q' "$PROJECT") FM_POLL=1 FM_SIGNAL_GRACE=0 FM_HEARTBEAT=600; printf '%s\\n' \"\$\$\" > \"\$FM_HOME/state/.lock\"; $(fm_test_credentialed_command "$HOME_DIR/config" pi --approve --no-session --no-context-files --no-extensions -e .pi/extensions/fm-calm.ts -e .pi/extensions/fm-primary-turnend-guard.ts -e .pi/extensions/fm-primary-pi-watch.ts --model openai-codex/gpt-5.6-sol --thinking low); rc=\$?; printf 'PI_EXIT=%s\\n' \"\$rc\"; sleep 300"
 
 i=0
 while [ "$i" -lt 120 ]; do

@@ -609,6 +609,36 @@ with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
     cx("pipeline-after-cleanup", validation, iso(time.time() + 20), 19)
     refresh()
     assert total() == 56, report()
+    metadata(int(time.time()) + 1)
+    retained = json.loads((store / "catalog.json").read_text())
+    current_pipelines = retained["pipeline_scopes"]
+    retained["pipeline_scopes"] = {}
+    for i in range(100):
+        task = f"completed-{i}"
+        generation = f"s{start - 100}.123.{i}"
+        owner = dict(task=task, task_kind="ship", harness="codex", cwd=str(root / task),
+                     project_path=str(project), branch=f"fm/{task}", start=start - 100,
+                     end=start - 50, generation=generation)
+        key = hashlib.sha256(json.dumps([task, generation], separators=(",", ":")).encode()).hexdigest()
+        retained["generations"][key] = owner
+        scope = dict(owner, cwd=str(root / (task + "-pipeline")), activity="validation", harness=None, end=None)
+        retained["pipeline_scopes"][task] = scope
+        cx(task, Path(scope["cwd"]), iso(time.time() + 20), 1)
+    retained["pipeline_scopes"].update(current_pipelines)
+    retained["scope_cursor"] = 50
+    (store / "catalog.json").write_text(json.dumps(retained))
+    live_paths = [cx("history-current-worker", worktree, iso(time.time() + 20), 3),
+                  cx("history-current-supervisor", home, iso(time.time() + 20), 5),
+                  cx("history-current-pipeline", validation, iso(time.time() + 20), 7)]
+    status = refresh()
+    observed = json.loads((store / "catalog.json").read_text())["sources"].values()
+    assert set(map(str, live_paths)) <= {s["path"] for s in observed}, status
+    for _ in range(45):
+        status = refresh()
+        assert status["selected_sources"] <= 64, status
+        if total() == 171:
+            break
+    assert total() == 171, report()
     index.close()
     # Privacy covers catalog/index/status and persistent DB, not just summaries.
     for f in (f for s in stores + [store] for f in s.rglob("*")):

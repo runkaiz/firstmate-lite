@@ -298,6 +298,27 @@ SH
   assert_contains "$out" 'native copy still has processes' "$backend never reached native process proof"
   [ -d "$WT" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
     || fail "$backend process refusal lost copy or records"
+  bash "$ROOT/bin/fm-busy-event.sh" arm "$HOME_DIR/state" "$id" >/dev/null || fail 'could not arm retirement fixture'
+  real_rm=$(command -v rm)
+  cat > "$fakebin/rm" <<'SH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  if [ -n "${FM_TEST_RETIRE_PATH:-}" ] && [ "$arg" = "$FM_TEST_RETIRE_PATH" ]; then
+    printf 'fixture retirement failure\n' >&2
+    exit 1
+  fi
+done
+exec "${FM_TEST_REAL_RM:?}" "$@"
+SH
+  chmod +x "$fakebin/rm"
+  for artifact in busy-gen meta; do
+    rc=0
+    out=$(FM_TEST_REAL_RM="$real_rm" FM_TEST_RETIRE_PATH="$HOME_DIR/state/$id.$artifact" run_native_teardown 2>&1) || rc=$?
+    [ "$rc" != 0 ] || fail "$backend $artifact fault did not fail teardown"
+    [ ! -e "$WT" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
+      || fail "$backend $artifact failure lost retry ownership evidence"
+  done
+  "$real_rm" "$fakebin/rm"
   out=$(run_native_teardown 2>&1)
   expect_code 0 "$?" "$backend native retry after endpoint loss failed: $out"
   [ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] && [ ! -e "$HOME_DIR/state/$id.git-worktree" ] \

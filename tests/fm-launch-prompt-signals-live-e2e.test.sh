@@ -114,7 +114,7 @@ check_harness() {  # <harness> <session> <extra-path> <extra-content> <expect-re
     printf '%s' "$extra_content" > "$lab/wt/$extra_path"
   fi
 
-  "$REAL_TMUX" -L "$SOCKET" new-session -d -s "$session" -n w -c "$lab/wt" -- "$@" \
+  "$REAL_TMUX" -L "$SOCKET" new-session -d -s "$session" -n w -c "$lab/wt" "$(fm_test_credentialed_command "$lab/config" "$@")" \
     || fail "$harness: could not launch the real binary"
 
   tail=''

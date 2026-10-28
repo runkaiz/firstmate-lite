@@ -72,7 +72,7 @@ VERSION=$(codex --version 2>/dev/null | head -1)
 [ -n "$VERSION" ] || VERSION='version-unknown'
 
 tmux -L "$SOCKET" new-session -d -s "$SESSION" -x 160 -y 45 -c "$ROOT"
-tmux -L "$SOCKET" new-window -d -t "$SESSION:" -n "$WIN" -c "$ROOT" -- codex \
+tmux -L "$SOCKET" new-window -d -t "$SESSION:" -n "$WIN" -c "$ROOT" "$(fm_test_credentialed_command "$SHIM_DIR/config" codex)" \
   || fail "codex ($VERSION): could not launch in the isolated tmux server"
 
 # The cursorless styled read exactly as bin/backends/herdr.sh describes its

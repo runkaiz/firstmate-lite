@@ -247,8 +247,13 @@ def rotate(items, catalog, key, limit):
 
 
 def scope_batch(scopes, catalog, key, limit):
-    active = [s for s in scopes if s["end"] is None]
-    ended = [s for s in scopes if s["end"] is not None]
+    active_tasks = {(g["task"], g.get("project_path"), g.get("branch"))
+                    for g in catalog["generations"].values() if g["end"] is None}
+    active, ended = [], []
+    for scope in scopes:
+        current = ((scope["task"], scope.get("project_path"), scope.get("branch")) in active_tasks
+                   if scope.get("activity") == "validation" else scope["end"] is None)
+        (active if current else ended).append(scope)
     selected = rotate(active, catalog, key, limit - bool(ended))
     return selected + rotate(ended, catalog, key + "_ended", limit - len(selected))
 

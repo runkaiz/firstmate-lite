@@ -340,10 +340,48 @@ trap 'fm_test_cleanup; exit 131' QUIT
 FM_TEST_USAGE_ROOT_VARS=(CODEX_HOME CLAUDE_CONFIG_DIR PI_CODING_AGENT_DIR NM_HOME)
 FM_TEST_USAGE_ROOTS=$(fm_test_tmproot fm-test-usage-roots) || return 1
 for _fm_usage_var in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
+  if [ "$_fm_usage_var" != NM_HOME ]; then
+    if [ -n "${!_fm_usage_var+x}" ]; then
+      printf -v "FM_TEST_AMBIENT_$_fm_usage_var" '%s' "${!_fm_usage_var}"
+    else
+      unset "FM_TEST_AMBIENT_$_fm_usage_var"
+    fi
+  fi
   mkdir -p "$FM_TEST_USAGE_ROOTS/$_fm_usage_var" || return 1
   export "$_fm_usage_var=$FM_TEST_USAGE_ROOTS/$_fm_usage_var"
 done
 unset _fm_usage_var
+
+fm_test_credentialed_command() {
+  local config=$1 command=$2 var='' saved key
+  shift
+  case "${command##*/}" in
+    codex) var=CODEX_HOME ;;
+    claude) var=CLAUDE_CONFIG_DIR ;;
+    pi|pi-signed) var=PI_CODING_AGENT_DIR ;;
+  esac
+  mkdir -p "$config" || return 1
+  printf 'off\n' > "$config/usage-ledger" || return 1
+  printf '%q ' env
+  if [ -n "$var" ]; then
+    saved=FM_TEST_AMBIENT_$var
+    if [ -z "${!saved+x}" ]; then printf '%q ' -u "$var"; fi
+  fi
+  for key in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
+    if [ "$key" = "$var" ]; then
+      if [ -n "${!saved+x}" ]; then printf '%q ' "$key=${!saved}"; fi
+    else
+      printf '%q ' "$key=${!key}"
+    fi
+  done
+  printf '%q ' "FM_CONFIG_OVERRIDE=$config" "$@"
+}
+
+fm_test_credentialed_run() {
+  local command
+  command=$(fm_test_credentialed_command "$@") || return 1
+  bash -c "$command"
+}
 
 # fm_test_reap_orphans: best-effort sweep for fixture roots left behind by a
 # prior run that was killed hard enough to skip the traps above (e.g. a

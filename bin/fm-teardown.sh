@@ -2654,6 +2654,9 @@ else
     exit 1
   fi
 fi
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  rm -- "$STATE/$ID.git-worktree" || exit 1
+fi
 fm_lock_release "$META_LOCK"
 META_LOCK_HELD=0
 if [ "$KIND" != scout ] && [ "$KIND" != secondmate ] && [ "$MODE" != local-only ]; then
