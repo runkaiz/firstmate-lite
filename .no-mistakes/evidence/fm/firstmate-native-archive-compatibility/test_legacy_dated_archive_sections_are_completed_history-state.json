@@ -1,0 +1,26 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "44d8ed68833b42ee75e493d404979dca1d158b9be04a3eb1b9c129fa5ecfcbbe",
+    "content": "## In flight\n\n## Queued\n- [ ] next - Follow-on (repo: project) blocked-by: beta\n- [ ] later - Uses alpha blocked-by: alpha\n\n## Done\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "e46651fdf0e240095086660cf54e1a4819e5ce112831c8d5779bdf451fa676d0",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n\n## Archived 2026-10-28\n- [x] delta - Native completion (since 2026-10-28) (done 2026-10-28)\n\n## Archived 2099-01-01\n- [x] epsilon - Legacy writer row (done 2099-01-01)\n"
+  },
+  "backup/0-backlog.md": {
+    "sha256": "44d8ed68833b42ee75e493d404979dca1d158b9be04a3eb1b9c129fa5ecfcbbe",
+    "content": "## In flight\n\n## Queued\n- [ ] next - Follow-on (repo: project) blocked-by: beta\n- [ ] later - Uses alpha blocked-by: alpha\n\n## Done\n"
+  },
+  "backup/1-done-archive.md": {
+    "sha256": "f1a35fa9dab4acf71f593addd1edf2b8ea74a4cb5c9e1abc2a4b2e6b7b738419",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n"
+  },
+  "backup/manifest.json": {
+    "sha256": "bd47aeb013ae555ff4bc282537db3c701aa8ccc50aaea5715d929b2ef9739715",
+    "content": "[\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmpjw2jgscc/data/backlog.md\",\n    \"backup\": \"0-backlog.md\",\n    \"sha256\": \"44d8ed68833b42ee75e493d404979dca1d158b9be04a3eb1b9c129fa5ecfcbbe\"\n  },\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmpjw2jgscc/data/done-archive.md\",\n    \"backup\": \"1-done-archive.md\",\n    \"sha256\": \"f1a35fa9dab4acf71f593addd1edf2b8ea74a4cb5c9e1abc2a4b2e6b7b738419\"\n  }\n]"
+  }
+}

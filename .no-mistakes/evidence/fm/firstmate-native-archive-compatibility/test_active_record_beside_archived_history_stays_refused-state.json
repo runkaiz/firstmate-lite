@@ -1,0 +1,18 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "6df32719c1814ea0ee0957b1006494ff5d40b0b1e620a748351658d8584994c8",
+    "content": "## Queued\n- [ ] beta - Active reuse\n- [ ] other - Unrelated\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "f1a35fa9dab4acf71f593addd1edf2b8ea74a4cb5c9e1abc2a4b2e6b7b738419",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n"
+  },
+  "data/note-archive.md": {
+    "sha256": "a93472165026f8810b241a59b335fe39f49b772a773071182c56cf46470a2689",
+    "content": "\n## beta - Reopened with identity preserved - 2026-01-08T00:00:00+00:00\n\n- [x] beta - Prerequisite (reported 2026-01-06)\n\n"
+  }
+}

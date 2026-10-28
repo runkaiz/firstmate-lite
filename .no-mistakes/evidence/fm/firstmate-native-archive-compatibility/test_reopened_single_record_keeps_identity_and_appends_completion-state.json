@@ -1,0 +1,26 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "fc7cfb341b1c7627e953dcca21ee8f90a02fb1e30d8ef38f3a3ba576acbe6bc8",
+    "content": "## In flight\n\n## Queued\n\n## Done\n"
+  },
+  "data/note-archive.md": {
+    "sha256": "536de00551bf3afe350cfa43e0b1cfe0d6cf48826c4b5c162cdd5785287e9892",
+    "content": "\n## gamma - Reopened with identity preserved - 2026-10-28T08:10:35.819763+00:00\n\n- [x] gamma - Unrelated (done 2026-01-07)\n\n\n\n## gamma - Completion history link - 2026-10-28T08:10:35.819771+00:00\n\n  predecessor: sha256:ba18d5f294fa239e4090fd3c1300d9a1cd0fa90d6f4612e3f0b6a2f9767ced65#1\n  successor: active\n\n## gamma - Completion history link - 2026-10-28T08:10:36.036871+00:00\n\n  predecessor: sha256:ba18d5f294fa239e4090fd3c1300d9a1cd0fa90d6f4612e3f0b6a2f9767ced65#1\n  successor: sha256:a529fb016f62ab3f6c4180f13bb42fdafd7eaba369a501ace2ddc00b2c2c4449#1\n\n## gamma - Completion history link - 2026-10-28T08:10:36.121151+00:00\n\n  predecessor: sha256:a529fb016f62ab3f6c4180f13bb42fdafd7eaba369a501ace2ddc00b2c2c4449#1\n  successor: sha256:e46744053f020e67c1ed021808671f9ce1be21088c02b5b78de6650cf514bbea#1\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "2ea33a247732414b6fd2821202f9fd2a69d861e1bbd3fd119a68f516f2f6fa97",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n\n## Archived 2026-10-28\n- [x] gamma - Unrelated (done 2026-10-28)\n\n## Archived 2026-10-28\n- [x] gamma - Unrelated - https://example.test/project/pull/2 (done 2026-10-28)\n"
+  },
+  "other/data/backlog.md": {
+    "sha256": "fc7cfb341b1c7627e953dcca21ee8f90a02fb1e30d8ef38f3a3ba576acbe6bc8",
+    "content": "## In flight\n\n## Queued\n\n## Done\n"
+  },
+  "other/data/done-archive.md": {
+    "sha256": "9706b4314054f6866d7fbfe22fcef28131c3b8fe3fbb0200e49a51e9dceb564f",
+    "content": "\n## Archived 2026-10-28\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n"
+  }
+}

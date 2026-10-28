@@ -1,0 +1,18 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "8482f9b455d8a7eada5f45fc53a073bb8502291a9efff2c163e7ba69abae5a72",
+    "content": "\n## Archived 2026-10-28\n- [x] stable - Original - https://example.test/project/pull/1 (since 2026-10-28) (merged 2026-10-28) (hold: Choose release) (hold-kind: captain) (hold-until: 2099-01-01)\n  Answer: use existing release\n"
+  },
+  "data/backlog.md": {
+    "sha256": "9a8c6e938f2192d0528d2ca78e4e90c25eeab2e4fe46fe6d0fbcf619de5f0b59",
+    "content": "## In flight\n\n## Queued\n\n- [ ] stable - Original - https://example.test/project/pull/1 (since 2026-10-28) (hold: Choose release) (hold-kind: captain) (hold-until: 2099-01-01)\n  Answer: use existing release\n## Done\n"
+  },
+  "data/note-archive.md": {
+    "sha256": "d557e0440afc1bd0bb58379af5fc285a7d4b71d978a3c8dedf8f91048846725c",
+    "content": "\n## stable - Body replaced - 2026-10-28T08:10:35.472439+00:00\n\n- [ ] stable - Original (since 2026-10-28) (hold: Choose release) (hold-kind: captain) (hold-until: 2099-01-01)\n  Accepted original intent\n\n\n## stable - Reopened with identity preserved - 2026-10-28T08:10:35.671155+00:00\n\n- [x] stable - Original - https://example.test/project/pull/1 (since 2026-10-28) (merged 2026-10-28) (hold: Choose release) (hold-kind: captain) (hold-until: 2099-01-01)\n  Answer: use existing release\n\n\n## stable - Completion history link - 2026-10-28T08:10:35.671161+00:00\n\n  predecessor: sha256:d1a3c754c6eaf04fb726bea1d483e284b72d0e70a54be0f487e55fe78fc2c738#1\n  successor: active\n"
+  }
+}

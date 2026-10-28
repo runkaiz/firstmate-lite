@@ -1,0 +1,18 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "6a76595dd793b8d480ccc249e6f3988f940f428e03363ccab8ea97bf75f2a8bf",
+    "content": "# Existing queue\n\n## In flight\n- **running** - Existing work (repo: project, kind: ship, since 2026-01-01)\n  Accepted intent\n\n## Queued\n- [ ] held - Real question (hold: Choose release) (hold-kind: captain)\n  Answer history is here\n\n## Done\n- [x] old - Delivered - data/old/report.md - data/old/extra.md (reported 2026-01-01)\n"
+  },
+  "backup/0-backlog.md": {
+    "sha256": "4d5edc5e4ef35b49e81ee2e18b32f60bdad9ca481a5d0d05986ddc9148a7d8bb",
+    "content": "# Existing queue\n\n## In flight\n- **running** - Existing work (repo: project, kind: ship, since 2026-01-01)\n  Accepted intent\n\n## Queued\n- [ ] held - Real question (hold: Choose release) (hold-kind: captain)\n  Answer history is here\n\n## Done\n- [x] old - Delivered - data/old/report.md (reported 2026-01-01)\n"
+  },
+  "backup/manifest.json": {
+    "sha256": "32de1032fa3e764900cb623f4e0baac3c1ec4422fc2665205fadd0af22e8307a",
+    "content": "[\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmp3nu_hh6p/data/backlog.md\",\n    \"backup\": \"0-backlog.md\",\n    \"sha256\": \"4d5edc5e4ef35b49e81ee2e18b32f60bdad9ca481a5d0d05986ddc9148a7d8bb\"\n  }\n]"
+  }
+}

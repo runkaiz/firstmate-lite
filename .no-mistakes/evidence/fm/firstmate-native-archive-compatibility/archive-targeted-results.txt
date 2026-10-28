@@ -1,0 +1,21 @@
+test_legacy_dated_archive_sections_are_completed_history (archive_live_import.QueueTests.test_legacy_dated_archive_sections_are_completed_history) ... ok
+test_archive_lookup_reopen_and_identity_reservation (archive_live_import.QueueTests.test_archive_lookup_reopen_and_identity_reservation) ... ok
+test_reopened_single_record_keeps_identity_and_appends_completion (archive_live_import.QueueTests.test_reopened_single_record_keeps_identity_and_appends_completion) ... ok
+test_archived_edits_append_idempotent_revisions (archive_live_import.QueueTests.test_archived_edits_append_idempotent_revisions) ... ok
+test_late_evidence_preserves_legacy_completion_verbs (archive_live_import.QueueTests.test_late_evidence_preserves_legacy_completion_verbs) ... ok
+test_late_evidence_after_linked_recompletion_recovers_once (archive_live_import.QueueTests.test_late_evidence_after_linked_recompletion_recovers_once) ... ok
+test_single_record_continuation_rm_and_reopen_recover (archive_live_import.QueueTests.test_single_record_continuation_rm_and_reopen_recover) ... ok
+test_repeated_archived_identity_is_refused_not_guessed (archive_live_import.QueueTests.test_repeated_archived_identity_is_refused_not_guessed) ... ok
+test_explicit_history_link_resolves_latest_and_reopen_continues_it (archive_live_import.QueueTests.test_explicit_history_link_resolves_latest_and_reopen_continues_it) ... ok
+test_bad_history_links_stay_ambiguous (archive_live_import.QueueTests.test_bad_history_links_stay_ambiguous) ... ok
+test_concurrent_history_links_record_once (archive_live_import.QueueTests.test_concurrent_history_links_record_once) ... ok
+test_active_record_beside_archived_history_stays_refused (archive_live_import.QueueTests.test_active_record_beside_archived_history_stays_refused) ... ok
+test_legacy_history_survives_crash_recovery_and_concurrent_writers (archive_live_import.QueueTests.test_legacy_history_survives_crash_recovery_and_concurrent_writers) ... ok
+test_cross_queue_history_moves_refuse_without_changing_either_store (archive_live_import.QueueTests.test_cross_queue_history_moves_refuse_without_changing_either_store) ... ok
+test_active_archive_conflict_fails_without_discarding (archive_live_import.QueueTests.test_active_archive_conflict_fails_without_discarding) ... ok
+test_compatibility_check_and_backup_never_rewrite (archive_live_import.QueueTests.test_compatibility_check_and_backup_never_rewrite) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 14.668s
+
+OK

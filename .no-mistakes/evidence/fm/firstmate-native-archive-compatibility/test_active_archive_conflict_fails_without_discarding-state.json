@@ -1,0 +1,14 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "9f55881e7d2b4863406f58ae0698b40597e8dc6ff8ed6a63d5b6383ab486b58d",
+    "content": "## In flight\n\n## Queued\n\n- [ ] same - Active (since 2026-10-28)\n## Done\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "090c8e3cad1bea91eb65fbd50197cf9e64900f4af589300f63d41b7dbb6e9ede",
+    "content": "## Done\n- [x] same - Historical (done 2026-01-01)\n  Prior answer\n"
+  }
+}

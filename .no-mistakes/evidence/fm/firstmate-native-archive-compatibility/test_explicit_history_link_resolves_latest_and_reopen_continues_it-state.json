@@ -1,0 +1,34 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "fc7cfb341b1c7627e953dcca21ee8f90a02fb1e30d8ef38f3a3ba576acbe6bc8",
+    "content": "## In flight\n\n## Queued\n\n## Done\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "35400a0fd58bb29d128047d33f2e6064cf59f48568b50fc9440a6fa05c1fc9dd",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n\n## Archived 2026-10-28\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-10-28)\n  Follow-up scope\n\n## Archived 2026-10-28\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-10-28)\n  Follow-up scope\n"
+  },
+  "data/note-archive.md": {
+    "sha256": "2bb057212cfa2b314f06b8924daf58d3bd28f056b849dafa66554eb4c82fc5d0",
+    "content": "\n## alpha - Completion history link - 2026-10-28T08:10:43.973768+00:00\n\n  predecessor: sha256:d303440779b150c6e9c89ca74950da94bc9863d9f687e0cb5ce36f55293d0655#1\n  successor: sha256:72a8238c22097bc79e9220eb764aa18eb5cdb61f6eb3506ee2b5a9909214c1a3#1\n\n## alpha - Reopened with identity preserved - 2026-10-28T08:10:44.198856+00:00\n\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n\n\n## alpha - Completion history link - 2026-10-28T08:10:44.198863+00:00\n\n  predecessor: sha256:72a8238c22097bc79e9220eb764aa18eb5cdb61f6eb3506ee2b5a9909214c1a3#1\n  successor: active\n\n## alpha - Completion history link - 2026-10-28T08:10:44.431618+00:00\n\n  predecessor: sha256:72a8238c22097bc79e9220eb764aa18eb5cdb61f6eb3506ee2b5a9909214c1a3#1\n  successor: sha256:33cf66aeb18fbb858acd0aaf0d29704a644eed0ae1351c576346ddb9085c04f8#1\n\n## alpha - Reopened with identity preserved - 2026-10-28T08:10:44.554765+00:00\n\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-10-28)\n  Follow-up scope\n\n\n## alpha - Completion history link - 2026-10-28T08:10:44.554773+00:00\n\n  predecessor: sha256:33cf66aeb18fbb858acd0aaf0d29704a644eed0ae1351c576346ddb9085c04f8#1\n  successor: active\n\n## alpha - Completion history link - 2026-10-28T08:10:44.648377+00:00\n\n  predecessor: sha256:33cf66aeb18fbb858acd0aaf0d29704a644eed0ae1351c576346ddb9085c04f8#1\n  successor: sha256:33cf66aeb18fbb858acd0aaf0d29704a644eed0ae1351c576346ddb9085c04f8#2\n"
+  },
+  "backup/0-backlog.md": {
+    "sha256": "fc7cfb341b1c7627e953dcca21ee8f90a02fb1e30d8ef38f3a3ba576acbe6bc8",
+    "content": "## In flight\n\n## Queued\n\n## Done\n"
+  },
+  "backup/1-done-archive.md": {
+    "sha256": "f1a35fa9dab4acf71f593addd1edf2b8ea74a4cb5c9e1abc2a4b2e6b7b738419",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n"
+  },
+  "backup/2-note-archive.md": {
+    "sha256": "41efad6e5511f908b0ced38bc02e1f6dc99e1fd2e933e5b10b3bd22f25eb3292",
+    "content": "\n## alpha - Completion history link - 2026-10-28T08:10:43.973768+00:00\n\n  predecessor: sha256:d303440779b150c6e9c89ca74950da94bc9863d9f687e0cb5ce36f55293d0655#1\n  successor: sha256:72a8238c22097bc79e9220eb764aa18eb5cdb61f6eb3506ee2b5a9909214c1a3#1\n"
+  },
+  "backup/manifest.json": {
+    "sha256": "0b8a00d8cf300023a7b222993a4bd1dff79fecd41658d60c0833fa114bc7ec32",
+    "content": "[\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmplrn9u4lg/data/backlog.md\",\n    \"backup\": \"0-backlog.md\",\n    \"sha256\": \"fc7cfb341b1c7627e953dcca21ee8f90a02fb1e30d8ef38f3a3ba576acbe6bc8\"\n  },\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmplrn9u4lg/data/done-archive.md\",\n    \"backup\": \"1-done-archive.md\",\n    \"sha256\": \"f1a35fa9dab4acf71f593addd1edf2b8ea74a4cb5c9e1abc2a4b2e6b7b738419\"\n  },\n  {\n    \"source\": \"/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M60RN1Z50R48Z1MGTDYM874F/.archive-live-qtnv05vs/tmplrn9u4lg/data/note-archive.md\",\n    \"backup\": \"2-note-archive.md\",\n    \"sha256\": \"41efad6e5511f908b0ced38bc02e1f6dc99e1fd2e933e5b10b3bd22f25eb3292\"\n  }\n]"
+  }
+}

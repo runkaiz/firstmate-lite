@@ -1,0 +1,30 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "37a429ffc6a0ab8980468eda031e3ae6f8290ccd46c9f9fb7e255f4cc4700393",
+    "content": "\n## Archived 2026-01-05\n- [x] alpha - First delivery - https://example.test/project/pull/1 (repo: project) (kind: ship) (merged 2026-01-04)\n  Accepted first scope (kind: not-metadata)\n\n  ## Intent\n  - [x] lookalike - not a row (done 2026-01-01)\n\n## Archived 2026-01-07\n- [x] beta - Prerequisite - data/beta/report.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-01-07\n- [x] gamma - Unrelated (done 2026-01-07)\n\n## Archived 2026-01-09\n- [x] alpha - Follow-up delivery (repo: project) (kind: task) (done 2026-01-09)\n  Follow-up scope\n\n## Archived 2026-10-28\n- [x] beta - Prerequisite - data/beta/report.md - data/beta/extra.md (repo: project) (kind: scout) (reported 2026-01-06)\n\n## Archived 2026-10-28\n- [x] gamma - Unrelated (done 2026-10-28)\n\n## Archived 2026-10-28\n- [x] gamma - Unrelated (done 2026-10-28)\n  Late completion evidence\n"
+  },
+  "data/note-archive.md": {
+    "sha256": "6c9fb298b144ad63001a9841f5f68321bf0cdbee0efb313a23079144e65c9523",
+    "content": "\n## alpha - Completion history link - 2026-10-28T08:10:46.761234+00:00\n\n  predecessor: sha256:d303440779b150c6e9c89ca74950da94bc9863d9f687e0cb5ce36f55293d0655#1\n  successor: sha256:72a8238c22097bc79e9220eb764aa18eb5cdb61f6eb3506ee2b5a9909214c1a3#1\n\n## gamma - Reopened with identity preserved - 2026-10-28T08:10:46.807487+00:00\n\n- [x] gamma - Unrelated (done 2026-01-07)\n\n\n\n## gamma - Completion history link - 2026-10-28T08:10:46.807494+00:00\n\n  predecessor: sha256:ba18d5f294fa239e4090fd3c1300d9a1cd0fa90d6f4612e3f0b6a2f9767ced65#1\n  successor: active\n\n## beta - Completion history link - 2026-10-28T08:10:46.853719+00:00\n\n  predecessor: sha256:353b120cd97c665e9fa72812bc90430cd03881bd782558523baec174ed7b1564#1\n  successor: sha256:6224e0add4ac67fdd351721780dc2fc28c9d333d32495703ec7639fe3ff6378f#1\n\n## gamma - Completion history link - 2026-10-28T08:10:48.389819+00:00\n\n  predecessor: sha256:ba18d5f294fa239e4090fd3c1300d9a1cd0fa90d6f4612e3f0b6a2f9767ced65#1\n  successor: sha256:a529fb016f62ab3f6c4180f13bb42fdafd7eaba369a501ace2ddc00b2c2c4449#1\n\n## gamma - Completion note added - 2026-10-28T08:10:48.442488+00:00\n\n- [x] gamma - Unrelated (done 2026-10-28)\n\n\n## gamma - Completion history link - 2026-10-28T08:10:48.442517+00:00\n\n  predecessor: sha256:a529fb016f62ab3f6c4180f13bb42fdafd7eaba369a501ace2ddc00b2c2c4449#1\n  successor: sha256:48dceef5ecda128aaeb6a61d505c43944fd02b9768e773e10337be8f8169b8c3#1\n"
+  },
+  "data/backlog.md": {
+    "sha256": "e9324590394b76cf5ece1d315a40699d4e3c7aeac4f5f56b8bd2bfac309299d7",
+    "content": "## In flight\n\n## Queued\n\n- [ ] movable - Single-record task (since 2026-10-28)\n## Done\n"
+  },
+  "other/data/note-archive.md": {
+    "sha256": "37d5ccdca8ae7d1968eb40ccf0a0cbadf200d8af9293f9c35642a559d7934299",
+    "content": "\n## resident - Body replaced - 2026-10-28T08:10:46.985928+00:00\n\n- [ ] resident - Destination history (since 2026-10-28)\n  Original scope\n\n"
+  },
+  "other/data/done-archive.md": {
+    "sha256": "949bc249e3c894151e8c69b102048db588b03e5f30c78a5746c8c5be33975b7f",
+    "content": "\n## Archived 2026-10-28\n- [x] resident - Destination history (since 2026-10-28) (done 2026-10-28)\n  Revised scope\n"
+  },
+  "other/data/backlog.md": {
+    "sha256": "fd4b63fd18c8d30e86b5dbf563ec31d65f1f91dc14f9f84be90c399d683dc5d5",
+    "content": "## In flight\n\n## Queued\n\n- [ ] waiting - Destination active work (since 2026-10-28)\n## Done\n"
+  }
+}

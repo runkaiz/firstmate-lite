@@ -1,0 +1,14 @@
+{
+  ".tasks.toml": {
+    "sha256": "e3bbf3eeb1bb1e8b31c72152fceb70552f268ada42565e52beb3174b1dabf829",
+    "content": "backend = \"markdown\"\n[markdown]\npath = \"data/backlog.md\"\narchive = \"data/done-archive.md\"\ndone_keep = 100\n"
+  },
+  "data/backlog.md": {
+    "sha256": "bc7ea0e5dfd354ac7dd7b79ba0e8dc6219a2739ac41e394ae213ad5df047efee",
+    "content": "## Queued\n\n## Done\n"
+  },
+  "data/done-archive.md": {
+    "sha256": "10ad76a90a3b658302f90a6723a9c6fc4ed320fcdb0617e1ac70873516cf6d83",
+    "content": "\n## Archived 2026-01-05\n- [x] dup - Private first title (kind: ship) (done 2026-01-04)\n  Private first scope; digest sha256:00000000synthetic\n\n## Archived 2026-01-09\n- [x] dup - Private first title (kind: ship) (done 2026-01-09)\n\n## Archived 2026-10-28\n- [x] other - Unrelated work (done 2026-10-28) blocked-by: dup\n"
+  }
+}
