@@ -32,7 +32,7 @@
 # resolves it per task at intake (AGENTS.md section 7); data/projects.md holds the
 # captain's standing posture as context, and this script never reads it:
 #   no-mistakes  implement -> /no-mistakes pipeline -> PR -> configured merge authority
-#   direct-PR    implement -> push + open PR via gh-axi (no pipeline) -> configured merge authority
+#   direct-PR    implement -> push + open PR via gh (no pipeline) -> configured merge authority
 #   local-only   implement on branch, stop and report "ready in branch" (no push/PR);
 #                the configured merge authority approves, firstmate merges to local main
 # no-mistakes-prod-only is a registry policy, not a task mode; resolve it to one of
@@ -284,7 +284,7 @@ if [ "$KIND" = ship ]; then
     echo "error: --shape is unsupported; GitHub/local delivery does not use a publish shape" >&2
     exit 1
   fi
-  FORGE_RULE_LINE="Use gh-axi for GitHub operations and chrome-devtools-axi for browser operations."
+  FORGE_RULE_LINE="Use native gh for GitHub operations with complete selective --json fields and deterministic --jq/parsing; consult current help. Preserve required identity and state evidence, handle errors and ambiguous or missing results explicitly, and keep guarded merge and no-mistakes authority. Use chrome-devtools-axi for browser operations."
 elif [ "$FORGE_SET" -eq 1 ] || [ "$SHAPE_SET" -eq 1 ]; then
   echo "error: --forge and --shape apply only to ship briefs; a scout delivers a report" >&2
   exit 1
@@ -550,7 +550,7 @@ The report is the only thing that survives, so anything worth keeping must be in
 # Rules
 1. Never push to any remote and never open a PR.
 2. Stay inside this worktree; the only files you may write outside it are the report and the status file below.
-3. Use gh-axi for GitHub operations and chrome-devtools-axi for browser operations.
+3. Use native gh for GitHub operations with complete selective --json fields and deterministic --jq/parsing; consult current help. Preserve required identity and state evidence, handle errors and ambiguous or missing results explicitly, and keep guarded merge and no-mistakes authority. Use chrome-devtools-axi for browser operations.
 4. Report status by appending one line:
    \`$STATUS_APPEND\`
    States: working, needs-decision, blocked, $PAUSED_VERB, done, failed.

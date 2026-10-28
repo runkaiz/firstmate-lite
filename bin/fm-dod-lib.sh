@@ -343,7 +343,7 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<s
   local record_tool delivery_record_instruction=
   fm_delivery_surface_valid "$surface" || return 1
   printf -v record_tool '%q' "${BASH_SOURCE[0]%/*}/fm-delivery-record.py"
-  local branch=${3:-fm/$id} pr_base='' nm_base='' base_q contract_forge='' contract_consent='' forge_cli=gh-axi draft_check
+  local branch=${3:-fm/$id} pr_base='' nm_base='' base_q contract_forge='' contract_consent='' forge_cli=gh draft_check
   fm_forge_valid_for_mode "$forge" "$mode" fm_dod_block || return 1
   fm_base_branch_valid "$base" "$mode" "$forge" fm_dod_block || return 1
   if [ -n "$consent" ]; then
@@ -353,7 +353,7 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<s
     fi
     contract_consent=" upstream-consent=$consent"
   fi
-  draft_check="(\`gh-axi pr view <number>\` must print \`draft: no\`, where <number> is the PR number from your PR URL); if it is a draft, mark it ready with \`gh-axi pr ready <number>\`."
+  draft_check="(\`gh pr view <url> --json url,isDraft\` must return the reported PR URL and boolean \`isDraft: false\` in valid JSON); if it is a draft, mark it ready with \`gh pr ready <url>\` and read it back again. A failed read, malformed JSON, missing fields, or a different URL is not proof of readiness."
   if [ -n "$base" ]; then
     printf -v base_q '%q' "$base"
     pr_base=", against the base branch \`$base\` (\`--base $base_q\`), not the repository default"

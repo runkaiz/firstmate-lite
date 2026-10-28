@@ -58,10 +58,15 @@
 # or a clean content-in-default tree match. Anything else refuses.
 # The PR itself is resolved from the task's recorded pr= when present, or - when
 # no pr= was ever recorded (e.g. a yolo-authorized merge on a repo with no PR CI,
-# where the usual "checks green" fm-pr-check.sh trigger never fires) - by looking
-# up a merged PR whose head branch matches the worktree's branch, fetching its head
-# via refs/pull/<n>/head when the branch itself was deleted. So a missing pr= never
-# by itself causes a false refusal of landed work.
+# where the usual "checks green" fm-pr-check.sh trigger never fires) - through
+# native gh in the worktree's repository context. Discovery requests up to two
+# PRs across all states with --json number,url,headRefName and accepts exactly
+# one result with the matching branch and a valid PR URL matching its number.
+# Empty, ambiguous, malformed, incomplete, or failed reads prove neither absence
+# nor landing. The discovered URL is then checked for merged state and head
+# containment, fetching refs/pull/<n>/head when the branch itself was deleted.
+# A missing pr= alone does not refuse landed work: inconclusive discovery may
+# still use the independent content proof below.
 # A failed lookup for a recorded PR refuses. Only an unrecorded PR may use
 # the content fallback, which also refuses when inconclusive.
 # Uncommitted changes are never landed; dirty refusals distinguish untracked-only
@@ -907,16 +912,23 @@ remove_pr_poll_artifacts() {
     "$state_dir/$id.merge-authority" "$state_dir/$id.check-trust" || return 1
 }
 
-# Resolve the PR number for a worktree branch via gh-axi. Echoes the number on a
-# single match and returns 0; returns non-zero on no match or any lookup failure,
-# so the caller treats it as "no PR found" (fail-safe).
-pr_number_from_branch() {
-  local branch=$1 out n
+# PR-discovery requirements and fallback authority are owned by the header above.
+pr_url_from_branch() {
+  local branch=$1 out
   [ -n "$branch" ] && [ "$branch" != HEAD ] || return 1
-  out=$( cd "$WT" && gh-axi pr list --state all --head "$branch" --limit 1 2>/dev/null ) || return 1
-  n=$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*\([0-9][0-9]*\),.*/\1/p' | head -1)
-  [ -n "$n" ] || return 1
-  printf '%s' "$n"
+  out=$( cd "$WT" && gh pr list --state all --head "$branch" --limit 2 \
+    --json number,url,headRefName 2>/dev/null ) || return 1
+  printf '%s\n' "$out" | jq -ser --arg branch "$branch" '
+    if length == 1 then .[0] else error("expected one JSON document") end
+    | if type == "array" and length == 1 then .[0] else error("expected one PR") end
+    | select(.headRefName == $branch)
+    | select(.number | type == "number" and . > 0 and . == floor)
+    | .number as $number
+    | .url
+    | select(type == "string")
+    | select(test("^https://[^/[:space:]]+/[^/[:space:]]+/[^/[:space:]]+/pull/[0-9]+$"))
+    | select(endswith("/pull/" + ($number | tostring)))
+  ' 2>/dev/null
 }
 
 pr_number_from_target() {
@@ -982,7 +994,7 @@ pr_is_merged() {
   if [ -n "$PR_URL" ]; then
     target=$PR_URL
   else
-    target=$(pr_number_from_branch "$branch") || return 1
+    target=$(pr_url_from_branch "$branch") || return 1
   fi
   [ -n "$target" ] || return 1
   view=$(cd "$WT" && gh pr view "$target" --json state,headRefOid,url -q '.state + "\t" + .headRefOid + "\t" + .url' 2>/dev/null) || return 1
