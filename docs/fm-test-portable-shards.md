@@ -21,8 +21,14 @@ A failed script's duration is excluded even when its lane uploaded an artifact.
 In particular, run 36664663190's serial 5 finished in 22m15s with an assertion failure, not a timeout; treating that as a healthy whole-lane sample would hide the failure.
 Collect successful per-script measurements for every member before calculating a split.
 
-`tests/fm-supervision-host.test.sh` uses 789123 ms from run 36669175457, after the merged [host runtime fix](https://github.com/kunchenguid/firstmate/pull/6179), rather than its pre-fix maximum of 1065298 ms.
-That post-fix value has only one sample in this baseline, so further green runs must establish its variance.
+The supervision-host cases are split between `tests/fm-supervision-host.test.sh` (58 cases) and `tests/fm-supervision-host-recovery.test.sh` (18 cases), sourcing the same unchanged fixture and case definitions.
+Each wrapper has its own temporary homes and owned-process cleanup, and both remain serial members of the `afk` family.
+Their weights, 1100000 ms and 1080000 ms respectively, are derived CI packing estimates, not separately measured successful CI durations.
+The derivation uses completed case intervals from [successful CI](https://github.com/runkaiz/firstmate-lite/actions/runs/40755372211) and both timed-out attempts of [the identical-tree integration run](https://github.com/runkaiz/firstmate-lite/actions/runs/40759663022).
+Taking the slowest observed prefix intervals and scaling the uncompleted tail by the largest same-progress slowdown yields approximately 1049 and 1026 seconds, rounded conservatively for separate setup and cleanup.
+The cancelled attempts are lower-bound observations, not successful timing samples or proof of a duration ceiling.
+On 2026-10-28, focused Linux x86_64 validation through the runner with `--jobs 1` measured 153327 ms and 80405 ms, both exit 0 with no gate skip, and retained all 76 ordered case results.
+Those local measurements do not replace the CI-derived weights; refresh these two exceptions with successful wrapper CI samples through the procedure below.
 The native-Windows-only `tests/fm-pi-windows-shell-invocation.test.sh` retains its separate 5121 ms measurement from 2026-09-06T21:02Z instead of a portable capability skip.
 The session-start hint retains its pre-optimization maximum until CI measures the shorter fixture-only home-summary bound; do not discount a local speedup from CI packing weights.
 
@@ -67,7 +73,7 @@ Refresh the hints whenever a serial member grows materially or the lane gains sc
 `bin/fm-test-run.sh` owns the per-shard packing, so its `--check-coverage` output is the current account of lane size and coverage rather than a copied inventory.
 Its header and `--help` own the modeled-budget check and output fields; read the current estimates from `--check-coverage` instead of retaining copied lane sums here.
 [`tests/fm-test-run.test.sh`](../tests/fm-test-run.test.sh), in `test_portable_serial_packing_budget_boundary`, verifies acceptance exactly at the budget and refusal one millisecond above it through the executable runner.
-The longest script, `tests/fm-watch-triage.test.sh`, is the indivisible floor for this layout.
+The largest individual hint is the indivisible floor for the modeled layout.
 The estimates use per-file maxima from different runs, not measured rebalanced jobs or an end-to-end latency guarantee.
 The baseline watch-triage samples range from 944375 to 1074843 ms, while each observed completed portable job adds at most 30 seconds beyond its summed scripts in these runs.
 Even so, maxima from five runs do not establish a P95 or guarantee future headroom.

@@ -116,6 +116,8 @@ init_changed_fixture_repo() {
     fm-pi-watch-extension.test.sh \
     fm-pi-windows-shell-invocation.test.sh \
     fm-afk-return.test.sh \
+    fm-supervision-host.test.sh \
+    fm-supervision-host-recovery.test.sh \
     fm-bearings-snapshot.test.sh \
     fm-backend-cmux.test.sh \
     fm-backend-zellij.test.sh \
@@ -137,8 +139,11 @@ init_changed_fixture_repo() {
   # beside a tests/ file nothing reads at all.
   : >"$repo/tests/shared-probe-fixture.sh"
   : >"$repo/tests/unread-thing.sh"
+  : >"$repo/tests/supervision-host-fixture.sh"
   printf '# shared-probe-fixture.sh\n' >>"$repo/tests/fm-pr-merge.test.sh"
   printf '# shared-probe-fixture.sh\n' >>"$repo/tests/fm-secondmate-safety.test.sh"
+  printf '# supervision-host-fixture.sh\n' >>"$repo/tests/fm-supervision-host.test.sh"
+  printf '# supervision-host-fixture.sh\n' >>"$repo/tests/fm-supervision-host-recovery.test.sh"
   # A nested fixture whose consuming suite names only the fixture directory,
   # the shape the tests/fixtures/<dir>/ arm is keyed for.
   mkdir -p "$repo/tests/fixtures/demo"
@@ -1134,6 +1139,12 @@ test_portable_serial_shards_partition_the_serial_lane() {
   [ -z "$dups" ] || fail "portable serial shards run the same script twice: $dups"
   [ "$(printf '%s\n' "$union" | LC_ALL=C sort)" = "$serial" ] \
     || fail "portable serial shards must exactly cover the portable serial lane"
+  for listed in tests/fm-supervision-host.test.sh tests/fm-supervision-host-recovery.test.sh; do
+    [ "$(printf '%s\n' "$union" | grep -Fxc "$listed")" -eq 1 ] \
+      || fail "the serial shards must run supervision-host wrapper $listed exactly once"
+    "$RUNNER" --list --family afk | grep -Fxq "$listed" \
+      || fail "supervision-host wrapper $listed must retain the afk family"
+  done
 
   # Every shard carries a real share of the lane, so no degenerate partition
   # leaves one runner doing nearly all of the work the split exists to spread.
@@ -1384,6 +1395,25 @@ test_unmapped_new_test_never_inherits_family_concurrency() {
     || fail "the unmapped fixture did not land in the catch-all family: $(cat "$tmp/serial.out")"
   rm -rf "$tmp"
   pass "an unclassified new test stays serial while the proven residual family runs concurrently"
+}
+
+test_changed_supervision_host_fixture_selects_both_wrappers() {
+  local tmp repo listed
+  tmp=$(mktemp -d "${TMPDIR:-/tmp}/fm-test-run-host-fixture.XXXXXX")
+  repo="$tmp/repo"
+  init_changed_fixture_repo "$repo"
+  printf '\n' >>"$repo/tests/supervision-host-fixture.sh"
+  listed=$(cd "$repo" && bin/fm-test-run.sh --list --changed --base HEAD | LC_ALL=C sort)
+  [ "$listed" = "$(printf '%s\n' tests/fm-supervision-host-recovery.test.sh tests/fm-supervision-host.test.sh | LC_ALL=C sort)" ] \
+    || fail "the shared supervision-host fixture must select both wrappers only: $listed"
+  git -C "$repo" add tests/supervision-host-fixture.sh
+  git -C "$repo" -c user.name=test -c user.email=test@example.invalid commit -qm fixture-change
+  : >"$repo/.pi/extensions/lib/fm-branch-dispatch.ts"
+  listed=$(cd "$repo" && bin/fm-test-run.sh --list --changed --base HEAD)
+  assert_contains "$listed" tests/fm-supervision-host.test.sh "branch dispatch must select the first host wrapper"
+  assert_contains "$listed" tests/fm-supervision-host-recovery.test.sh "branch dispatch must select the recovery wrapper"
+  rm -rf "$tmp"
+  pass "shared host fixtures and branch dispatch retain both supervision-host wrappers"
 }
 
 test_changed_shared_fixture_selects_its_readers() {
@@ -1860,6 +1890,7 @@ test_jobs_requires_proven_isolated
 test_jobs_admits_a_concurrent_safe_family
 test_unmapped_new_test_never_inherits_family_concurrency
 test_changed_shared_fixture_selects_its_readers
+test_changed_supervision_host_fixture_selects_both_wrappers
 test_concurrent_runs_are_ordered_longest_first
 test_per_script_timeout_bounds_a_hang
 test_changed_bound_gives_slow_watcher_suites_headroom
