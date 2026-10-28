@@ -1,0 +1,45 @@
+ codemode
+ text(await tools.fixture_delay({outcome:"ok"}));
+
+ ✓ fixture_delay {"outcome":"ok"} 5.0s
+
+ LIVE_OUTPUT_ok
+
+ Took 5.0s
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+
+ error
+
+
+
+ codemode
+ text(await tools.fixture_delay({outcome:"error"}));
+
+ ✗ fixture_delay {"outcome":"error"} 5.0s
+
+ Script error:
+ Error: LIVE_ERROR
+
+ Tool calls made before the failure (they are not undone): fixture_delay (error)
+
+ Took 5.0s
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q2TFMG98XD2R55EMBXAH4/.calm-validation/live (detached)
+14.5%/8.2k (auto)                                                                                                                                          local

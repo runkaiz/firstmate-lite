@@ -1,0 +1,5 @@
+success: pass; real renderer timers started=1, cleared=1, active after completion=0
+error: pass; real renderer timers started=1, cleared=1, active after completion=0
+abort: pass; real renderer timers started=1, cleared=1, active after completion=0
+hidden-success: pass; real renderer timers started=1, cleared=1, active after completion=0
+negative: pass; real renderer timers started=0, cleared=0, active after completion=0

@@ -1,0 +1,45 @@
+
+
+ LIVE_DONE
+
+
+ success
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+
+ error
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+
+ abort
+
+
+ Tool output: collapsed
+
+ Error: This operation was aborted
+
+ Tool output: collapsed
+
+
+ hidden-success
+
+
+            ◿│◣
+▃▃▂▂▂▁▁▁▁▁▁╲▁▁▁╱▁▁▁▁▁▂▂▃▃▃▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▃▃▃▂▂▂▁▁▁▁▁▁▂▂▃▃▃▄▄▄▄▄▄▃▃▂▂▁▁▁▁▁▁▂▂▃▃▃▄▄▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▄▃▃▂▂▁▁▁▁▁▂▂▃▃▃
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q2TFMG98XD2R55EMBXAH4/.calm-validation/live (detached)
+15.6%/8.2k (auto)                                                                                                                                          local

@@ -1,0 +1,45 @@
+
+
+ Tool output: collapsed
+
+ Error: This operation was aborted
+
+ Tool output: collapsed
+
+
+ hidden-success
+
+
+
+ codemode
+ text(await tools.fixture_delay({outcome:"ok"}));
+
+ ✓ fixture_delay {"outcome":"ok"} 5.0s
+
+ LIVE_OUTPUT_ok
+
+ Took 5.0s
+
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+
+ negative
+
+
+
+ UNRELATED_CUSTOM_CALL
+ UNRELATED_CUSTOM_RESULT
+
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q2TFMG98XD2R55EMBXAH4/.calm-validation/live (detached)
+16.1%/8.2k (auto)                                                                                                                                          local

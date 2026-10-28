@@ -1,0 +1,45 @@
+ ▀▀█  v1.4.0
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  fm-calm.ts, live-probe.ts
+
+
+ Startup is still in progress
+
+ Warning: fd not found. Offline mode enabled, skipping download.
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+
+ success/calm
+
+
+ LIVE_DONE
+
+
+ success
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+ Tool output: collapsed
+
+
+ error
+
+
+ Tool output: collapsed
+
+      ◿│◣
+▁▁▁▁▁╲▁▁▁╱▁▁▁▁▁▁▂▂▃▃▄▄▄▄▄▄▃▃▂▂▁▁▁▁▁▁▂▂▂▃▃▃▃▄▄▄▄▄▄▃▃▃▂▂▂▁▁▁▁▁▁▂▂▃▃▃▄▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▄▃▃▃▂▂▂▁▁▁▁▁▁▂▂▂▃▃▃▃▄▄▄▄▄▃▃▃▂▂▁▁▁▁▁▂▂▃▃▄▄▄▄▄▄
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q2TFMG98XD2R55EMBXAH4/.calm-validation/live (detached)
+14.0%/8.2k (auto)                                                                                                                                          local

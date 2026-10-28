@@ -1,0 +1,45 @@
+[Extensions]
+  fm-calm.ts, live-probe.ts
+
+
+ Startup is still in progress
+
+ Warning: fd not found. Offline mode enabled, skipping download.
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+
+ success/calm
+
+
+ LIVE_DONE
+
+
+ success
+
+
+ Tool output: collapsed
+
+ LIVE_DONE
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q2TFMG98XD2R55EMBXAH4/.calm-validation/live (detached)
+13.8%/8.2k (auto)                                                                                                                                          local
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
