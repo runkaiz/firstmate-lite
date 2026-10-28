@@ -2152,8 +2152,18 @@ SH
   assert_contains "$show" "state: done" "a chat answer left the legacy row open"
   assert_contains "$show" "Answer: go with option A" "the chat-answered row lost the captain answer"
 
+  # The held-key path must work even when the old executable is not discoverable.
+  cat > "$home/no-external-discovery.sh" <<'SH'
+command() {
+  if [ "${1:-}" = -v ] && [ "${2:-}" = tasks-axi ]; then return 1; fi
+  builtin command "$@"
+}
+SH
+  if BASH_ENV="$home/no-external-discovery.sh" bash -c 'command -v tasks-axi' >/dev/null 2>&1; then
+    fail "the no-external-discovery fixture did not hide the old command"
+  fi
   : > "$home/send.log"
-  env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" \
+  env BASH_ENV="$home/no-external-discovery.sh" PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" \
     FM_STATE_OVERRIDE="$home/state" FM_DATA_OVERRIDE="$home/data" \
     FM_SEND_LOG="$home/send.log" FM_SEND_SETTLE=0 \
     "$ROOT/bin/fm-send.sh" "$id" --resolve-key sample-chat-followup "take the second option" >/dev/null 2>&1 \

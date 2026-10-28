@@ -420,7 +420,9 @@ RESOLVE_CLOSE_MAX=$FM_LINE_CAP_DEFAULT
 # preserves even past a hold-until date.
 fm_send_hold_resolved_id() { # <task-id> <decision-key>
   local show id state hold_kind
-  command -v tasks-axi >/dev/null 2>&1 || return 1
+  # shellcheck source=bin/fm-tasks-axi-lib.sh
+  . "$SCRIPT_DIR/fm-tasks-axi-lib.sh"
+  fm_tasks_axi_compatible || return 1
   for id in "$2" "$1-decision-$2"; do
     show=$(FM_HOME="$FM_HOME" FM_DATA_OVERRIDE='' "$SCRIPT_DIR/fm-tasks-axi.sh" show "$id" --full 2>/dev/null) || continue
     state=$(printf '%s\n' "$show" | sed -n 's/^  state: //p' | head -1)
