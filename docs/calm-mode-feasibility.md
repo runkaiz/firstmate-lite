@@ -17,7 +17,7 @@ Pi 0.81.1 was installed when Calm was first built, and Pi 0.82.0 was the later r
 The inspected Pi CHANGELOG shows no relevant presentation API introduced at either version, so those versions remain verification evidence rather than compatibility bounds.
 The exported classes used by the adapters (`AssistantMessageComponent` and `InteractiveMode`) are undocumented internals with no stated version guarantee.
 `tests/fm-calm-pi-extension.test.sh` records the installed Pi version as evidence without gating on it and covers both newer synthetic versions and an unavailable adapter seam.
-This host tracks Pi latest, so the version the evidence is pinned to moves; the [2026-09-07 record](#2026-09-07-pi-0851-renderer-and-export-dom-verification) owns the currently pinned version and the renderer comparison behind it.
+This host tracks Pi latest, so the version the evidence is pinned to moves; the [Pi 1.4.0 record](#2026-10-28-pi-140-codemode-renderers) owns the latest codemode renderer evidence.
 
 ### Built-in tool override constraints
 
@@ -86,7 +86,8 @@ The persisted assistant message, provider context, tool execution, export data, 
 Collapsed thinking-only assistant messages now render zero rows, thinking before visible assistant text adds no spacing beyond the text-only baseline, and expanding thinking still renders the original reasoning.
 
 The disconfirming checks deliberately retain supported boundaries.
-An arbitrary third-party custom tool and a built-in read image remain visible because Pi exposes neither a global tool renderer nor image-row control.
+In that Pi 0.81.1 reproduction, an arbitrary third-party custom tool and a built-in read image remained visible because that version exposed neither a global tool renderer nor image-row control.
+The Pi 1.4.0 renderer evidence below supersedes the custom-tool boundary for tools with both renderer slots.
 Expanded thinking remains visible by design, while re-collapsing it returns to zero-height Calm presentation.
 Ordinary user-role near misses remain visible, including quoted current markers, ASCII-only labels, unrelated text before a marker, unrelated text after U+2063, and image-bearing input.
 
@@ -226,8 +227,8 @@ The test fixture enumerates every class below through the centralized policy, an
 | `genuine-agent-response` | Assistant text in `AssistantMessageComponent` | Visible. |
 | `assistant-working-note` | Assistant text in an `AssistantMessageComponent` message the model did not end its response with, identified by its own `stopReason` of `toolUse`, or of `length` with tool calls present | Each settled text block follows the cross-harness preservation contract in [`calm.md`](calm.md); hidden blocks are removed from the shallow presentation copy before layout, a `toolUse` message carrying only short narration occupies zero rows (verified on Pi 0.84.1), and a still-streaming `pending` message is never filtered. |
 | `assistant-thinking` | Thinking content in `AssistantMessageComponent` | Collapsed reasoning is removed from the shallow presentation copy before layout and occupies zero rows; explicit expansion renders the original reasoning. |
-| `assistant-tool-call` | `ToolExecutionComponent` | Seven built-ins, `fm_watch_arm_pi`, `fm_branch_outcomes`, and `fm_branch_processed` hidden; other arbitrary custom tools remain an unsupported boundary. |
-| `tool-result` | `ToolExecutionComponent` | Text results for the controlled tools hidden; other arbitrary custom results remain an unsupported boundary. |
+| `assistant-tool-call` | `ToolExecutionComponent` | Seven built-ins, `fm_watch_arm_pi`, `fm_branch_outcomes`, and `fm_branch_processed` hidden; Pi 1.4.0 additionally hides codemode and resolved custom tools with both renderer slots. |
+| `tool-result` | `ToolExecutionComponent` | Text results for the controlled tools hidden, including codemode and resolved custom tools with both renderer slots on Pi 1.4.0. |
 | `tool-image` | Image children appended outside tool renderer slots | Unsupported boundary; remains visible. |
 | `user-bash` | `BashExecutionComponent` for `!` and `!!` | Unsupported boundary; remains visible. |
 | `skill-invocation` | `SkillInvocationMessageComponent` plus parsed user text | Unsupported boundary; remains visible. |
@@ -244,9 +245,49 @@ The test fixture enumerates every class below through the centralized policy, an
 | `synthetic-assistant` | No authoritative Firstmate source found | Policy-hidden, but Pi exposes no generic assistant-role renderer. |
 | `unknown` | Future or unclassified transcript component | Policy-hidden, but no generic renderer exists; never claimed as covered. |
 
-The installed extension API has no supported global transcript filter, user-message renderer, assistant-message renderer, chat-container API, or generic custom-tool wrapper.
+The Pi 0.81.1 extension API had no supported global transcript filter, user-message renderer, assistant-message renderer, chat-container API, or generic custom-tool wrapper.
+Pi 1.4.0 adds the supported tool renderer resolver described below; the remaining transcript boundaries still apply.
 Pi 0.81.1 through 0.82.0, Pi 0.84.4, and Pi 0.85.1 export `AssistantMessageComponent` and `InteractiveMode`, so Calm uses separate idempotent, API-probed adapters for assistant thinking layout and the complete operational-user transcript row while leaving all message data and non-Calm rendering unchanged; see the [compatibility contract](calm.md#pi-compatibility) for how a future Pi lacking one of those exports is handled.
 General component replacement, ANSI cursor erasure, provider-context mutation, and installed-file patching remain rejected as unsupported or preservation-breaking workarounds.
+
+## 2026-10-28 Pi 1.4.0 codemode renderers
+
+The installed `@earendil-works/pi-coding-agent` package reported version `1.4.0`.
+Its README, complete extension and TUI guides, extension declarations, built-in renderer example, codemode definition and renderer, extension runner, tool component, and HTML exporter were inspected.
+The public `registerToolRenderer((name, next) => renderers)` API resolves presentation independently of tool execution, including late registrations and restored calls.
+Calm uses that resolver for non-built-in tools with both render slots and retains the existing built-in compatibility path.
+Normal rendering and exports delegate to the original slots; default shells reuse Calm's existing box composition, while self-shell renderers keep their own original components across toggles.
+
+The deterministic regressions use installed Pi renderers and TUI with synthetic tool results and a test-private stored session, without model inference or access to a real session.
+The installed codemode definition provides the real script header, nested-call status, and output renderer.
+The same replay distinguishes Calm off, first activation, reload, and restart/resume, while the renderer fixture checks pending and error results, self and default shells with zero and two-cell output padding, export/share, unchanged arguments/results, and missing renderer slots.
+The built-in collision tests retain their existing non-retroactive first-toggle boundary.
+
+The refreshed verification command is:
+
+```sh
+FM_PI_PACKAGE_DIR=/path/to/installed/@earendil-works/pi-coding-agent \
+FM_CHROME_BIN=/path/to/cached/chrome \
+bash tests/fm-calm-pi-extension.test.sh
+```
+
+The affected suite passed on Pi 1.4.0, including its native TUI restore/restart and rendered-export-DOM checks.
+Captured TUI markers had these values:
+
+| Presentation | Script and output | Nested-call status | Final reply |
+| --- | --- | --- | --- |
+| Calm off | Visible | Visible | Visible |
+| Calm on | Absent | Absent | Visible |
+| Restart/resume with Calm on | Absent | Absent | Visible |
+| Calm off after restart | Visible | Visible | Visible |
+
+The rendered export conversation retained `CODEMODE_TUI_CALL`, `CODEMODE_TUI_OUTPUT`, and `fixture.echo`, while the settled live transcript after export retained none of the codemode script/output markers.
+The suite reported its explicit standalone-Calm dual-install skip because no standalone extension was installed; the pinned shared-slot test still passed.
+The strict Pi typecheck entry point reported `skip: Pi extension typecheck prerequisite not found: tsc` on this host.
+
+The selected Chrome is used only for synthetic local HTML export checks with a test-private profile.
+The fixture resolves dependencies through the selected Pi package so both nested and installer-hoisted layouts work without installing or copying dependencies.
+Other harnesses and runtime backends do not participate in Pi's renderer resolution; their Calm integrations and delivery paths are unchanged.
 
 ## Cross-harness verification record
 
