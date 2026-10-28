@@ -393,11 +393,15 @@ def collect(db, specs, budget, usage_only=False):
 
 def summary(db, groups, since=None, until=None):
     aggregates = {}
+    since = dt.datetime.fromisoformat(since.replace("Z", "+00:00")) if since else None
+    until = dt.datetime.fromisoformat(until.replace("Z", "+00:00")) if until else None
     for row in db.execute("select id,data from events order by id"):
         event = json.loads(row["data"])
         ts = event["timestamp"]
-        if (since or until) and (not ts or (since and ts < since) or (until and ts >= until)):
-            continue
+        if since or until:
+            instant = dt.datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else None
+            if instant is None or (since and instant < since) or (until and instant >= until):
+                continue
         key = tuple((ts[:10] if ts else None) if k == "day" else event.get(k) for k in groups)
         if key not in aggregates:
             aggregates[key] = {"group": dict(zip(groups, key)), "usage_records": 0, "tool_calls": 0,

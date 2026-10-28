@@ -129,7 +129,7 @@ def pipeline_scopes(g, gaps, catalog):
                 if r["worktree_dir"] == g["cwd"]:
                     gaps.add("pipeline_shares_worker_cwd_activity_unknown")
                 else:
-                    scopes.append(dict(g, cwd=r["worktree_dir"], start=r["created_at"],
+                    scopes.append(dict(g, cwd=r["worktree_dir"], start=r["created_at"], end=None,
                                        activity="validation", harness=None))
         return scopes
     except (sqlite3.Error, OSError):
@@ -273,6 +273,11 @@ def refresh(args, store, catalog):
                    harness=None, activity="supervisor")]
     generations = list(catalog["generations"].values())
     pipeline = catalog.setdefault("pipeline_scopes", {})
+    for p in pipeline.values():
+        if p["end"] is not None:
+            for harness in ledger.MAPS:
+                discovery_cursor(p, harness, catalog).pop("rejected", None)
+            p["end"] = None
     chosen = scope_batch(generations, catalog, "pipeline_cursor", 4)
     if len(generations) > len(chosen):
         gaps.add("pipeline_scope_discovery_backlog")
@@ -283,11 +288,7 @@ def refresh(args, store, catalog):
         scopes.append(dict(g, activity="worker"))
         if g["harness"] not in ledger.MAPS:
             gaps.add("unsupported_worker_reader_" + (g["harness"] or "unknown"))
-    for p in pipeline.values():
-        owner = catalog["generations"].get(ledger.identity(p["task"], p["generation"]))
-        if owner:
-            p["end"] = owner["end"]
-        scopes.append(p)
+    scopes.extend(pipeline.values())
     # Scope rotation prevents a long fleet/history from starving later scopes.
     selected = scope_batch(scopes, catalog, "scope_cursor", 8)
     if len(scopes) > len(selected):
@@ -334,7 +335,9 @@ def refresh(args, store, catalog):
         try:
             native = header(pending["path"], pending["harness"])
             scope = pending["scope"]
-            if scope.get("generation"):
+            if scope["activity"] == "validation":
+                scope = dict(scope, end=None)
+            elif scope.get("generation"):
                 retained = catalog["generations"].get(ledger.identity(scope["task"], scope["generation"]))
                 if retained:
                     scope = dict(scope, end=retained["end"])

@@ -170,6 +170,34 @@ with tempfile.TemporaryDirectory(prefix='fm-usage-test-') as tmp:
     assert any(g['group']['task']=='trial' and g['tool_calls']==1 and g['usage_records']==1 for g in turns)
     assert report('--since','2030-01-01T00:00:00Z')['groups'] == []
     assert report() == report()
+    bounded = root / 'bounded.jsonl'
+    bounds_db = root / 'bounds.sqlite'
+    times = [when, '2026-10-25T10:00:00.5Z', '2026-10-25T10:00:00.750000Z',
+             '2026-10-25T10:00:01Z', None]
+    write(bounded, [dict(type='session', version=3, id='bounded')] + [
+        dict(type='message', id=f'b-{i}', timestamp=t, message=dict(role='assistant',
+             usage={'input': 2**i}, content=[dict(type='toolCall', id=f'call-{i}', name='Read')]))
+        for i, t in enumerate(times)])
+    manifest.write_text(json.dumps([spec('pi', bounded)]))
+    cli('collect', '--manifest', manifest, '--db', bounds_db)
+    with sqlite3.connect(bounds_db) as con:
+        for event_id, data in con.execute('select id,data from events').fetchall():
+            event = json.loads(data)
+            if event['timestamp'] == when:
+                event['timestamp'] = '2026-10-25T03:00:00.000000-07:00'
+            elif event['timestamp'] == '2026-10-25T10:00:00.500000Z':
+                event['timestamp'] = '2026-10-25T10:00:00.5Z'
+            con.execute('update events set data=? where id=?', (json.dumps(event), event_id))
+    for bounds, expected, count in [
+        (['--since', when], 15, 4), (['--until', when], 0, 0),
+        (['--since', times[1]], 14, 3), (['--until', times[1]], 1, 1),
+        (['--since', times[1], '--until', times[2]], 2, 1),
+        (['--since', '2026-10-25T03:00:00-07:00', '--until', times[3]], 7, 3),
+    ]:
+        result = cli('summary', '--db', bounds_db, *bounds)['groups']
+        assert sum(g['tokens']['input']['reported'] for g in result) == expected, (bounds, result)
+        assert sum(g['usage_records'] for g in result) == count, (bounds, result)
+        assert sum(g['tool_calls'] for g in result) == count, (bounds, result)
     # Non-ledger DB and unsafe/symlink sources refused without content disclosure.
     foreign = root/'foreign.sqlite'
     with sqlite3.connect(foreign) as con:con.execute('create table unrelated (x)')
@@ -516,9 +544,74 @@ with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
         result = refresh("--max-candidates", "7")
         assert result["known_sources"] == known + 2, (harness, result)
         assert total() == baseline + 74, (harness, total())
+    stores = [store]
+    home = root / "relaunch-home"
+    for part in ("state", "data", "config"):
+        (home / part).mkdir(parents=True)
+    env["FM_HOME"] = str(home)
+    store = home / "data/usage-ledger"
+    project, worktree, validation = [root / n for n in ("relaunch-project", "relaunch-worker", "relaunch-validation")]
+    meta = home / "state/job.meta"
+    start = int(time.time()) - 100
+    def iso(epoch):
+        return dt.datetime.fromtimestamp(epoch, dt.timezone.utc).isoformat()
+    metadata(start)
+    pipeline.execute("insert into repos values (?,?)", ("relaunch-project", str(project)))
+    pipeline.execute("insert into runs values (?,?,?,?,?)",
+                     ("relaunch-run", "relaunch-project", "fm/job", start + 1, str(validation)))
+    pipeline.commit()
+    cx("pipeline-before-relaunch", validation, iso(start + 2))
+    pending_validation = cx("pipeline-partial-relaunch", validation, iso(time.time() + 10), 17)
+    validation_bytes = pending_validation.read_bytes()
+    pending_validation.write_bytes(validation_bytes[:30])
+    pending_worker = cx("worker-partial-relaunch", worktree, iso(time.time() + 10), 1000)
+    worker_bytes = pending_worker.read_bytes()
+    pending_worker.write_bytes(worker_bytes[:30])
+    refresh()
+    assert total() == 7, report()
+    assert len(json.loads((store / "catalog.json").read_text())["retry"]) == 2
+    refresh("--retire", "job")
+    worktree = root / "relaunch-worker-new"
+    metadata(int(time.time()))
+    refresh("--remember", "job")
+    pending_validation.write_bytes(validation_bytes)
+    pending_worker.write_bytes(worker_bytes)
+    late_validation = cx("pipeline-after-relaunch", validation, iso(time.time() + 10), 13)
+    cx("pipeline-before-run", validation, iso(start), 1000)
+    import hashlib
+    retained = json.loads((store / "catalog.json").read_text())
+    cutoff = next(g["end"] for g in retained["generations"].values() if g["start"] == start)
+    for scope in retained["pipeline_scopes"].values():
+        scope["end"] = cutoff
+    for pending in retained["retry"].values():
+        if pending["scope"]["activity"] == "validation":
+            pending["scope"]["end"] = cutoff
+    rejected_id = hashlib.sha256(json.dumps([str(late_validation)], separators=(",", ":")).encode()).hexdigest()
+    stat = late_validation.stat()
+    for cursor in retained["discovery"].values():
+        cursor.setdefault("rejected", {})[rejected_id] = [
+            stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns]
+    (store / "catalog.json").write_text(json.dumps(retained))
+    for name, repo_id, branch, created in [
+        ("wrong-project", "p", "fm/job", start + 1),
+        ("wrong-branch", "relaunch-project", "fm/other", start + 1),
+        ("before-generation", "relaunch-project", "fm/job", start - 1),
+    ]:
+        cwd = root / name
+        pipeline.execute("insert into runs values (?,?,?,?,?)", (name, repo_id, branch, created, str(cwd)))
+        cx(name, cwd, iso(time.time() + 10), 1000)
+    pipeline.execute("delete from runs where id='relaunch-run'")
+    pipeline.commit()
+    refresh()
+    assert total() == 37, report()
+    assert {g["group"]["task"] for g in report()["groups"]} == {"job"}
+    meta.unlink()
+    cx("pipeline-after-cleanup", validation, iso(time.time() + 20), 19)
+    refresh()
+    assert total() == 56, report()
     index.close()
     # Privacy covers catalog/index/status and persistent DB, not just summaries.
-    for f in store.rglob("*"):
+    for f in (f for s in stores + [store] for f in s.rglob("*")):
         assert f.stat().st_mode & 0o077 == 0,(f,oct(f.stat().st_mode))
         if f.is_file():
             assert secret.encode() not in f.read_bytes(),f

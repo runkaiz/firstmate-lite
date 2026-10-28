@@ -229,6 +229,82 @@ for kind in ship scout remote; do
   pass "native $kind selects exact accepted source on divergence and refuses duplicate spawn"
 done
 
+for backend in tmux herdr; do
+  make_case "missing-$backend"
+  printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
+  id=missing-endpoint
+  allocate "$id" || fail 'missing endpoint fixture allocation failed'
+  WT=$FM_GIT_WORKTREE_PATH
+  fakebin=$(fm_fakebin "$CASE/fake")
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$fakebin/no-mistakes"
+  cat > "$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$1" in
+  list-windows)
+    [ "${FM_TEST_ENDPOINT_UNREADABLE:-0}" != 1 ] || exit 1
+    printf 'main\n' ;;
+  display-message) exit 1 ;;
+esac
+SH
+  cat > "$fakebin/herdr" <<'SH'
+#!/usr/bin/env bash
+case "$1 $2" in
+  'pane get')
+    if [ "${FM_TEST_ENDPOINT_UNREADABLE:-0}" = 1 ]; then
+      printf 'not-json\n'
+    else
+      printf '%s\n' '{"error":{"code":"pane_not_found"}}'
+    fi
+    exit 1 ;;
+  'session list') printf '{"sessions":[{"name":"native-fixture","running":true,"socket_path":"%s"}]}\n' "${FM_TEST_HERDR_SOCKET:?}" ;;
+  'status --json') printf '%s\n' '{"server":{"running":true}}' ;;
+  'workspace list') printf '%s\n' '{"result":{"workspaces":[]}}' ;;
+  'pane process-info') exit 1 ;;
+esac
+SH
+  chmod +x "$fakebin/no-mistakes" "$fakebin/tmux" "$fakebin/herdr"
+  target="native-fixture:fm-$id"
+  [ "$backend" != herdr ] || target=native-fixture:w1:p1
+  fm_write_meta "$HOME_DIR/state/$id.meta" \
+    "window=$target" "endpoint_task_id=$id" "backend=$backend" \
+    "worktree=$WT" "project=$PROJ" 'kind=ship' 'mode=local-only' \
+    'spawn_gen=s1792922400.123.456' 'allocator=git'
+  if [ "$backend" = herdr ]; then
+    printf '%s\n' 'herdr_session=native-fixture' 'herdr_workspace_id=w1' \
+      'herdr_tab_id=w1:t1' 'herdr_pane_id=w1:p1' >> "$HOME_DIR/state/$id.meta"
+  fi
+  run_native_teardown() {
+    env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+      FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+      FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
+      FM_TEST_HERDR_SOCKET="$CASE/herdr.sock" \
+      bash "$ROOT/bin/fm-teardown.sh" "$id"
+  }
+  if out=$(FM_TEST_ENDPOINT_UNREADABLE=1 run_native_teardown 2>&1); then
+    fail "$backend unreadable endpoint permitted native removal"
+  fi
+  assert_contains "$out" 'live or unverified endpoint' "$backend refused for the wrong reason"
+  bash -c 'cd "$1" && printf ready > "$2" && exec sleep 60' _ "$WT" "$CASE/ready" &
+  owner=$!
+  for _ in $(seq 1 100); do [ ! -f "$CASE/ready" ] || break; sleep 0.01; done
+  [ -f "$CASE/ready" ] || { kill "$owner"; wait "$owner" || true; fail 'copy owner did not start'; }
+  rc=0
+  out=$(run_native_teardown 2>&1) || rc=$?
+  alive=0
+  kill -0 "$owner" 2>/dev/null && alive=1
+  kill "$owner" 2>/dev/null || true
+  wait "$owner" 2>/dev/null || true
+  [ "$rc" != 0 ] && [ "$alive" = 1 ] || fail "$backend missing endpoint discarded a live copy"
+  assert_contains "$out" 'native copy still has processes' "$backend never reached native process proof"
+  [ -d "$WT" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
+    || fail "$backend process refusal lost copy or records"
+  out=$(run_native_teardown 2>&1)
+  expect_code 0 "$?" "$backend native retry after endpoint loss failed: $out"
+  [ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] && [ ! -e "$HOME_DIR/state/$id.git-worktree" ] \
+    || fail "$backend missing endpoint cleanup left copy or records"
+  pass "native $backend teardown retries a missing endpoint but preserves unreadable and live owners"
+done
+
 fm_live_gate default-on FM_NATIVE_TMUX_LIVE_E2E tmux pgrep lsof
 
 LAB_HOME_HELPER=${LAB_HOME_HELPER:-$ROOT/bin/fm-lab-home.sh}

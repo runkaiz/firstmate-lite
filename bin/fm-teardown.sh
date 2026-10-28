@@ -747,16 +747,17 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
-    case "$(fm_backend_agent_state "$BACKEND" "$T")" in
-      dead) ;;
+    native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
+    case "$native_endpoint_state" in
+      dead|missing) ;;
       *) echo 'REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first' >&2; exit 1 ;;
     esac
-    if [ "$BACKEND" = herdr ]; then
+    if [ "$native_endpoint_state" = dead ] && [ "$BACKEND" = herdr ]; then
       fm_backend_herdr_parse_target "$T" || exit 1
       fm_backend_herdr_pane_idle_shell_pid "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE" >/dev/null || {
         echo 'REFUSED: native endpoint is not a proven idle childless shell; preserving copy' >&2; exit 1;
       }
-    elif [ "$BACKEND" = tmux ]; then
+    elif [ "$native_endpoint_state" = dead ] && [ "$BACKEND" = tmux ]; then
       native_pane_pid=$(tmux display-message -p -t "$T" '#{pane_pid}') || exit 1
       case "$native_pane_pid" in ''|*[!0-9]*) echo 'REFUSED: native shell PID is unverified' >&2; exit 1 ;; esac
       native_children_rc=0
