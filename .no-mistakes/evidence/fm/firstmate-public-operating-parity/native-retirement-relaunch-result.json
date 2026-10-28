@@ -1,0 +1,43 @@
+{
+  "tested_head_sha": "71557b00fe50ec0865cb539a49e12b1e29a64fa7",
+  "scope": "Remaining interruption/relaunch evidence gap only; seven prior scenarios were not rerun",
+  "source_changes": false,
+  "elapsed_seconds_including_cleanup": 7,
+  "command": "timeout --signal=TERM 270 bash .test-phase/native-retirement-relaunch.sh",
+  "exit_code": 0,
+  "scenarios": [
+    {
+      "name": "Stopped marker relaunch preserves recorded allocator and native copy",
+      "result": "pass",
+      "live": true,
+      "interface": "bin/fm-spawn.sh TASK --relaunch --harness RAW_SHELL_MARKER",
+      "observed": "After fixture default changed from git to treehouse, the replacement ran in the original copy, allocator remained git, and reservation bytes and Git worktree inventory were unchanged. The same real tmux pane was reused.",
+      "limitation": "Exercises the documented already-stopped relaunch path with a non-model shell marker, not fm-control's interactive model-agent stop/checkpoint transaction. No inference or credentials were used."
+    },
+    {
+      "name": "Failed reservation retirement after metadata removal recovers through startup replay",
+      "result": "pass",
+      "live": true,
+      "interface": "bin/fm-teardown.sh TASK followed by bin/fm-bootstrap.sh with FM_BOOTSTRAP_NETWORK=skip",
+      "fault": "Existing test technique: command-scoped rm wrapper refuses only the exact owned reservation path; real endpoint and filesystem operations remain in use",
+      "observed": "Teardown returned 1 after removing the copy and task metadata. The byte-identical reservation and production backlog-close marker remained. Bootstrap returned 0 and retired both remaining records. The primary project remained clean.",
+      "limitation": "Deterministically injected filesystem-operation failure, not an asynchronous process kill. The removal owner suppressed wrapper stderr, so the transcript does not retain its attempted teardown-parent PID diagnostic. Marker and tmux process identities are retained."
+    }
+  ],
+  "processes": {
+    "driver_pid": 2629264,
+    "first_marker_pid": 2630081,
+    "replacement_marker_pid": 2631855,
+    "tmux_main_pane_pid": 2629336,
+    "tmux_worker_pane_pid": 2629674,
+    "private_socket": "/tmp/fml.uENW5e/tmux-1000/fm-lab"
+  },
+  "isolation": "Disposable lab home/project/manual backlog; synthetic CODEX_HOME, CLAUDE_CONFIG_DIR, PI_CODING_AGENT_DIR and NM_HOME from tests/lib.sh; real tmux routed only to the lab helper's private socket; no Herdr, model inference, real usage stores or pipeline commands",
+  "cleanup": "Lab server stopped, lab helper removed socket directory, fixture cleanup removed owned project/copy/home and task temp. Independently verified these paths absent. Temporary driver removed from worktree after retaining evidence.",
+  "artifacts": {
+    "driver": "/home/runkai/.no-mistakes/evidence/01M61Q39ZYPMGTHHT7DZ77ZHWN/native-retirement-relaunch.sh",
+    "transcript": "/home/runkai/.no-mistakes/evidence/01M61Q39ZYPMGTHHT7DZ77ZHWN/native-retirement-relaunch.log",
+    "before_after_records": "/home/runkai/.no-mistakes/evidence/01M61Q39ZYPMGTHHT7DZ77ZHWN/native-retry-records",
+    "verified_corrected_prior_usage_log": "/home/runkai/.no-mistakes/evidence/01M61Q39ZYPMGTHHT7DZ77ZHWN/usage-live.log"
+  }
+}

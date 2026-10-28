@@ -1,0 +1,31 @@
+{
+  "head": "71557b00fe50ec0865cb539a49e12b1e29a64fa7",
+  "audit": "pass",
+  "execution_policy": "Retained same-run product executions; no scenario rerun in this audit",
+  "reservation_sha256": "02b3928dafb0b68f8f31b286c2e470e2c51f907df4b45c3adf3b9d5f460bd4b2",
+  "observations": [
+    "Reservation bytes and copy inventory unchanged across relaunch",
+    "New spawn generation retains allocator=git and original copy path",
+    "Retirement marker binds exact reservation digest and replacement generation",
+    "Failure snapshot preserves ownership after task metadata disappears",
+    "Replay snapshot contains only the original project worktree",
+    "Recorded fixture paths, private socket and transient driver are absent",
+    "Current worktree is clean; corrected usage evidence path exists"
+  ],
+  "cleanup": {
+    "home": "absent",
+    "project": "absent",
+    "root": "absent",
+    "path": "absent"
+  },
+  "retained_artifact_sha256": {
+    "native-live.log": "aca58ab1b337f6f5febbd40e8c381025fe69091b31752ac574378ad3355e27ff",
+    "native-recovery-live.log": "0f68df9fe47367066f1751f8465d13e38862cdf9fd749b69eb7541cdbe77a3f7",
+    "usage-live.log": "ddc83903796b307eaeac66a5afa6baa604b3258af8c621ed0132a6f34a05cd6a",
+    "focused-tests.log": "a7c2321460bd36eb074817b853792111cd1eae2ede7af5894f4cc48a95ac3dd2",
+    "lifecycle-tests.log": "210b6982ebf56344acb145c7c4bb434da94500ca1aa57f6dbc0387b46d89eca7",
+    "native-retirement-relaunch.sh": "b97d863528138542f4da9c7920c6a12d3836b3fb0d181664cec1dd02023ea64b",
+    "native-retirement-relaunch.log": "abde498727fdc8f586ae26c2149feccaddf82726a4d199b75c9975aa62496923",
+    "native-retirement-relaunch-result.json": "392d30856af88f39788759562fb6cde5a07242062f36d5ff1af5ff0cb502f74b"
+  }
+}

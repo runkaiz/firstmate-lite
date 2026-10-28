@@ -1,0 +1,9 @@
+schema=fm-git-worktree.v1
+task=native-retry-2629264
+home=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/home
+project=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/project
+common=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/project/.git
+root=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/copies
+path=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/copies/native-retry-2629264/worktree
+base=106b05222a77fb62fb2964b4e0eaa0e621beb0ec
+source_ref=refs/heads/main

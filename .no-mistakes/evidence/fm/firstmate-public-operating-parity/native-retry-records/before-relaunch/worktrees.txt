@@ -1,0 +1,8 @@
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/project
+HEAD 106b05222a77fb62fb2964b4e0eaa0e621beb0ec
+branch refs/heads/main
+
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-retry.yN2SNL/copies/native-retry-2629264/worktree
+HEAD 106b05222a77fb62fb2964b4e0eaa0e621beb0ec
+detached
+

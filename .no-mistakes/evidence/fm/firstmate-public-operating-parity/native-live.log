@@ -1,0 +1,31 @@
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/home
+ACTION: spawn a shell marker worker through the real native allocator and private tmux
+warning: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/home/data/native-evidence-1769843/launch-brief.md records no ship branch; defaulting to legacy branch fm/native-evidence-1769843
+warning: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/home/data/native-evidence-1769843/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: native-evidence-1769843 ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD 3d792f5)
+HEAD is now at 3d792f5 initial
+native allocation task=native-evidence-1769843 source_ref=refs/heads/main base=3d792f5b9be3be7909aa252afb95abb159eb9617 worktree=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/copies/native-evidence-1769843/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned native-evidence-1769843 harness=bash kind=ship mode=local-only yolo=off window=firstmate:fm-native-evidence-1769843 worktree=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/copies/native-evidence-1769843/worktree
+OBSERVED worker working directory:
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/copies/native-evidence-1769843/worktree
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/project
+HEAD 3d792f5b9be3be7909aa252afb95abb159eb9617
+branch refs/heads/main
+
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/copies/native-evidence-1769843/worktree
+HEAD 3d792f5b9be3be7909aa252afb95abb159eb9617
+detached
+
+ACTION: attempt cleanup while worker is busy (must refuse)
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+OBSERVED: busy copy and task record preserved
+ACTION: clean up the stopped, unchanged worker
+teardown native-evidence-1769843 complete (window firstmate:fm-native-evidence-1769843, worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/copies/native-evidence-1769843/worktree)
+Backlog: native-evidence-1769843 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/home/data/backlog.md - move native-evidence-1769843 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+OBSERVED: copy, metadata, and reservation retired; primary project remains
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.aR95lt/project
+HEAD 3d792f5b9be3be7909aa252afb95abb159eb9617
+branch refs/heads/main
+

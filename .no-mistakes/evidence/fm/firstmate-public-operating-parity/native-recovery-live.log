@@ -1,0 +1,40 @@
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/home
+ACTION: reserve a copy before launch, then advance the accepted source
+Preparing worktree (detached HEAD 40690af)
+HEAD is now at 40690af initial
+[main a3cc0e6] source advances before launch
+ACTION: try to adopt that reservation under a foreign home (must refuse)
+error: native worktree: requested base does not match source ref; inspect source before retrying
+ACTION: spawn a shell marker worker through the real native allocator and private tmux
+warning: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/home/data/native-evidence-1904610/launch-brief.md records no ship branch; defaulting to legacy branch fm/native-evidence-1904610
+warning: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/home/data/native-evidence-1904610/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: native-evidence-1904610 ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+native allocation task=native-evidence-1904610 source_ref=refs/heads/main base=40690af78f3321d7b4c977ea239c88915cb4ecfe worktree=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned native-evidence-1904610 harness=bash kind=ship mode=local-only yolo=off window=firstmate:fm-native-evidence-1904610 worktree=/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree
+OBSERVED: launch resumed the exact reserved base after source advancement
+{"bytes_read":0,"coverage":"partial","cpu_seconds":0.011735530000000001,"enabled":true,"gaps":["claude_native_store_unavailable","codex_native_index_unavailable","no_native_sources_observed_usage_unknown","pi_native_store_unavailable","pipeline_native_scope_unavailable","unsupported_worker_reader_bash"],"known_sources":0,"metadata_bytes_read":0,"observed_at":1793212544.8259265,"pipeline_counters":"separate_fm_pipeline_spend_owner","schema_version":1,"selected_sources":0,"wall_seconds":0.039202419051434845}
+OBSERVED worker working directory:
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/project
+HEAD a3cc0e672561beb545bead03ce9d3393a8700b90
+branch refs/heads/main
+
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree
+HEAD 40690af78f3321d7b4c977ea239c88915cb4ecfe
+detached
+
+ACTION: attempt cleanup while worker is busy (must refuse)
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+OBSERVED: busy copy and task record preserved
+ACTION: try cleanup with untracked work present (must refuse and preserve bytes)
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree; preserving copy
+OBSERVED: untracked work remains unchanged
+ACTION: clean up the stopped, unchanged worker
+teardown native-evidence-1904610 complete (window firstmate:fm-native-evidence-1904610, worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/copies/native-evidence-1904610/worktree)
+Backlog: native-evidence-1904610 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/home/data/backlog.md - move native-evidence-1904610 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+OBSERVED: copy, metadata, and reservation retired; primary project remains
+worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61Q39ZYPMGTHHT7DZ77ZHWN/.test-phase/tmp/fm-lab-native-evidence.12wzwo/project
+HEAD a3cc0e672561beb545bead03ce9d3393a8700b90
+branch refs/heads/main
+
