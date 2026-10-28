@@ -167,16 +167,45 @@ def header(path, harness):
     return None
 
 
+def discovery_cursor(scope, harness, catalog):
+    key = ledger.identity(scope["cwd"], harness, scope["start"], scope["task"], scope["activity"])
+    return catalog["discovery"].setdefault(key, {})
+
+
+def file_signature(path):
+    st = os.stat(path, follow_symlinks=False)
+    return [st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns]
+
+
 def candidates(scope, harness, catalog, limit, gaps):
     cwd = scope["cwd"]
-    key = ledger.identity(cwd, harness, scope["start"], scope["task"], scope["activity"])
-    cursor = catalog["discovery"].setdefault(key, {})
+    cursor = discovery_cursor(scope, harness, catalog)
+
+    def unknown(path):
+        if not isinstance(path, str) or not Path(path).is_absolute():
+            return True
+        sid = ledger.identity(os.path.abspath(path))
+        if sid in catalog["sources"] or sid in catalog["retry"]:
+            return False
+        rejected = cursor.get("rejected", {}).get(sid)
+        if rejected is not None:
+            try:
+                return rejected != file_signature(path)
+            except OSError:
+                return True
+        return True
+
     if harness == "codex":
         root = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
         try:
             with readonly(root / "state_5.sqlite") as db:
-                rows = db.execute("select id,rollout_path from threads where cwd=? and id>? "
-                                  "order by id limit ?", (cwd, cursor.get("after", ""), limit)).fetchall()
+                rows = []
+                for row in db.execute("select id,rollout_path from threads where cwd=? and id>? order by id",
+                                      (cwd, cursor.get("after", ""))):
+                    if unknown(row["rollout_path"]):
+                        rows.append(row)
+                        if len(rows) == limit:
+                            break
             cursor["after"] = rows[-1]["id"] if len(rows) == limit else ""
             if len(rows) == limit:
                 gaps.add("discovery_backlog")
@@ -192,16 +221,15 @@ def candidates(scope, harness, catalog, limit, gaps):
         directory = root / re.sub(r"[^a-zA-Z0-9]", "-", cwd)
     try:
         stamp = directory.stat().st_mtime_ns
-        if cursor.get("complete") == stamp:
-            return []
         if cursor.get("stamp") != stamp:
             cursor.update(stamp=stamp, after="")
         # Metadata-only enumeration of ONE exact cwd store, never unrelated logs.
         with os.scandir(directory) as entries:
             names = heapq.nsmallest(limit, (e.name for e in entries if e.name.endswith(".jsonl")
-                                           and e.name > cursor.get("after", "") and e.is_file(follow_symlinks=False)))
+                                           and e.name > cursor.get("after", "") and e.is_file(follow_symlinks=False)
+                                           and unknown(e.path)))
         if len(names) < limit:
-            cursor.update(complete=stamp, after="")
+            cursor["after"] = ""
         else:
             cursor["after"] = names[-1]
             gaps.add("discovery_backlog")
@@ -279,9 +307,8 @@ def refresh(args, store, catalog):
                     gaps.add("invalid_native_locator")
                     continue
                 sid = ledger.identity(os.path.abspath(path))
-                if sid in catalog["sources"]:
-                    continue
                 try:
+                    signature = file_signature(path)
                     native = header(path, harness)
                     if native is None:
                         # Retry partial headers even if directory mtime stays unchanged.
@@ -291,12 +318,14 @@ def refresh(args, store, catalog):
                     cwd, created, run = native
                     if cwd != scope["cwd"] or created < scope["start"] or (
                             scope["end"] is not None and created >= scope["end"]):
+                        discovery_cursor(scope, harness, catalog).setdefault("rejected", {})[sid] = signature
                         continue
                     catalog.setdefault("proofs", {})[sid] = dict(cwd=cwd, created=created, run=run)
                     catalog["sources"][sid] = dict(harness=harness, path=path, task=scope["task"],
                         task_kind=scope["task_kind"], activity=scope["activity"])
                     catalog["retry"].pop(sid, None)
                 except (OSError, ValueError, TypeError, AttributeError):
+                    catalog["retry"][sid] = dict(path=path, harness=harness, scope=scope)
                     gaps.add("native_metadata_unavailable")
     # Retry only bounded partial headers, no transcript history or new timer.
     retries = list(catalog["retry"].items())

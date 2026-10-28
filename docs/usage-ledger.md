@@ -53,7 +53,8 @@ Backlog, partial tails, unsupported sources, and refresh failures are visible in
 A failed refresh never becomes a successful empty measurement.
 The generation handoff is written before acquiring the refresh lock, so a concurrent cleanup can retire metadata without losing its join.
 SQLite events and incremental offsets commit in one transaction; manual and automatic writers serialize before reading offsets.
-Native per-directory discovery enumerates names only when that directory changes or a discovery page remains pending, and opens only bounded candidate metadata records.
+Native discovery filters known sources, pending metadata retries, and unchanged scope rejections before selecting a bounded page of new candidate headers.
+Directory scans enumerate only the exact cwd store; Codex applies the same filter while reading its read-only index.
 It does not repeatedly read completed transcript history.
 
 After a guarded local landing, MAIN should perform one stable-home refresh and verify another newly created native session is discovered before claiming activation.

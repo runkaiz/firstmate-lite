@@ -462,6 +462,60 @@ with tempfile.TemporaryDirectory(prefix="fm-usage-auto-test-") as tmp:
     assert total() == before + 296
     live_path.write_bytes(unchanged)
     refresh()
+    import datetime as dt
+    sequence = 0
+    def native_fixture(harness, name, *, foreign=False, partial=False):
+        global sequence
+        sequence += 1
+        when = (dt.datetime(2026, 10, 25, 12, tzinfo=dt.timezone.utc) + dt.timedelta(seconds=sequence)).isoformat()
+        cwd = root/"unrelated" if foreign else home
+        native_id = harness + "-" + name
+        if harness == "codex":
+            path = root/"logs"/(name + ".jsonl")
+            if not path.exists():
+                index.execute("insert into threads values (?,?,?)", (native_id, str(path), str(home)))
+                index.commit()
+            rows = [dict(type="session_meta", payload=dict(id=native_id, cwd=str(cwd), timestamp=when)),
+                    dict(type="event_msg", timestamp=when, payload=dict(type="token_count", info=dict(
+                        total_token_usage=dict(input_tokens=1, output_tokens=0),
+                        last_token_usage=dict(input_tokens=1, output_tokens=0))))]
+        elif harness == "pi":
+            path = pd/(name + ".jsonl")
+            rows = [dict(type="session", version=3, id=native_id, cwd=str(cwd), timestamp=when),
+                    dict(type="message", id=native_id, timestamp=when,
+                         message=dict(role="assistant", usage=dict(input=1, output=0)))]
+        else:
+            path = cd/(name + ".jsonl")
+            rows = [dict(type="assistant", sessionId=native_id, cwd=str(cwd), timestamp=when,
+                         message=dict(id=native_id, role="assistant", usage=dict(input_tokens=1, output_tokens=0)))]
+        if partial:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(rows[0]))
+        else:
+            write(path, rows)
+        return path
+
+    for harness in ("claude", "pi", "codex"):
+        baseline = total()
+        for i in range(72):
+            native_fixture(harness, f"history-{harness}-{i:03}")
+            native_fixture(harness, f"foreign-{harness}-{i:03}", foreign=True)
+        for i in range(40):
+            native_fixture(harness, f"partial-{harness}-{i:03}", partial=True)
+        for _ in range(20):
+            refresh()
+        assert total() == baseline + 72, (harness, total(), baseline)
+        known = refresh()["known_sources"]
+        native_fixture(harness, f"zz-new-{harness}")
+        result = refresh("--max-candidates", "7")
+        assert result["known_sources"] == known + 1, (harness, result)
+        assert total() == baseline + 73, (harness, total())
+        assert "metadata_retry_backlog" in result["gaps"], result
+        assert "discovery_backlog" not in result["gaps"], result
+        native_fixture(harness, f"foreign-{harness}-000")
+        result = refresh("--max-candidates", "7")
+        assert result["known_sources"] == known + 2, (harness, result)
+        assert total() == baseline + 74, (harness, total())
     index.close()
     # Privacy covers catalog/index/status and persistent DB, not just summaries.
     for f in store.rglob("*"):
