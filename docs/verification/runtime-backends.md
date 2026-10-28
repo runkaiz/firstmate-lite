@@ -8,6 +8,27 @@ This record contains reusable version-scoped evidence for active runtime guarant
 The backend guides own current setup, safety boundaries, and limitations.
 Exact task chronology, branch names, temporary homes, local paths, process ids, thread ids, and delivery transcripts remain in private reports or PR evidence.
 
+## Herdr allocator completion
+
+Verified on 2026-10-26 UTC with Herdr 0.9.5 and Treehouse 3.1.1, using a named isolated session, an attached viewer, a local-file origin and a private one-slot fixture pool.
+Refresh with:
+
+```sh
+bash bin/fm-test-run.sh --jobs 1 tests/fm-herdr-attached-viewer-live-e2e.test.sh
+```
+
+Representative output:
+
+```text
+# runtime: herdr=0.9.5 treehouse=v3.1.1
+ok - attached viewer: real spawn allocates once in a private copy and reports allocator refusal before the isolation timeout
+```
+
+The regression drives the real spawn entry point with harmless cwd-marker workers and no model prompts.
+It verifies one allocation per attempt, an isolated worker cwd, allocator status and diagnostics on refusal, no worker metadata or execution after refusal, acknowledgement cleanup with a quoted temporary path, and owned lab teardown.
+This proves completion reporting and the existing isolation boundary; it does not establish pool eligibility or change local versus origin base selection.
+`bin/fm-spawn.sh` owns the completion-file mechanics.
+
 ## Worker profile evidence
 
 Verified on 2026-10-25 UTC with Pi 1.4.0 and Node 22.23.2 using the installed SDK, in-memory credentials/settings, an isolated resource loader and no prompt or network access.

@@ -32,8 +32,9 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
+LAB_HOME_HELPER=${LAB_HOME_HELPER:-$ROOT/bin/fm-lab-home.sh}
 
-fm_live_gate default-on FM_HERDR_ATTACHED_VIEWER_LIVE_E2E herdr jq python3
+fm_live_gate default-on FM_HERDR_ATTACHED_VIEWER_LIVE_E2E herdr jq python3 treehouse
 
 [ -x "$LAB_HELPER" ] || { echo "skip: Herdr lab helper not executable at $LAB_HELPER"; exit 0; }
 
@@ -43,11 +44,23 @@ FOCUS_SWITCH_CONTROL="$TMP_ROOT/focus-switch"
 ORIGINAL_PATH=$PATH
 LAB_SESSION=$("$LAB_HELPER" name fm-herdr-attached-viewer)
 export LAB_HELPER LAB_SESSION ORIGINAL_PATH FOCUS_SWITCH_CONTROL
+SPAWN_FIXTURE_ROOT=
+SPAWN_FIXTURE_HOME=
 
 cleanup() {
   local status=$?
   env PATH="$ORIGINAL_PATH" "$LAB_HELPER" viewer stop "$LAB_SESSION" >/dev/null 2>&1 || status=1
   env PATH="$ORIGINAL_PATH" "$LAB_HELPER" teardown "$LAB_SESSION" || status=1
+  if [ -n "$SPAWN_FIXTURE_ROOT" ]; then
+    # Only this test's fixture pool, after its named terminal session stopped.
+    while IFS= read -r marker; do
+      slot=${marker%/.git}
+      common=$(git -C "$slot" rev-parse --path-format=absolute --git-common-dir) || { status=1; continue; }
+      [ "$common" = "$SPAWN_FIXTURE_ROOT/project/.git" ] || { status=1; continue; }
+      treehouse --root "$SPAWN_FIXTURE_ROOT" return "$slot" || status=1
+    done < <(find "$SPAWN_FIXTURE_ROOT/.treehouse" -type f -name .git 2>/dev/null)
+    "$LAB_HOME_HELPER" teardown "$SPAWN_FIXTURE_HOME" || status=1
+  fi
   fm_test_cleanup
   exit "$status"
 }
@@ -75,6 +88,12 @@ set -- "${args[@]}"
 for arg in "$@"; do
   case "$arg" in --session|--session=*) exit 9 ;; esac
 done
+# Keep shell startup's PATH changes from redirecting the fixture to a host pool.
+# Only the task's explicit one-shot command is replaced with its private shim.
+if [ -n "${FM_HERDR_FIXTURE_TREEHOUSE:-}" ] && [ "${1:-} ${2:-}" = 'pane run' ]; then
+  args[3]=${args[3]//treehouse get/"'$FM_HERDR_FIXTURE_TREEHOUSE' get"}
+  set -- "${args[@]}"
+fi
 if [ -f "$FOCUS_SWITCH_CONTROL/trigger" ] && [ "$*" = "$(cat "$FOCUS_SWITCH_CONTROL/trigger")" ]; then
   rm -f "$FOCUS_SWITCH_CONTROL/trigger"
   env PATH="$ORIGINAL_PATH" "$LAB_HELPER" run "$LAB_SESSION" \
@@ -157,6 +176,8 @@ REASON=$(foreground_reason) || fail "could not probe the session's foreground cl
 REASON=$(foreground_reason) || fail "could not probe the session's foreground client"
 [ "$REASON" = cleared ] \
   || fail "the attached pty viewer did not register as a foreground client (reason=$REASON)"
+CLIENT_VERSION=$(lab status --json | jq -r '.client.version // "unknown"')
+printf '# runtime: herdr=%s treehouse=%s\n' "$CLIENT_VERSION" "$(treehouse --version)"
 pass "attached viewer: a pty sized before the fork registers as a real Herdr foreground client"
 
 # A fresh tab can echo input while shell startup still consumes it. Prove an
@@ -180,6 +201,89 @@ for attempt in 1 2 3; do
   [ "$(cat "$READY_LOG")" = prepared ] || fail "preparation did not execute exactly once"
 done
 pass "attached viewer: fresh shells acknowledge execution before one-shot preparation"
+
+# Exercise the whole allocation/isolation boundary, using only a local-file
+# origin, a task-private pool and marker workers. An occupied pool must report
+# the allocator's exit and diagnostic, rather than spending the cwd timeout.
+SPAWN_FIXTURE_ROOT="$TMP_ROOT/spawn-fixture"
+SPAWN_FIXTURE_HOME="$SPAWN_FIXTURE_ROOT/home"
+PROBE_TMP="$SPAWN_FIXTURE_ROOT/probe tmp's"
+"$LAB_HOME_HELPER" create "$SPAWN_FIXTURE_HOME" >/dev/null || fail "could not mark fixture home"
+mkdir -p "$SPAWN_FIXTURE_ROOT/project" "$PROBE_TMP"
+git -C "$SPAWN_FIXTURE_ROOT/project" init -q -b main || fail "could not initialize fixture"
+printf 'fixture\n' > "$SPAWN_FIXTURE_ROOT/project/README.md"
+printf 'max_trees = 1\nroot = "%s"\n' "$SPAWN_FIXTURE_ROOT" > "$SPAWN_FIXTURE_ROOT/project/treehouse.toml"
+git -C "$SPAWN_FIXTURE_ROOT/project" add . || fail "could not stage fixture"
+git -C "$SPAWN_FIXTURE_ROOT/project" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid \
+  commit -qm fixture || fail "could not commit fixture"
+git clone -q --bare "$SPAWN_FIXTURE_ROOT/project" "$SPAWN_FIXTURE_ROOT/origin.git" || fail "could not create local origin"
+git -C "$SPAWN_FIXTURE_ROOT/project" remote add origin "file://$SPAWN_FIXTURE_ROOT/origin.git" || fail "could not bind local origin"
+printf 'off\n' > "$SPAWN_FIXTURE_HOME/config/herdr-presentation-spaces"
+printf 'manual\n' > "$SPAWN_FIXTURE_HOME/config/backlog-backend"
+export FM_HERDR_FIXTURE_TREEHOUSE="$SPAWN_FIXTURE_ROOT/treehouse"
+{
+  printf '#!/usr/bin/env bash\nset -eu\n'
+  printf 'fixture=%q\nreal=%q\n' "$SPAWN_FIXTURE_ROOT" "$(command -v treehouse)"
+  cat <<'SH'
+[ "$(pwd -P)" = "$fixture/project" ] || exit 91
+printf '%s\n' "$*" >> "$fixture/allocations"
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+export GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false SSH_ASKPASS=/bin/false
+exec "$real" --root "$fixture" "$@"
+SH
+} > "$FM_HERDR_FIXTURE_TREEHOUSE"
+chmod +x "$FM_HERDR_FIXTURE_TREEHOUSE"
+
+for admission in free occupied; do
+  ID="attached-alloc-$admission-$$"
+  mkdir -p "$SPAWN_FIXTURE_HOME/data/$ID"
+  cat > "$SPAWN_FIXTURE_HOME/data/$ID/brief.md" <<'MD'
+# Task
+## Captain's intent
+Verify the isolated fixture launch boundary.
+
+## Firstmate spec
+Write only the harmless worker cwd marker.
+MD
+  MARKER="$SPAWN_FIXTURE_ROOT/worker-$admission"
+  # The positional parameter belongs to the generated marker worker.
+  # shellcheck disable=SC2016
+  printf -v RAW_WORKER 'bash -c '\''pwd -P > "$1"'\'' _ %q' "$MARKER"
+  START=$SECONDS
+  OUT=$(env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID -u HERDR_SOCKET_PATH \
+    -u FM_STATE_OVERRIDE -u FM_DATA_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_PROJECTS_OVERRIDE \
+    PATH="$FAKEBIN:$ORIGINAL_PATH" HERDR_SESSION="$LAB_SESSION" \
+    TMPDIR="$PROBE_TMP" \
+    FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$SPAWN_FIXTURE_HOME" FM_SPAWN_NO_GUARD=1 \
+    GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false SSH_ASKPASS=/bin/false \
+    bash "$ROOT/bin/fm-spawn.sh" "$ID" "$SPAWN_FIXTURE_ROOT/project" "$RAW_WORKER" --scout --backend herdr 2>&1)
+  STATUS=$?
+  ELAPSED=$((SECONDS - START))
+  [ -z "$(find "$PROBE_TMP" -name 'fm-allocation.*' -o -name 'fm-herdr-ready.*')" ] \
+    || fail "spawn leaked its allocation/readiness acknowledgement directory"
+  case "$admission" in
+    free)
+      [ "$STATUS" = 0 ] || fail "free private-pool launch failed: $OUT"
+      for _ in $(seq 1 30); do [ ! -s "$MARKER" ] || break; sleep 0.1; done
+      [ -s "$MARKER" ] || fail "isolated marker worker never executed"
+      WT=$(sed -n 's/^worktree=//p' "$SPAWN_FIXTURE_HOME/state/$ID.meta")
+      [ "$(cat "$MARKER")" = "$WT" ] || fail "worker cwd differs from recorded copy"
+      case "$WT" in "$SPAWN_FIXTURE_ROOT/.treehouse/"*) ;; *) fail "allocation escaped private fixture: $WT" ;; esac
+      [ "$WT" != "$SPAWN_FIXTURE_ROOT/project" ] || fail "worker ran in primary"
+      [ "$(cat "$SPAWN_FIXTURE_ROOT/allocations")" = get ] || fail "free launch allocated more than once"
+      ;;
+    occupied)
+      [ "$STATUS" != 0 ] || fail "occupied private pool incorrectly launched"
+      assert_contains "$OUT" 'treehouse get exited with status 1' "allocator completion was masked: $OUT"
+      assert_contains "$OUT" 'all 1 worktrees are in use or dirty' "allocator diagnostic was lost: $OUT"
+      [ "$ELAPSED" -lt 60 ] || fail "known allocator refusal still spent the isolation timeout"
+      [ ! -e "$MARKER" ] && [ ! -e "$SPAWN_FIXTURE_HOME/state/$ID.meta" ] || fail "refused launch started or published a worker"
+      [ "$(wc -l < "$SPAWN_FIXTURE_ROOT/allocations" | tr -d ' ')" = 2 ] || fail "occupied launch retried allocation"
+      ;;
+  esac
+done
+unset FM_HERDR_FIXTURE_TREEHOUSE
+pass "attached viewer: real spawn allocates once in a private copy and reports allocator refusal before the isolation timeout"
 
 # --- scenario 3: a viewer on the target tab blocks the close ---------------
 
