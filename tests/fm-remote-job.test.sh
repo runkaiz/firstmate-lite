@@ -393,8 +393,18 @@ NEW_WORKER_PID=$(cat "$STATE_ROOT/worker.pid")
 pass "worker identity binds the canonical configured code root"
 
 CRASHED_WORKER_PID=$NEW_WORKER_PID
-kill -KILL "$CRASHED_WORKER_PID"
-wait "$CRASHED_WORKER_PID" 2>/dev/null || true
+# Abandoned ownership requires the supervisor and heartbeat to crash too;
+# otherwise they can replace or refresh the records while we simulate PID reuse.
+CRASHED_WORKER_PGID=$(fm_remote_job_worker_process_group "$CRASHED_WORKER_PID") \
+  || fail "the stale ownership fixture could not resolve its isolated worker group"
+kill -KILL -- "-$CRASHED_WORKER_PGID" || fail "the worker group did not crash"
+wait "$CRASHED_WORKER_PGID" 2>/dev/null || true
+for _ in $(seq 1 100); do
+  kill -0 -- "-$CRASHED_WORKER_PGID" 2>/dev/null || break
+  sleep 0.05
+done
+! kill -0 -- "-$CRASHED_WORKER_PGID" 2>/dev/null \
+  || fail "the crashed worker group survived before the stale ownership fixture"
 assert_present "$STATE_ROOT/worker.lock" "an unclean exit did not retain the worker ownership lock"
 sleep 20 &
 OTHER_PID=$!
