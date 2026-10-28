@@ -1458,6 +1458,9 @@ const { ExtensionRunner } = await import(pathToFileURL(`${packageRoot}/dist/core
 const resolveRenderers = (name, definition) => ExtensionRunner.prototype.resolveToolRenderers.call(
   { extensions: [{ toolRenderers }] }, name, () => definition,
 );
+if (resolveRenderers("third_party_tool", customDefinition) !== customDefinition) {
+  throw new Error("Calm replaced unrelated custom-tool renderers");
+}
 const customRow = new ToolExecutionComponent(
   "third_party_tool",
   "custom-row",
@@ -1475,12 +1478,11 @@ customRow.updateResult({ content: [{ type: "text", text: "CUSTOM_RESULT" }], det
 // model calls, nested tools, permissions, or actual session state are exercised.
 const { createCodemodeToolDefinition } = await import(pathToFileURL(`${packageRoot}/dist/extensions/codemode/tool.js`).href);
 const codemodeDefinition = createCodemodeToolDefinition({ models: false });
-const customProbes = [
+if (codemodeDefinition.name !== "codemode") throw new Error("Installed Pi changed its registered codemode name");
+const codemodeProbes = [
   ["codemode", codemodeDefinition, { code: 'text("CODEMODE_FIXTURE_OUTPUT")' }, 1],
-  ["standard_custom", { ...customDefinition, renderShell: undefined }, {}, 0],
-  ["padded_custom", { ...customDefinition, renderShell: undefined }, {}, 2],
 ];
-const customProbeRows = customProbes.map(([name, definition, args, outputPad]) => {
+const codemodeProbeRows = codemodeProbes.map(([name, definition, args, outputPad]) => {
   const result = {
     content: [{ type: "text", text: "CODEMODE_FIXTURE_OUTPUT" }],
     details: { calls: [{ name: "fixture.echo", args: "synthetic", status: "error", error: "FIXTURE_ERROR", durationMs: 25 }] },
@@ -1501,9 +1503,14 @@ const customProbeRows = customProbes.map(([name, definition, args, outputPad]) =
   return { name, definition, args, result, before, baseline, actual };
 });
 // Tools without both custom slots stay on Pi's normal fallback path.
-const fallbackDefinition = { ...customDefinition, renderCall: undefined };
-if (resolveRenderers("partial_custom", fallbackDefinition) !== fallbackDefinition || resolveRenderers("unregistered", undefined) !== undefined) {
-  throw new Error("Calm claimed unsupported fallback or unregistered tool rendering");
+for (const slot of ["renderCall", "renderResult"]) {
+  const fallbackDefinition = { ...codemodeDefinition, [slot]: undefined };
+  if (resolveRenderers("codemode", fallbackDefinition) !== fallbackDefinition) {
+    throw new Error(`Calm claimed codemode rendering without ${slot}`);
+  }
+}
+if (resolveRenderers("codemode", undefined) !== undefined) {
+  throw new Error("Calm claimed unregistered codemode rendering");
 }
 
 setCapabilities({ images: "iterm2", trueColor: true, hyperlinks: true });
@@ -1608,7 +1615,7 @@ const commandContext = {
       for (const row of rows) row.actual.setExpanded(value);
       watchActual.setExpanded(value);
       customRow.setExpanded(value);
-      for (const { actual } of customProbeRows) actual.setExpanded(value);
+      for (const { actual } of codemodeProbeRows) actual.setExpanded(value);
       imageRow.setExpanded(value);
     },
     setWorkingVisible(value) {
@@ -1726,7 +1733,7 @@ for (const { name, actual } of rows) {
 // release reads the key it knows and renders the same wrapped definitions.
 function createInstalledToolHtmlRenderer() {
   const lookup = (name) => resolveRenderers(name,
-    tools.find((tool) => tool.name === name) ?? customProbes.find(([probe]) => probe === name)?.[1]);
+    tools.find((tool) => tool.name === name) ?? codemodeProbes.find(([probe]) => probe === name)?.[1]);
   return createToolHtmlRenderer({
     getToolDefinition: lookup,
     getToolRenderers: lookup,
@@ -1741,7 +1748,7 @@ async function assertStockHtmlRendering(command, submitData) {
   const exportCases = [
     ...cases.filter(([toolName]) => toolName === "grep" || toolName === "find"),
     ["fm_watch_arm_pi", watchArgs, watchResult],
-    ...customProbeRows.map(({ name, args, result }) => [name, args, result]),
+    ...codemodeProbeRows.map(({ name, args, result }) => [name, args, result]),
   ];
   for (const [name, args, result] of exportCases) {
     const toolCallId = `${command}-${name}`;
@@ -1784,15 +1791,17 @@ if (!calmImageOutput.includes("\x1b]1337;File=")) {
 if (calmImageOutput.includes("pixel.png")) {
   throw new Error("calm mode left the built-in read call shell beside the disclosed image output");
 }
-for (const { name, actual, result, args, before } of customProbeRows) {
+for (const { name, actual, result, args, before } of codemodeProbeRows) {
   for (const partial of [true, false]) {
     actual.updateResult(result, partial);
     if (actual.render(100).length !== 0) throw new Error(`${name} left a pending/error result, header, or shell in Calm`);
   }
   if (JSON.stringify({ args, result }) !== before) throw new Error(`${name} presentation changed tool data`);
 }
-if (customRow.render(100).length !== 0) {
-  throw new Error("Calm left a resolved custom tool call/result visible");
+for (const marker of ["CUSTOM_CALL", "CUSTOM_RESULT"]) {
+  if (!customRow.render(100).join("\n").includes(marker)) {
+    throw new Error(`Calm suppressed unrelated custom-tool ${marker}`);
+  }
 }
 if (watchActual.render(100).length !== 0) {
   throw new Error("Calm left the fm_watch_arm_pi call/result shell visible");
@@ -1835,7 +1844,7 @@ for (const { name, baseline, actual } of rows) {
     throw new Error(`${name} did not restore the expanded standard renderer`);
   }
 }
-for (const { name, baseline, actual } of customProbeRows) {
+for (const { name, baseline, actual } of codemodeProbeRows) {
   baseline.setExpanded(expanded);
   if (JSON.stringify(actual.render(100)) !== JSON.stringify(baseline.render(100))) {
     throw new Error(`${name} did not restore stock expanded rendering after Calm`);
@@ -1874,9 +1883,14 @@ for (const reason of ["startup", "new", "resume", "fork", "reload"]) {
       throw new Error(`${reason} session did not retain the active Calm choice for ${name}`);
     }
   }
-  for (const { name, actual } of customProbeRows) {
+  for (const { name, actual } of codemodeProbeRows) {
     actual.setExpanded(expanded);
     if (actual.render(100).length !== 0) throw new Error(`${reason} exposed ${name}`);
+  }
+  for (const marker of ["CUSTOM_CALL", "CUSTOM_RESULT"]) {
+    if (!customRow.render(100).join("\n").includes(marker)) {
+      throw new Error(`${reason} suppressed unrelated custom-tool ${marker}`);
+    }
   }
   if (workingVisible !== true || hiddenThinkingLabel !== "" || statuses.get("firstmate-calm") !== undefined) {
     throw new Error(`${reason} session did not retain gapless Calm presentation with native working visibility`);

@@ -67,7 +67,7 @@ Calm hides these rows:
 - Collapsed thinking labels.
 - The mid-turn assistant working-note blocks governed by the [shared preservation rule](#shared-preservation-rule-for-assistant-text) above.
 - The shells for the Pi built-in tool names Calm owns.
-- Codemode and custom-tool call and text-result shells with both renderer slots, when Pi provides `registerToolRenderer`.
+- Codemode call and text-result shells with both renderer slots, when Pi provides `registerToolRenderer`.
 - Firstmate-owned tool shells listed in the [Pi tool audit](calm-mode-feasibility.md#firstmate-pi-tool-audit).
 - Canonically classified Firstmate operational user rows.
 
@@ -111,9 +111,9 @@ These rows remain visible:
 - User-bash rows.
 - Skill and summary rows.
 - Generic status notices.
-- Custom tools without both renderer slots, custom tools on Pi without `registerToolRenderer`, and arbitrary extension rows.
+- Other arbitrary custom-tool or extension rows.
 
-These are supported-API boundaries rather than hidden-content failures.
+These rows are outside Calm's supported presentation coverage.
 
 ## Pi compatibility
 
@@ -126,12 +126,13 @@ When Calm loads, the collapsed-thinking, operational-user-row, and queued-operat
 If Pi removes one of those seams, Calm logs a diagnostic naming the unavailable adapter and skips only that adapter.
 `/calm`, the other adapters, and unrelated Pi extensions remain available.
 
-### Codemode and custom-tool renderers
+### Codemode renderers
 
-Pi 1.4.0 exposes `registerToolRenderer`, which Calm uses to wrap a tool's existing call and result renderers without registering or replacing its execution.
+Pi 1.4.0 exposes `registerToolRenderer`, which Calm uses only for the registered tool name `codemode`, wrapping its existing call and result renderers without registering or replacing its execution.
 The resolver is installed while Calm is off as well, so those rows can hide on the first toggle and restore when Calm turns off, including restored-session rows.
 Codemode's script, nested-call status, and text output use this path.
-A tool without both renderer slots retains normal rendering, as do custom tools when this API is unavailable.
+Codemode retains normal rendering when either renderer slot or this API is unavailable.
+Unrelated custom tools retain their original renderers.
 Tool images remain outside the renderer slots and stay visible.
 An earlier extension renderer resolver that does not delegate can take precedence over Calm.
 

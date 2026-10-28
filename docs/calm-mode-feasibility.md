@@ -87,7 +87,7 @@ Collapsed thinking-only assistant messages now render zero rows, thinking before
 
 The disconfirming checks deliberately retain supported boundaries.
 In that Pi 0.81.1 reproduction, an arbitrary third-party custom tool and a built-in read image remained visible because that version exposed neither a global tool renderer nor image-row control.
-The Pi 1.4.0 renderer evidence below supersedes the custom-tool boundary for tools with both renderer slots.
+The Pi 1.4.0 renderer evidence below adds codemode coverage; unrelated custom tools remain outside Calm's renderer coverage.
 Expanded thinking remains visible by design, while re-collapsing it returns to zero-height Calm presentation.
 Ordinary user-role near misses remain visible, including quoted current markers, ASCII-only labels, unrelated text before a marker, unrelated text after U+2063, and image-bearing input.
 
@@ -227,8 +227,8 @@ The test fixture enumerates every class below through the centralized policy, an
 | `genuine-agent-response` | Assistant text in `AssistantMessageComponent` | Visible. |
 | `assistant-working-note` | Assistant text in an `AssistantMessageComponent` message the model did not end its response with, identified by its own `stopReason` of `toolUse`, or of `length` with tool calls present | Each settled text block follows the cross-harness preservation contract in [`calm.md`](calm.md); hidden blocks are removed from the shallow presentation copy before layout, a `toolUse` message carrying only short narration occupies zero rows (verified on Pi 0.84.1), and a still-streaming `pending` message is never filtered. |
 | `assistant-thinking` | Thinking content in `AssistantMessageComponent` | Collapsed reasoning is removed from the shallow presentation copy before layout and occupies zero rows; explicit expansion renders the original reasoning. |
-| `assistant-tool-call` | `ToolExecutionComponent` | Seven built-ins, `fm_watch_arm_pi`, `fm_branch_outcomes`, and `fm_branch_processed` hidden; Pi 1.4.0 additionally hides codemode and resolved custom tools with both renderer slots. |
-| `tool-result` | `ToolExecutionComponent` | Text results for the controlled tools hidden, including codemode and resolved custom tools with both renderer slots on Pi 1.4.0. |
+| `assistant-tool-call` | `ToolExecutionComponent` | Seven built-ins, `fm_watch_arm_pi`, `fm_branch_outcomes`, and `fm_branch_processed` hidden; Pi 1.4.0 additionally hides codemode with both renderer slots. |
+| `tool-result` | `ToolExecutionComponent` | Text results for the controlled tools hidden, including codemode with both renderer slots on Pi 1.4.0. |
 | `tool-image` | Image children appended outside tool renderer slots | Unsupported boundary; remains visible. |
 | `user-bash` | `BashExecutionComponent` for `!` and `!!` | Unsupported boundary; remains visible. |
 | `skill-invocation` | `SkillInvocationMessageComponent` plus parsed user text | Unsupported boundary; remains visible. |
@@ -255,12 +255,13 @@ General component replacement, ANSI cursor erasure, provider-context mutation, a
 The installed `@earendil-works/pi-coding-agent` package reported version `1.4.0`.
 Its README, complete extension and TUI guides, extension declarations, built-in renderer example, codemode definition and renderer, extension runner, tool component, and HTML exporter were inspected.
 The public `registerToolRenderer((name, next) => renderers)` API resolves presentation independently of tool execution, including late registrations and restored calls.
-Calm uses that resolver for non-built-in tools with both render slots and retains the existing built-in compatibility path.
-Normal rendering and exports delegate to the original slots; default shells reuse Calm's existing box composition, while self-shell renderers keep their own original components across toggles.
+Calm uses that resolver only for the registered tool name `codemode` with both render slots and retains the existing built-in compatibility path.
+Normal rendering and exports delegate to the original slots; built-in default shells reuse Calm's existing box composition, while self-shell renderers keep their own original components across toggles.
 
 The deterministic regressions use installed Pi renderers and TUI with synthetic tool results and a test-private stored session, without model inference or access to a real session.
 The installed codemode definition provides the real script header, nested-call status, and output renderer.
-The same replay distinguishes Calm off, first activation, reload, and restart/resume, while the renderer fixture checks pending and error results, self and default shells with zero and two-cell output padding, export/share, unchanged arguments/results, and missing renderer slots.
+The same replay distinguishes Calm off, first activation, reload, and restart/resume, while the renderer fixture checks codemode pending and error results, original self-shell components, export/share, unchanged arguments/results, and missing renderer slots.
+An unrelated custom-tool negative control retains visible call and result rows across Calm toggles and session lifecycle events.
 The built-in collision tests retain their existing non-retroactive first-toggle boundary.
 
 The refreshed verification command is:

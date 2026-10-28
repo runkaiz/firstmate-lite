@@ -354,10 +354,9 @@ export default function (pi: ExtensionAPI) {
   // registrations. Keep the legacy built-in path below for older Pi releases.
   // Missing render slots retain Pi's normal fallback rather than guessing its UI.
   if (typeof pi.registerToolRenderer === "function") {
-    const builtInNames = new Set(wrappedBuiltIns.map((tool) => tool.name));
     pi.registerToolRenderer((name, next) => {
       const original = next();
-      if (!original || builtInNames.has(name)) return original;
+      if (!original || name !== "codemode") return original;
       return wrapRenderers(original);
     });
   }
