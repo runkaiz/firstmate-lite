@@ -8,27 +8,6 @@ This record contains reusable version-scoped evidence for active runtime guarant
 The backend guides own current setup, safety boundaries, and limitations.
 Exact task chronology, branch names, temporary homes, local paths, process ids, thread ids, and delivery transcripts remain in private reports or PR evidence.
 
-## Herdr allocator completion
-
-Verified on 2026-10-26 UTC with Herdr 0.9.5 and Treehouse 3.1.1, using a named isolated session, an attached viewer, a local-file origin and a private one-slot fixture pool.
-Refresh with:
-
-```sh
-bash bin/fm-test-run.sh --jobs 1 tests/fm-herdr-attached-viewer-live-e2e.test.sh
-```
-
-Representative output:
-
-```text
-# runtime: herdr=0.9.5 treehouse=v3.1.1
-ok - attached viewer: real spawn allocates once in a private copy and reports allocator refusal before the isolation timeout
-```
-
-The regression drives the real spawn entry point with harmless cwd-marker workers and no model prompts.
-It verifies one allocation per attempt, an isolated worker cwd, allocator status and diagnostics on refusal, no worker metadata or execution after refusal, acknowledgement cleanup with a quoted temporary path, and owned lab teardown.
-This proves completion reporting and the existing isolation boundary; it does not establish pool eligibility or change local versus origin base selection.
-`bin/fm-spawn.sh` owns the completion-file mechanics.
-
 ## Native Git task copies
 
 Verified on 2026-10-26 UTC with Herdr 0.9.5 and Git 2.56.0 in isolated local-file fixtures.
@@ -50,8 +29,7 @@ ok - native scout: divergent local history, interrupted allocation recovery, one
 ```
 
 The real attached-viewer check interrupts the launcher after allocation but before endpoint/metadata publication, then verifies one allocation and one marker worker on recovery.
-The fixture keeps an existing pooled task while opting new tasks into native copies.
-The portable checks cover foreign reservations, path collisions, primary-root refusal, changed recovery source and preservation of dirty, untracked, ignored and unlanded content.
+The portable checks cover foreign reservations, path collisions, primary-root refusal, fast-forward recovery, creation interruptions, changed source/branch refusals and preservation of dirty, untracked, ignored and unlanded content.
 They also exercise one real tmux marker worker on a private socket, busy-owner refusal and complete clean removal.
 The lifecycle suites preserve dirty native work across an allocator-setting change and still return an existing pooled task after new tasks opt into native allocation.
 These checks submit no model prompts and authorize no production allocator switch.

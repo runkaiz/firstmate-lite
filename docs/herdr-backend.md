@@ -63,7 +63,6 @@ No separate first-run provisioning is required.
 Before fresh task allocation, Firstmate confirms that the new shell can execute a harmless readiness probe.
 This prevents interactive shell startup programs from consuming the one-shot Treehouse command before the prompt is ready.
 A shell that never acknowledges readiness fails before allocation; `bin/backends/herdr.sh` owns the bounded probe and cleanup mechanics.
-An allocator that exits before isolation is confirmed fails promptly with its exit status and terminal diagnostics; `bin/fm-spawn.sh` owns that completion check.
 
 The required CI lane uses the pinned installers in `bin/fm-install-herdr.sh` and `bin/fm-install-treehouse.sh`.
 Those script headers own release assets, checksums, download bounds, and post-install gates.

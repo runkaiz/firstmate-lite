@@ -366,7 +366,7 @@ Neither a configuration compatibility check nor merging this code authorizes rew
 The default remains Treehouse for new task copies; Orca continues to own its own copies.
 Set `config/worktree-allocator` to `git` only after reviewing a native candidate and approving activation for that home.
 The native allocator currently supports tmux and Herdr, whose endpoint ownership checks are verified.
-Native cleanup requires `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
+Native reservation recovery and cleanup require `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
 Other runtime backends remain available through their existing allocators.
 
 Native allocation also requires `config/git-worktree-root`, containing one absolute directory path outside the project, its primary checkout and the active Firstmate home.
@@ -375,7 +375,7 @@ Each task receives its own new copy without pooling or reuse across task identit
 `bin/fm-git-worktree-lib.sh` owns the path, reservation schema and recovery/removal mechanics.
 
 Local-only ships and scouts of registered local-only projects select accepted local history, including when origin has diverged.
-Other deliveries retain origin freshness; relaunch retains the recorded copy and its work.
+Other fresh allocations select current origin history; interrupted allocations and relaunch retain their recorded copy.
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 
 Native cleanup conservatively requires exact ancestry in the recorded source ref and no dirty or untracked content, including ignored files, even for scouts.

@@ -50,7 +50,7 @@ fm_git_worktree_private_dir() { # <existing-dir>
 }
 
 fm_git_worktree_identity() { # <state> <id> <home> <project> [<expected-path>]
-  local record="$1/$2.git-worktree" key value home project common root container path top linked
+  local record="$1/$2.git-worktree" key value home project common root container path top linked registered
   for key in schema task home project common root path base source_ref; do
     value=$(fm_git_worktree_field "$record" "$key") && [ -n "$value" ] || {
       fm_git_worktree_error "unreadable ownership field $key in $record"; return 1;
@@ -78,14 +78,21 @@ fm_git_worktree_identity() { # <state> <id> <home> <project> [<expected-path>]
   fi
   [ "$(cd "$root" && pwd -P)" = "$root" ] || return 1
   case "$root/" in "$project/"*|"${common%/*}/"*|"$home/"*) return 1 ;; esac
+  registered=$(git -C "$project" worktree list --porcelain) || return 1
   if [ -e "$path" ] || [ -L "$path" ]; then
+    if fm_git_worktree_private_dir "$path" &&
+      [ -z "$(find "$path" -mindepth 1 -maxdepth 1 -print -quit)" ] &&
+      ! grep -Fxq "worktree $path" <<< "$registered"; then
+      FM_GIT_WORKTREE_PATH=$path
+      return 0
+    fi
     [ -d "$path" ] && [ ! -L "$path" ] && [ -f "$path/.git" ] && [ ! -L "$path/.git" ] || return 1
     top=$(git -C "$path" rev-parse --show-toplevel) || return 1
     [ "$top" = "$path" ] || return 1
     linked=$(git -C "$path" rev-parse --path-format=absolute --git-common-dir) || return 1
     [ "$(cd "$linked" && pwd -P)" = "$common" ] || return 1
-    git -C "$project" worktree list --porcelain | grep -Fxq "worktree $path" || return 1
-  elif git -C "$project" worktree list --porcelain | grep -Fxq "worktree $path"; then
+    grep -Fxq "worktree $path" <<< "$registered" || return 1
+  elif grep -Fxq "worktree $path" <<< "$registered"; then
     fm_git_worktree_error 'missing copy is still registered; preserving reservation'; return 1
   fi
   FM_GIT_WORKTREE_PATH=$path
@@ -99,25 +106,46 @@ fm_git_worktree_clean() { # <path> - unknown ignored files are work too
 }
 
 fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit> <source-ref>
-  local state=$1 id=$2 home=$3 project=$4 root=$5 base=$6 source_ref=$7 record common tmp parent
+  local state=$1 id=$2 home=$3 project=$4 root=$5 base=$6 source_ref=$7 record common tmp parent processes
   case "$id" in ''|.|..|*[!A-Za-z0-9._-]*) return 1 ;; esac
   for tmp in "$home" "$project" "$root" "$source_ref"; do
     case "$tmp" in *$'\n'*|*$'\r'*|*$'\t'*) return 1 ;; esac
   done
   home=$(cd "$home" && pwd -P) && project=$(cd "$project" && pwd -P) || return 1
   record="$state/$id.git-worktree"
+  if [ -e "$state/$id.meta" ] || [ -L "$state/$id.meta" ]; then
+    fm_git_worktree_error 'task metadata already exists; use guarded task relaunch'; return 1
+  fi
+  case "$root" in /*) ;; *) fm_git_worktree_error 'git-worktree-root must be absolute'; return 1 ;; esac
+  parent=$(cd "$(dirname "$root")" && pwd -P) || return 1
+  root="$parent/$(basename "$root")"
+  case "$source_ref" in refs/heads/*|refs/remotes/origin/*) ;; *) return 1 ;; esac
+  [ "$(git -C "$project" rev-parse --verify "$source_ref^{commit}")" = "$base" ] || {
+    fm_git_worktree_error 'requested base does not match source ref; inspect source before retrying'; return 1;
+  }
   if [ -e "$record" ] || [ -L "$record" ]; then
-    fm_git_worktree_identity "$state" "$id" "$home" "$project" || return 1
+    fm_git_worktree_identity "$state" "$id" "$home" "$project" "$root/$id/worktree" || {
+      fm_git_worktree_error "reservation identity cannot be proved; inspect $record and its copy"; return 1;
+    }
     # Resume the reservation, never replace/rebase an interrupted copy.
-    [ "$(fm_git_worktree_field "$record" base)" = "$base" ] &&
-      [ "$(fm_git_worktree_field "$record" source_ref)" = "$source_ref" ] || {
+    [ "$(fm_git_worktree_field "$record" source_ref)" = "$source_ref" ] || {
         fm_git_worktree_error 'reserved source changed; preserving copy rather than rebasing recovery'; return 1;
       }
     base=$(fm_git_worktree_field "$record" base) || return 1
+    git -C "$project" cat-file -e "$base^{commit}" &&
+      git -C "$project" merge-base --is-ancestor "$base" "$source_ref" || {
+        fm_git_worktree_error 'reserved base is missing or source history was rewritten; inspect reservation before retrying'; return 1;
+      }
+    if [ -d "$FM_GIT_WORKTREE_PATH" ]; then
+      processes=$(lsof -a -d cwd -Fn 2>/dev/null) || {
+        fm_git_worktree_error 'cannot prove reserved copy has no live owner (lsof failed); preserving copy'; return 1;
+      }
+      if printf '%s\n' "$processes" | awk -v path="n$FM_GIT_WORKTREE_PATH" \
+        '$0 == path || index($0, path "/") == 1 {found=1} END {exit !found}'; then
+        fm_git_worktree_error 'reserved copy has a live process owner; stop its lifecycle before retrying'; return 1
+      fi
+    fi
   else
-    case "$root" in /*) ;; *) fm_git_worktree_error 'git-worktree-root must be absolute'; return 1 ;; esac
-    parent=$(cd "$(dirname "$root")" && pwd -P) || return 1
-    root="$parent/$(basename "$root")"
     common=$(git -C "$project" rev-parse --path-format=absolute --git-common-dir) || return 1
     common=$(cd "$common" && pwd -P) || return 1
     case "$root/" in "$project/"*|"${common%/*}/"*|"$home/"*) fm_git_worktree_error 'root is inside project/primary/home'; return 1 ;; esac
@@ -125,8 +153,9 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
     fm_git_worktree_private_dir "$root" || return 1
     [ "$(cd "$root" && pwd -P)" = "$root" ] || return 1
     git -C "$project" cat-file -e "$base^{commit}" || return 1
-    # mkdir refuses any previous/foreign path, including dangling symlinks.
-    (umask 077; mkdir "$root/$id") || { fm_git_worktree_error 'task path already exists without this reservation'; return 1; }
+    if [ -e "$root/$id" ] || [ -L "$root/$id" ]; then
+      fm_git_worktree_error 'task path already exists without this reservation'; return 1
+    fi
     FM_GIT_WORKTREE_PATH="$root/$id/worktree"
     tmp=$(mktemp "$state/.$id.git-worktree.XXXXXXXX") || return 1
     {
@@ -135,11 +164,13 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
     } > "$tmp"
     mv "$tmp" "$record" || return 1
   fi
-  if [ ! -e "$FM_GIT_WORKTREE_PATH" ]; then
+  if [ ! -d "$root/$id" ]; then (umask 077; mkdir "$root/$id") || return 1; fi
+  if [ ! -e "$FM_GIT_WORKTREE_PATH/.git" ]; then
     git -C "$project" worktree add --detach "$FM_GIT_WORKTREE_PATH" "$base" || return 1
   fi
   fm_git_worktree_identity "$state" "$id" "$home" "$project" || return 1
-  if [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" != "$base" ] ||
+  if git -C "$FM_GIT_WORKTREE_PATH" symbolic-ref -q HEAD >/dev/null ||
+    [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" != "$base" ] ||
     ! fm_git_worktree_clean "$FM_GIT_WORKTREE_PATH"; then
     fm_git_worktree_error 'interrupted copy changed; preserving it for recovery'; return 1
   fi

@@ -277,10 +277,6 @@
 #   itself a linked worktree of the project repository still launches. A pane
 #   that never reaches an isolated worktree refuses at the end of that wait,
 #   naming the last path seen and why it was rejected.
-#   Herdr submits allocation once after shell readiness, with a private completion
-#   file cleaned by the spawn EXIT handler. If the allocator exits before the
-#   isolated cwd is confirmed, spawn stops immediately with its exit status and
-#   recent terminal diagnostics instead of waiting for the isolation deadline.
 #   That placement is proven only at launch. Every ship or scout pane therefore
 #   also receives `export FM_TASK_ID=<task-id>` before the launch command, on
 #   the same channel as GOTMPDIR, and bin/fm-test-run.sh refuses to execute the
@@ -1090,7 +1086,6 @@ SPAWN_TASK_SET_LOCK_HELD=0
 SPAWN_TREEHOUSE_PROJECT_LOCK=
 SPAWN_TREEHOUSE_PROJECT_LOCK_HELD=0
 SPAWN_SLOT_CLAIMED=0
-SPAWN_ALLOCATION_RESULT_DIR=
 RELAUNCH_REPLACEMENT_PENDING=0
 RELAUNCH_REPLACEMENT_BUSY_GEN=
 RELAUNCH_REPLACEMENT_HARNESS=
@@ -1145,7 +1140,6 @@ spawn_orca_reclaim_launch_file() {
 
 spawn_abort_cleanup() {
   local status=$?
-  [ -z "$SPAWN_ALLOCATION_RESULT_DIR" ] || rm -rf -- "$SPAWN_ALLOCATION_RESULT_DIR"
   if [ "$RELAUNCH_REPLACEMENT_PENDING" = 1 ] &&
     [ "$SPAWN_META_PUBLISH_STARTED" = 1 ] &&
     [ -n "$SPAWN_META_TMP" ] &&
@@ -3401,10 +3395,6 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ "$RELAUNCH" -eq 1 ]; then
     fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ_ABS" "$RELAUNCH_WT" || exit 1
   else
-    if [ -e "$STATE/$ID.meta" ] || [ -L "$STATE/$ID.meta" ]; then
-      echo 'error: native task metadata already exists; use guarded task relaunch, not another fresh worker' >&2
-      exit 1
-    fi
     native_local=0
     [ "$MODE" != local-only ] || native_local=1
     if [ "$KIND" = scout ]; then
@@ -3435,6 +3425,7 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     native_root=$(cat "$CONFIG/git-worktree-root") || exit 1
     fm_git_worktree_allocate "$STATE" "$ID" "$FM_HOME" "$PROJ_ABS" "$native_root" "$native_commit" "$native_ref" || exit 1
     WT=$FM_GIT_WORKTREE_PATH
+    echo "native allocation task=$ID source_ref=$native_ref base=$(fm_git_worktree_field "$STATE/$ID.git-worktree" base) worktree=$WT"
     validate_spawn_worktree 'native Git allocation' native
   fi
 elif [ "$RELAUNCH" -eq 0 ] && { [ -e "$STATE/$ID.git-worktree" ] || [ -L "$STATE/$ID.git-worktree" ]; }; then
@@ -4180,17 +4171,7 @@ elif [ "$RELAUNCH" -eq 1 ]; then
   validate_spawn_worktree "relaunch" "$T"
 elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
   if [ "$BACKEND" = herdr ]; then
-    # Readiness proves the input channel, not allocator success. Preserve the
-    # terminal's stdin/stdout/stderr and publish completion only when get exits;
-    # a successful get stays inside its worktree shell until that shell exits.
-    SPAWN_ALLOCATION_RESULT_DIR=$(mktemp -d "${TMPDIR:-/tmp}/fm-allocation.XXXXXXXX") || exit 1
-    case "$SPAWN_ALLOCATION_RESULT_DIR" in
-      /*) ;;
-      *) SPAWN_ALLOCATION_RESULT_DIR="$PWD/$SPAWN_ALLOCATION_RESULT_DIR" ;;
-    esac
-    allocation_result_quoted=$(shell_quote "$SPAWN_ALLOCATION_RESULT_DIR")
-    allocation_command="if test -d $allocation_result_quoted; then treehouse get; _fm_allocation_rc=\$?; test ! -d $allocation_result_quoted || printf '%s\\n' \"\$_fm_allocation_rc\" > $allocation_result_quoted/exit; fi"
-    fm_backend_herdr_prepare_shell "$WT_TARGET" "$allocation_command" || {
+    fm_backend_herdr_prepare_shell "$WT_TARGET" 'treehouse get' || {
       echo "error: task $ID's shell could not confirm readiness and submit allocation; inspect window $T" >&2
       exit 1
     }
@@ -4234,14 +4215,6 @@ elif [ "$KIND" != secondmate ] && [ "$BACKEND" != orca ] && [ "$WORKTREE_ALLOCAT
   last_seen=""
   last_reason="the pane reported no path"
   for _ in $(seq 1 60); do
-    if [ -n "$SPAWN_ALLOCATION_RESULT_DIR" ] && [ -s "$SPAWN_ALLOCATION_RESULT_DIR/exit" ] &&
-      IFS= read -r allocation_status < "$SPAWN_ALLOCATION_RESULT_DIR/exit" 2>/dev/null; then
-      echo "error: treehouse get exited with status $allocation_status before an isolated worktree was confirmed; refusing worker launch; inspect window $T" >&2
-      # The terminal owns the allocator's diagnostics. Include them instead of
-      # masking a prompt refusal (for example pool exhaustion) as a cwd timeout.
-      fm_backend_herdr_capture "$WT_TARGET" 40 >&2 || true
-      exit 1
-    fi
     p=$(spawn_current_path "$WT_TARGET" || true)
     [ -z "$p" ] || last_seen="$p"
     if [ -n "$p" ] && spawn_worktree_isolated "$p"; then
