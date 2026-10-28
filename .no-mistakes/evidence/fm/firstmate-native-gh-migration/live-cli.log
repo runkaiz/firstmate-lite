@@ -1,0 +1,62 @@
+$ bash bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab
+
+exit=0
+$ bash bin/fm-brief.sh lab-no-mistakes disposable-project --mode no-mistakes
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab/data/lab-no-mistakes/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+
+exit=0
+$ bash bin/fm-brief.sh lab-direct-pr disposable-project --mode direct-PR
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab/data/lab-direct-pr/brief.md (ship, mode=direct-PR; replace {TASK} and {FIRSTMATE_SPEC})
+
+exit=0
+$ bash bin/fm-brief.sh lab-local-only disposable-project --mode local-only
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab/data/lab-local-only/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+
+exit=0
+$ bash bin/fm-brief.sh lab-scout disposable-project --scout
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab/data/lab-scout/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+
+exit=0
+$ git init -q -b main
+
+exit=0
+$ git remote add origin https://github.com/runkaiz/firstmate-lite.git
+
+exit=0
+$ git fetch --quiet --depth=2 origin refs/pull/5/head:refs/heads/proof-base
+
+exit=0
+$ git checkout -q proof-base
+
+exit=0
+$ git branch main HEAD
+
+exit=0
+$ git checkout -q main
+
+exit=0
+$ treehouse get --lease --no-fetch --base main -b fm/firstmate-native-archive-compatibility
+🌳 Setting up worktree...
+🌳 Leased worktree at /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-b923c3/1/proof. Run 'treehouse return /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-b923c3/1/proof' to release it.
+/var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-b923c3/1/proof
+
+exit=0
+$ bash bin/fm-teardown.sh lab-cleanup
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A new version of treehouse is available: v3.1.1 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+proof: STUCK: on diverged main, 6 commits behind origin/main - needs attention
+teardown lab-cleanup complete (window lab-only:fm-lab-cleanup, worktree /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-b923c3/1/proof)
+Backlog: lab-cleanup just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab/data/backlog.md - move lab-cleanup to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+
+exit=0

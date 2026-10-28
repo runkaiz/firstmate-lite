@@ -1,0 +1,39 @@
+$ git remote set-url origin https://github.com/cli/cli.git
+
+exit=0
+$ git show-ref --verify --quiet refs/heads/patch-1
+
+exit=1
+$ treehouse get --lease --no-fetch --base proof-base -b patch-1
+A new version of treehouse is available: v3.1.1 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-f19af4/1/proof. Run 'treehouse return /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-f19af4/1/proof' to release it.
+/home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-f19af4/1/proof
+
+exit=0
+$ git rev-parse HEAD
+70c50f1a44bd55bc0a538d33347910c1cfe6861c
+
+exit=0
+$ bash bin/fm-teardown.sh lab-ambiguous-pr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/lab
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: worktree /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-f19af4/1/proof has work that has not landed.
+unpushed commits:
+
+Land the task's PR, or get the captain's explicit OK to discard, then --force.
+
+exit=1
+$ git rev-parse HEAD
+70c50f1a44bd55bc0a538d33347910c1cfe6861c
+
+exit=0
+$ treehouse return --force /home/runkai/.no-mistakes/worktrees/c4c55a3d9407/01M61VX1Y6D34QBB3QP6V66952/.test-native-gh/pool/.treehouse/proof-f19af4/1/proof
+A new version of treehouse is available: v3.1.1 → v3.1.7
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+
+exit=0

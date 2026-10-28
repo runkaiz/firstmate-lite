@@ -1,0 +1,37 @@
+[
+  {
+    "case": "merged-discovery",
+    "exit": 0,
+    "passed": true,
+    "metadata_preserved": false,
+    "head_before": "70c50f1a44bd55bc0a538d33347910c1cfe6861c"
+  },
+  {
+    "case": "open-pr",
+    "exit": 1,
+    "passed": true,
+    "metadata_preserved": true,
+    "head_before": "2d7d258de046bc7dad947f963802767671cf97a2"
+  },
+  {
+    "case": "missing-pr",
+    "exit": 1,
+    "passed": true,
+    "metadata_preserved": true,
+    "head_before": "70c50f1a44bd55bc0a538d33347910c1cfe6861c"
+  },
+  {
+    "case": "auth-error",
+    "exit": 1,
+    "passed": true,
+    "metadata_preserved": true,
+    "head_before": "70c50f1a44bd55bc0a538d33347910c1cfe6861c"
+  },
+  {
+    "case": "stale-head",
+    "exit": 1,
+    "passed": true,
+    "metadata_preserved": true,
+    "head_before": "cf9c50b34582641aa77422755a91cd12ccee0a32"
+  }
+]

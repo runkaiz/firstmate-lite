@@ -1,0 +1,9 @@
+[
+  {
+    "case": "ambiguous-pr",
+    "exit": 1,
+    "passed": true,
+    "metadata_preserved": true,
+    "head_before": "70c50f1a44bd55bc0a538d33347910c1cfe6861c"
+  }
+]
