@@ -1,0 +1,73 @@
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: omp
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- Ordinary wake: the omp extension already owns watcher continuity; do not arm another cycle.
+PROACTIVE MODE: on
+# Proactive orchestration policy (active only while the preference is on)
+
+Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
+New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
+Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
+That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
+
+Reuse the current startup digest, presented wake records, and completed validation evidence instead of repeating their preflights at each handoff.
+Read again when evidence is missing, stale, contradictory, or the next action's owning guard requires a fresh check.
+Keep focused validation of affected behavior, the selected delivery pipeline, real required checks, truthful failures, and useful outcome reports.
+Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
+Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
+
+Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
+It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
+Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
+Read-only or lock-refused sessions remain read-only.
+Never toggle yolo, waive validation, or take over a worker-owned pipeline.
+
+For MAIN firstmate, ON grants automatic merge authority for an authorized in-scope ordinary GitHub PR even with project yolo off, once current-head required checks and reviews pass and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive`; its header owns the action-time preference, synchronous-merge and review guards.
+Do not ask for another merge approval solely because yolo is off.
+Explicit review-first or do-not-merge instructions, captain holds, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL outcome.
+OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
+Local-only landing and non-GitHub merges retain their baseline authority.
+
+The supervision branch applies this policy only inside its existing role and posture authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+Away instructions remain the whole away mandate; proactive mode does not enlarge it or wake parked MAIN.
+- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+
+Mode: omp (Oh My Pi) extension background wake.
+
+When this session owns supervision and away mode is not active:
+1. Drain first with `bin/fm-wake-drain.sh`.
+   After handling all emitted wakes and reconciling open decisions and unread status lines, run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`; until then the work remains durable for idempotent re-handling after interruption.
+2. Confirm the omp primary auto-loaded both project extensions from `.omp/extensions/`; omp has no project-trust gate, so a plain `omp` started with this home as its working directory loads them with no dialog.
+   If `bin/fm-session-start.sh` reported the omp extensions as not loaded, restart omp inside this home; pass `-e /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-turnend-guard.ts -e /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-omp-watch.ts` only when omp must start from another directory, because omp loads a file named both ways twice.
+3. Initial process cycle only: make the one required `fm_watch_arm_omp` call; if startup already owned the fleet lock, this is an ownership-based no-op.
+   Use `/fm-watch-arm-omp` only as a human-entered fallback.
+   Never run `bin/fm-watch-arm.sh` through omp's bash tool because that foreground arm can wedge the agent and bypasses extension-owned cleanup.
+4. If the extension says no live session holds the lock, run `bin/fm-session-start.sh` to reclaim the session lock, then call `fm_watch_arm_omp` again.
+5. The extension starts `bin/fm-watch-arm.sh --restart`, keeps the child attached to the live omp process, and owns every later successor launch.
+6. Ordinary same-process session replacement (`/new`, `/resume`, `/fork`) retires only the prior generation; when the replacement owns the fleet lock, its `session_start` arms the new generation without a model turn or another `fm_watch_arm_omp` call.
+   The generation-owner contract and in-flight actionable-close handoff live in `.omp/extensions/fm-primary-omp-watch.ts`; because omp reports no shutdown reason, every shutdown with a pending actionable close persists the handoff, and the next owning `session_start` in any process replays it.
+7. After an actionable child close, the extension rechecks session-lock ownership and verifies one successor before it delivers the follow-up wake; its bounded fallback is defined in `docs/watcher-continuity.md`.
+8. Ordinary work, turn completion, and ordinary signal, stale, check, heartbeat, or other wake handling: do not call `fm_watch_arm_omp` again because continuity is extension-owned rather than model-memory-owned.
+9. An unexpected child close enters bounded exponential retry, and an exhausted retry or lost session lock is surfaced as a watcher failure instead of disappearing.
+10. Missing, failed, or unhealthy cycle only: if a later notification explicitly reports one of those repair conditions, drain queued wakes, inspect the failure text, call `fm_watch_arm_omp`, and restart omp inside this home if the extensions are not loaded.
+   A redundant call while the extension owns an arm child or scheduled retry is an ownership-based `watcher: unchanged` no-op, not an independent health claim.
+11. Never use shell `&` for watcher supervision.
+   The arm mechanism above is extension-owned, not a model tool call, but a manual recovery probe that backgrounds, pipes, or bundles the arm is denied automatically by the pre-tool seatbelt (`bin/fm-arm-pretool-check.sh`, wired into the turn-end guard extension at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-turnend-guard.ts`).
+
+The turn-end guard on omp is structural, not advisory: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-turnend-guard.ts` answers omp's blocking `session_stop` hook, and when `bin/fm-turnend-guard.sh` returns 2 it forces one continuation carrying the guard text, bounded to one per turn by the `stop_hook_active` flag omp sets on the continuation's own stop.
+An interrupted turn never raises `session_stop`, so a supervisor-initiated interrupt is not guarded; `bin/fm-control.sh` owns that postcondition.
+
+The Pi supervision branch (`docs/pi-supervision-branch.md`) is Pi's in-process conversation and does not run on omp: without the supervision host every actionable wake is delivered to this conversation and the lease, outcome-store, and `fm_branch_processed` contracts do not apply here, while a home with `config/supervision-host` and no `config/supervision-host-off` runs the host's away session ([`supervision-host.md`](../supervision-host.md)).
+
+The turn-end guard extension lives at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-turnend-guard.ts`.
+The watcher extension lives at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.omp/extensions/fm-primary-omp-watch.ts`.
+Both are tracked, project-local `.omp/extensions/*.ts` files that omp auto-discovers from this home with no trust dialog; `bin/fm-session-start.sh` reports when the running omp session has not loaded both required extensions.
+

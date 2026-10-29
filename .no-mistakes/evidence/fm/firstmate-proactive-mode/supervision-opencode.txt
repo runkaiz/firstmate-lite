@@ -1,0 +1,60 @@
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: opencode
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- Ordinary wake: the OpenCode TUI plugin already owns watcher continuity; do not arm manually.
+PROACTIVE MODE: on
+# Proactive orchestration policy (active only while the preference is on)
+
+Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
+New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
+Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
+That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
+
+Reuse the current startup digest, presented wake records, and completed validation evidence instead of repeating their preflights at each handoff.
+Read again when evidence is missing, stale, contradictory, or the next action's owning guard requires a fresh check.
+Keep focused validation of affected behavior, the selected delivery pipeline, real required checks, truthful failures, and useful outcome reports.
+Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
+Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
+
+Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
+It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
+Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
+Read-only or lock-refused sessions remain read-only.
+Never toggle yolo, waive validation, or take over a worker-owned pipeline.
+
+For MAIN firstmate, ON grants automatic merge authority for an authorized in-scope ordinary GitHub PR even with project yolo off, once current-head required checks and reviews pass and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive`; its header owns the action-time preference, synchronous-merge and review guards.
+Do not ask for another merge approval solely because yolo is off.
+Explicit review-first or do-not-merge instructions, captain holds, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL outcome.
+OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
+Local-only landing and non-GitHub merges retain their baseline authority.
+
+The supervision branch applies this policy only inside its existing role and posture authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+Away instructions remain the whole away mandate; proactive mode does not enlarge it or wake parked MAIN.
+- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+
+Mode: OpenCode TUI plugin background wake.
+
+When this session owns supervision and away mode is not active:
+1. Drain first with `bin/fm-wake-drain.sh`.
+   After handling all emitted wakes and reconciling open decisions and unread status lines, run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`; until then the work remains durable for idempotent re-handling after interruption.
+2. First cycle: let `.opencode/plugins/fm-primary-watch-arm.js` arm supervision after the OpenCode session goes idle.
+3. The plugin listens for `session.idle`, spawns `bin/fm-watch-arm.sh --restart` without awaiting it in the idle handler, and owns every later successor launch.
+4. After an actionable child close, the plugin rechecks session-lock ownership and verifies one singleton successor before it calls `client.session.promptAsync`; its bounded fallback is defined in `docs/watcher-continuity.md`.
+5. Ordinary wake: do not ask the model to re-arm because continuity is plugin-owned.
+6. An unexpected child close enters bounded exponential retry, and an exhausted retry or lost session lock is surfaced as a watcher failure instead of disappearing.
+7. Failure or missing cycle only: if the plugin reports a watcher failure, drain queued wakes, inspect the failure text, and use `bin/fm-watch-arm.sh` manually only as a short recovery probe.
+8. Never use shell `&` for watcher supervision.
+   The arm mechanism above is plugin-owned, not a model tool call, but a manual recovery probe that backgrounds, pipes, or bundles the arm is denied automatically by the PreToolUse seatbelt (`.opencode/plugins/fm-primary-pretool-check.js`, `bin/fm-arm-pretool-check.sh`).
+9. Do not rely on this plugin in headless `opencode run`; firstmate primary supervision targets persistent OpenCode TUI sessions.
+
+OpenCode's persistent TUI plugin runtime is the wake mechanism.
+The plugin applies in the main primary checkout and a secondmate's own home, and stays silent only in child crewmate and scout worktrees.
+

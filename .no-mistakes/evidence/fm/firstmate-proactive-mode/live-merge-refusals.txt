@@ -1,0 +1,11 @@
+$ bash bin/fm-pr-merge.sh proactive-lab https://github.com/example/repo/pull/84 --proactive --allow-red ci
+error: proactive merges cannot use overrides or check waivers
+exit=2
+
+$ bash bin/fm-pr-merge.sh proactive-lab https://github.com/example/repo/pull/84 --proactive --allow-missing ci
+error: proactive merges cannot use overrides or check waivers
+exit=2
+
+$ bash bin/fm-pr-merge.sh proactive-lab https://github.com/example/repo/pull/84 --proactive --attended-override
+error: proactive merges cannot use overrides or check waivers
+exit=2

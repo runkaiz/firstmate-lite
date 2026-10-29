@@ -1,0 +1,74 @@
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: cursor
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- Ordinary wake: the stop-hook park (bin/fm-turnend-guard-cursor.sh) already owns watcher continuity; drain and handle the wake, and do not arm another cycle yourself.
+PROACTIVE MODE: on
+# Proactive orchestration policy (active only while the preference is on)
+
+Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
+New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
+Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
+That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
+
+Reuse the current startup digest, presented wake records, and completed validation evidence instead of repeating their preflights at each handoff.
+Read again when evidence is missing, stale, contradictory, or the next action's owning guard requires a fresh check.
+Keep focused validation of affected behavior, the selected delivery pipeline, real required checks, truthful failures, and useful outcome reports.
+Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
+Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
+
+Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
+It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
+Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
+Read-only or lock-refused sessions remain read-only.
+Never toggle yolo, waive validation, or take over a worker-owned pipeline.
+
+For MAIN firstmate, ON grants automatic merge authority for an authorized in-scope ordinary GitHub PR even with project yolo off, once current-head required checks and reviews pass and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive`; its header owns the action-time preference, synchronous-merge and review guards.
+Do not ask for another merge approval solely because yolo is off.
+Explicit review-first or do-not-merge instructions, captain holds, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL outcome.
+OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
+Local-only landing and non-GitHub merges retain their baseline authority.
+
+The supervision branch applies this policy only inside its existing role and posture authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+Away instructions remain the whole away mandate; proactive mode does not enlarge it or wake parked MAIN.
+- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+
+Mode: Cursor stop-hook-owned park.
+
+When this session owns supervision and away mode is not active:
+1. Drain first with `bin/fm-wake-drain.sh`.
+   After handling all emitted wakes and reconciling open decisions, run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`; until then the work remains durable for idempotent re-handling after interruption.
+2. Routine watcher arm and re-arm are owned by the `stop` hook (`bin/fm-turnend-guard-cursor.sh`), never by you.
+   Cursor runs that hook synchronously and awaits it, so every turn end while supervision is needed parks the turn boundary open on one home-scoped watcher cycle, with no model command and no model tokens spent while parked.
+3. An actionable close wakes you as a follow-up turn carrying the `watcher` operational kind.
+   On that wake, run `bin/fm-wake-drain.sh` first and handle it.
+   Do not run `bin/fm-watch-arm.sh` after an ordinary wake; the next turn end parks again automatically when supervision is still needed.
+   Do not invent a wake from an attach-status line alone; drain and act only on real wake records, the drain's `OPEN DECISIONS` entries, or a real watcher reason line.
+4. The captain keeps control while the hook is parked.
+   A message typed into a parked Cursor pane is accepted and runs its turn immediately, but the older park remains the recorded owner until that turn ends and the next `stop` hook claims the baton.
+   An actionable watcher close in that window can still be delivered by the older park as one follow-up.
+   This is bounded and safe: only one park exists in that window, so the event is a real wake rather than a stale duplicate of another park's wake, the durable wake queue makes handling idempotent, and the next `stop` claim makes an older park that is still running stand down without emitting.
+   The private supersession records are `state/.cursor-park-owner` and its short publication and commit lock `state/.cursor-park-owner.lock`.
+5. On a `turn-end-guard` follow-up, the park could not establish a live cycle.
+   Inspect the watcher startup path rather than turning the notice into a repeating manual-arm loop; the nag is bounded by `FM_CURSOR_TURNEND_BLOCK_BUDGET` (default 3) and then stops on its own.
+6. Treat `watcher: started ...` and `watcher: attached ...` inside park output as proof that one live cycle exists.
+   On attach, the arm follows verified identity-matched successors instead of exiting when the first cycle ends.
+7. The durable wake queue preserves actionable events between a follow-up and the next park.
+   [`watcher-continuity.md`](../watcher-continuity.md) owns the exact session-lock recovery boundary.
+8. Waiting on the hook-owned park is silent: do not send idle progress while the watcher is parked.
+
+The watcher itself remains `bin/fm-watch.sh`, and `bin/fm-watch-arm.sh` remains the verified arm wrapper that the `stop` hook runs as its own tracked child.
+Re-arm attaches to an existing healthy cycle when one is already present and follows its verified successor chain.
+See [`watcher-continuity.md`](../watcher-continuity.md) for the arm-layer successor and clean-close failure contract.
+
+Exit status 2 is a silent no-op on Cursor's `stop` step, so this adapter never blocks a turn end and instead forces one bounded follow-up, which [`turnend-guard.md`](../turnend-guard.md) accepts as an equal alternative.
+That document owns the double loop bound, the supersession contract, the Pi-host stand-down, and the compatibility limits, including that a Cursor primary must be launched with `--trust` for its project hooks to load at all.
+The registered `beforeSubmitPrompt` dialog-mirror hook does not invalidate the park baton; [turnend-guard.md](../turnend-guard.md) owns that deferred boundary.
+

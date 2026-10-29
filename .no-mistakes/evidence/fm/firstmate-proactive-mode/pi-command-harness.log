@@ -1,0 +1,10 @@
+ok - installed Pi manual compact aborts input arriving after idle; forced dispatch remains disabled
+ok - ahoy and bearings use one command owner and mode expansion
+ok - proactive command routes toggle, on, off and status to its skill owner only from the owning session
+ok - early model-aware stow is one native boundary continuation; verified save and compact failure remain distinct
+ok - overflow keeps native retry and queued input ownership; incomplete save does not retry
+ok - save-only, duplicate request, unreachable tier, unreadable/over budget and missing owners fail safely
+ok - input race defers stow, resume/fork reject stale receipts, aborted run retains incomplete work, no invented resume
+ok - same-run threshold/overflow compaction preserves the pending receipt across the real Pi tree, retires after the batch, and queues no replay
+ok - compaction alone verifies nothing; incomplete capture, owner, budget and sibling failures still refuse completion
+ok - compacted requests still reject resumed, foreign-session, foreign-lock and settled receipts

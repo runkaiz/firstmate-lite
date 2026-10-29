@@ -1,0 +1,84 @@
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: pi-signed
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- Ordinary wake: the Pi extension already owns watcher continuity; do not arm another cycle.
+PROACTIVE MODE: on
+# Proactive orchestration policy (active only while the preference is on)
+
+Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
+New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
+Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
+That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
+
+Reuse the current startup digest, presented wake records, and completed validation evidence instead of repeating their preflights at each handoff.
+Read again when evidence is missing, stale, contradictory, or the next action's owning guard requires a fresh check.
+Keep focused validation of affected behavior, the selected delivery pipeline, real required checks, truthful failures, and useful outcome reports.
+Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
+Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
+
+Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
+It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
+Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
+Read-only or lock-refused sessions remain read-only.
+Never toggle yolo, waive validation, or take over a worker-owned pipeline.
+
+For MAIN firstmate, ON grants automatic merge authority for an authorized in-scope ordinary GitHub PR even with project yolo off, once current-head required checks and reviews pass and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive`; its header owns the action-time preference, synchronous-merge and review guards.
+Do not ask for another merge approval solely because yolo is off.
+Explicit review-first or do-not-merge instructions, captain holds, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL outcome.
+OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
+Local-only landing and non-GitHub merges retain their baseline authority.
+
+The supervision branch applies this policy only inside its existing role and posture authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+Away instructions remain the whole away mandate; proactive mode does not enlarge it or wake parked MAIN.
+- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+
+Mode: Pi extension background wake.
+
+When this session owns supervision, in either posture:
+1. Drain first with `bin/fm-wake-drain.sh`.
+   After handling all emitted wakes and reconciling open decisions and unread status lines, run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`; until then the work remains durable for idempotent re-handling after interruption.
+2. Confirm the Pi primary auto-loaded both project extensions (plain `pi` or `pi-signed`, after approving project trust once per clone); if not, restart the selected executable with `-e /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.pi/extensions/fm-primary-turnend-guard.ts -e /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.pi/extensions/fm-primary-pi-watch.ts` as a trust-free fallback.
+3. Initial process cycle only: make the one required `fm_watch_arm_pi` call; if startup already owned the fleet lock, this is an ownership-based no-op.
+   Use `/fm-watch-arm-pi` only as a human-entered fallback.
+   Never run `bin/fm-watch-arm.sh` through Pi's bash tool because that foreground arm can wedge the agent and bypasses extension-owned cleanup.
+4. If the extension says no live session holds the lock, run `bin/fm-session-start.sh` to reclaim the session lock, then call `fm_watch_arm_pi` again.
+5. The extension starts `bin/fm-watch-arm.sh --restart`, keeps the child attached to the live Pi process, and owns every later successor launch.
+6. Ordinary same-process session replacement (`/new`, `/resume`, `/fork`, reload) retires only the prior generation; when the replacement owns the fleet lock, its `session_start` arms the new generation without a model turn or another `fm_watch_arm_pi` call.
+   The generation-owner contract and in-flight actionable-close handoff live in `.pi/extensions/fm-primary-pi-watch.ts`.
+7. After an actionable child close, the extension rechecks session-lock ownership and verifies one successor before it delivers the follow-up wake; its bounded fallback is defined in `docs/watcher-continuity.md`.
+8. Ordinary work, turn completion, and ordinary signal, stale, check, heartbeat, or other wake handling: do not call `fm_watch_arm_pi` again because continuity is extension-owned rather than model-memory-owned.
+9. An unexpected child close enters bounded exponential retry, and an exhausted retry or lost session lock is surfaced as a watcher failure instead of disappearing.
+10. Missing, failed, or unhealthy cycle only: if a later notification explicitly reports one of those repair conditions, drain queued wakes, inspect the failure text, call `fm_watch_arm_pi`, and restart the selected Pi-family executable with both extensions loaded if needed.
+   A redundant call while the extension owns an arm child or scheduled retry is an ownership-based `watcher: unchanged` no-op, not an independent health claim.
+11. Never use shell `&` for watcher supervision.
+   The arm mechanism above is extension-owned, not a model tool call, but a manual recovery probe that backgrounds, pipes, or bundles the arm is denied automatically by the PreToolUse seatbelt (`bin/fm-arm-pretool-check.sh`, wired into the turn-end guard extension at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.pi/extensions/fm-primary-turnend-guard.ts`).
+
+The supervision branch is default-on (docs/pi-supervision-branch.md): whenever this session owns the fleet lock, the watcher extension hands eligible task-local rows from ordinary actionable wakes, plus selected fleet-wide heartbeat reviews, to the in-process supervision branch while main-only rows remain queued for this conversation.
+While the away-posture record `state/.afk-contract` exists the branch takes every row instead, this conversation receives no processing request, and main's standing authority relocates to the branch through the guarded scripts; a wake the branch cannot take and every watcher-failure alarm still reach this conversation, and the first run boundary after the record is archived presents what accumulated (docs/pi-supervision-branch.md "Postures").
+Decision-owned signal and stale routing, including whole-batch precedence and the independent heartbeat exception, is owned by [docs/pi-supervision-branch.md](../pi-supervision-branch.md#components-and-their-owners).
+A task-level routine outcome that says the worker is still busy, nothing new has happened since the last outcome, and no action was taken may use `silent=true`; an unchanged heartbeat may do the same with `task=fleet`.
+Both are stored but delivered without a rendered note, while routine outcomes reporting an action, state change, or new result stay rendered with ⛵ then the dim outcome text, and captain outcomes are never silent.
+A captain-facing outcome instead appears as one exact, sequence-keyed visible transcript entry, and while attended then arrives in this conversation as one hidden supervision processing request listing each `[seq N, recorded <age> ago] task: summary` it covers; outcomes recorded while away wait for that request until the record is archived.
+That request is the one turn in which MAIN processes the outcome, starting from the task's current state because the outcome is what was true when it was recorded: give the captain a visible response where one is due, answer or escalate a decision, act on a blocker or failure, or record that no further action is needed; the reply covers only the still-open outcomes, as if the settled ones, such as a decision since answered or a PR since merged, had never been listed, with no captain-facing mention even in a recap; then call the `fm_branch_processed` tool with the highest sequence the request listed, exactly once.
+Only that call closes the outcome; an unrelated, empty, or paraphrased answer leaves it open, and the current unprocessed sequence set is presented again at the next run boundary and at session start until it is acknowledged.
+Where that persisted entry is in this transcript it is already the captain-visible record, so MAIN must not re-emit it verbatim merely because it appeared (an outcome carried over from before a restart or a switch of primary may have no entry here); this prevents repetition but does not replace any captain-facing outcome response required by `AGENTS.md` section 9.
+Regression example - keep verbatim and never condense away: `[seq 41] claude-mod: implementation complete, ready for review` requires relaying a captain-facing outcome response, not just `Captain, shipshape.`.
+A merge ask with no URL that leans on the dim anchor violates `AGENTS.md` section 9.
+Before MAIN steers, controls lifecycle, or cleans up a task, claim its lease with `bin/fm-lease.sh claim <task>` and release it afterwards; a refused claim means the branch is acting on that task right now.
+This conversation still receives every other fleet-wide or unresolvable wake, the branch's wakes when it is unavailable, and every watcher-failure alarm regardless of posture, so the arm and repair contract above is unchanged.
+Treat the merged fleet event as already handled for fleet operations: MAIN must not re-drain, re-run, or acknowledge it.
+Separately, MAIN applies judgment about whether and how to surface, summarize, reference, or incorporate a merged sailboat outcome in the captain conversation; event ownership does not decide the conversational treatment.
+Read the durable outcome store with the fm_branch_outcomes tool when the captain asks what happened.
+
+The turn-end guard extension lives at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.pi/extensions/fm-primary-turnend-guard.ts`.
+The watcher extension lives at `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64BCXTFANZT4W6PV57S5R9Z/.pi/extensions/fm-primary-pi-watch.ts`.
+Both are tracked, project-local `.pi/extensions/*.ts` files that Pi auto-discovers once the project is trusted; `bin/fm-session-start.sh` reports when the running Pi session has not loaded both required extensions.
+
