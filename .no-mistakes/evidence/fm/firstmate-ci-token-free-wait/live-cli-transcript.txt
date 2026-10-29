@@ -1,0 +1,78 @@
+$ git init -q -b fm/live-validation <disposable-lab>/repo
+[exit 0]
+$ git -C <disposable-lab>/repo -c user.name=Validation -c user.email=validation@example.invalid commit -qm initial --allow-empty
+[exit 0]
+
+Real no-mistakes CLI, isolated NM_HOME, no pipeline initialization or drive commands.
+$ no-mistakes --version
+no-mistakes version v1.84.0 (4822244) 2026-09-26T08:30:42Z
+[exit 0]
+$ no-mistakes axi status
+error: repo not initialized (run 'no-mistakes init' first)
+help[1]: Run `no-mistakes init` to set up the gate in this repository
+[exit 1]
+$ <worktree>/bin/fm-brief.sh ordinary example --mode no-mistakes
+scaffolded: <disposable-lab>/home/data/ordinary/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+
+Generated ordinary worker handoff command reaches real eligibility guard.
+$ bash -c FM_HOME=<disposable-lab>/home FM_STATE_OVERRIDE=<disposable-lab>/home/state <worktree>/bin/fm-procevent-ci.sh arm ordinary
+error: cannot read no-mistakes run
+[exit 1]
+$ <worktree>/bin/fm-brief.sh wait-no-turns example --mode no-mistakes
+scaffolded: <disposable-lab>/home/data/wait-no-turns/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+
+Generated wait-no-turns worker handoff command reaches real eligibility guard.
+$ bash -c FM_HOME=<disposable-lab>/home FM_STATE_OVERRIDE=<disposable-lab>/home/state <worktree>/bin/fm-procevent-ci.sh arm wait-no-turns
+error: cannot read no-mistakes run
+[exit 1]
+
+Existing PR monitor refuses CI handoff before creating a second owner.
+$ <worktree>/bin/fm-procevent-ci.sh arm task
+error: task already has a PR/custom monitor
+[exit 1]
+
+Registered CI ownership blocks both repeated handoff and merge monitoring.
+$ <worktree>/bin/fm-procevent.sh register ci ci-livevalidation -- <worktree>/bin/fm-procevent-ci.sh poll task <disposable-lab>/repo LIVEVALIDATION fm/live-validation https://github.com/example/disposable/pull/1
+registered: ci-livevalidation (ci)
+[exit 0]
+$ <worktree>/bin/fm-procevent-ci.sh arm task
+error: CI wait already registered
+[exit 1]
+$ <worktree>/bin/fm-pr-check.sh task https://github.com/example/disposable/pull/1
+error: task has a delegated CI wait; handle its result before arming merge monitoring
+[exit 1]
+
+Restart reconciliation starts the real adapter; nonexistent run becomes a durable monitoring-error wake.
+$ <worktree>/bin/fm-procevent.sh reconcile
+reconciled: published=0 started=1 stopped=0 uncertain=0 failed=0
+[exit 0]
+ci_wait: monitor-error
+task: task
+run_id: LIVEVALIDATION
+pr: https://github.com/example/disposable/pull/1
+evidence:
+bound run/branch/PR unavailable or changed
+
+Wake queue:
+1793306102	1	check	procevent:ci-livevalidation:1	check: procevent ci ci-livevalidation 1
+$ <worktree>/bin/fm-procevent.sh classify <disposable-lab>/home/state/procevent-inbox/ci-livevalidation.1.result
+monitor-error
+[exit 0]
+
+Acknowledgement is idempotent; another reconciliation neither repeats the wake nor restarts the terminal wait.
+$ <worktree>/bin/fm-procevent.sh handled ci-livevalidation 1
+handled: ci-livevalidation 1
+[exit 0]
+$ <worktree>/bin/fm-procevent.sh handled ci-livevalidation 1
+already-handled: ci-livevalidation 1
+[exit 0]
+$ <worktree>/bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+[exit 0]
+$ <worktree>/bin/fm-procevent.sh list
+no sources registered
+[exit 0]
+
+PASS: all real CLI refusal, monitor-exclusivity, error-capture and acknowledgement checks.
