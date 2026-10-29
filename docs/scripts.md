@@ -51,6 +51,7 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-arm-command-policy.mjs` | Semantic owner of the watcher-arm PreToolUse policy (docs/arm-pretool-check.md)   |
 | `fm-subagent-pretool-check.sh` | Primary-home delegation-shape PreToolUse guard (docs/subagent-guard.md) |
 | `fm-supervision-instructions.sh` | Render the session-start primary-harness supervision block or the one-line repair instruction |
+| [`fm-proactive.sh`](../bin/fm-proactive.sh) | Persist the home's proactive preference and render its current policy |
 | [`fm-project-origin-lib.sh`](../bin/fm-project-origin-lib.sh) | Accepted origin-form owner shared by both remote provisioning boundaries |
 | `fm-spawn.sh` | Spawn crewmates, scouts, and `id=repo` batches on the resolved harness and runtime backend |
 | `fm-git-strip-ai-trailers.sh` | Strip known AI commit trailers at commit-msg time and install that hook for a fleet launch |

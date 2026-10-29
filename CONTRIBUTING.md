@@ -100,7 +100,7 @@ Coordinate any workflow rollback with its required-check names so a retired chec
 
 ## Development
 
-Tracked changes to firstmate itself - `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.tasks.toml`, `.github/workflows/`, `bin/`, `.agents/skills/`, and `skills/` - follow the contribution policy above on a feature branch and require an explicit merge approval.
+Tracked changes to firstmate itself - `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.tasks.toml`, `.github/workflows/`, `bin/`, `.agents/skills/`, and `skills/` - follow the contribution policy above on a feature branch and the [configured merge authority](AGENTS.md#selected-delivery-path-and-merge-authority).
 Before making any such change, load the agent-only `firstmate-coding-guidelines` skill (`.agents/skills/firstmate-coding-guidelines/SKILL.md`).
 It has the knowledge-placement rules that keep `AGENTS.md` from regrowing after each diet pass.
 Firstmate adds this skill's load line to firstmate-repo briefs by hand; the [coding-guidelines skill](.agents/skills/firstmate-coding-guidelines/SKILL.md#trigger-hygiene) owns the scaffold's detection limits.
