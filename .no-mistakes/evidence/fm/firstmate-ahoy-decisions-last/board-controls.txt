@@ -1,0 +1,30 @@
+DECISION
+demo/catalog
+Choose the compact layout
+Compact
+Spacious
+Reconcile
+Re-check the latest state, then close this with evidence or keep it open with a note
+Queue answer
+QUEUED
+Lavish
+EDITOR
+1
+Annotate
+Conversation
+QUEUED
+<choice>
+“Choose the compact layout -> compact”
+Captain's Call answer - Choose the compact layout: compact
+
+Context data:
+{
+  "schema": "fm-bearings-answer.v1",
+  "question": "layout",
+  "selection": "compact",
+  "note": ""
+}
+Your agent is not listening. If this persists, ask your agent to poll for updates from Lavish.
+Attach images
+Send & End
+Send to Agent
