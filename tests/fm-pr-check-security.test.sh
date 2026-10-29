@@ -2824,6 +2824,76 @@ SH
   pass "device re-record publication waits without rewriting its registration"
 }
 
+test_poll_metadata_survives_lifecycle_receipts() {
+  local dir state before head
+  dir=$(make_case lifecycle-metadata)
+  state="$dir/home/state"
+  head=0123456789abcdef0123456789abcdef01234567
+  write_poll_meta "$state" task-a https://github.com/o/r/pull/1 'spawn_gen=s123.456.789' "pr_head=$head"
+  seed_canonical_poll "$dir" task-a https://github.com/o/r/pull/1
+  before=$(fm_pr_sha256 "$state/task-a.pr-poll-registration")
+  # Exercise the actual bookkeeping writer without driving a worker lifecycle.
+  # shellcheck source=bin/fm-backend.sh
+  . "$ROOT/bin/fm-backend.sh"
+  # shellcheck source=bin/fm-afk-capacity-lib.sh
+  . "$ROOT/bin/fm-afk-capacity-lib.sh"
+  fm_afk_capacity_receipt_write "$state/task-a.meta" stopped || fail "stop receipt could not be written"
+  printf '%s\n' 'control_relaunch_tx=42.20261029T010203Z.123' >> "$state/task-a.meta"
+  fm_pr_poll_artifacts_valid "$state" task-a "$POLL" \
+    || fail "stop/relaunch metadata after PR readiness invalidated the poll"
+  [ "$FM_PR_META_URL" = https://github.com/o/r/pull/1 ] && [ "$FM_PR_META_NUMBER" = 1 ] \
+    || fail "lifecycle receipts changed the canonical PR identity"
+  [ "$(fm_pr_sha256 "$state/task-a.pr-poll-registration")" = "$before" ] \
+    || fail "lifecycle validation rewrote authentication evidence"
+  cp "$state/task-a.meta" "$dir/accepted.meta"
+  printf '%s\n' 'unknown_lifecycle=allowed' >> "$state/task-a.meta"
+  ! fm_pr_poll_artifacts_valid "$state" task-a "$POLL" \
+    || fail "unknown post-PR metadata was accepted"
+  cp "$dir/accepted.meta" "$state/task-a.meta"
+  printf '%s\n' 'pr=https://github.com/o/r/pull/2' >> "$state/task-a.meta"
+  ! fm_pr_poll_artifacts_valid "$state" task-a "$POLL" \
+    || fail "a second PR identity was accepted after lifecycle metadata"
+  pass "PR poll identity and authentication survive supported post-readiness lifecycle receipts only"
+}
+
+test_lifecycle_metadata_rejects_duplicates_and_malformed_values() {
+  local dir state row placement
+  dir=$(make_case lifecycle-metadata-refusals)
+  state="$dir/home/state"
+  # shellcheck disable=SC2016 # Literal command-substitution bytes must remain inert test data.
+  for row in \
+    'afk_worker_stopped=' 'afk_worker_stopped=bad value' 'afk_worker_stopped=$(touch sentinel)' \
+    'control_relaunch_tx=' 'control_relaunch_tx=unknown' \
+    'pr_head=not-a-head'; do
+    for placement in before after; do
+      write_poll_meta "$state" task-a https://github.com/o/r/pull/1
+      if [ "$placement" = before ]; then
+        printf '%s\n' "$row" > "$dir/invalid.meta"
+        cat "$state/task-a.meta" >> "$dir/invalid.meta"
+      else
+        cp "$state/task-a.meta" "$dir/invalid.meta"
+        printf '%s\n' "$row" >> "$dir/invalid.meta"
+      fi
+      ! fm_pr_metadata_identity_parse "$dir/invalid.meta" \
+        || fail "malformed lifecycle metadata was accepted $placement the PR"
+    done
+  done
+  for row in 'afk_worker_stopped=legacy' 'control_relaunch_tx=42.20261029T010203Z.123' \
+    'pr_head=0123456789abcdef0123456789abcdef01234567'; do
+    write_poll_meta "$state" task-a https://github.com/o/r/pull/1 "$row"
+    printf '%s\n' "$row" >> "$state/task-a.meta"
+    ! fm_pr_metadata_identity_parse "$state/task-a.meta" \
+      || fail "duplicate metadata straddling the PR was accepted"
+  done
+  write_poll_meta "$state" task-a https://github.com/o/r/pull/1
+  printf '%s\n' 'afk_worker_stopped=legacy' >> "$state/task-a.meta"
+  fm_pr_metadata_identity_parse "$state/task-a.meta" || fail "legacy stop generation was refused"
+  [ ! -e sentinel ] || fail "metadata bytes were executed"
+  pass "supported lifecycle fields and PR heads reject duplicates and malformed values before or after identity"
+}
+
+test_poll_metadata_survives_lifecycle_receipts
+test_lifecycle_metadata_rejects_duplicates_and_malformed_values
 test_parser_matrix
 test_merged_poll_retires_once
 test_merged_poll_reregistration_after_notification_is_absorbed

@@ -747,6 +747,56 @@ test_non_signature_fetch_failure_is_not_retried() {
   pass "a non-packed-refs.lock fetch failure keeps today's behavior (no retry)"
 }
 
+test_retained_history_skips_refresh_without_changing_policy() {
+  local home clone active before refs_before out real_git fakebin policy
+  home=$(new_home)
+  clone=$(build_pair "$home" historical)
+  active=$(build_pair "$home" public)
+  commit_file "$clone" private.txt private private-history
+  advance_origin "$home" historical remote-new
+  advance_origin "$home" public public-new
+  before=$(head_sha "$clone")
+  refs_before=$(git -C "$clone" show-ref)
+  mkdir -p "$home/data" "$home/fakebin"
+  printf '%s\n' \
+    '- historical [no-mistakes-prod-only retained-history] - Preserved copy.' \
+    '- public [no-mistakes-prod-only] - Maintained source.' > "$home/data/projects.md"
+  policy=$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" --raw historical)
+  [ "$policy" = 'no-mistakes-prod-only off' ] || fail 'retention weakened delivery or merge policy'
+  [ "$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" historical)" = 'no-mistakes off' ] \
+    || fail 'retention changed conservative task delivery'
+  [ "$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" --retained-history historical)" = on ] \
+    || fail 'explicit historical annotation was not recognized'
+  [ "$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" --retained-history public)" = off ] \
+    || fail 'retention leaked into the active public project'
+  real_git=$(command -v git)
+  fakebin="$home/fakebin"
+  cat > "$fakebin/git" <<'SH'
+#!/usr/bin/env bash
+case " $* " in
+  *" fetch "*|*" branch "*|*" checkout "*|*" merge "*) printf '%s\n' "$*" >> "$FM_TEST_SYNC_GIT_LOG" ;;
+esac
+exec "$FM_TEST_SYNC_REAL_GIT" "$@"
+SH
+  chmod +x "$fakebin/git"
+  out=$(FM_TEST_SYNC_REAL_GIT="$real_git" FM_TEST_SYNC_GIT_LOG="$home/git.log" PATH="$fakebin:$PATH" run_sync "$home")
+  assert_contains "$out" 'historical: skipped: retained historical clone (delivery policy unchanged)' \
+    'retained history was not explained as a deliberate skip'
+  [ "$(head_sha "$clone")" = "$before" ] && [ "$(git -C "$clone" show-ref)" = "$refs_before" ] \
+    || fail 'retained clone HEAD or refs changed'
+  ! grep -F "$clone" "$home/git.log" >/dev/null || fail 'retained clone was fetched or mutated'
+  [ "$(head_sha "$active")" = "$(head_sha "$home/work-public")" ] \
+    || fail 'active public clone no longer refreshes normally'
+  # Marker ordering and an empty branch prefix remain orthogonal.
+  printf '%s\n' '- historical [retained-history no-mistakes-prod-only branch= +yolo]' > "$home/data/projects.md"
+  [ "$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" --raw historical)" = 'no-mistakes-prod-only on' ] \
+    || fail 'marker ordering changed the registered posture'
+  [ -z "$(FM_HOME="$home" "$ROOT/bin/fm-project-mode.sh" --branch-prefix historical)" ] \
+    || fail 'retention lost an empty branch prefix'
+  pass 'retained historical clones skip refresh without changing public delivery policy, refs or active clones'
+}
+
+test_retained_history_skips_refresh_without_changing_policy
 test_detached_clean_ancestor_recovers
 test_detached_unique_commit_is_stuck_untouched
 test_detached_clean_ancestor_with_diverged_local_default_is_stuck_untouched

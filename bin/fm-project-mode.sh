@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Resolve registered delivery mode, merge authority and branch prefix.
-# Usage: fm-project-mode.sh [--raw|--forge|--branch-prefix] <project-name>
+# Usage: fm-project-mode.sh [--raw|--forge|--branch-prefix|--retained-history] <project-name>
 # Default output is <no-mistakes|direct-PR|local-only> <on|off>.
 # no-mistakes-prod-only remains a registry policy: --raw returns that policy;
 # normal output resolves conservatively to no-mistakes.
@@ -9,8 +9,11 @@
 # they must be corrected explicitly rather than silently receiving GitHub delivery.
 # --branch-prefix returns the registered branch= value, default fm/; an empty
 # registered value means a bare task-id branch.
+# --retained-history prints on for retained-history inside the registry entry's
+# bracketed annotations (for example [no-mistakes retained-history]),
+# otherwise off. It does not change delivery mode, merge authority or refs.
 # Registry input is the active home data/projects.md; no configuration is written.
-# Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge] <project-name>
+# Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history] <project-name>
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,27 +24,30 @@ REG="$DATA/projects.md"
 RAW=0
 BRANCH_PREFIX_QUERY=0
 WANT_FORGE=0
+RETAINED_HISTORY_QUERY=0
 case "${1:-}" in
   --raw) RAW=1; shift ;;
   --branch-prefix) BRANCH_PREFIX_QUERY=1; shift ;;
   --forge) WANT_FORGE=1; shift ;;
+  --retained-history) RETAINED_HISTORY_QUERY=1; shift ;;
 esac
-NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge] <project-name>}
+NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history] <project-name>}
 
 if [ ! -f "$REG" ]; then
   echo "warn: no registry at $REG; defaulting $NAME to no-mistakes off" >&2
-  if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
+  if [ "$RETAINED_HISTORY_QUERY" -eq 1 ]; then
+    echo off
+  elif [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
     echo "fm/"
   elif [ "$WANT_FORGE" -eq 1 ]; then echo none; else echo "no-mistakes off"; fi
   exit 0
 fi
 
 # awk emits one "near <token>" line per keyed token whose key is a near miss of
-# `forge`, then "posture <mode> <yolo> <branch-prefix> <forge>" (branch-prefix is
+# `forge`, then "posture <mode> <yolo> <forge> <retained> <branch-prefix>" (branch-prefix is
 # the raw prefix, defaulting to "fm/"; forge is `none` or the whole `forge=<value>`
 # token, so an empty value survives the split), or nothing if the project is
-# absent. Every other token beside the mode is ignored, exactly as before either
-# annotation existed.
+# absent.
 parsed=$(awk -v n="$NAME" '
   function dist(x, y,   i, j, lx, ly, d, c, v) {
     lx = length(x); ly = length(y);
@@ -66,20 +72,21 @@ parsed=$(awk -v n="$NAME" '
     if (substr($0, 1, plen) != prefix) next
     after = substr($0, plen + 1);
     if (after != "" && substr(after, 1, 2) != " [" && substr(after, 1, 3) != " - ") next
-    mode="no-mistakes"; yolo="off"; branch="fm/"; forge="none";
+    mode="no-mistakes"; yolo="off"; branch="fm/"; forge="none"; retained="off";
     if (substr(after, 1, 2) == " [") {
       s="";
       nk = split(after, rest, " ");
       for (i=1; i<=nk; i++) { s = s (s==""?"":" ") rest[i]; if (rest[i] ~ /\]$/) break }
       gsub(/^\[|\]$/, "", s);           # strip the surrounding brackets
       k = split(s, a, " ");
-      # Tokens are order-independent: +yolo, branch=<prefix>, and forge=<value>
+      # Tokens are order-independent: +yolo, retained-history, branch=<prefix>, and forge=<value>
       # are recognized by their own shape wherever they appear, keyed tokens
       # that are neither are ignored (with a near-miss warning for the forge
       # spelling), and the first token left over is the mode.
       mode_set = 0
       for (j=1; j<=k; j++) {
         if (a[j]=="+yolo") { yolo="on"; continue }
+        if (a[j]=="retained-history") { retained="on"; continue }
         if (a[j] ~ /^branch=/) { branch = substr(a[j], 8); continue }
         if (a[j] ~ /^forge=/) { forge = a[j]; continue }
         if (a[j] ~ /^[^=]+=/) {
@@ -94,13 +101,15 @@ parsed=$(awk -v n="$NAME" '
     }
     # branch is printed LAST: an empty branch= override must survive as an
     # empty final field, which only holds when nothing follows it.
-    print "posture", mode, yolo, forge, branch; exit
+    print "posture", mode, yolo, forge, retained, branch; exit
   }
 ' "$REG")
 
 if [ -z "$parsed" ]; then
   echo "warn: project \"$NAME\" not in registry; defaulting to no-mistakes off" >&2
-  if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
+  if [ "$RETAINED_HISTORY_QUERY" -eq 1 ]; then
+    echo off
+  elif [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
     echo "fm/"
   elif [ "$WANT_FORGE" -eq 1 ]; then echo none; else echo "no-mistakes off"; fi
   exit 0
@@ -115,8 +124,8 @@ while IFS=' ' read -r kind rest; do
 done <<EOF
 $parsed
 EOF
-while IFS=' ' read -r m y f b; do
-  mode=$m; yolo=$y; rest_forge=$f; branch=$b
+while IFS=' ' read -r m y f r b; do
+  mode=$m; yolo=$y; rest_forge=$f; retained=$r; branch=$b
 done <<EOF
 $posture
 EOF
@@ -146,6 +155,10 @@ if [ "$forge" != none ] && [ "$mode" = local-only ]; then
 fi
 if [ "$WANT_FORGE" -eq 1 ]; then
   echo "$forge"
+  exit 0
+fi
+if [ "$RETAINED_HISTORY_QUERY" -eq 1 ]; then
+  echo "$retained"
   exit 0
 fi
 # A conditional policy is not a task mode. Mechanical callers get its most

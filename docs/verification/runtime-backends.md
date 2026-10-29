@@ -505,10 +505,9 @@ The Orca close refuses under `--force` too.
 The step immediately after it removes the Orca worktree through the same CLI whose absence is the only thing that arm ever reports, so a forced continue would die there having removed nothing while claiming the records were already gone.
 The two child close sites inside forced secondmate cleanup also keep refusing: that path is only ever reached under `--force`, so honoring force there would delete the refusal rather than override it, and would contradict the adjacent Herdr child gate that stops forced cleanup for the same hazard.
 
-The retained record is this run's, not a durable guarantee.
-A task carrying a backlog transition writes its pending-close marker before the endpoint close, and the marker survives the refusal; the next `bin/fm-bootstrap.sh` replays it and removes the retained record.
-The pre-existing Herdr confirmed-gone gate has the identical property.
-The refusal message says so rather than promising a retention teardown does not own, so an operator reconciles the surviving endpoint instead of trusting the record to still be there later.
+A close refusal alone does not guarantee durable record retention; [`bin/fm-backlog-transition-lib.sh`](../../bin/fm-backlog-transition-lib.sh) owns the restart replay contract and its guarded-cleanup requirements.
+The generic refusal warns operators to reconcile the surviving endpoint rather than assume its record survives replay.
+Herdr's interrupted-cleanup retention is covered separately under [Interrupted cleanup ownership](#interrupted-cleanup-ownership).
 
 Both directions are proven non-vacuous.
 Restoring the swallowed status makes the refusal case report `teardown <id> complete`, delete the endpoint record, and leave the window live.
@@ -1291,6 +1290,20 @@ Gemini as a PRIMARY or SECONDMATE runtime is unverified and is refused by `bin/f
 No reasoning-effort axis was found; `gemini --help` on 0.58.0 exposes no effort, reasoning, or thinking flag, so the record-and-omit contract applies.
 
 ## Herdr
+
+### Interrupted cleanup ownership
+
+Portable verification on 2026-10-29 used Bash 5.3.9, Git 2.56.0 and a fake Herdr executable; no live terminal lifecycle was driven.
+`tests/fm-teardown.test.sh` case `test_herdr_interrupted_cleanup_preserves_owner_across_replay` terminates only its fixture teardown after the pending close is written and before the pane closes.
+Both ordinary and captain-held variants retain byte-identical endpoint metadata and the pending close through restart replay, then finish through guarded teardown without closing an unrelated pane or losing the hold.
+The focused case reports:
+
+```text
+ok - interrupted flat Herdr cleanup retains ownership through restart replay and guarded retry preserves holds
+```
+
+The complete regression entry point is `bash bin/fm-test-run.sh tests/fm-teardown.test.sh --jobs 1`; the current focused result does not claim a full suite or real-Herdr pass.
+The recovery contract is owned by [`bin/fm-backlog-transition-lib.sh`](../../bin/fm-backlog-transition-lib.sh).
 
 The compatibility floor is protocol 14.
 The whole real-Herdr lane's latest active verification uses both Herdr 0.7.4 protocol 16 and Herdr 0.8.0 protocol 19 on macOS aarch64, while focused Herdr 0.7.5 protocol 17, earlier protocol-16, protocol-14, and 0.7.3 evidence is retained where it defines current behavior or fallbacks.

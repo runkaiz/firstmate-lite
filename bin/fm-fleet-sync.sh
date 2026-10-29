@@ -15,6 +15,8 @@
 # and fetch failures. A project whose registry entry bin/fm-project-mode.sh
 # refuses is skipped too, naming that command so its refusal is readable, rather
 # than synced under a guessed posture.
+# An explicit retained-history registry annotation skips clone refresh without
+# changing delivery policy; fm-project-mode.sh owns the annotation query.
 # A candidate under projects/ must be the root of its own work tree: git discovery
 # walks up, so a plain nested directory would otherwise resolve to the enclosing
 # repository (the firstmate checkout) and be synced under that directory's label.
@@ -335,6 +337,15 @@ sync_project() {
   mode=${mode_line%% *}
   if [ "$mode" = "local-only" ]; then
     echo "$label: skipped: local-only project"
+    return 0
+  fi
+  local retained_history
+  if ! retained_history=$("$FM_ROOT/bin/fm-project-mode.sh" --retained-history "$label" 2>/dev/null); then
+    echo "$label: skipped: retained-history annotation does not resolve (run bin/fm-project-mode.sh --retained-history $label for the refusal)"
+    return 0
+  fi
+  if [ "$retained_history" = on ]; then
+    echo "$label: skipped: retained historical clone (delivery policy unchanged)"
     return 0
   fi
   if ! git -C "$PROJ" remote get-url origin >/dev/null 2>&1; then

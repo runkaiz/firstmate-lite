@@ -2662,6 +2662,79 @@ SH
   chmod +x "$case_dir/fakebin/herdr"
 }
 
+test_herdr_interrupted_cleanup_preserves_owner_across_replay() {
+  local case_dir log closed rc held meta_before marker_before
+  for held in ordinary captain; do
+    case_dir=$(make_case "herdr-interrupted-$held")
+    write_meta "$case_dir" local-only ship
+    configure_flat_herdr_teardown_case "$case_dir"
+    seed_backlog_in_flight "$case_dir"
+    if [ "$held" = captain ]; then
+      tasks-axi hold task-x1 --kind captain --reason 'Keep accepted work pending a decision' \
+        --file "$case_dir/data/backlog.md" >/dev/null || fail "could not hold interruption fixture"
+    fi
+    log="$case_dir/herdr.log"; : > "$log"
+    closed="$case_dir/closed"
+    printf 'foreign endpoint evidence\n' > "$case_dir/state/foreign.meta"
+    cat > "$case_dir/fakebin/treehouse" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = return ] && [ ! -e "$FM_TEST_INTERRUPT_ONCE" ]; then
+  : > "$FM_TEST_INTERRUPT_ONCE"
+  kill -TERM "$FM_TEST_TEARDOWN_PID"
+  exit 1
+fi
+exit 0
+SH
+    chmod +x "$case_dir/fakebin/treehouse"
+    rc=0
+    FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$case_dir" FM_STATE_OVERRIDE="$case_dir/state" \
+      FM_DATA_OVERRIDE="$case_dir/data" FM_CONFIG_OVERRIDE="$case_dir/config" \
+      FM_FAKE_HERDR_LOG="$log" FM_FAKE_HERDR_CLOSED="$closed" \
+      FM_TEST_INTERRUPT_ONCE="$case_dir/interrupted" PATH="$case_dir/fakebin:$PATH" \
+      bash -c 'export FM_TEST_TEARDOWN_PID=$$; exec bash "$@"' _ "$TEARDOWN" task-x1 \
+      > "$case_dir/interrupted.out" 2> "$case_dir/interrupted.err" || rc=$?
+    [ "$rc" -ne 0 ] && [ -e "$case_dir/interrupted" ] \
+      || fail "Herdr cleanup did not reach its injected interruption"
+    [ -f "$case_dir/state/task-x1.backlog-close" ] && [ -f "$case_dir/state/task-x1.meta" ] \
+      || fail "interruption lost the pending close or endpoint owner"
+    [ ! -e "$closed" ] || fail "interruption fixture closed the pane before the restart window"
+    meta_before=$(shasum -a 256 "$case_dir/state/task-x1.meta")
+    marker_before=$(shasum -a 256 "$case_dir/state/task-x1.backlog-close")
+    rc=0
+    FM_HOME="$case_dir" FM_STATE_OVERRIDE="$case_dir/state" FM_DATA_OVERRIDE="$case_dir/data" \
+      FM_CONFIG_OVERRIDE="$case_dir/config" PATH="$case_dir/fakebin:$PATH" \
+      bash -c '. "$1/bin/fm-tasks-axi-lib.sh"; . "$1/bin/fm-backlog-transition-lib.sh";
+        fm_backlog_close_marker_replay "$2/state" "$2/state/task-x1.backlog-close" "$2/data"' \
+        _ "$ROOT" "$case_dir" > "$case_dir/replay.out" 2> "$case_dir/replay.err" || rc=$?
+    [ "$rc" -ne 0 ] || fail "restart replay retired an unfinished Herdr endpoint owner"
+    [ "$(shasum -a 256 "$case_dir/state/task-x1.meta")" = "$meta_before" ] \
+      && [ "$(shasum -a 256 "$case_dir/state/task-x1.backlog-close")" = "$marker_before" ] \
+      || fail "restart replay changed interrupted Herdr ownership evidence"
+    [ "$(backlog_row_state "$case_dir")" = in_flight ] \
+      || fail "restart replay completed work before endpoint cleanup"
+    FM_FAKE_HERDR_LOG="$log" FM_FAKE_HERDR_CLOSED="$closed" \
+      FM_TEST_INTERRUPT_ONCE="$case_dir/interrupted" FM_BACKEND_HERDR_IDLE_SHELL_PROOF_POLLS=1 \
+      run_teardown "$case_dir" > "$case_dir/retry.out" 2> "$case_dir/retry.err" \
+      || fail "guarded Herdr teardown could not resume: $(cat "$case_dir/retry.err")"
+    [ -e "$closed" ] && [ ! -e "$case_dir/state/task-x1.meta" ] \
+      && [ ! -e "$case_dir/state/task-x1.backlog-close" ] \
+      || fail "resumed teardown did not finish exact pane and task cleanup"
+    if [ "$held" = captain ]; then
+      [ "$(backlog_row_state "$case_dir")" = queued ] || fail "cleanup closed held work"
+      tasks-axi show task-x1 --json --file "$case_dir/data/backlog.md" \
+        | jq -e '.task.held and .task.hold_kind == "captain"' >/dev/null \
+        || fail "resumed cleanup lost the captain hold"
+    else
+      [ "$(backlog_row_state "$case_dir")" = 'done' ] || fail "resumed cleanup did not complete ordinary work"
+    fi
+    [ "$(cat "$case_dir/state/foreign.meta")" = 'foreign endpoint evidence' ] \
+      || fail "interrupted cleanup touched foreign ownership"
+    ! grep '^pane close' "$log" | grep -v '^pane close wG:pQ ' >/dev/null \
+      || fail "resumed cleanup closed an unrecorded pane"
+  done
+  pass "interrupted flat Herdr cleanup retains ownership through restart replay and guarded retry preserves holds"
+}
+
 test_herdr_flat_teardown_refuses_orphaning_records_then_retry_completes() {
   local case_dir log closed lock ready release holder_pid rc thlog
   case_dir=$(make_case herdr-orphan-refusal)
@@ -4717,6 +4790,7 @@ test_no_mistakes_truly_unpushed_refuses
 test_local_only_force_overrides_unpushed
 test_teardown_missing_busy_sidecar_completes
 test_herdr_teardown_clears_escalation_marker
+test_herdr_interrupted_cleanup_preserves_owner_across_replay
 test_herdr_flat_teardown_refuses_orphaning_records_then_retry_completes
 test_herdr_flat_teardown_refuses_records_on_unparseable_presence
 test_herdr_flat_teardown_preflight_refuses_before_changes

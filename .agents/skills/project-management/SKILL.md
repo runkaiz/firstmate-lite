@@ -21,6 +21,7 @@ Persistent supervisor homes are unsupported; preserve any legacy homes and their
 
 Projects live flat under `projects/`, and `data/projects.md` is the private fleet registry.
 Use the registry format and parser contract owned by the header of `bin/fm-project-mode.sh`.
+For a clone deliberately retained as historical evidence, use that owner's `retained-history` annotation rather than reducing its delivery policy, and identify the current maintained source in the registry description.
 Keep each registry description useful for identifying the project, but keep delivery posture, captain-private state, and detailed project knowledge in their existing designated homes.
 Do not turn the registry into project documentation.
 

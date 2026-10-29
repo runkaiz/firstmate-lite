@@ -59,8 +59,9 @@
 # For native copies, native_reservation binds the exact ownership record by
 # SHA-256. Keep it until metadata retirement and any paired backlog operation
 # succeed; marker removal verifies that the owned copy/container is absent
-# before retiring that reservation. With metadata still present, native replay
-# refuses and requires guarded teardown to finish its cleanup checks.
+# before retiring that reservation. With metadata still present, native or
+# Herdr replay refuses and requires guarded teardown to finish its cleanup
+# checks, preserving the exact endpoint owner across a restart.
 # mode=remove is the native metadata-only retirement path for exempt backlogs;
 # it takes no backlog arguments. Bootstrap replays it even for manual backlogs.
 
@@ -1208,6 +1209,13 @@ fm_backlog_close_marker_replay() {  # <state-dir> <marker-path> <authorized-data
     fi
     if [ -n "$native_reservation" ] || [ -e "$state/$id.git-worktree" ] || [ -L "$state/$id.git-worktree" ]; then
       FM_BACKLOG_TRANSITION_ERROR="native task cleanup is unfinished; rerun guarded teardown for $id"
+      return 1
+    fi
+    # A pending backlog close is not proof the exact Herdr pane was closed.
+    # Replay must not erase the endpoint identity needed by guarded teardown,
+    # even for a legacy pooled copy or an already agent-free shell tab.
+    if grep -q '^backend=herdr$' "$meta"; then
+      FM_BACKLOG_TRANSITION_ERROR="Herdr task cleanup is unfinished; rerun guarded teardown for $id"
       return 1
     fi
     fm_backlog_close_marker_mark_cleanup_incomplete "$state" "$marker" "$id" "$data" \
