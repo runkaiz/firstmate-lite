@@ -84,10 +84,10 @@ For a contribution wake or linked-issue filing, go directly to Contribution foll
    This is the only file-mode write allowed by the skill.
    The detailed report includes:
    - **Title** - `# Ahoy - <day> <YYYY-MM-DD>` (use "Morning status" only when the captain specifically asks for a morning brief), followed by two or three sentences framing where things stand.
-   - **Captain's Call** - every unsuppressed open decision summarized with its options from the structured decision record, plus each PR ready to merge and each needed credential or login, every PR with the full `https://...` URL, never a bare `#number`.
    - **Recently Landed** - the bounded current recent-completions baseline from structured state in this home, rendered in full on every run.
    - **Underway** - each live direct report making progress, with its current state, and the plans or main pickup pointers worth reopening (`data/<id>/report.md` files, `.lavish/*.html` boards).
    - **Charted Next** - queued or gated work, including deferred or aged captain-hold safety gates and any main-inventory integrity warning, with each item's blocker, date, age, or integrity reason.
+   - **Captain's Call** - every unsuppressed open decision summarized with its options from the structured decision record, plus each PR ready to merge and each needed credential or login, every PR with the full `https://...` URL, never a bare `#number`.
    After writing the file, return the concise four-section chat digest and include the report path or link without adding a fifth section.
    For a richer review surface, offer `/ahoy lavish` when the report has enough structure to deserve one, but only after the required digest is ready.
 
@@ -144,20 +144,20 @@ Only the exact answer value `merge` authorizes a merge; an answer carrying a fre
 ## Chat-response contract
 
 This skill is the one owner of the `/ahoy` chat-response format; the snapshot and classifier own the data that feeds it, and no other file restates this contract.
-Every `/ahoy` chat response renders EXACTLY these four sections, in THIS order, and nothing else structural (there is no At Anchor section):
+Every `/ahoy` chat response renders EXACTLY these four sections, in THIS order with Captain's Call last, and nothing else structural (there is no At Anchor section):
 
-1. **Captain's Call** - ONLY unsuppressed items that need the captain's own action now: a decision to make, a PR to approve or merge, a credential or login to provide, or a blocker only the captain can clear.
+1. **Recently Landed** - the bounded current recent-completions baseline: merged PRs, completed scouts, and finished local-only merges in this home.
+   Empty-state: "No recent completions are in the current baseline."
+2. **Underway** - live work progressing on its own, one line of current state per direct report.
+   Empty-state: "Nothing is underway."
+3. **Charted Next** - queued or gated work waiting on the fleet or a date, deferred or aged captain-hold safety gates, plus action-free fleet-integrity warnings.
+   Empty-state: "Nothing is queued."
+4. **Captain's Call** - ONLY unsuppressed items that need the captain's own action now: a decision to make, a PR to approve or merge, a credential or login to provide, or a blocker only the captain can clear.
    Deferred or aged holds follow the presentation safety rule above instead.
    Include `contributions.captain` rows in this section, deduplicating any row already represented by its live captain hold or merge call.
    Show the other contribution actors only as counts beside the checked/known coverage, and disclose `captain_omitted`, `unmeasured_homes`, stale verdicts and checks with no verdict when nonzero.
    Empty-state: "Nothing needs your action right now" is allowed only when `contributions.proven_clear` is true and the existing decision set is empty.
    When the section is empty but coverage is incomplete, say that no decision is recorded and give the checked/known count; a missing coverage field is also unverified.
-2. **Recently Landed** - the bounded current recent-completions baseline: merged PRs, completed scouts, and finished local-only merges in this home.
-   Empty-state: "No recent completions are in the current baseline."
-3. **Underway** - live work progressing on its own, one line of current state per direct report.
-   Empty-state: "Nothing is underway."
-4. **Charted Next** - queued or gated work waiting on the fleet or a date, deferred or aged captain-hold safety gates, plus action-free fleet-integrity warnings.
-   Empty-state: "Nothing is queued."
 
 Rules that keep the contract unambiguous:
 

@@ -238,6 +238,28 @@ test_an_underway_identifier_label_is_not_replaced_by_run_status() {
   pass "an underway identifier label is not replaced by run status"
 }
 
+test_the_board_renders_captains_call_last() {
+  local home out
+  home=$(make_home call-last)
+  out=$(render_board "$home" '[]' '[]')
+  printf '%s' "$out" | jq -e '.error == ""' >/dev/null \
+    || fail "the board rendered its fail-closed error instead of the fleet: $out"
+  local order
+  order=$(node -e '
+    const fs = require("fs");
+    const html = fs.readFileSync(process.argv[1], "utf8");
+    const pre = html.slice(0, html.indexOf("<script id=\"bearings-data\""));
+    const rx = /fm-sign--eyebrow"[^>]*>\s*<svg[\s\S]*?<\/svg>\s*([^<]+)/g;
+    const found = [];
+    let m;
+    while ((m = rx.exec(pre)) !== null) found.push(m[1].trim());
+    process.stdout.write(JSON.stringify(found));
+  ' "$home/.lavish/bearings-board.html")
+  [ "$order" = '["Recently Landed","Underway","Charted Next","Captain'\''s Call"]' ] \
+    || fail "the board did not render Captain's Call last: $order"
+  pass "the board renders Recently Landed, Underway, Charted Next, then Captain's Call last"
+}
+
 test_charted_next_reads_newest_filed_first() {
   local home out
   home=$(make_home charted-order)
@@ -273,5 +295,6 @@ test_charted_rows_without_a_filed_date_follow_the_dated_rows_in_payload_order
 test_a_warning_row_reads_as_a_repair_not_as_queued_work
 test_warnings_are_excluded_from_the_charted_next_count
 test_a_board_of_only_warnings_still_reports_nothing_queued
+test_the_board_renders_captains_call_last
 test_omitted_warnings_never_count_as_more_queued
 test_an_omitted_kind_keeps_the_existing_queued_rendering

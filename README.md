@@ -193,9 +193,9 @@ Claude and grok use the slash form shown here; codex uses the same names with `$
 | `/updatefirstmate` | Guardedly fast-forward this home to the current upstream commit, then reread its instructions |
 | `/stow` | File current knowledge and open records; Pi verifies the receipt and saves early before native compaction, with `save-only` available; see the [stow workflow](.agents/skills/stow/SKILL.md#pi-command-and-automatic-preservation) for scheduling limits |
 
-Ahoy invocation examples (`/ahoy` remains an alias):
+Ahoy invocation examples (`/bearings` remains an alias):
 
-- `/ahoy` returns the fresh four-section digest in chat only.
+- `/ahoy` returns the fresh four-section digest in chat only, following the [section-order contract](.agents/skills/ahoy/SKILL.md#chat-response-contract).
 - Owned-contribution follow-up comes from the cached coverage projection; `include PRs` remains the opt-in for repository-wide live PR enrichment.
 - `/ahoy include PRs` keeps chat-only mode and opts into live PR enrichment.
 - `/ahoy file` replaces today's `data/status-report-<YYYY-MM-DD>.md` from scratch and links it from the four-section chat digest.
