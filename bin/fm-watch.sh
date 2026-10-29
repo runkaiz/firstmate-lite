@@ -1736,16 +1736,14 @@ away_entry_surface_after_output() {
 
 # Like process-event publication, entry has already queued the event. Surface
 # its newest sequence even on a handling successor, whose generic downtime
-# resurface is deliberately disabled. Hold the queue lock through output and
-# the receipt so refresh cannot be marked surfaced before it was delivered.
+# resurface is deliberately disabled. The caller holds the queue lock through
+# selection, output, and receipt so refresh cannot overtake its delivery.
 away_entry_surface_queued() {
   local seen
   [ -s "$FM_WAKE_QUEUE" ] || return 0
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
   AWAY_ENTRY_SURFACED_SEQ=$(awk -F '\t' '$3 == "check" && $4 == "away-entry-review" { seq=$2 } END { print seq }' "$FM_WAKE_QUEUE")
   seen=$(cat "$STATE/.seen-away-entry-review" 2>/dev/null || true)
   if [ -z "$AWAY_ENTRY_SURFACED_SEQ" ] || [ "$AWAY_ENTRY_SURFACED_SEQ" = "$seen" ]; then
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 0
   fi
   # shellcheck disable=SC2034 # Consumed by wake() in the transition owner.
@@ -1787,7 +1785,6 @@ procevent_surface_queued() {
   local key reason captured="" stranded="" unstarted=""
   PROCEVENT_SURFACED=
   [ -s "$FM_WAKE_QUEUE" ] || return 0
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
   while IFS= read -r key; do
     case "$key" in procevent:*) ;; *) continue ;; esac
     [ -e "$(procevent_surfaced_marker "$key")" ] && continue
@@ -1803,7 +1800,6 @@ procevent_surface_queued() {
     esac
   done < <(fm_wake_queued_keys_locked check)
   if [ -z "$PROCEVENT_SURFACED" ]; then
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 0
   fi
   reason="check:"
@@ -2348,6 +2344,11 @@ rerecord_device_shifted_pr_poll() {  # <id>
   return 0
 }
 
+# wake() passes its output status; either result releases the selection lock.
+recovery_surface_after_output() {
+  fm_lock_release "$FM_WAKE_QUEUE_LOCK"
+}
+
 resurface_after_downtime() {
   # Handling successors already have a predecessor-delivered wake on the way.
   # Re-announcing from this cycle is what turned a lost handshake into an
@@ -2356,12 +2357,15 @@ resurface_after_downtime() {
     return 0
   fi
   if [ "$WATCHER_RECOVERY_PENDING" -ne 1 ]; then
-    if ! fm_recovery_marker_arm_check "$WATCHER_DOWNTIME_MARKER"; then
+    if ! fm_recovery_marker_arm_check_locked "$WATCHER_DOWNTIME_MARKER"; then
+      fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       echo "watcher: recovery state could not be consumed safely" >&2
       exit 1
     fi
     [ "$FM_RECOVERY_MARKER_ACTION" = recover ] || return 0
   fi
+  # shellcheck disable=SC2034 # Consumed by wake() in the transition owner.
+  FM_WAKE_POST_OUTPUT_ACTION=recovery_surface_after_output
   wake "check: rearm-resurface"
 }
 
@@ -2445,13 +2449,14 @@ while :; do
   fi
   # Then deliver any queued-but-unsurfaced result, including one a runner
   # published while this watcher was between cycles.
+  # Select specialized delivery and generic recovery from the same snapshot.
+  # An append publishes downtime before its queue row; observing those across
+  # separate locks can announce recovery and then repeat the row on a successor.
+  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
   procevent_surface_queued
-
   away_entry_surface_queued
-
-  # A process-event result carries richer adapter-owned wake context than the
-  # generic recovery reason, so give that owner first refusal.
   resurface_after_downtime
+  fm_lock_release "$FM_WAKE_QUEUE_LOCK"
 
   # The existing poll loop also owns the bounded inactive-outcome cadence.
   # This is mechanical and silent unless a durable terminal-outcome obligation

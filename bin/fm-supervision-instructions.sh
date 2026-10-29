@@ -10,6 +10,8 @@
 # "{<harness>,...} " render only for the listed harnesses), and Grok's arm
 # command becomes the host; on a home that does not run it the output is
 # unchanged.
+# The current home-scoped proactive policy is rendered through fm-proactive.sh;
+# repair-line output remains unchanged.
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -242,6 +244,7 @@ if [ -n "$HOST_SNIPPET" ]; then
   printf '%s\n' '- Supervision host: on; it takes away-posture wakes and, where the dialog mirror is verified, eligible attended wakes itself, and hands the rest to you (protocol at the end of this block).'
 fi
 ordinary_wake_line
+"$SCRIPT_DIR/fm-proactive.sh" instructions
 if [ "$READ_ONLY" -eq 0 ]; then
   printf '%s\n' '- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.'
 fi

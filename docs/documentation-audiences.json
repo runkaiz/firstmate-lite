@@ -548,6 +548,14 @@
       "audience": "agent-runtime"
     },
     {
+      "path": ".agents/skills/proactive/SKILL.md",
+      "audience": "agent-runtime"
+    },
+    {
+      "path": ".agents/skills/proactive/policy.md",
+      "audience": "agent-runtime"
+    },
+    {
       "path": "docs/queue.md",
       "audience": "operator-current"
     }

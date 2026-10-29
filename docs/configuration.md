@@ -153,6 +153,26 @@ The Claude Code mod reloads it on every `session.start`, including same-process 
 It also loads the preference lazily before any row that can draw ahead of that event, including during `claude --continue` restoration.
 This preference is local to each Firstmate home.
 
+## Proactive preference (config/proactive)
+
+`/proactive` toggles persisted proactive orchestration; `/proactive on`, `/proactive off`, and `/proactive status` set or inspect it explicitly through the bundled skill.
+It is opt-in and off when absent, independently of Calm presentation and away/quiet posture.
+The command, atomic persistence, home resolution, and malformed-file behavior are owned by `bin/fm-proactive.sh`'s header and `--help`.
+The [conditional proactive policy](../.agents/skills/proactive/policy.md) owns repair, continuation, escalation, and automatic ordinary green-PR merge authority while on.
+Project yolo settings are not rewritten, and turning the mode off removes its additional authority before the next guarded proactive merge.
+
+Startup/re-emitted supervision instructions read the current preference and present the policy once; successful queued-wake presentations carry the current mode and a compact policy reference on stderr, loading the policy only if it is absent from context.
+Off instructions supersede earlier mode context.
+This shared path covers every primary harness, Pi's branch, and the off-Pi supervision host without a second watcher or changed lease ownership.
+A resumed conversation that has not received a startup/wake refresh can use `/proactive status` to refresh immediately.
+Install or reload the bundled skill using the harness's ordinary skill discovery; this is an agent-handled command, not a Calm rendering extension.
+Local-only landing retains its existing approval rules.
+New no-mistakes briefs generated while on replace the implementation-complete/firstmate-invocation round trip with immediate same-worker validation, checking current mode again before proceeding and preserving explicit validation holds.
+Already-issued briefs retain their task-specific handoff until firstmate steers them; enabling mode does not silently rewrite workers' existing instructions.
+
+The deterministic regression entry points are `tests/fm-supervision-instructions.test.sh`, `tests/fm-task-delivery.test.sh`, and `tests/fm-pr-merge.test.sh`, plus the provider-free Pi command fixtures in `tests/fm-pi-primary-types.test.sh`.
+They prove preference and instruction delivery plus guarded forge behavior with fixtures; they do not measure model obedience, turn counts, tokens, or end-to-end latency savings.
+
 ## Pi supervision branch
 
 On a Pi primary, an in-process supervision branch handles eligible task-local wake rows and selected heartbeat reviews.

@@ -106,7 +106,12 @@
 # explicit captain instruction and never skips the live green check, the
 # away-record read, or a captain hold.
 #
-# Usage: fm-pr-merge.sh <task-id> <pr-url> [--attended-override] [--allow-red <check-name>] [--allow-missing <check-name>] [-- <extra forge merge args>]
+# --proactive is the opt-in ordinary GitHub merge path: config/proactive must
+# still be on immediately before the synchronous forge call, under the same
+# config lock used by the toggle. Required reviews must be resolved; overrides,
+# waivers and asynchronous requests are refused. Human scope/hold and safety
+# decisions remain the caller's responsibility under the proactive policy.
+# Usage: fm-pr-merge.sh <task-id> <pr-url> [--proactive] [--attended-override] [--allow-red <check-name>] [--allow-missing <check-name>] [-- <extra forge merge args>]
 #
 # An unconfirmed request leaves the poll armed and records no landed outcome.
 # bin/fm-merge-outcome-lib.sh owns a confirmed merge's
@@ -150,10 +155,12 @@ PR_REPO=$FM_PR_REPO
 PR_NUMBER=$FM_PR_NUMBER
 shift 2
 ATTENDED_OVERRIDE=false
+PROACTIVE=false
 ALLOW_RED=()
 ALLOW_MISSING=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    --proactive) PROACTIVE=true; shift ;;
     --attended-override)
       ATTENDED_OVERRIDE=true
       shift
@@ -186,6 +193,13 @@ while [ "$#" -gt 0 ]; do
     *) break ;;
   esac
 done
+if [ "$PROACTIVE" = true ]; then
+  [ "$PROVIDER" = github ] || { echo 'error: proactive merges currently support GitHub only' >&2; exit 2; }
+  if [ "$ATTENDED_OVERRIDE" = true ] || [ "${#ALLOW_RED[@]}" -gt 0 ] || [ "${#ALLOW_MISSING[@]}" -gt 0 ]; then
+    echo 'error: proactive merges cannot use overrides or check waivers' >&2
+    exit 2
+  fi
+fi
 if [ "${#ALLOW_RED[@]}" -gt 0 ]; then
   case "$PROVIDER" in
   esac
@@ -339,7 +353,9 @@ MERGE_EXPECTED_SPAWN_GEN=$FM_BACKLOG_META_SPAWN_GEN
 
 MERGE_CONTROL_LOCK=
 MERGE_META_LOCK=
+PROACTIVE_LOCK=
 merge_control_cleanup() {
+  [ -z "$PROACTIVE_LOCK" ] || fm_lock_release "$PROACTIVE_LOCK" || true
   [ -z "$MERGE_META_LOCK" ] || fm_lock_release "$MERGE_META_LOCK" || true
   fm_afk_contract_lock_release || true
   [ -z "$MERGE_CONTROL_LOCK" ] || fm_lock_release "$MERGE_CONTROL_LOCK" || true
@@ -557,7 +573,7 @@ github_verify_mergeable() {
   local total=0 named=0 refusals='' mergeable_refusal=''
   local state='' draft='' mergeable='' merge_state='' live_head='' base=''
 
-  if ! json=$(gh pr view "$URL" --json state,isDraft,mergeable,mergeStateStatus,headRefOid,baseRefName,statusCheckRollup 2>/dev/null) \
+  if ! json=$(gh pr view "$URL" --json state,isDraft,mergeable,mergeStateStatus,headRefOid,baseRefName,statusCheckRollup,reviewDecision 2>/dev/null) \
     || [ -z "$json" ]; then
     echo "error: could not read the GitHub pull request state before merging" >&2
     return 1
@@ -601,6 +617,11 @@ FIELDS
   fi
   if ! red=$(github_checks_not_green "$json"); then
     echo "error: could not read the GitHub pull request state before merging" >&2
+    return 1
+  fi
+  if [ "$PROACTIVE" = true ] && ! printf '%s' "$json" | jq -e '
+      has("reviewDecision") and (.reviewDecision == "APPROVED" or .reviewDecision == "")' >/dev/null; then
+    echo 'error: proactive merge refused: required reviews unresolved or unreadable' >&2
     return 1
   fi
 
@@ -1001,13 +1022,13 @@ persist_accepted_merge_authority() {
 # stays synchronous (--auto is refused earlier) and every other gate still
 # applies.
 refuse_github_queue_while_away() {
-  [ "$FM_PR_AWAY_POSTURE" = true ] || return 0
+  [ "$FM_PR_AWAY_POSTURE" = true ] || [ "$PROACTIVE" = true ] || return 0
   # Accepted confused-agent-grade limitation, as in bin/fm-lease-lib.sh, not an
   # oversight: a queue rule or PR base change after this preflight can still
   # enqueue the merge, which can land after its away authority lapses.
   github_read_queue_method
   [ "$FM_PR_GITHUB_QUEUE_STATUS" = none ] && return 0
-  echo "error: GitHub merge refused while away because the base branch's merge-queue state does not prove an immediate merge; nothing was handed to the forge" >&2
+  echo "error: GitHub merge refused while away or proactive because the base branch's merge-queue state does not prove an immediate merge; nothing was handed to the forge" >&2
   return 2
 }
 
@@ -1194,6 +1215,20 @@ case "$PROVIDER" in
     away_status=0
     require_current_away_authority || away_status=$?
     [ "$away_status" -eq 0 ] || exit "$away_status"
+    if [ "$PROACTIVE" = true ]; then
+      if [ "$("$SCRIPT_DIR/fm-proactive.sh" status)" != 'PROACTIVE MODE: on' ]; then
+        echo 'error: proactive merge refused: mode is off at action time' >&2
+        exit 1
+      fi
+      PROACTIVE_LOCK="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}/.proactive.lock"
+      fm_lock_acquire_wait "$PROACTIVE_LOCK"
+      if [ "$("$SCRIPT_DIR/fm-proactive.sh" status)" != 'PROACTIVE MODE: on' ]; then
+        echo 'error: proactive merge refused: mode is off at action time' >&2
+        exit 1
+      fi
+      # A queue could land after mode is switched off, so require an immediate
+      # path just as the existing bounded away authority does.
+    fi
     refuse_github_queue_while_away || exit 2
     merge_status=0
     merge_output=$(gh pr merge "$PR_NUMBER" --repo "$PR_OWNER/$PR_REPO" \

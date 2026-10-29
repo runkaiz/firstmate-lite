@@ -6,6 +6,8 @@
 # newer branch outcome, OPEN DECISIONS, captain-call record divergence, and on
 # a supervision-host home the supervision session's new and unprocessed
 # outcomes (BRANCH OUTCOMES), then assert liveness.
+# Successful queued-wake presentations refresh the proactive preference on
+# stderr for MAIN and either branch host, keeping stdout records unchanged.
 #
 # Keep sequence-bound row consumption independent from generation-bound episode
 # retirement; docs/watcher-continuity.md owns the recovery contract.
@@ -806,6 +808,9 @@ print_status_presentation() {  # [<deduped-raw-rows>]
   fi
   if [ "$rc" -eq 0 ] && [ -n "$snapshot" ]; then print_status_sections "$snapshot" "$fully_presented" || rc=1; fi
   fm_lock_release "$lock"
+  if [ "$rc" -eq 0 ] && [ -n "$rows" ]; then
+    "$SCRIPT_DIR/fm-proactive.sh" context >&2
+  fi
   return "$rc"
 }
 

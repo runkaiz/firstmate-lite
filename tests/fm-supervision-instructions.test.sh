@@ -300,6 +300,74 @@ test_pi_snippet_uses_effective_extension_path() {
   pass "pi supervision snippet renders the effective extension path"
 }
 
+test_proactive_preference_and_instruction_delivery() {
+  local home config command out harness baseline
+  home="$TMP_ROOT/proactive-home"
+  config="$TMP_ROOT/proactive-config"
+  command="$ROOT/bin/fm-proactive.sh"
+  mkdir -p "$home/state" "$config"
+  export FM_HOME="$home" FM_CONFIG_OVERRIDE="$config"
+  assert_equals "$(bash "$command" status)" 'PROACTIVE MODE: off' 'absent preference must be off'
+  [ ! -e "$config/proactive" ] || fail 'status wrote a preference'
+  baseline=$(bash "$RENDER" --harness codex)
+  assert_equals "$(bash "$command")" 'PROACTIVE MODE: on' 'bare command must toggle on'
+  assert_equals "$(cat "$config/proactive")" on 'toggle did not persist'
+  for harness in claude codex opencode pi pi-signed grok cursor omp unknown; do
+    out=$(bash "$RENDER" --harness "$harness")
+    assert_contains "$out" 'PROACTIVE MODE: on' "$harness lost persisted mode"
+    assert_contains "$out" 'an unambiguous bounded reversible defect repair is authorized' "$harness lost repair policy"
+    assert_contains "$out" 'already-approved next steps without a fresh permission question' "$harness lost continuation policy"
+    assert_contains "$out" 'independent approved work continues' "$harness lost ambiguity handling"
+    assert_contains "$out" 'Honor explicit stops, holds' "$harness lost explicit stop policy"
+    assert_contains "$out" 'It authorizes no unrelated project' "$harness lost scope limits"
+    assert_contains "$out" 'GPU/resource spending grants' "$harness lost resource boundary"
+    assert_contains "$out" 'attended branch no new spawn, merge, or decision-answer authority' "$harness expanded branch authority"
+  done
+  # Empty drains stay silent; actual queued wakes refresh policy on stderr
+  # without changing the structured stdout records. No watcher is armed.
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" '' 'empty wake presentation was not silent'
+  assert_not_contains "$(cat "$home/drain.err")" 'PROACTIVE MODE:' 'empty drain emitted mode context'
+  bash -c 'source "$1"; fm_wake_append heartbeat proactive-test "heartbeat: proactive-test"' _ \
+    "$ROOT/bin/fm-wake-lib.sh" || fail 'could not queue wake'
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" "$(cat "$home/state/.wake-queue")" 'mode context altered structured wake records'
+  out=$(cat "$home/drain.err")
+  assert_contains "$out" 'PROACTIVE MODE: on' 'wake presentation lost mode'
+  assert_contains "$out" '/.agents/skills/proactive/policy.md' 'wake presentation lost policy reference'
+  assert_not_contains "$out" 'automatic merge authority' 'wake needlessly repeated the full policy'
+  assert_equals "$(bash "$command" off)" 'PROACTIVE MODE: off' 'explicit off failed'
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" "$(cat "$home/state/.wake-queue")" 'off context altered structured wake records'
+  assert_contains "$(cat "$home/drain.err")" 'any earlier proactive instruction is inactive' 'queued wake failed to revoke old context'
+  assert_equals "$(bash "$RENDER" --harness codex)" "$baseline" 'off did not restore baseline instructions'
+  assert_contains "$(bash "$command" instructions)" 'any earlier proactive instruction is inactive' 'off failed to revoke old context'
+  assert_equals "$(bash "$command")" 'PROACTIVE MODE: on' 'toggle after off failed'
+  assert_equals "$(bash "$command")" 'PROACTIVE MODE: off' 'second toggle failed'
+  printf 'ON\n' > "$config/proactive"
+  out=$(bash "$command" instructions 2>&1)
+  assert_contains "$out" 'invalid or unreadable preference' 'malformed preference lacks diagnostic'
+  assert_contains "$out" 'PROACTIVE MODE: off' 'malformed preference enabled mode'
+  if bash "$command" > /dev/null 2>&1; then fail 'toggle silently overwrote malformed preference'; fi
+  assert_equals "$(cat "$config/proactive")" ON 'toggle damaged malformed preference'
+  bash "$command" off >/dev/null || fail 'explicit off could not repair malformed preference'
+  printf 'on\n\n' > "$config/proactive"
+  assert_equals "$(bash "$command" status 2>/dev/null)" 'PROACTIVE MODE: off' 'extra lines enabled mode'
+  printf 'on\000\n' > "$config/proactive"
+  assert_equals "$(bash "$command" status 2>/dev/null)" 'PROACTIVE MODE: off' 'NUL bytes enabled mode'
+  rm "$config/proactive"
+  mkdir "$config/proactive"
+  if bash "$command" on >/dev/null 2>&1; then fail 'directory preference falsely reported a saved choice'; fi
+  rmdir "$config/proactive"
+  unset FM_CONFIG_OVERRIDE
+  bash "$command" on >/dev/null
+  assert_equals "$(cat "$home/config/proactive")" on 'FM_HOME did not select home'
+  unset FM_HOME
+  FM_ROOT_OVERRIDE="$home" bash "$command" off >/dev/null
+  assert_equals "$(cat "$home/config/proactive")" off 'legacy root override did not select home'
+  pass 'proactive preference persists, restores baseline, rejects malformed state, and reaches every supervision renderer'
+}
+
 test_supervision_host_protocol_on_a_claude_home_unless_off
 test_supervision_host_protocol_on_every_arm_owner
 test_selected_harness_block_only
@@ -312,3 +380,4 @@ test_pi_signed_preserves_identity_with_pi_supervision_protocol
 test_grok_is_background_notify
 test_grok_command_sources_effective_config
 test_pi_snippet_uses_effective_extension_path
+test_proactive_preference_and_instruction_delivery

@@ -2050,6 +2050,73 @@ test_attended_latch_keeps_closes_on_main_and_records_recovery_off_main() {
   pass "host: attended, two engine errors latch the session, main keeps every close unchanged in the cooldown, a failed probe doubles it up to its cap, and a routine probe's recovery stays in the ledger, off main"
 }
 
+# Force publication at the next queue-lock acquisition after the specialized
+# scan. Separate selection reads let recovery overtake the new row; one locked
+# scan defers publication until the next cycle can select its specialized wake.
+test_queued_wake_selection_is_atomic_with_recovery() {
+  local key home expected rc real_cat real_ln real_path=$PATH
+  real_cat=$(command -v cat)
+  real_ln=$(command -v ln)
+  # shellcheck source=/dev/null # Production timeout owner is linted separately.
+  . "$ROOT/bin/fm-timeout-lib.sh"
+  for key in away-entry-review procevent:demo:1 procevent:demo:stranded:1 procevent:demo:launch-failed:1; do
+    home=$(make_home "queue-race-${key//:/-}" attended)
+    rm "$home/state/demo.meta"
+    append_wake "$home/state" check old 'check: already handling' || fail 'fixture: seed queue'
+    FM_HOME="$home" bash -c '
+      . "$1"
+      fm_recovery_marker_read "$STATE/.watcher-down"
+      fm_recovery_marker_begin_handling "$STATE/.watcher-down" "${FM_RECOVERY_MARKER_TOKEN##*:}"
+    ' _ "$ROOT/bin/fm-wake-lib.sh" || fail 'fixture: mark old wake as handling'
+    cat > "$home/fakebin/cat" <<'SH'
+#!/usr/bin/env bash
+case "$*" in
+  */.seen-away-entry-review)
+    [ -e "$FM_HOME/injected" ] || : > "$FM_HOME/inject-ready"
+    ;;
+esac
+exec "$RACE_REAL_CAT" "$@"
+SH
+    cat > "$home/fakebin/ln" <<'SH'
+#!/usr/bin/env bash
+case "$*" in
+  */.wake-queue.lock)
+    if [ -e "$FM_HOME/inject-ready" ]; then
+      mv "$FM_HOME/inject-ready" "$FM_HOME/injected"
+      PATH="$RACE_REAL_PATH" bash -c '
+        . "$FM_REPO/bin/fm-wake-lib.sh"
+        fm_wake_append check "$RACE_KEY" "check: $RACE_KEY"
+      ' &
+      publisher=$!
+      # Publish before the next queue-lock acquisition: separate selection
+      # reads recover generically; an atomic scan sees the specialized row.
+      wait "$publisher"
+    fi
+    ;;
+esac
+exec "$RACE_REAL_LN" "$@"
+SH
+    chmod +x "$home/fakebin/cat" "$home/fakebin/ln"
+    rc=0
+    FM_HOME="$home" PATH="$home/fakebin:$PATH" RACE_REAL_PATH="$real_path" \
+      RACE_REAL_CAT="$real_cat" RACE_REAL_LN="$real_ln" RACE_KEY="$key" \
+      FM_CREW_STATE_BIN="$home/fakebin/fm-crew-state.sh" \
+      fm_run_timed 15 bash "$ROOT/bin/fm-watch.sh" > "$home/race.out" 2>&1 || rc=$?
+    expect_code 0 "$rc" "queued delivery for $key: $(cat "$home/race.out")"
+    [ -e "$home/injected" ] || fail "fixture: publication was not interleaved for $key: $(cat "$home/race.out")"
+    case "$key" in
+      away-entry-review) expected='check: away-entry-review' ;;
+      *:stranded:*) expected="check: process-event source stranded: $key" ;;
+      *:launch-failed:*) expected="check: process-event source failed to start: $key" ;;
+      *) expected="check: process-event result captured: $key" ;;
+    esac
+    assert_grep "$expected" "$home/race.out" "specialized delivery lost to recovery for $key"
+    assert_no_grep 'check: rearm-resurface' "$home/race.out" "generic recovery overtook $key"
+    assert_grep "$key" "$home/state/.wake-queue" "delivery consumed $key before acknowledgement"
+  done
+  pass 'watcher: concurrent away and process-event publication keeps specialized delivery ahead of generic recovery'
+}
+
 test_away_entry_and_refresh_reach_the_engine_without_a_fleet_event() {
   local home
   home=$(make_home away-entry-review attended)

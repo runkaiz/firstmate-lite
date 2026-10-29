@@ -341,6 +341,7 @@ fm_delivery_surface_valid() {  # <surface>
 fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<surface>]
   local mode=$1 id=$2 forge=${4:-none} base=${5:-} consent=${6:-} surface=${7:-unknown}
   local record_tool delivery_record_instruction=
+  local proactive_script proactive_config proactive_check handoff
   fm_delivery_surface_valid "$surface" || return 1
   printf -v record_tool '%q' "${BASH_SOURCE[0]%/*}/fm-delivery-record.py"
   local branch=${3:-fm/$id} pr_base='' nm_base='' base_q contract_forge='' contract_consent='' forge_cli=gh draft_check
@@ -399,14 +400,27 @@ The configured merge authority approves the ready branch, then firstmate merges 
 EOF
       ;;
     no-mistakes:*)
+      # shellcheck disable=SC2016 # Literal instructions for the worker.
+      handoff='When you believe it is complete, append `done [at=<epoch>]: {summary}` to the status file and stop.
+Firstmate will then instruct you to run /no-mistakes to validate and ship a PR.
+That first `done:` is the handoff that starts the pipeline, which owns the push; it is not a request to push from this copy.'
+      proactive_script="$(cd "${BASH_SOURCE[0]%/*}" && pwd)/fm-proactive.sh"
+      proactive_config="${CONFIG:-${FM_CONFIG_OVERRIDE:-${FM_HOME:-${FM_ROOT_OVERRIDE:-${proactive_script%/bin/*}}}/config}}"
+      if [ "$(FM_CONFIG_OVERRIDE="$proactive_config" "$proactive_script" status)" = 'PROACTIVE MODE: on' ]; then
+        printf -v proactive_check 'FM_CONFIG_OVERRIDE=%q bash %q status' \
+          "$proactive_config" "$proactive_script"
+        handoff="When implementation is committed and ready for validation, run \`$proactive_check\` once.
+If it reports \`PROACTIVE MODE: on\`, invoke /no-mistakes immediately on this same worker, without an intermediate done declaration or waiting for another firstmate invocation.
+Explicit validation stops, holds, unmet dependencies, and task-specific constraints still win.
+If mode is off or unreadable, append \`done [at=<epoch>]: {summary}\` to the status file and stop; firstmate will instruct you to run /no-mistakes.
+The selected full pipeline owns the push in either case."
+      fi
       cat <<EOF
 # Definition of done
 Delivery contract: mode=no-mistakes$contract_forge$contract_consent
 Ship branch: $branch
 The task is complete only when committed on your branch.
-When you believe it is complete, append \`done [at=<epoch>]: {summary}\` to the status file and stop.
-Firstmate will then instruct you to run /no-mistakes to validate and ship a PR.
-That first \`done:\` is the handoff that starts the pipeline, which owns the push; it is not a request to push from this copy.
+$handoff
 ${nm_base}
 EOF
       fm_nm_driving_block "$forge"

@@ -6,6 +6,27 @@ This record supports current session-start, turn-end, watcher-continuity, superv
 Operator behavior and active limits remain in the linked current guides.
 Task-specific chronology, temporary paths, run identifiers, and delivery transcripts remain in private reports or PR evidence.
 
+## Proactive instruction and merge fixtures
+
+On 2026-10-29, the opt-in `config/proactive` interface passed deterministic instruction and merge fixtures; the Pi command adapter passed strict types and provider-free command routing against Pi 1.4.0 with Node 22.23.2.
+Refresh with:
+
+```sh
+bash bin/fm-test-run.sh tests/fm-supervision-instructions.test.sh tests/fm-pr-merge.test.sh
+bash bin/fm-test-run.sh tests/fm-task-delivery.test.sh
+bash bin/fm-test-run.sh tests/fm-pi-primary-types.test.sh
+```
+
+The first two scripts passed individually with `failed=0 skipped_gate=0`; the Pi script reported `FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0` with the installed Pi package and TypeScript compiler explicitly selected through its existing environment and PATH seams.
+The preference fixture checks cold process reads, on/off/toggle, directory overrides, malformed bytes, off restoration, and policy delivery for claude, codex, opencode, pi, pi-signed, grok, cursor, omp, and unknown fallback.
+The shared wake presentation carries the current mode and compact policy reference for MAIN, the Pi branch, and the supervision host, without changing the branch's byte-stable system prompt or its lease/role partition.
+The delivery fixture reported `FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0` and verifies that new proactive no-mistakes briefs omit the intermediate done/invocation exchange, retain the current-mode recheck and explicit holds, and restore the baseline when off.
+Merge fixtures prove ordinary green reviewed PRs can use the proactive path with yolo off, while off/malformed/revoked mode, unresolved/unreadable reviews, red/missing checks, holds, queues, and waivers refuse before the forge merge.
+The mode is re-read under the toggle's lock before that synchronous action.
+No endpoint or backend lifecycle mechanism changed, so tmux, Herdr, zellij, Orca, and cmux use the same instruction path without backend-specific changes.
+These are executable-interface and package-contract fixtures, not proof of model obedience, live forge merging, or measured turn/token/latency improvement.
+The policy owner remains the [conditional proactive policy](../../.agents/skills/proactive/policy.md).
+
 ## Away capacity handoffs
 
 The 2026-10-27 Firstmate-lite check uses the version 2 away-record interface, with version 1 compatibility, and synthetic provider fixtures rather than live agents.

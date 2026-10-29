@@ -63,6 +63,14 @@ export default function (pi: ExtensionAPI) {
       },
     });
   }
+  pi.registerCommand("proactive", {
+    description: "Toggle or inspect persisted proactive orchestration",
+    handler: async (args, ctx) => {
+      if (!eligible()) { notice(ctx, "Proactive requires the owning Firstmate session."); return; }
+      if (!["", "on", "off", "status"].includes(args.trim())) { notice(ctx, "Usage: /proactive [on|off|status]"); return; }
+      pi.sendUserMessage(`/skill:proactive ${args.trim()}`, { expandPromptTemplates: true, deliverAs: "followUp" });
+    },
+  });
   pi.registerCommand("stow", {
     description: "Save current knowledge and work; native Pi compaction follows when needed",
     handler: async (args, ctx) => {
