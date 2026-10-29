@@ -8,6 +8,33 @@ This record contains reusable version-scoped evidence for active runtime guarant
 The backend guides own current setup, safety boundaries, and limitations.
 Exact task chronology, branch names, temporary homes, local paths, process ids, thread ids, and delivery transcripts remain in private reports or PR evidence.
 
+## CI-only worker waits
+
+Verified on 2026-10-29 with Bash 5.3.9, Git 2.56.0 and deterministic no-mistakes/forge fixtures.
+The installed no-mistakes v1.84.0 help confirms the supported drive hold and explicit-intent start boundary; its [version-matched drive source](https://github.com/kunchenguid/no-mistakes/blob/4822244/internal/cli/axi_drive.go) and [renderer](https://github.com/kunchenguid/no-mistakes/blob/4822244/internal/cli/axi_render.go) establish the elapsed-wait error, exit status, full-head and step-table fixtures.
+No live pipeline was driven for this evidence.
+Refresh with `bash tests/fm-procevent-ci.test.sh`.
+Representative output:
+
+```text
+PASS: four unchanged pending holds consumed in one shell before action
+PASS: zero worker/supervisor model dispatches during pending holds
+PASS: one actionable transition produces one queued wake
+PASS: handled action not reannounced after reconcile/restart
+PASS: real watcher completes repeated pending cycles
+PASS: unchanged CI produces zero pane-review/heartbeat dispatch events
+PASS: without CI ownership same idle worker becomes actionable
+CI wait tests passed
+```
+
+The shared runner and watcher path is independent of worker harness and runtime backend; no native harness output, keybinding or backend lifecycle command is added.
+The portable integration uses an idle tmux fixture and the real watcher, with controlled pending holds and the real durable process-event registration/capture/acknowledgement path.
+Claude, Codex, OpenCode, Pi, Pi-signed, Grok, Kimi, Cursor, OMP, Gemini, Muse, Rovo, AGY and Devin receive the same generated handoff instruction; tmux, Herdr, zellij, Orca and cmux use the same registered-source custody.
+This is shared-path coverage, not live proof for each harness/backend or evidence that an agent interprets every instruction correctly.
+Missing-check and revalidation cases exercise no-mistakes' response contract with fixtures; no real forge check was evaluated, no live worker was changed, and no Herdr lifecycle test ran.
+The measured zero dispatches apply only to the exercised unchanged-CI wait path, excluding pipeline agents, initial handoff, actionable returns and unrelated fleet activity.
+Unacknowledged actionable captures retain the existing bounded re-announcement semantics rather than an exactly-once delivery claim.
+
 ## Native Git task copies
 
 Verified on 2026-10-26 UTC with Herdr 0.9.5 and Git 2.56.0 in isolated local-file fixtures.

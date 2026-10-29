@@ -91,6 +91,8 @@ Two rules the commands cannot enforce for you:
 
 ## Handling a wake
 
+A `procevent ci` wake belongs to `validation-supervision`; load it for the CI-only worker handoff before handling that result.
+
 `procevent <adapter> <source-id> <sequence>`
 : The named durable result is waiting at `state/procevent-inbox/<source-id>.<sequence>.result`. Read that exact result; separate wakes identify later results independently.
 : **When the adapter owns applying the result, run that adapter before recording the generic acknowledgement below.**
