@@ -1,0 +1,19 @@
+Selected finding: test-2
+Subject: 5209340f251d711e96d45cab08f25988ed530527
+Disposition: go for the recorded fake-only lifecycle and unapplied private-handoff scope.
+
+This reassessment inspected retained evidence only. No scenarios, lifecycle operations, or tests were rerun. No source or permanent test changes were made.
+
+The five earlier product scenarios remain supported by pr-lifecycle-live.log, pr-duplicate-live.log, pr-injection-live.log, fleet-live.log, and bootstrap-replay-live.log. Their live labels describe execution earlier in this same validation run, not new execution during this reassessment. Bootstrap replay exercised real product state handling without a real Herdr endpoint.
+
+cleanup-regression.log and focused-teardown.sh record the behavioral interruption/replay case and unpushed-work refusal case. test-2-reassessment.txt records a subsequent focused interruption/replay success. The committed case executes cleanup, interrupts after persisting ownership, invokes replay, compares ownership bytes, retries guarded cleanup, and checks foreign endpoint and captain-held work preservation. This is fake-backend evidence, not real Herdr cleanup evidence. No bounded fixture gap remains apparent from these retained results.
+
+Real Herdr interruption/restart/cleanup remains live-untested. The earlier guarded prepare attempts could not establish a worktree-contained lab with the required default-session tripwire baseline. The recorded decision now explicitly forbids further live operations. A future live proof needs separate authorization and a supported isolated lab; this disposition does not grant either.
+
+The private installation handoff remains unapplied and live-untested by the recorded scope. The referenced patch apply/reverse receipt and private patch are not present in the named evidence directory or worktree. No patch result is claimed. A sanitized patch, its before-image, and its receipt would permit bounded independent verification without accessing the operational home. No private home or other checkout was inspected.
+
+The missing private receipt is a disclosed limitation, not evidence of a public-source failure or authority to apply the private patch. The decision to keep the private handoff unapplied supersedes the earlier demand for an installed end-user result.
+
+No screenshot was captured: reviewed public behavior is CLI/persisted-state behavior; real terminal lifecycle and private installation were not exercised. The retained intermittent PR watcher issue was not investigated, changed, or re-reported as a finding.
+
+Inspection commands included the base-to-target diff, bounded evidence inventory, retained CLI transcripts and focused test driver, and git status --short (clean). No lint, formatting, static analysis, broad suite, pipeline control, publication, or installation occurred.

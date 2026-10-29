@@ -1,0 +1,21 @@
+Selected finding: test-2 only
+Subject: 5209340f251d711e96d45cab08f25988ed530527
+
+The recorded human decision limits this reassessment to fake lifecycle fixtures and an unapplied private handoff. A requirement for live Herdr cleanup or applying the private installation patch would exceed that decision. The previous five passed scenarios were not rerun. The ignored intermittent watcher finding was not investigated or changed.
+
+Retained evidence reviewed: cleanup-regression.log, focused-teardown.sh, and test-notes.txt in this evidence directory. The cleanup log records successful interruption/replay and unpushed-work refusal checks. The committed runtime-backends verification note explicitly describes fake Herdr coverage, not a live terminal lifecycle result.
+
+Focused verification performed in this phase:
+Loaded the existing tests/fm-teardown.test.sh definitions using the retained driver's DEBUG-trap selection technique, then invoked only test_herdr_interrupted_cleanup_preserves_owner_across_replay with TMPDIR inside the worktree.
+Result: exit success, with output:
+ok - interrupted flat Herdr cleanup retains ownership through restart replay and guarded retry preserves holds
+
+This executes teardown against fake Herdr, interrupts after the pending close is persisted, executes restart replay, verifies unchanged owner metadata and close marker, retries guarded cleanup, and checks exact-pane closure and preservation of captain-held work and foreign ownership. Both ordinary and captain-held variants passed. It does not establish behavior against a real Herdr session. No failing code case was reproduced, and no source or permanent test change was justified.
+
+Handoff evidence limitation:
+The supplied decision refers to retained patch apply/reverse evidence, but no such receipt or patch is present in this run's named evidence directory or the current worktree. The previous test-notes.txt likewise records no supplied installation fixture or receipt. No other checkout or private operational home was searched or accessed. Consequently the patch apply/reverse result cannot be independently verified here. No replacement private patch was invented or applied.
+
+Disposition:
+Fake lifecycle evidence is sufficient for the explicitly bounded lifecycle scope; requiring live operations is not an actionable product defect under the recorded decision. Real Herdr lifecycle cleanup and private installation handoff/navigation remain live-untested. The referenced private patch evidence remains unavailable to this phase, rather than being treated as passed. The outer executor should retain this limitation in its evidence record.
+
+No live backend operations, pipeline control, lint, formatting, static analysis, publication, or broad regression suite was performed. Temporary test files were removed; source and test files remain unchanged.

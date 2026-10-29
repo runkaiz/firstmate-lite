@@ -1,0 +1,28 @@
+$ fm-pr-check.sh a-worker https://github.com/cli/cli/pull/1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/a-worker.check.sh
+
+Persisted lifecycle metadata:
+kind=ship
+mode=no-mistakes
+project=<disposable-lab>/pr-duplicate-live/projects/demo
+worktree=<disposable-lab>/pr-duplicate-live/projects/demo
+spawn_gen=s123.456.789
+pr=https://github.com/cli/cli/pull/1
+pr_head=e9a3253762e768badaa1d4a5b3d267416d1e42f4
+afk_worker_stopped=s123.456.789
+control_relaunch_tx=42.20261029T010203Z.123
+afk_worker_stopped=legacy
+
+$ fm-watch.sh
+exit=0
+check: rejected unauthenticated state checks: <disposable-lab>/pr-duplicate-live/state/a-worker.check.sh
+
+Persisted .wake-queue:
+1793238463	1	check	unauthenticated-state-checks	check: rejected unauthenticated state checks: <disposable-lab>/pr-duplicate-live/state/a-worker.check.sh

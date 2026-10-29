@@ -1,0 +1,34 @@
+$ fm-pr-check.sh a-worker https://github.com/cli/cli/pull/1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/a-worker.check.sh
+
+Persisted lifecycle metadata:
+kind=ship
+mode=no-mistakes
+project=<disposable-lab>/pr-lifecycle-live/projects/demo
+worktree=<disposable-lab>/pr-lifecycle-live/projects/demo
+spawn_gen=s123.456.789
+pr=https://github.com/cli/cli/pull/1
+pr_head=e9a3253762e768badaa1d4a5b3d267416d1e42f4
+afk_worker_stopped=s123.456.789
+control_relaunch_tx=42.20261029T010203Z.123
+
+$ fm-watch.sh
+exit=0
+check: <disposable-lab>/pr-lifecycle-live/state/a-worker.check.sh: merged
+
+Persisted .wake-queue:
+1793238460	1	check	merged-a-worker-https://github.com/cli/cli/pull/1	check: merge landed: a-worker https://github.com/cli/cli/pull/1 external
+
+Persisted a-worker.pr-poll-merge-notified:
+fm-pr-poll-merge-notified-v1
+github
+github.com
+cli/cli
+1

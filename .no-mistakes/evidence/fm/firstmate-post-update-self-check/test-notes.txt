@@ -1,0 +1,24 @@
+Validation scope: 497e1048c09612c40b26be46218d6baf311baddb..5209340f251d711e96d45cab08f25988ed530527.
+
+Live commands and observations
+- live-check.py drove fm-project-mode.sh and fm-fleet-sync.sh against disposable real Git repositories and a local bare origin. The retained clone kept its refs and dirty bytes, the normal clone advanced, and unlanded work was preserved. Removing retained-history restored the STUCK diagnostic.
+- live-check.py drove fm-pr-check.sh and fm-watch.sh with real GitHub reads of the already-merged public cli/cli PR 1. Supported lifecycle metadata produced a durable merge wake and poll retirement. Duplicate and command-shaped metadata produced an unauthenticated-check refusal and retained the poll. No GitHub writes were performed. Worker stop/relaunch actions themselves were not driven; the production stop-receipt writer and disposable persisted relaunch metadata supplied the parser inputs.
+- replay-live.py drove fm-bootstrap.sh with FM_BOOTSTRAP_NETWORK=skip against disposable homes containing pending-close records created by the production marker writer and real native queue records. Both ordinary and captain-held cases preserved metadata and pending-close bytes and left the row in flight. No actual Herdr pane existed in these cases.
+
+Herdr isolation attempt
+bin/fm-herdr-lab.sh prepare fm-lab-selfcheck-gate succeeded with HERDR_CONFIG_PATH and FM_HERDR_LAB_STATE_DIR inside the worktree, but its tripwire still resolved the operator default namespace. No session was provisioned.
+Adding worktree-local XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_STATE_HOME and XDG_CACHE_HOME, then running bin/fm-herdr-lab.sh prepare fm-lab-selfcheck-isolated, refused with: fleet-state tripwire requires exactly one running default session.
+The required helper forbids operating or creating a default session. Therefore a complete isolated real-Herdr interruption/restart/cleanup scenario could not be provisioned under this run's boundary. No default session or fleet pane was changed, no lab session was created, and no server required teardown. Supply a supported worktree-contained Herdr lab namespace with the required tripwire baseline, or explicit authority for the helper's named-session storage outside the worktree, to finish this check.
+
+Targeted supporting checks
+TMPDIR="$PWD/.test-phase-tmp" bash bin/fm-test-run.sh tests/fm-project-mode.test.sh tests/fm-fleet-sync.test.sh tests/fm-pr-check-security.test.sh --jobs 1
+Project-mode and fleet-sync passed. PR-security passed its new lifecycle cases but initially failed test_merged_poll_retires_once on its second watcher cycle.
+A bash -x diagnostic rerun got past that case; the trace itself contaminated an exact stderr assertion later in the suite. That diagnostic failure is not a product failure.
+TMPDIR="$PWD/.test-phase-tmp" bash bin/fm-test-run.sh tests/fm-pr-check-security.test.sh --jobs 1
+This clean rerun passed the entire subject. focused-pr.sh then passed test_merged_poll_retires_once three times. The initial intermittent failure's cause remains unresolved.
+focused-teardown.sh loaded the unchanged tests/fm-teardown.test.sh functions and ran only test_herdr_interrupted_cleanup_preserves_owner_across_replay and test_local_only_truly_unpushed_refuses. Both passed. This uses fake Herdr and is not live terminal-cleanup evidence.
+
+Acceptance limits
+No installation handoff or source-navigation change is present in the committed diff. The operator installation/private home is outside the permitted data and workspace boundary, and no sanitized before/after installation fixture or receipt was supplied. Those operational outcomes could not be independently verified.
+No screenshot was captured: validated changed surfaces are CLI/state contracts, and real Herdr provisioning was blocked before a rendered tab surface existed.
+No linters, formatters, static analysis, complete repository suite, installation, publication, or other gate phases were run. Disposable worktree data and drivers were removed after copies of the drivers and evidence were retained here.

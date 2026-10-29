@@ -1,0 +1,21 @@
+$ fm-project-mode.sh --raw historical
+direct-PR on
+
+$ fm-project-mode.sh --branch-prefix historical
+
+
+$ fm-project-mode.sh --forge historical
+none
+
+$ fm-project-mode.sh --retained-history historical
+on
+
+$ fm-fleet-sync.sh
+historical: skipped: retained historical clone (delivery policy unchanged)
+normal: synced 513ca4b..65f6dd6
+unlanded: STUCK: on branch unfinished with uncommitted changes, 1 commits behind origin/main - needs attention
+
+Observed: all retained refs and dirty bytes unchanged; normal clone fast-forwarded; unlanded branch and dirty bytes preserved.
+
+$ fm-fleet-sync.sh historical # annotation removed
+historical: STUCK: on branch unfinished with uncommitted changes, 1 commits behind origin/main - needs attention
