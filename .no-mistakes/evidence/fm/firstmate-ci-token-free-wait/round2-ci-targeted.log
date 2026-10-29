@@ -1,0 +1,44 @@
+PASS: four unchanged pending holds consumed in one shell before action
+PASS: controlled clock advances without real CI wait
+PASS: zero worker/supervisor model dispatches during pending holds
+PASS: only pipeline drive supplies green evidence
+PASS: forge verification only at actionable green return
+PASS: approval finding preserved verbatim
+PASS: failure retained rather than hidden by wait
+PASS: error stops safely
+PASS: near-elapsed stops safely
+PASS: new forge head cannot inherit stale green
+PASS: skipped CI remains explicit, never clean green
+PASS: pipeline rebase/revalidation waits without worker observation turns
+PASS: revalidation gate returns to original driver
+PASS: other-run stops safely
+PASS: other-branch stops safely
+PASS: broken stops safely
+PASS: missing required checks remain visible through pipeline gate
+PASS: pipeline head changes cannot inherit a prior forge head green
+PASS: matching new status and forge heads cannot launder an older drive green
+PASS: durable registration owns wait before listener recovery
+PASS: recovered pending listener emits zero supervisor dispatch events
+PASS: listener recovery dispatches no models
+PASS: action captured durably and queued
+PASS: one actionable transition produces one queued wake
+PASS: capture classified by owning adapter
+PASS: handled action not reannounced after reconcile/restart
+PASS: terminal wait retires so it cannot wake completed worker again
+PASS: entire exercised monitor path dispatches zero models
+PASS: public arm refuses repair without registering a wait
+PASS: public arm refuses a duplicate PR monitor
+PASS: public arm confirms durable CI listener
+PASS: repeated handoff cannot replace existing owner
+PASS: merge monitor refuses overlapping CI custody
+PASS: unconfirmed handoff retires its registration before driver resumes
+PASS: failed confirmation explicitly returns drive ownership
+PASS: real watcher completes repeated pending cycles
+PASS: unchanged CI produces zero pane-review/heartbeat dispatch events
+PASS: CI-owned task is never pane-captured for stale review
+PASS: without CI ownership same idle worker becomes actionable
+PASS: generated handoff command is present in either wait configuration
+PASS: generated worker command confirms actual listener in either posture
+PASS: generated handoff command is present in either wait configuration
+PASS: generated worker command confirms actual listener in either posture
+CI wait tests passed

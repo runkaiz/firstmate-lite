@@ -1,0 +1,49 @@
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6
+
+Generated worker contract, default configuration:
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6/data/task/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+When only CI remains running and every preceding step completed (a skipped rebase is allowed), delegate the next drive return using `FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6 FM_STATE_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6/state /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/bin/fm-procevent-ci.sh arm task`.
+
+Generated worker contract, wait-no-turns enabled:
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6/data/other/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+When only CI remains running and every preceding step completed (a skipped rebase is allowed), delegate the next drive return using `FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6 FM_STATE_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/.test-ci-phase-tmp/fm-lab.ms3KN6/state /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64NQZNA4524FEW9H0MMA1A8/bin/fm-procevent-ci.sh arm other`.
+
+Refuse invalid task and unsupported mode:
+error: invalid task id
+exit=1
+error: not a no-mistakes task
+exit=1
+
+Existing merge monitor prevents CI ownership:
+error: task already has a PR/custom monitor
+exit=1
+
+Register a durable CI source without starting a pipeline:
+registered: ci-livecheck (ci)
+SOURCE                       ADAPTER      OWNER      PENDING
+ci-livecheck                 ci           none       0
+
+Existing CI ownership prevents both duplicate CI and merge monitoring:
+error: CI wait already registered
+exit=1
+error: task has a delegated CI wait; handle its result before arming merge monitoring
+exit=1
+
+Restart the runner with a genuinely unavailable run in an empty isolated NM_HOME:
+ci_wait: monitor-error
+task: task
+run_id: LIVECHECK
+pr: https://github.com/example/repo/pull/1
+evidence:
+bound run/branch/PR unavailable or changed
+
+Durable wake:
+1793308359	1	check	procevent:ci-livecheck:1	check: procevent ci ci-livecheck 1
+
+Acknowledge twice, then reconcile after retirement:
+handled: ci-livecheck 1
+already-handled: ci-livecheck 1
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+no sources registered
+
+No new wake after acknowledgement; terminal CI source retired.
