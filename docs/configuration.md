@@ -592,6 +592,7 @@ The optional local, gitignored `config/wait-no-turns` presence flag opts this ho
 With it present, ship and scout briefs gain the `# Waiting` section and the foreground no-mistakes drive text, every brief's inbox section keeps the natural-checkpoint check and adds that a waiting worker does not poll or list its inbox because a waiting instruction rings, a pending-reply recovery waits while that mate has its own open decision or blocker, and a fire-and-forget steer whose doorbell did not land gets one later ring.
 With the file absent, generated briefs omit the waiting section and the no-poll inbox line, the drive text backgrounds the call, recovery sends during an open decision, and a fire-and-forget steer is not owed a retry ring.
 The flag is a home-local preference.
+The [CI-only worker handoff](#ci-only-worker-waits) is independent of this flag.
 
 ## No-mistakes pipeline spend (config/pipeline-spend)
 
@@ -1549,6 +1550,15 @@ Never run the registered blocking source command directly in a conversational tu
 
 A long-polling external process is registered as a *source* through its adapter, whose header and `--help` own the commands and flags.
 `bin/fm-procevent.sh` owns the generic contract; built-in adapters retain their tracked `bin/fm-procevent-<adapter>.sh` commands, while an explicitly bound external adapter routes through the trusted host contract above.
+
+### CI-only worker waits
+
+No-mistakes workers can delegate a CI-only wait to the existing process-event runner regardless of proactive mode or `config/wait-no-turns`; no additional monitoring service or setting is needed.
+After a confirmed handoff, unchanged pending CI consumes no worker or routine supervision-review turns; a drive response requiring action or a monitoring error returns through firstmate to the original worker.
+[`bin/fm-procevent-ci.sh`](../bin/fm-procevent-ci.sh) owns eligibility, listener confirmation, run and head binding, and exclusive monitoring; [`validation-supervision`](../.agents/skills/validation-supervision/SKILL.md) owns handling the captured result.
+The [verification record](verification/runtime-backends.md#ci-only-worker-waits) states the tested scope and live-evidence limits.
+
+### Lavish sources
 
 `bin/fm-procevent-lavish.sh` is the first built-in adapter and wraps the published `lavish-axi poll` interface plus `lavish-axi reply` when the installed version supports synchronous reply acceptance.
 
