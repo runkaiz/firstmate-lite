@@ -442,7 +442,7 @@ test_promotion_persists_the_selected_ship_branch() {
 # the worker executes, so a ref-format-valid metacharacter prefix must stay
 # literal there, exactly as it does in a generated ship brief.
 test_promotion_branch_command_is_shell_safe() {
-  local home id prefix marker meta instructions command repo branch
+  local home id prefix marker meta instructions command repo branch out
   home="$TMP_ROOT/promote-branch-shell-safe/home"
   marker="$TMP_ROOT/promote-branch-shell-safe-marker"
   id=promote-branch-safe-e3
@@ -454,9 +454,9 @@ test_promotion_branch_command_is_shell_safe() {
     || fail "shell-safe promotion scout brief should scaffold"
   fill_brief_subsections "$home/data/$id/brief.md" \
     "Promote the shell-safe fixture." "Use the configured branch exactly."
-  FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" "$PROMOTE" "$id" \
-    --mode local-only --yolo off --branch-prefix "$prefix" >/dev/null 2>&1 \
-    || fail "a ref-format-valid metacharacter prefix should promote safely"
+  out=$(FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" "$PROMOTE" "$id" \
+    --mode local-only --yolo off --branch-prefix "$prefix" 2>&1) \
+    || fail "a ref-format-valid metacharacter prefix should promote safely: $out"
   instructions="$home/data/$id/ship-instructions.md"
   # shellcheck disable=SC2016  # Single quotes are required: the sed expression holds literal backticks.
   command=$(sed -n 's/.*create your branch: `\(.*\)`\.$/\1/p' "$instructions")
@@ -1254,4 +1254,30 @@ test_spawn_requires_the_brief_to_carry_the_selected_branch
 test_spawn_notices_a_ship_branch_against_the_registry_prefix
 test_spawn_and_promote_require_filled_task_subsections
 test_project_mode_resolves_branch_prefix
+test_proactive_validation_handoff() {
+  local home baseline proactive restored
+  home="$TMP_ROOT/proactive-handoff"
+  mkdir -p "$home/config" "$home/state" "$home/data"
+  FM_HOME="$home" "$BRIEF" proactive-before fixture --mode no-mistakes >/dev/null
+  baseline=$(cat "$home/data/proactive-before/brief.md")
+  assert_contains "$baseline" 'Firstmate will then instruct you to run /no-mistakes' 'off lost baseline handoff'
+  printf 'on\n' > "$home/config/proactive"
+  FM_HOME="$home" "$BRIEF" proactive-after fixture --mode no-mistakes >/dev/null
+  proactive=$(cat "$home/data/proactive-after/brief.md")
+  assert_contains "$proactive" 'invoke /no-mistakes immediately on this same worker' 'on kept the redundant firstmate invocation'
+  assert_contains "$proactive" 'without an intermediate done declaration' 'on kept the implementation done wake'
+  assert_contains "$proactive" 'If mode is off or unreadable' 'handoff failed to re-evaluate authority'
+  assert_contains "$proactive" "$home/config" 'worker checks the wrong home preference'
+  assert_contains "$proactive" 'ask-user findings are never yours to answer' 'handoff waived decision ownership'
+  assert_contains "$proactive" 'Explicit validation stops, holds, unmet dependencies' 'handoff ignored explicit stops'
+  assert_not_contains "$proactive" 'Firstmate will then instruct you' 'on also rendered the old unconditional handoff'
+  printf 'off\n' > "$home/config/proactive"
+  FM_HOME="$home" "$BRIEF" proactive-restored fixture --mode no-mistakes >/dev/null
+  restored=$(cat "$home/data/proactive-restored/brief.md")
+  assert_contains "$restored" 'Firstmate will then instruct you to run /no-mistakes' 'off did not restore baseline'
+  assert_not_contains "$restored" 'invoke /no-mistakes immediately on this same worker' 'off retained proactive handoff'
+  pass 'proactive brief removes the implementation-to-validation round trip, checks current mode, and restores baseline when off'
+}
+
+test_proactive_validation_handoff
 echo "# all fm-task-delivery tests passed"

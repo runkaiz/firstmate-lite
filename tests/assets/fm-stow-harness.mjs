@@ -69,6 +69,21 @@ assert.deepEqual(prompts[0], prompts[1]);
 assert.equal(prompts[0].text, "/skill:ahoy detail");
 assert.equal(prompts[0].options.expandPromptTemplates, true);
 console.log("ok - ahoy and bearings use one command owner and mode expansion");
+for (const argument of ["", "on", "off", "status"]) {
+  await commands.get("proactive").handler(argument, ctx);
+  assert.equal(prompts.at(-1).text, `/skill:proactive ${argument}`);
+  assert.equal(prompts.at(-1).options.expandPromptTemplates, true);
+  assert.equal(prompts.at(-1).options.deliverAs, "followUp");
+}
+const proactivePromptCount = prompts.length;
+await commands.get("proactive").handler("maybe", ctx);
+assert.equal(prompts.length, proactivePromptCount);
+writeFileSync(`${home}/state/.lock`, "1\n");
+await commands.get("proactive").handler("on", ctx);
+assert.equal(prompts.length, proactivePromptCount);
+writeFileSync(`${home}/state/.lock`, `${process.pid}\n`);
+console.log("ok - proactive command routes toggle, on, off and status to its skill owner only from the owning session");
+prompts.splice(proactivePromptCount - 4);
 
 usage = { contextWindow: 200000, tokens: null };
 assert.equal(await fire("turn_end", turn), undefined);

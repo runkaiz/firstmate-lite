@@ -188,6 +188,9 @@ case "${1:-} ${2:-}" in
             rm -f "$FM_STATE_OVERRIDE/.afk-contract"
           fi
         fi
+        if [ -f "$FM_HOME/config/proactive-off-after-view" ]; then
+          printf 'off\n' > "$FM_HOME/config/proactive"
+        fi
         exit 0
         ;;
       *headRefOid*)
@@ -3561,3 +3564,61 @@ test_allow_missing_follows_the_allow_red_rules
 test_required_producer_identity
 test_app_bound_required_status_context_matches_by_name
 test_required_partial_reads_report_all_failures
+
+test_proactive_guarded_merge() {
+  local case_dir scenario rc head url
+  head=adadadadadadadadadadadadadadadadadadadad
+  url=https://github.com/example/repo/pull/84
+  for scenario in green off malformed revoked review-required changes-requested review-unreadable red missing hold queue; do
+    case_dir=$(make_case "proactive-$scenario")
+    add_gh_mocks "$case_dir" "$head"
+    # No standing yolo authority; proactive must not rewrite this task setting.
+    printf 'yolo=off\n' >> "$case_dir/state/task-x1.meta"
+    printf 'on\n' > "$case_dir/home/config/proactive"
+    jq '.reviewDecision = "APPROVED"' "$case_dir/github-view.json" > "$case_dir/view.tmp"
+    mv "$case_dir/view.tmp" "$case_dir/github-view.json"
+    case "$scenario" in
+      off) printf 'off\n' > "$case_dir/home/config/proactive" ;;
+      malformed) printf 'yes\n' > "$case_dir/home/config/proactive" ;;
+      revoked) : > "$case_dir/home/config/proactive-off-after-view" ;;
+      review-required|changes-requested|review-unreadable)
+        case "$scenario" in
+          review-required) jq '.reviewDecision = "REVIEW_REQUIRED"' "$case_dir/github-view.json" ;;
+          changes-requested) jq '.reviewDecision = "CHANGES_REQUESTED"' "$case_dir/github-view.json" ;;
+          review-unreadable) jq 'del(.reviewDecision)' "$case_dir/github-view.json" ;;
+        esac > "$case_dir/view.tmp"
+        mv "$case_dir/view.tmp" "$case_dir/github-view.json"
+        ;;
+      red)
+        jq '.statusCheckRollup[0].conclusion = "FAILURE"' "$case_dir/github-view.json" > "$case_dir/view.tmp"
+        mv "$case_dir/view.tmp" "$case_dir/github-view.json"
+        ;;
+      missing) write_github_required "$case_dir" classic:missing-ci ;;
+      hold)
+        FM_HOME="$case_dir/home" FM_STATE_OVERRIDE="$case_dir/state" \
+          "$ROOT/bin/fm-captain-hold.sh" hold task-x1 --title 'held task' --reason 'review first' >/dev/null
+        ;;
+      queue) printf 'merge_method=SQUASH\n' > "$case_dir/github-rules" ;;
+    esac
+    rc=0
+    run_pr_merge "$case_dir" task-x1 "$url" --proactive > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+    if [ "$scenario" = green ]; then
+      expect_code 0 "$rc" 'proactive green merge should succeed with yolo off'
+      assert_logged_gh_merge "$case_dir" 84 example/repo --squash
+      assert_grep 'yolo=off' "$case_dir/state/task-x1.meta" 'proactive rewrote task yolo'
+    else
+      [ "$rc" -ne 0 ] || fail "proactive $scenario should refuse"
+      assert_no_grep 'pr merge' "$case_dir/gh.log" "proactive $scenario reached the forge merge"
+    fi
+  done
+  for scenario in '--allow-red ci' '--allow-missing ci' '--attended-override'; do
+    rc=0
+    # Intentional argument splitting supplies the public option/value pair.
+    # shellcheck disable=SC2086
+    run_pr_merge "$case_dir" task-x1 "$url" --proactive $scenario > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+    expect_code 2 "$rc" 'proactive accepted a waiver or override'
+  done
+  pass 'proactive merges only green reviewed unheld synchronous PRs while mode remains on, without changing yolo'
+}
+
+test_proactive_guarded_merge
