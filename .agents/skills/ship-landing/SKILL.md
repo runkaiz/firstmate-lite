@@ -27,6 +27,8 @@ Tear down a ship task only after landing is confirmed.
 A teardown refusal for uncommitted or unlanded work is a stop-and-investigate result, never an obstacle to bypass.
 Never force teardown without explicit discard authority.
 After successful teardown, record completion, retain only the configured recent Done history, and re-evaluate queued work whose blockers and time gates have cleared.
+Treat the recorded worker, tab and disposable copy as one wrap-up through `bin/fm-teardown.sh`; an endpoint-only control exit is not task cleanup.
+If cleanup refuses or is interrupted, retain the task with the exact unresolved resource, refusal evidence and next safe action instead of marking wrap-up complete or repeatedly announcing unchanged idle workers.
 
 A secondmate is persistent and an empty queue is healthy.
 Retire one only on an explicit captain or main-firstmate decision, after loading `secondmate-provisioning`; its home must contain no work under way, and forced discard still requires explicit captain authority.

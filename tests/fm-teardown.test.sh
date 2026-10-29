@@ -34,7 +34,7 @@
 #   (k) no-mistakes + merged PR but HEAD moved afterward        -> REFUSE (stale PR)
 #   (l) no-mistakes + stale origin/main but fetched content     -> ALLOW  (fresh fetch)
 #   (m) no-mistakes + local HEAD ancestor of merged PR head     -> ALLOW  (lagging local)
-#   (n) no-mistakes + replayed unpushed patch in merged PR head -> ALLOW  (replayed local)
+#   (n) no-mistakes + replayed child with published unique parent -> REFUSE
 #   (o) fm-pr-check rerun after HEAD moved                      -> no stale pr_head
 #   (p) fm-pr-check when local HEAD lags                        -> record remote PR head
 #   (q) no-mistakes + NO pr= recorded, PR discovered by branch  -> ALLOW  (yolo/no-CI merge)
@@ -1014,7 +1014,7 @@ ROWS
   pass "native discovery rejects empty, ambiguous, malformed, incomplete and failed reads"
 }
 
-test_squash_merged_pr_allows_replayed_unpushed_patch() {
+test_squash_merged_pr_preserves_published_unique_parent() {
   local case_dir rc parent_head pr_head
   case_dir=$(make_case squash-replayed-patch)
   write_meta "$case_dir" no-mistakes ship
@@ -1032,9 +1032,10 @@ test_squash_merged_pr_allows_replayed_unpushed_patch() {
   rc=$?
   set -e
 
-  expect_code 0 "$rc" "squash-replayed-patch: teardown should succeed when unpushed local patch is in the merged PR head"
-  ! grep -q REFUSED "$case_dir/stderr" || fail "squash-replayed-patch: teardown printed a REFUSED line"
-  pass "squash-merged PR accepts replayed unpushed local patches contained in the PR head"
+  expect_code 1 "$rc" "squash-replayed-patch: published unique parent must not be treated as landed"
+  assert_grep REFUSED "$case_dir/stderr" 'published unique parent did not refuse'
+  [ -f "$case_dir/wt/local-parent.txt" ] || fail 'refusal lost published unique parent'
+  pass "squash-merged PR preserves published unique parent even when the unpushed child patch landed"
 }
 
 test_merged_pr_with_later_local_commit_refuses() {
@@ -4807,7 +4808,7 @@ test_squash_merged_branch_deleted_allows
 test_squash_merged_pr_allows_when_head_ancestor_of_pr_head
 test_no_pr_recorded_discovers_merged_pr_by_branch_allows
 test_native_branch_discovery_rejects_unproved_results
-test_squash_merged_pr_allows_replayed_unpushed_patch
+test_squash_merged_pr_preserves_published_unique_parent
 test_merged_pr_with_later_local_commit_refuses
 test_squash_merged_rebased_branch_allows
 test_squash_merged_same_file_different_content_refuses

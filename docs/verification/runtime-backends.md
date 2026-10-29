@@ -62,6 +62,23 @@ The lifecycle suites preserve dirty native work across an allocator-setting chan
 These checks submit no model prompts and authorize no production allocator switch.
 The native cleanup contract is deliberately more conservative than pooled scout discard; `bin/fm-git-worktree-lib.sh` owns it and the [configuration guide](../configuration.md#task-worktree-allocator-configworktree-allocator) records its supported limits.
 
+The native removal proof was refreshed on 2026-10-29 UTC with Git 2.56.0 and GNU Bash 5.3.9:
+
+```sh
+bash bin/fm-test-run.sh tests/fm-git-worktree.test.sh
+```
+
+```text
+ok - native cleanup accepts an explicit landed-work proof without weakening default ancestry or dirt gates
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+ok - native herdr teardown retries a missing endpoint but preserves unreadable and live owners
+ok - real native tmux worker owns one isolated copy; busy refusal and clean teardown preserve lifecycle guards
+```
+
+The rebased PR fixture publishes the original submission before rebasing, refuses an open PR and a separately published unique commit, then exercises interrupted removal and retirement replay.
+The same shared removal gate applies across harnesses; it introduces no vendor-output check.
+The fixture covers tmux and Herdr adapter paths; the unchanged Zellij, cmux and Orca endpoint owners retain their existing verification and limitations below.
+
 ## Worker profile evidence
 
 Verified on 2026-10-25 UTC with Pi 1.4.0 and Node 22.23.2 using the installed SDK, in-memory credentials/settings, an isolated resource loader and no prompt or network access.
@@ -137,7 +154,7 @@ The [Herdr guide](../herdr-backend.md#spawn-preflight-and-ci) owns the operator-
 
 ## Finished-delivery redraw bound
 
-Verified on 2026-10-21 UTC with GNU Bash 5.3.9 and the mocked tmux capture and crew-state fixtures in `tests/fm-watch-triage.test.sh`.
+Verified on 2026-10-29 UTC with GNU Bash 5.3.9 and the mocked tmux capture and crew-state fixtures in `tests/fm-watch-triage.test.sh`.
 These deterministic tests exercise the shared polling watcher in attended and away modes without launching a vendor harness or driving any real backend lifecycle.
 The bound consumes status presentation identity and the shared busy incarnation; backend capture, semantic busy detection, native push transitions and vendor classifiers retain their existing owners and verification below.
 Refresh the focused evidence with:
@@ -152,7 +169,7 @@ FM_TEST_ONLY=test_terminal_delivery_failed_append_keeps_first_delivery bash bin/
 Behavioral output:
 
 ```text
-ok - a delivery surfaces once across four settled hashes, re-surfaces on cadence, and resets on a new generation in attended and away modes
+ok - a delivery surfaces once across settled hashes, stays quiet after twelve hours, and resets on a new generation in attended and away modes
 ok - a new delivery, decision, blocker or failure after done still surfaces
 ok - authoritative resumed activity clears the delivery bound and preserves the next first sight
 ok - a failed durable append cannot suppress the first delivery on retry

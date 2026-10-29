@@ -209,6 +209,34 @@ git -C "$PROJ" remote set-url origin "file://$CASE/origin.git"
 remove_copy landed || fail 'native merged remote copy could not retire'
 pass 'native safety refreshes only its recorded remote ref and fails closed on refresh failure'
 
+make_case rebased-delivery
+allocate rebased || fail 'rebased fixture allocation failed'
+WT=$FM_GIT_WORKTREE_PATH
+printf 'delivered\n' > "$WT/delivered"
+git -C "$WT" add delivered
+git -C "$WT" -c user.name=test -c user.email=test@example.invalid commit -qm original
+original=$(git -C "$WT" rev-parse HEAD)
+printf 'new base\n' > "$PROJ/new-base"
+git -C "$PROJ" add new-base
+git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid commit -qm advance
+git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid cherry-pick "$original" >/dev/null
+if remove_copy rebased; then fail 'default native source gate accepted non-ancestral HEAD'; fi
+native_delivered() {
+  [ "$(git -C "$WT" merge-tree --write-tree "refs/heads/$MAIN" HEAD)" = "$(git -C "$PROJ" rev-parse 'HEAD^{tree}')" ]
+}
+if fm_git_worktree_safe "$HOME_DIR/state" rebased "$HOME_DIR" "$PROJ" "$WT" missing_proof; then
+  fail 'missing landed proof was accepted'
+fi
+printf 'private evidence\n' > "$WT/private"
+if fm_git_worktree_safe "$HOME_DIR/state" rebased "$HOME_DIR" "$PROJ" "$WT" native_delivered; then
+  fail 'landed proof bypassed untracked preservation'
+fi
+rm "$WT/private"
+fm_git_worktree_remove "$HOME_DIR/state" rebased "$HOME_DIR" "$PROJ" "$WT" native_delivered \
+  || fail 'proved rebased delivery could not be removed'
+[ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/rebased.git-worktree" ] || fail 'rebased cleanup left resources'
+pass 'native cleanup accepts an explicit landed-work proof without weakening default ancestry or dirt gates'
+
 for kind in ship scout remote; do
   make_case "source-$kind"
   # Local and origin share a base but then diverge, matching the recurrence.
@@ -253,9 +281,10 @@ for kind in ship scout remote; do
   pass "native $kind selects exact accepted source on divergence and refuses duplicate spawn"
 done
 
-for scenario in tmux-manual tmux-close tmux-retain herdr-manual; do
+for scenario in tmux-manual tmux-rebased tmux-close tmux-retain herdr-manual; do
   backend=${scenario%%-*}
   retirement=${scenario#*-}
+  [ "$retirement" != rebased ] || retirement=manual
   make_case "missing-$scenario"
   printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
   id=missing-endpoint
@@ -271,7 +300,35 @@ for scenario in tmux-manual tmux-close tmux-retain herdr-manual; do
   fi
   allocate "$id" || fail 'missing endpoint fixture allocation failed'
   WT=$FM_GIT_WORKTREE_PATH
+  native_mode=local-only
+  if [ "$scenario" = tmux-rebased ]; then
+    native_mode=no-mistakes
+    git clone -q --bare "$PROJ" "$CASE/origin.git"
+    git -C "$PROJ" remote add origin "$CASE/origin.git"
+    git -C "$PROJ" fetch -q origin
+    printf 'original delivery\n' > "$WT/delivered"
+    git -C "$WT" add delivered
+    git -C "$WT" -c user.name=test -c user.email=test@example.invalid commit -qm original
+    original=$(git -C "$WT" rev-parse HEAD)
+    git -C "$WT" push -q origin HEAD:refs/heads/original-submission
+    git -C "$PROJ" fetch -q origin
+    printf 'new base\n' > "$PROJ/advance"
+    git -C "$PROJ" add advance
+    git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid commit -qm advance
+    git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid cherry-pick "$original" >/dev/null
+    native_pr_head=$(git -C "$PROJ" rev-parse HEAD)
+    git -C "$PROJ" push -q origin "$MAIN"
+  fi
   fakebin=$(fm_fakebin "$CASE/fake")
+  cat > "$fakebin/gh" <<'SH'
+#!/usr/bin/env bash
+if [ "$1 $2" = 'pr view' ]; then
+  printf '%s\t%s\thttps://example.invalid/fixture/project/pull/1\n' "${FM_TEST_NATIVE_PR_STATE:-MERGED}" "${FM_TEST_NATIVE_PR_HEAD:?}"
+else
+  exit 1
+fi
+SH
+  chmod +x "$fakebin/gh"
   printf '#!/usr/bin/env bash\nexit 0\n' > "$fakebin/no-mistakes"
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
@@ -303,8 +360,11 @@ SH
   [ "$backend" != herdr ] || target=native-fixture:w1:p1
   fm_write_meta "$HOME_DIR/state/$id.meta" \
     "window=$target" "endpoint_task_id=$id" "backend=$backend" \
-    "worktree=$WT" "project=$PROJ" 'kind=ship' 'mode=local-only' \
+    "worktree=$WT" "project=$PROJ" 'kind=ship' "mode=$native_mode" \
     'spawn_gen=s1792922400.123.456' 'allocator=git'
+  if [ "$scenario" = tmux-rebased ]; then
+    printf 'pr=https://example.invalid/fixture/project/pull/1\n' >> "$HOME_DIR/state/$id.meta"
+  fi
   if [ "$backend" = herdr ]; then
     printf '%s\n' 'herdr_session=native-fixture' 'herdr_workspace_id=w1' \
       'herdr_tab_id=w1:t1' 'herdr_pane_id=w1:p1' >> "$HOME_DIR/state/$id.meta"
@@ -314,12 +374,31 @@ SH
       FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
       FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
       FM_TEST_HERDR_SOCKET="$CASE/herdr.sock" \
+      FM_TEST_NATIVE_PR_HEAD="${native_pr_head:-}" \
       bash "$ROOT/bin/fm-teardown.sh" "$id"
   }
   if out=$(FM_TEST_ENDPOINT_UNREADABLE=1 run_native_teardown 2>&1); then
     fail "$backend unreadable endpoint permitted native removal"
   fi
   assert_contains "$out" 'live or unverified endpoint' "$backend refused for the wrong reason"
+  if [ "$scenario" = tmux-rebased ]; then
+    if out=$(FM_TEST_NATIVE_PR_STATE=OPEN run_native_teardown 2>&1); then
+      fail 'native teardown accepted an unmerged rebased PR'
+    fi
+    assert_contains "$out" 'not proven landed' 'open PR failed for an unrelated reason'
+    git -C "$WT" switch -qc retained-unique-work
+    printf 'unique work\n' > "$WT/unique"
+    git -C "$WT" add unique
+    git -C "$WT" -c user.name=test -c user.email=test@example.invalid commit -qm unique
+    git -C "$WT" push -q origin HEAD:refs/heads/unique-published
+    git -C "$PROJ" fetch -q origin
+    if out=$(run_native_teardown 2>&1); then
+      fail 'native teardown discarded unique work beside the merged patch'
+    fi
+    assert_contains "$out" 'not proven landed' 'unique commit failed for an unrelated reason'
+    [ -f "$WT/unique" ] && [ -f "$HOME_DIR/state/$id.meta" ] || fail 'unique-work refusal lost evidence'
+    git -C "$WT" checkout -q --detach "$original"
+  fi
   bash -c 'cd "$1" && printf ready > "$2" && exec sleep 60' _ "$WT" "$CASE/ready" &
   owner=$!
   for _ in $(seq 1 100); do [ ! -f "$CASE/ready" ] || break; sleep 0.01; done

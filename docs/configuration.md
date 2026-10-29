@@ -398,10 +398,10 @@ Local-only ships and scouts of registered local-only projects select accepted lo
 Other fresh allocations select current origin history when origin is configured, otherwise the local default branch; interrupted allocations and relaunch retain their recorded copy.
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 
-Native cleanup conservatively requires exact ancestry in the recorded source ref and no dirty or untracked content, including ignored files, even for scouts.
+Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard.
 Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them.
-This can retain copies after a squash merge whose content landed without preserving HEAD ancestry.
+PR ships use the task's merged-delivery proof across pipeline rebases; local-only ships and scouts retain the recorded source-ancestry requirement.
 Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
 
 ## Runtime backend (config/backend / FM_BACKEND)

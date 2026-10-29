@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # allocator=git metadata selects native removal regardless of current config;
 # absent allocator keeps legacy pooled/Orca behavior. Native copies always face
-# bin/fm-git-worktree-lib.sh's exact ownership, clean/untracked and source-ancestry
-# gates, even scouts; --force is unsupported. A live/unverified owner refuses.
+# bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
+# PR ships use this script's existing landed-work proof, while local-only ships
+# and scouts require source ancestry. --force is unsupported. A live/unverified owner refuses.
 # Only the recorded idle endpoint is closed; remaining copy processes refuse
 # removal rather than being reaped. Git removal uses no force and keeps branch
 # refs. An interrupted removal with an absent, unregistered copy retires only
@@ -750,7 +751,8 @@ WORKTREE_ALLOCATOR=$(fm_git_worktree_meta_allocator "$META" "$STATE/$ID.git-work
 case "$WORKTREE_ALLOCATOR" in treehouse|git) ;; *) echo 'REFUSED: unknown recorded worktree allocator' >&2; exit 1 ;; esac
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
-  fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  if [ -d "$WT" ]; then fm_git_worktree_clean "$WT" || exit 1; fi
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
     native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
     case "$native_endpoint_state" in
@@ -1003,8 +1005,8 @@ patch_id_for_commit() {
     | awk 'NR == 1 { print $1 }'
 }
 
-unpushed_patches_are_in_pr_head() {
-  local pr_head=$1 current base pr_patch_ids commit patch_id unpushed
+local_patches_are_in_pr_head() {
+  local pr_head=$1 current base pr_patch_ids commit patch_id local_commits
   current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
   base=$(git -C "$WT" merge-base "$current" "$pr_head" 2>/dev/null) || return 1
   pr_patch_ids=$(
@@ -1016,15 +1018,18 @@ unpushed_patches_are_in_pr_head() {
       | sort -u
   ) || return 1
   [ -n "$pr_patch_ids" ] || return 1
-  unpushed=$(git -C "$WT" log --format=%H HEAD --not --remotes -- 2>/dev/null) || return 1
-  [ -n "$unpushed" ] || return 1
+  # Remote reachability does not prove landing: the original branch can remain
+  # published after a pipeline rebase, and other published work can be unique.
+  # Check every commit on the local side of this exact PR's divergence.
+  local_commits=$(git -C "$WT" log --format=%H "$base..$current" -- 2>/dev/null) || return 1
+  [ -n "$local_commits" ] || return 1
   while IFS= read -r commit; do
     [ -n "$commit" ] || continue
     patch_id=$(patch_id_for_commit "$commit") || return 1
     [ -n "$patch_id" ] || return 1
     printf '%s\n' "$pr_patch_ids" | grep -qxF "$patch_id" || return 1
   done <<EOF
-$unpushed
+$local_commits
 EOF
 }
 
@@ -1052,7 +1057,7 @@ pr_is_merged() {
   current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
   if git -C "$WT" merge-base --is-ancestor "$current" "$head" 2>/dev/null; then
     landed=1
-  elif unpushed_patches_are_in_pr_head "$head"; then
+  elif local_patches_are_in_pr_head "$head"; then
     landed=1
   fi
   [ "$landed" = 1 ] || return 1
@@ -2253,6 +2258,20 @@ if [ "$BACKEND" = orca ] && [ "$KIND" != scout ] && [ "$KIND" != secondmate ] &&
   ORCA_PATH_MATCH_VERIFIED=1
 fi
 
+NATIVE_LANDING_CHECK=()
+teardown_native_pr_landed() {
+  local branch
+  branch=$(git -C "$WT" rev-parse --abbrev-ref HEAD) || return 1
+  work_is_landed "$branch"
+}
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  if [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
+    NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
+  fi
+  fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
+    "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+fi
+
 if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
   if validate_worktree_teardown_safety; then
     :
@@ -2568,7 +2587,8 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free' >&2; exit 1; }
     [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
   fi
-  fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
+    "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
 fi
 
 remove_grok_turnend_auth "$STATE" "$ID" || exit 1
