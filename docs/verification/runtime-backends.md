@@ -28,7 +28,7 @@ CI wait tests passed
 ```
 
 The shared runner and watcher path is independent of worker harness and runtime backend; no native harness output, keybinding or backend lifecycle command is added.
-The portable integration uses an idle tmux fixture and the real watcher, with controlled pending holds and the real durable process-event registration/capture/acknowledgement path.
+The portable integration uses simulated tmux responses for an idle worker and the real watcher, with controlled pending holds and the real durable process-event registration/capture/acknowledgement path.
 Claude, Codex, OpenCode, Pi, Pi-signed, Grok, Kimi, Cursor, OMP, Gemini, Muse, Rovo, AGY and Devin receive the same generated handoff instruction; tmux, Herdr, zellij, Orca and cmux use the same registered-source custody.
 This is shared-path coverage, not live proof for each harness/backend or evidence that an agent interprets every instruction correctly.
 Missing-check and revalidation cases exercise no-mistakes' response contract with fixtures; no real forge check was evaluated, no live worker was changed, and no Herdr lifecycle test ran.
@@ -1076,7 +1076,7 @@ Pi 0.87.1 was installed but not verified: its configured model returned an accou
 
 ## Waiting-worker command ceilings
 
-The `# Waiting` section of the ship and scout briefs (`bin/fm-brief.sh`) has a worker hold every external wait inside one blocking shell command, bounded by what its harness lets one command run.
+The `# Waiting` section of the ship and scout briefs (`bin/fm-brief.sh`) bounds worker-owned blocking waits by what the harness lets one command run; the [CI-only handoff](../configuration.md#ci-only-worker-waits) is the exception.
 That section is generated only when `config/wait-no-turns` is present.
 Those bounds were read from the installed vendor code on 2026-09-11, macOS arm64, with Pi 0.85.1, codex-cli 0.154.0, and Claude Code 2.1.268.
 
