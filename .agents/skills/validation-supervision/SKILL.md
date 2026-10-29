@@ -9,7 +9,7 @@ metadata:
 # Validation supervision
 
 For a no-mistakes ship, follow the generated handoff owned by `bin/fm-dod-lib.sh`; when it calls for firstmate invocation after the implementation commit, use the same worker and the harness invocation owned by `harness-adapters`.
-The task worker that starts a no-mistakes run drives the pipeline and owns every `no-mistakes axi run` and `no-mistakes axi respond` call through the next gate or outcome.
+The task worker that starts a no-mistakes run owns pipeline decisions through the next gate or outcome; `bin/fm-procevent-ci.sh` owns the supported CI-only drive-wait delegation and its exact commands.
 Firstmate never invokes `no-mistakes axi respond` for a crew-owned run.
 `bin/fm-dod-lib.sh` owns the worker-side `--intent` contract.
 Once validation starts, prefer routing new requirements to follow-up work rather than expanding the current task, unless a new requirement completely invalidates the work being validated; however, the smallest downstream changes needed to keep already accepted product or engineering behavior correct, add behavioral tests where an executable contract exists, or keep documentation accurate remain within the current task even when they touch files not named at intake, and corrections required to satisfy already accepted intent are not new requirements.
@@ -30,3 +30,10 @@ Judge validation by the resolved state line from [`bin/fm-crew-state.sh`](../../
 Workers parked at approval or fix-review must follow the active gate help.
 A worker hand-editing, committing, aborting, or restarting during an active validation run duplicates pipeline ownership outside the supersession sequence above; steer it back to the gate response flow.
 The worker reports the PR when CI first becomes green rather than waiting for merge monitoring to finish.
+
+On a `procevent ci` result, read the exact capture and its adapter classification before acknowledging it.
+It is a drive response or monitoring error for the original worker, never independent authority to declare a run passed.
+If that worker already reported CI-ready done, acknowledge and retire the captured wait without waking the completed worker.
+Otherwise send the original worker the captured result path once, telling it to read the response and reattach or handle its gate through no-mistakes, then acknowledge the process-event sequence after the durable steer succeeds.
+A replay must reconcile the task's steering inbox before sending the same captured source/sequence again.
+Do not answer a gate, run a parallel CI or merge poll, or turn unchanged registered CI waits into routine status-review turns.

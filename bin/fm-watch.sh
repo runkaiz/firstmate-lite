@@ -2736,6 +2736,11 @@ EOF
     # Steering-inbox loss detection runs before the secondmate stale
     # exemption below, because a mate's steers land in an inbox too.
     [ -z "$task" ] || inbox_steer_check "$w" "$task"
+    # The CI adapter owns liveness and actionable outcomes, including restart
+    # repair. An unchanged parked worker needs no pane-stale recheck as well.
+    if [ -n "$task" ] && fm_procevent_ci_waiting "$STATE" "$task" "$FM_ROOT"; then
+      continue
+    fi
     key=$(window_key "$w")
     last=$(status_declared_wait_line "$STATE/$task.status")
     if ! status_is_paused_or_captain_held "$last" && [ -e "$STATE/.paused-$key" ]; then

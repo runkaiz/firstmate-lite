@@ -282,8 +282,9 @@ fm_ask_user_escalation_block() {  # <data-dir> <task-id>
 EOF
 }
 
-fm_nm_driving_block() {  # <forge>
-  local pr_return_line='' pr_reattach_clause=';' drive_block wait_cfg
+fm_nm_driving_block() {  # <forge> <task-id>
+  local pr_return_line='' pr_reattach_clause=';' drive_block wait_cfg ci_command
+  printf -v ci_command 'FM_HOME=%q FM_STATE_OVERRIDE=%q %q arm %q' "${FM_HOME:-${FM_ROOT:-}}" "${STATE:-${FM_HOME:-${FM_ROOT:-}}/state}" "${BASH_SOURCE[0]%/*}/fm-procevent-ci.sh" "${2:-}"
     pr_return_line="Only a drive call's return reports the green PR: \`no-mistakes axi status\` shows progress but never reports \`checks-passed\` while the ci step is still monitoring the PR for merge, so never wait on a status poll for the next gate or outcome.
 "
     pr_reattach_clause="; once checks are green it returns \`checks-passed\` immediately, and"
@@ -317,6 +318,17 @@ This replaces the no-mistakes skill's advice to enrich \`--intent\` with decisio
 Do not hand-edit, commit, or fix findings yourself while a run is active - the pipeline applies every fix.
 
 $drive_block
+
+CI-only exception to the reattachment instructions above (always enabled, independent of proactive mode or wait configuration): after an elapsed drive hold, inspect \`no-mistakes axi status\` once.
+When only CI remains running and every preceding step completed (a skipped rebase is allowed), delegate the next drive return using \`$ci_command\`.
+On confirmed listener success, append one \`paused [at=<epoch>]: CI wait delegated; waiting for the bound no-mistakes gate or outcome\` status and END YOUR TURN.
+Do not run another drive, forge watch, inbox poll, timer or background monitor while that registration owns the wait.
+The existing runner handles pending holds without model turns and wakes firstmate only for action or a broken monitor.
+If arming refuses before registration or confirms retirement, retain drive ownership and report the refusal.
+If it names an existing or uncertain registration, stop driving and report the ownership issue to firstmate instead of starting a parallel drive.
+Never claim an unconfirmed handoff.
+When firstmate returns the captured result, read it and resume the original run through its supported AXI drive/gate commands; the capture never independently proves pipeline success.
+
 A killed or timed-out call is never evidence the daemon died: the daemon accepts your response immediately and runs the round in the background, so the call was only ever waiting for a read while the run kept working.
 Reattach and keep going rather than reporting the pipeline blocked; rule 7 owns the checks that decide when a pipeline block is real.
 
@@ -423,7 +435,7 @@ The task is complete only when committed on your branch.
 $handoff
 ${nm_base}
 EOF
-      fm_nm_driving_block "$forge"
+      fm_nm_driving_block "$forge" "$id"
       cat <<EOF
 
 After /no-mistakes reports CI green (the CI-ready return point - do not wait for it to keep monitoring in the background until merge), read the PR back from the forge and confirm it is not a draft $draft_check

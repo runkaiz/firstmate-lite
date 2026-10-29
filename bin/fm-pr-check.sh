@@ -31,6 +31,8 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-wake-lib.sh"
 # shellcheck source=bin/fm-dod-lib.sh
 . "$SCRIPT_DIR/fm-dod-lib.sh"
+# shellcheck source=bin/fm-procevent-lib.sh
+. "$SCRIPT_DIR/fm-procevent-lib.sh"
 
 if [ "$#" -ne 2 ]; then
   echo "error: invalid PR check request" >&2
@@ -41,6 +43,15 @@ RAW_URL=$2
 if ! fm_pr_task_id_valid "$ID" || ! fm_pr_url_parse "$RAW_URL"; then
   echo "error: invalid PR check request" >&2
   exit 2
+fi
+# Serialize both directions of the CI-to-merge handoff, including the interval
+# between checking for an existing owner and publishing its registration.
+CI_WAIT_LOCK="$STATE/.ci-wait-$ID.lock"
+fm_lock_acquire_wait "$CI_WAIT_LOCK" || exit 1
+trap 'fm_lock_release "$CI_WAIT_LOCK" || true' EXIT
+if fm_procevent_ci_waiting "$STATE" "$ID" "$FM_ROOT"; then
+  echo "error: $ID has a delegated CI wait; handle its result before arming merge monitoring" >&2
+  exit 1
 fi
 URL=$FM_PR_URL
 PROVIDER=$FM_PR_PROVIDER
@@ -125,6 +136,7 @@ pr_check_cleanup() {
     fm_lock_release "$META_LOCK" || true
     META_LOCK_HELD=0
   fi
+  fm_lock_release "$CI_WAIT_LOCK" || true
 }
 trap pr_check_cleanup EXIT
 trap 'exit 1' HUP INT TERM

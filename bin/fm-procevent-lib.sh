@@ -48,6 +48,26 @@ fm_procevent_source_id_valid() {
   [ "${#id}" -le 64 ]
 }
 
+# A CI-only task has handed its next AXI drive return to the existing runner.
+# Registration, rather than shell liveness, owns this wait across restarts;
+# reconcile reports a missing/broken listener through the ordinary wake queue.
+# This predicate licenses only suppression of routine pane/heartbeat reviews.
+fm_procevent_ci_waiting() {  # <state> <task-id> <code-root>
+  local state=$1 task=$2 root=$3 record wt
+  fm_pr_task_id_valid "$task" || return 1
+  wt=$(sed -n 's/^worktree=//p' "$state/$task.meta" 2>/dev/null | tail -1)
+  [ -n "$wt" ] || return 1
+  for record in "$state"/procevent/ci-*.source; do
+    fm_pr_private_file_valid "$record" 600 "$(fm_pr_file_device "$state")" || continue
+    # Remaining argv bind the globally unique run, branch and PR. The adapter
+    # checks those before every drive. Never execute a registration as shell.
+    if [ "$(sed -n '1,7p' "$record")" = "$(printf '%s\n' adapter=ci argc=7 argv: "$root/bin/fm-procevent-ci.sh" poll "$task" "$wt")" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 fm_procevent_adapter_valid() {
   local a=${1-}
   case "$a" in
