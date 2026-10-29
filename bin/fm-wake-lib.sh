@@ -880,44 +880,46 @@ _fm_recovery_marker_ack() {
 }
 
 _fm_recovery_marker_arm_check() {
+  local status=0
+  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || return 1
+  fm_recovery_marker_arm_check_locked "$1" || status=$?
+  fm_lock_release "$FM_WAKE_QUEUE_LOCK"
+  return "$status"
+}
+
+# Caller owns the queue lock through notification selection and delivery.
+fm_recovery_marker_arm_check_locked() {
   local marker=$1 lock line quarantine
   FM_RECOVERY_MARKER_ACTION='none'
   lock="${marker}.lock"
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || return 1
   if ! fm_lock_acquire_wait "$lock"; then
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 1
   fi
   if [ ! -e "$marker" ] && [ ! -L "$marker" ]; then
     if [ -s "$FM_WAKE_QUEUE" ]; then
       if ! _fm_recovery_marker_write_locked "$marker" downtime "" announced; then
         fm_lock_release "$lock"
-        fm_lock_release "$FM_WAKE_QUEUE_LOCK"
         return 1
       fi
       FM_RECOVERY_MARKER_ACTION='recover'
     fi
     fm_lock_release "$lock"
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 0
   fi
   if ! fm_recovery_marker_read "$marker"; then
     quarantine=$(mktemp -d "${marker}.invalid.XXXXXX") \
       || {
         fm_lock_release "$lock"
-        fm_lock_release "$FM_WAKE_QUEUE_LOCK"
         return 1
       }
     if ! mv -- "$marker" "$quarantine/marker" \
       || ! _fm_recovery_marker_write_locked "$marker" downtime "" announced; then
       rmdir "$quarantine" 2>/dev/null || true
       fm_lock_release "$lock"
-      fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       return 1
     fi
     FM_RECOVERY_MARKER_ACTION='recover'
     fm_lock_release "$lock"
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 0
   fi
   line=$FM_RECOVERY_MARKER_TOKEN
@@ -925,13 +927,11 @@ _fm_recovery_marker_arm_check() {
     pending:handling:*|announced:handling:*|announced:downtime:*)
       FM_RECOVERY_MARKER_ACTION='wait'
       fm_lock_release "$lock"
-      fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       return 0
       ;;
     pending:downtime:*)
       if ! _fm_recovery_marker_write_locked "$marker" downtime "${line##*:}" announced; then
         fm_lock_release "$lock"
-        fm_lock_release "$FM_WAKE_QUEUE_LOCK"
         return 1
       fi
       FM_RECOVERY_MARKER_TOKEN="announced:downtime:${line##*:}"
@@ -941,7 +941,6 @@ _fm_recovery_marker_arm_check() {
       if [ -s "$FM_WAKE_QUEUE" ]; then
         if ! _fm_recovery_marker_write_locked "$marker" downtime "" announced; then
           fm_lock_release "$lock"
-          fm_lock_release "$FM_WAKE_QUEUE_LOCK"
           return 1
         fi
         # shellcheck disable=SC2034 # Output read by callers after this function returns.
@@ -950,7 +949,6 @@ _fm_recovery_marker_arm_check() {
       ;;
   esac
   fm_lock_release "$lock"
-  fm_lock_release "$FM_WAKE_QUEUE_LOCK"
 }
 
 # Apply the owner-documented announced-episode arm transition atomically with
