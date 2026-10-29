@@ -9,7 +9,8 @@
 # they must be corrected explicitly rather than silently receiving GitHub delivery.
 # --branch-prefix returns the registered branch= value, default fm/; an empty
 # registered value means a bare task-id branch.
-# --retained-history prints on for an explicit retained-history annotation,
+# --retained-history prints on for retained-history inside the registry entry's
+# bracketed annotations (for example [no-mistakes retained-history]),
 # otherwise off. It does not change delivery mode, merge authority or refs.
 # Registry input is the active home data/projects.md; no configuration is written.
 # Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history] <project-name>
@@ -46,8 +47,7 @@ fi
 # `forge`, then "posture <mode> <yolo> <forge> <retained> <branch-prefix>" (branch-prefix is
 # the raw prefix, defaulting to "fm/"; forge is `none` or the whole `forge=<value>`
 # token, so an empty value survives the split), or nothing if the project is
-# absent. Every other token beside the mode is ignored, exactly as before either
-# annotation existed.
+# absent.
 parsed=$(awk -v n="$NAME" '
   function dist(x, y,   i, j, lx, ly, d, c, v) {
     lx = length(x); ly = length(y);

@@ -1330,6 +1330,7 @@ In a read-only session that did not get the fleet lock, the same line is advisor
 **Project refresh at startup**
 
 The locked session-start deferred network stage runs bootstrap's best-effort project clone refresh through `fm-fleet-sync.sh`; [`fm-bootstrap.sh`'s header](../bin/fm-bootstrap.sh) owns the exact clone-refresh overlap, liveness-before-convergence, per-mate concurrency, ordered diagnostic replay, and sequential-fallback contract.
+For deliberately retained historical clones, use the registry annotation owned by [`fm-project-mode.sh`](../bin/fm-project-mode.sh); [`fm-fleet-sync.sh`](../bin/fm-fleet-sync.sh) owns its refresh exclusion.
 
 - It emits `FLEET_SYNC:` for skipped refreshes that may matter, recovered self-heals, and `STUCK:` alarms.
 - Normal completed runs keep local-only and no-origin skips silent.

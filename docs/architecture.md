@@ -305,7 +305,7 @@ It also owns the named-head reachability gate that refuses a ship `done:` while 
 It is also the one owner of the no-mistakes `--intent` contract those workers follow.
 `data/projects.md` records each project's standing posture and optional `+yolo` merge flag as the captain's default and as context for that decision, including the conditional `no-mistakes-prod-only` policy; a ship spawn that drops below the registered rigor prints a deviation notice and continues.
 Only GitHub and local delivery are supported; unsupported legacy forge bindings refuse dispatch.
-`bin/fm-project-mode.sh` remains the one registry parser for the mechanical consumers that have no task in hand: fleet sync's `local-only` skip and home seeding's refusal and no-mistakes initialization.
+`bin/fm-project-mode.sh` remains the one registry parser for the mechanical consumers that have no task in hand: fleet sync's refresh exclusions and home seeding's refusal and no-mistakes initialization.
 The registry's optional `branch=<prefix>` annotation overrides a project's ship-branch prefix (default `fm/`) the same way: firstmate resolves it via `bin/fm-project-mode.sh --branch-prefix` at intake and passes it explicitly to `bin/fm-brief.sh --branch-prefix`, which never reads the registry itself; each script's own header owns its side of that contract.
 A task's base branch is a per-task choice with no registry entry: `bin/fm-brief.sh --base-branch` records it in the brief, spawn records `base_branch=` in task meta, and the worker's pull request targets that branch; review, cleanup, and promotion read the recorded value instead of the default branch.
 The [`fm-spawn.sh` header](../bin/fm-spawn.sh) owns allocator-specific source selection and relaunch behavior.
