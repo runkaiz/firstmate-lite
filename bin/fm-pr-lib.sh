@@ -256,7 +256,7 @@ fm_pr_regular_destination_on_device_or_absent() {
 }
 
 fm_pr_metadata_identity_parse() {
-  local file=$1 line value pr_count=0 seen_pr=0 post_pr_invalid=0
+  local file=$1 line value pr_count=0 head_count=0 stop_count=0 relaunch_count=0 seen_pr=0 post_pr_invalid=0
   FM_PR_META_PROVIDER=
   FM_PR_META_URL=
   FM_PR_META_HOST=
@@ -280,10 +280,24 @@ fm_pr_metadata_identity_parse() {
         seen_pr=1
         ;;
       pr_head=*)
-        if [ "$seen_pr" -eq 1 ]; then
-          value=${line#pr_head=}
-          fm_pr_head_valid "$value" || post_pr_invalid=1
-        fi
+        head_count=$((head_count + 1))
+        [ "$head_count" -eq 1 ] || return 1
+        value=${line#pr_head=}
+        fm_pr_head_valid "$value" || return 1
+        ;;
+      afk_worker_stopped=*)
+        # The stop owner appends its generation after PR readiness. This is
+        # bookkeeping, never authority to execute or retire a PR poll.
+        stop_count=$((stop_count + 1))
+        [ "$stop_count" -eq 1 ] || return 1
+        value=${line#afk_worker_stopped=}
+        [[ "$value" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || return 1
+        ;;
+      control_relaunch_tx=*)
+        relaunch_count=$((relaunch_count + 1))
+        [ "$relaunch_count" -eq 1 ] || return 1
+        value=${line#control_relaunch_tx=}
+        [[ "$value" =~ ^[0-9]+\.[0-9]{8}T[0-9]{6}Z\.[0-9]+$ ]] || return 1
         ;;
       x_request=*|x_request_ts=*|x_followups=*|x_platform=*|x_reply_max_chars=*)
         ;;

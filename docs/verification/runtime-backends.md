@@ -1292,6 +1292,20 @@ No reasoning-effort axis was found; `gemini --help` on 0.58.0 exposes no effort,
 
 ## Herdr
 
+### Interrupted cleanup ownership
+
+Portable verification on 2026-10-29 used Bash 5.3.9, Git 2.56.0 and a fake Herdr executable; no live terminal lifecycle was driven.
+`tests/fm-teardown.test.sh` case `test_herdr_interrupted_cleanup_preserves_owner_across_replay` terminates only its fixture teardown after the pending close is written and before the pane closes.
+Both ordinary and captain-held variants retain byte-identical endpoint metadata and the pending close through restart replay, then finish through guarded teardown without closing an unrelated pane or losing the hold.
+The focused case reports:
+
+```text
+ok - interrupted flat Herdr cleanup retains ownership through restart replay and guarded retry preserves holds
+```
+
+The complete regression entry point is `bash bin/fm-test-run.sh tests/fm-teardown.test.sh --jobs 1`; the current focused result does not claim a full suite or real-Herdr pass.
+The recovery contract is owned by [`bin/fm-backlog-transition-lib.sh`](../../bin/fm-backlog-transition-lib.sh).
+
 The compatibility floor is protocol 14.
 The whole real-Herdr lane's latest active verification uses both Herdr 0.7.4 protocol 16 and Herdr 0.8.0 protocol 19 on macOS aarch64, while focused Herdr 0.7.5 protocol 17, earlier protocol-16, protocol-14, and 0.7.3 evidence is retained where it defines current behavior or fallbacks.
 Protocol 17 keeps every protocol-16 feature gate satisfied; the event and workspace-move floors remain 16.

@@ -21,7 +21,7 @@ pass "GitHub/local delivery keeps mode, merge authority and default forge"
 for forge in gitlab gerrit forgejo gitea; do
   for mode in no-mistakes direct-PR local-only; do
     printf '%s\n' "- removed [$mode forge=$forge] - fixture" > "$DATA/projects.md"
-    for flag in '' --forge --raw; do
+    for flag in '' --forge --raw --retained-history; do
       # shellcheck disable=SC2086 # Empty flag intentionally emits no argument.
       out=$(FM_DATA_OVERRIDE="$DATA" "$PROJECT_MODE" $flag removed 2>"$TMP_ROOT/error"); rc=$?
       [ "$rc" -eq 3 ] || fail "$mode/$forge/$flag must refuse, got $rc"
@@ -34,3 +34,8 @@ pass "removed forge bindings refuse without silently changing delivery"
 out=$(FM_DATA_OVERRIDE="$TMP_ROOT/absent" "$PROJECT_MODE" --forge absent 2>/dev/null)
 [ "$out" = none ] || fail "absent registry changed default forge"
 pass "absent registry preserves default forge"
+for directory in "$TMP_ROOT/absent" "$DATA"; do
+  out=$(FM_DATA_OVERRIDE="$directory" "$PROJECT_MODE" --retained-history absent 2>/dev/null)
+  [ "$out" = off ] || fail "absent project or registry implicitly enabled history retention"
+done
+pass "history retention requires an explicit registered annotation"
