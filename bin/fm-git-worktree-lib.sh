@@ -11,11 +11,10 @@
 # absent allocator means legacy Treehouse, independently of current config.
 # Removal requires matching identity, no dirt/untracked (including ignored),
 # and HEAD contained in the current recorded source ref, unless teardown supplies
-# its existing landed-work predicate for a PR ship. That predicate must prove
-# the task's merged delivery; it never exempts dirt or changes ownership checks.
-# Remote source checks
-# refresh only the recorded origin branch and refuse on fetch failure; local
-# refs are not fetched. Never deletes a branch. Task-record retirement/replay
+# its existing landed-work predicate for a PR ship. fm-teardown.sh owns that
+# predicate's proofs; it never exempts dirt or changes ownership checks.
+# Remote source checks refresh only the recorded origin branch and refuse on
+# fetch failure; local refs are not fetched. Never deletes a branch. Task-record retirement/replay
 # in fm-backlog-transition-lib.sh owns final reservation retirement when task
 # metadata or a pending-close marker remains after copy removal.
 

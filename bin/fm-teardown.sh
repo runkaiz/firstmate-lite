@@ -60,11 +60,13 @@
 # proof when the task has no recorded PR.
 # Squash merges collapse the branch's commits, so per-commit patch ids against main
 # no longer match, and a pipeline rebase can leave the local worktree diverged from
-# the PR head. A diverged copy is not treated as landed: path-set coverage, git
-# cherry, and merge-tree containment each fail to prove content landed without also
-# accepting unlanded edits to the same paths. Teardown still accepts a merged PR
-# whose head contains the current local work (ancestor or equivalent patch ids),
-# or a clean content-in-default tree match. Anything else refuses.
+# the PR head. A merged PR proves landing when its head contains the local HEAD
+# or every local-side commit since their merge base has an equivalent patch in
+# the PR-side history. Published local commits participate in this proof too:
+# excluding them could discard unique work merely because it reached a remote.
+# Path-set coverage alone cannot prove that edits to those paths landed.
+# Without a recorded PR, the content-in-default proof remains available below.
+# Anything else refuses.
 # The PR itself is resolved from the task's recorded pr= when present, or - when
 # no pr= was ever recorded (e.g. a yolo-authorized merge on a repo with no PR CI,
 # where the usual "checks green" fm-pr-check.sh trigger never fires) - through
@@ -83,11 +85,12 @@
 # local-only projects additionally accept work merged into the local default
 # branch (firstmate performs that merge after configured approval) as a fallback
 # for the common case where there is no remote at all.
-# Scout tasks (kind=scout in meta) carve out of that check: their worktree is
+# Pooled and Orca scout tasks (kind=scout in meta) carve out of that check: their worktree is
 # declared scratch and the report at data/<task-id>/report.md is the work
 # product. Teardown proceeds only once the report exists and the shared
 # unresolved-decision completion gate verifies its captain-held inventory.
-# A scratch copy (kind=scout) and a --force run discard untracked content.
+# Native scouts retain the native gates above in addition to the report gate.
+# Non-native scratch copies (kind=scout) and --force runs discard untracked content.
 # Treehouse's return resets with `git clean -fd`, which never deletes a nested
 # git repository, so the pool slot stays dirty and later checkouts skip it.
 # Before that return, teardown runs `git clean -ffdq` in the copy, and a forced
