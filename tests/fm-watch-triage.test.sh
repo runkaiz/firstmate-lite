@@ -4118,7 +4118,7 @@ test_stale_churn_without_a_captain_call_still_alarms() {
 
 # Reproduce idle TUI redraws through the actual watcher, with no real endpoint.
 # The initial delivery still surfaces, three subsequent settled hashes do not,
-# and an elapsed cadence or a new status generation restores the alarm.
+# elapsed time alone does not re-arm it, while a new status generation does.
 test_terminal_delivery_redraw_bound() {
   local mode dir state out capture throttle replacement
   command -v tasks-axi >/dev/null 2>&1 \
@@ -4136,12 +4136,11 @@ test_terminal_delivery_redraw_bound() {
     hold_watch_churn "$dir" "$out" "$capture" 'idle redraw' 3 \
       || fail "[$mode] unchanged delivery re-alarmed on a new hash"
     [ "$(hold_stale_wakes "$state")" -eq 0 ] || fail "[$mode] redraw queued a stale wake"
-    [ -s "$throttle" ] || fail "[$mode] delivery left no cadence marker"
-    set_mtime "$(( $(date +%s) - 5000 ))" "$throttle"
-    hold_watch_surface "$dir" "$out" "$capture" 'idle tick after cadence' \
-      || fail "[$mode] elapsed cadence did not re-surface delivery"
-    [ "$(hold_stale_wakes "$state")" -eq 1 ] || fail "[$mode] cadence wake count was not one"
-    ack_stopped_cycle "$state" || fail "[$mode] could not acknowledge cadence"
+    [ -s "$throttle" ] || fail "[$mode] delivery left no identity marker"
+    set_mtime "$(( $(date +%s) - 50000 ))" "$throttle"
+    hold_watch_churn "$dir" "$out" "$capture" 'idle after twelve hours' 1 \
+      || fail "[$mode] elapsed time re-surfaced unchanged delivery"
+    [ "$(hold_stale_wakes "$state")" -eq 0 ] || fail "[$mode] time alone queued a stale wake"
 
     # Same-length replacement with a new inode must not inherit the old silence.
     replacement="$state/replacement"
@@ -4158,7 +4157,7 @@ test_terminal_delivery_redraw_bound() {
       || fail "[$mode] successor inherited the previous delivery silence"
     [ "$(hold_stale_wakes "$state")" -eq 1 ] || fail "[$mode] successor count was not one"
   done
-  pass "a delivery surfaces once across four settled hashes, re-surfaces on cadence, and resets on a new generation in attended and away modes"
+  pass "a delivery surfaces once across settled hashes, stays quiet after twelve hours, and resets on a new generation in attended and away modes"
 }
 
 test_terminal_delivery_new_events_remain_actionable() {
@@ -4166,7 +4165,9 @@ test_terminal_delivery_new_events_remain_actionable() {
   command -v tasks-axi >/dev/null 2>&1 \
     || { echo "skip: tasks-axi not found (terminal delivery redraw bound)"; return 0; }
   for event in 'done: second delivery' 'needs-decision [key=new]: choose a release' \
-    'blocked [key=new]: release failed' 'failed: new validation failure'; do
+    'blocked [key=new]: release failed' 'failed: new validation failure' \
+    'resolved [key=delivery]: published result accepted
+done: delivered merged result; original copy retained for cleanup'; do
     dir=$(make_hold_home delivery-new-event 'done: delivered result' nohold) \
       || fail "could not build the new-event fixture"
     state="$dir/state"; out="$dir/watch.out"; capture="$dir/pane.txt"

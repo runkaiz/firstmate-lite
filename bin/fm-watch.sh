@@ -112,8 +112,8 @@
 #   check: rejected unauthenticated PR poll retirement receipts: <paths>
 #                          invalid pending retirements were preserved without
 #                          running a check or removing poll artifacts
-# A previously surfaced done delivery bounds idle redraw stale alarms to
-# PAUSE_RESURFACE_SECS in attended and away modes; new status generations and
+# A previously surfaced done delivery suppresses unchanged idle redraw alarms
+# in attended and away modes; new status generations and
 # worker incarnations, observed activity and open captain calls re-arm it.
 #   heartbeat              fleet-scan backstop found an unsurfaced captain-relevant
 #                          status, unless afk is active
@@ -1534,7 +1534,7 @@ stale_wait_record() {  # <window-key>
 }
 
 # A surfaced delivery is unchanged when only its idle display redraws.
-# Bound those redraws to the existing long re-surface cadence, independently
+# Suppress those redraws until the delivery changes, independently
 # of pause tracking (which hash changes can clear). New status generations,
 # unsurfaced records, captain calls and authoritative activity remain eligible.
 TERMINAL_DELIVERY_DECLARATION=
@@ -1562,8 +1562,7 @@ terminal_delivery_stale_bound() {  # <window-key> <task>
   TERMINAL_DELIVERY_DECLARATION="delivery:$gen:$signature:$TERMINAL_DELIVERY_END@$TERMINAL_DELIVERY_IDENT"
   [ "$rc" -eq 1 ] || return 1
   throttle="$STATE/.terminal-resurfaced-$key"
-  [ "$(cat "$throttle" 2>/dev/null || true)" = "$TERMINAL_DELIVERY_DECLARATION" ] \
-    && [ "$(age_of "$throttle")" -lt "$PAUSE_RESURFACE_SECS" ]
+  [ "$(cat "$throttle" 2>/dev/null || true)" = "$TERMINAL_DELIVERY_DECLARATION" ]
 }
 
 terminal_delivery_record() {  # <window-key> <task>

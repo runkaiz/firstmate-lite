@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # allocator=git metadata selects native removal regardless of current config;
 # absent allocator keeps legacy pooled/Orca behavior. Native copies always face
-# bin/fm-git-worktree-lib.sh's exact ownership, clean/untracked and source-ancestry
-# gates, even scouts; --force is unsupported. A live/unverified owner refuses.
+# bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
+# PR ships use this script's existing landed-work proof, while local-only ships
+# and scouts require source ancestry. --force is unsupported. A live/unverified owner refuses.
 # Only the recorded idle endpoint is closed; remaining copy processes refuse
 # removal rather than being reaped. Git removal uses no force and keeps branch
 # refs. An interrupted removal with an absent, unregistered copy retires only
@@ -59,11 +60,13 @@
 # proof when the task has no recorded PR.
 # Squash merges collapse the branch's commits, so per-commit patch ids against main
 # no longer match, and a pipeline rebase can leave the local worktree diverged from
-# the PR head. A diverged copy is not treated as landed: path-set coverage, git
-# cherry, and merge-tree containment each fail to prove content landed without also
-# accepting unlanded edits to the same paths. Teardown still accepts a merged PR
-# whose head contains the current local work (ancestor or equivalent patch ids),
-# or a clean content-in-default tree match. Anything else refuses.
+# the PR head. A merged PR proves landing when its head contains the local HEAD
+# or every local-side commit since their merge base has an equivalent patch in
+# the PR-side history. Published local commits participate in this proof too:
+# excluding them could discard unique work merely because it reached a remote.
+# Path-set coverage alone cannot prove that edits to those paths landed.
+# Without a recorded PR, the content-in-default proof remains available below.
+# Anything else refuses.
 # The PR itself is resolved from the task's recorded pr= when present, or - when
 # no pr= was ever recorded (e.g. a yolo-authorized merge on a repo with no PR CI,
 # where the usual "checks green" fm-pr-check.sh trigger never fires) - through
@@ -82,11 +85,12 @@
 # local-only projects additionally accept work merged into the local default
 # branch (firstmate performs that merge after configured approval) as a fallback
 # for the common case where there is no remote at all.
-# Scout tasks (kind=scout in meta) carve out of that check: their worktree is
+# Pooled and Orca scout tasks (kind=scout in meta) carve out of that check: their worktree is
 # declared scratch and the report at data/<task-id>/report.md is the work
 # product. Teardown proceeds only once the report exists and the shared
 # unresolved-decision completion gate verifies its captain-held inventory.
-# A scratch copy (kind=scout) and a --force run discard untracked content.
+# Native scouts retain the native gates above in addition to the report gate.
+# Non-native scratch copies (kind=scout) and --force runs discard untracked content.
 # Treehouse's return resets with `git clean -fd`, which never deletes a nested
 # git repository, so the pool slot stays dirty and later checkouts skip it.
 # Before that return, teardown runs `git clean -ffdq` in the copy, and a forced
@@ -750,7 +754,8 @@ WORKTREE_ALLOCATOR=$(fm_git_worktree_meta_allocator "$META" "$STATE/$ID.git-work
 case "$WORKTREE_ALLOCATOR" in treehouse|git) ;; *) echo 'REFUSED: unknown recorded worktree allocator' >&2; exit 1 ;; esac
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
-  fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  if [ -d "$WT" ]; then fm_git_worktree_clean "$WT" || exit 1; fi
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
     native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
     case "$native_endpoint_state" in
@@ -1003,8 +1008,8 @@ patch_id_for_commit() {
     | awk 'NR == 1 { print $1 }'
 }
 
-unpushed_patches_are_in_pr_head() {
-  local pr_head=$1 current base pr_patch_ids commit patch_id unpushed
+local_patches_are_in_pr_head() {
+  local pr_head=$1 current base pr_patch_ids commit patch_id local_commits
   current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
   base=$(git -C "$WT" merge-base "$current" "$pr_head" 2>/dev/null) || return 1
   pr_patch_ids=$(
@@ -1016,15 +1021,18 @@ unpushed_patches_are_in_pr_head() {
       | sort -u
   ) || return 1
   [ -n "$pr_patch_ids" ] || return 1
-  unpushed=$(git -C "$WT" log --format=%H HEAD --not --remotes -- 2>/dev/null) || return 1
-  [ -n "$unpushed" ] || return 1
+  # Remote reachability does not prove landing: the original branch can remain
+  # published after a pipeline rebase, and other published work can be unique.
+  # Check every commit on the local side of this exact PR's divergence.
+  local_commits=$(git -C "$WT" log --format=%H "$base..$current" -- 2>/dev/null) || return 1
+  [ -n "$local_commits" ] || return 1
   while IFS= read -r commit; do
     [ -n "$commit" ] || continue
     patch_id=$(patch_id_for_commit "$commit") || return 1
     [ -n "$patch_id" ] || return 1
     printf '%s\n' "$pr_patch_ids" | grep -qxF "$patch_id" || return 1
   done <<EOF
-$unpushed
+$local_commits
 EOF
 }
 
@@ -1052,7 +1060,7 @@ pr_is_merged() {
   current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
   if git -C "$WT" merge-base --is-ancestor "$current" "$head" 2>/dev/null; then
     landed=1
-  elif unpushed_patches_are_in_pr_head "$head"; then
+  elif local_patches_are_in_pr_head "$head"; then
     landed=1
   fi
   [ "$landed" = 1 ] || return 1
@@ -2253,6 +2261,20 @@ if [ "$BACKEND" = orca ] && [ "$KIND" != scout ] && [ "$KIND" != secondmate ] &&
   ORCA_PATH_MATCH_VERIFIED=1
 fi
 
+NATIVE_LANDING_CHECK=()
+teardown_native_pr_landed() {
+  local branch
+  branch=$(git -C "$WT" rev-parse --abbrev-ref HEAD) || return 1
+  work_is_landed "$branch"
+}
+if [ "$WORKTREE_ALLOCATOR" = git ]; then
+  if [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
+    NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
+  fi
+  fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
+    "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+fi
+
 if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
   if validate_worktree_teardown_safety; then
     :
@@ -2568,7 +2590,8 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free' >&2; exit 1; }
     [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
   fi
-  fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
+    "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
 fi
 
 remove_grok_turnend_auth "$STATE" "$ID" || exit 1

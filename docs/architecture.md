@@ -16,7 +16,7 @@ For an ordinary crew task, a wait is read from both of its records: the status l
 So a delivered ordinary crew task whose last line stays a `done` PR-ready line bounds repeated alarms from new pane hashes to the `FM_PAUSE_RESURFACE_SECS` cadence for the length of the captain's decision.
 The first hash still alarms, each new hash inside that window is absorbed, and a new hash after the window re-surfaces the hold; a terminal pane hash that never changes stays inert after its first alarm exactly as it did before this bound.
 The throttle is scoped to both the current captain-call lifecycle and the status-log state, so releasing and re-holding the same task without a status append starts a fresh window whose first new hash alarms.
-An already surfaced `done` delivery without a captain hold also bounds idle redraw alarms to that cadence in attended and away modes.
+An already surfaced `done` delivery without a captain hold suppresses unchanged idle redraw alarms in attended and away modes, including after twelve hours.
 Its bound follows the status generation and worker incarnation, clears on observed busy or authoritative resumed activity, and leaves new deliveries, decisions, blockers and failures eligible to surface.
 Repeated provably-working stale escalations on the same unchanged pane add an escalation count to the wake reason and, at `FM_WEDGE_DEMAND_INSPECT_COUNT`, a `demand-deep-inspection` marker.
 In the same branch that is about to escalate, the pane's own account of its quiet is consulted first: the worker's declared `paused:` or verified `captain-held` status line.

@@ -10,9 +10,11 @@
 # base, source_ref. Metadata allocator=git selects this lifecycle permanently;
 # absent allocator means legacy Treehouse, independently of current config.
 # Removal requires matching identity, no dirt/untracked (including ignored),
-# and HEAD contained in the current recorded source ref. Remote source checks
-# refresh only the recorded origin branch and refuse on fetch failure; local
-# refs are not fetched. Never deletes a branch. Task-record retirement/replay
+# and HEAD contained in the current recorded source ref, unless teardown supplies
+# its existing landed-work predicate for a PR ship. fm-teardown.sh owns that
+# predicate's proofs; it never exempts dirt or changes ownership checks.
+# Remote source checks refresh only the recorded origin branch and refuse on
+# fetch failure; local refs are not fetched. Never deletes a branch. Task-record retirement/replay
 # in fm-backlog-transition-lib.sh owns final reservation retirement when task
 # metadata or a pending-close marker remains after copy removal.
 
@@ -106,7 +108,12 @@ fm_git_worktree_clean() { # <path> - unknown ignored files are work too
   local status others
   status=$(git -C "$1" status --porcelain --untracked-files=all) || return 1
   others=$(git -C "$1" ls-files --others) || return 1
-  [ -z "$status$others" ] || { fm_git_worktree_error "dirty or untracked content at $1; preserving copy"; return 1; }
+  if [ -n "$status$others" ]; then
+    fm_git_worktree_error "dirty or untracked content at $1; preserving copy"
+    printf '%s\n' "$status" "$others" | sed '/^$/d' | head -20 >&2
+    printf 'Inspect and preserve these paths, including ignored session evidence, before retrying teardown.\n' >&2
+    return 1
+  fi
 }
 
 fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit> <source-ref>
@@ -183,7 +190,7 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
   fi
 }
 
-fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path>
+fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path> [<landed-function>]
   local ref
   fm_git_worktree_identity "$@" || return 1
   [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0 # confirmed unregistered removal/reservation recovery
@@ -198,8 +205,12 @@ fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path>
       ;;
     *) return 1 ;;
   esac
-  if ! git -C "$4" show-ref --verify --quiet "$ref" ||
-    ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
+  git -C "$4" show-ref --verify --quiet "$ref" || return 1
+  if [ -n "${6:-}" ]; then
+    if ! declare -F "$6" >/dev/null || ! "$6"; then
+      fm_git_worktree_error 'task delivery is not proven landed; preserving copy'; return 1
+    fi
+  elif ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
     fm_git_worktree_error "unlanded HEAD is not contained in $ref; preserving copy"; return 1
   fi
 }
