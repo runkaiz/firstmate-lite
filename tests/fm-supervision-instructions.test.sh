@@ -323,12 +323,23 @@ test_proactive_preference_and_instruction_delivery() {
     assert_contains "$out" 'GPU/resource spending grants' "$harness lost resource boundary"
     assert_contains "$out" 'attended branch no new spawn, merge, or decision-answer authority' "$harness expanded branch authority"
   done
-  # Both branch hosts and MAIN use this presentation; no watcher is armed.
-  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2>&1)
+  # Empty drains stay silent; actual queued wakes refresh policy on stderr
+  # without changing the structured stdout records. No watcher is armed.
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" '' 'empty wake presentation was not silent'
+  assert_not_contains "$(cat "$home/drain.err")" 'PROACTIVE MODE:' 'empty drain emitted mode context'
+  bash -c 'source "$1"; fm_wake_append heartbeat proactive-test "heartbeat: proactive-test"' _ \
+    "$ROOT/bin/fm-wake-lib.sh" || fail 'could not queue wake'
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" "$(cat "$home/state/.wake-queue")" 'mode context altered structured wake records'
+  out=$(cat "$home/drain.err")
   assert_contains "$out" 'PROACTIVE MODE: on' 'wake presentation lost mode'
   assert_contains "$out" '/.agents/skills/proactive/policy.md' 'wake presentation lost policy reference'
   assert_not_contains "$out" 'automatic merge authority' 'wake needlessly repeated the full policy'
   assert_equals "$(bash "$command" off)" 'PROACTIVE MODE: off' 'explicit off failed'
+  out=$(FM_SUPERVISION_ACTOR=main bash "$ROOT/bin/fm-wake-drain.sh" 2> "$home/drain.err")
+  assert_equals "$out" "$(cat "$home/state/.wake-queue")" 'off context altered structured wake records'
+  assert_contains "$(cat "$home/drain.err")" 'any earlier proactive instruction is inactive' 'queued wake failed to revoke old context'
   assert_equals "$(bash "$RENDER" --harness codex)" "$baseline" 'off did not restore baseline instructions'
   assert_contains "$(bash "$command" instructions)" 'any earlier proactive instruction is inactive' 'off failed to revoke old context'
   assert_equals "$(bash "$command")" 'PROACTIVE MODE: on' 'toggle after off failed'

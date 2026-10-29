@@ -161,7 +161,7 @@ The command, atomic persistence, home resolution, and malformed-file behavior ar
 The [conditional proactive policy](../.agents/skills/proactive/policy.md) owns repair, continuation, escalation, and automatic ordinary green-PR merge authority while on.
 Project yolo settings are not rewritten, and turning the mode off removes its additional authority before the next guarded proactive merge.
 
-Startup/re-emitted supervision instructions read the current preference and present the policy once; wake presentations carry the current mode and a compact policy reference, loading the policy only if it is absent from context.
+Startup/re-emitted supervision instructions read the current preference and present the policy once; successful queued-wake presentations carry the current mode and a compact policy reference on stderr, loading the policy only if it is absent from context.
 Off instructions supersede earlier mode context.
 This shared path covers every primary harness, Pi's branch, and the off-Pi supervision host without a second watcher or changed lease ownership.
 A resumed conversation that has not received a startup/wake refresh can use `/proactive status` to refresh immediately.
