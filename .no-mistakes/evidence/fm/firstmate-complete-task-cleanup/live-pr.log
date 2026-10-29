@@ -1,0 +1,94 @@
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+[exit 0]
+$ bash bin/fm-lab-home.sh tmux-dir /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+/tmp/fml.iDUnSH
+[exit 0]
+$ git clone --quiet https://github.com/cli/safeexec.git /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/project
+[exit 0]
+$ gh pr view https://github.com/cli/safeexec/pull/9 --json state,headRefOid,baseRefName,url,mergeCommit
+{"baseRefName":"main","headRefOid":"e86b61c7b653a3946af9c06cd86a00ec05e27255","mergeCommit":{"oid":"df52b7a548d8476be1ec3ed3fd70d1aaeca28dbb"},"state":"MERGED","url":"https://github.com/cli/safeexec/pull/9"}
+[exit 0]
+$ tmux -L fm-lab -f /dev/null new-session -d -s firstmate -n main -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT /bin/bash --noprofile --norc
+[exit 0]
+$ tmux -L fm-lab set-option -g default-command /bin/bash --noprofile --norc
+[exit 0]
+$ bash bin/fm-spawn.sh rebased-landed /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/project sleep 2 --mode direct-PR --yolo off --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home/data/rebased-landed/launch-brief.md records no ship branch; defaulting to legacy branch fm/rebased-landed
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home/data/rebased-landed/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode direct-PR - confirm its definition of done matches
+notice: rebased-landed ships mode=direct-PR while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD df52b7a)
+HEAD is now at df52b7a Merge pull request #9 from cli/go-1.19-compat
+native allocation task=rebased-landed source_ref=refs/remotes/origin/main base=df52b7a548d8476be1ec3ed3fd70d1aaeca28dbb worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/rebased-landed/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned rebased-landed harness=sleep kind=ship mode=direct-PR yolo=off window=firstmate:fm-rebased-landed worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/rebased-landed/worktree
+[exit 0]
+HISTORY {"task": "rebased-landed", "public_merged_head": "e86b61c7b653a3946af9c06cd86a00ec05e27255", "local_head": "aef79c8df37800c0c91ca5ee5abc31d9594a5fe5", "common_base": "7342e94fa62c8a8099fdaf6edb32d272ccbeac47", "unique_parent": false}
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/rebased-landed/worktree log --oneline --all --max-count=8
+aef79c8 locally rebased PR patch
+df52b7a Merge pull request #9 from cli/go-1.19-compat
+e86b61c Allow relative PATH entries on Go 1.19+
+7342e94 Clarify differences vs. Go 1.19 behavior
+da4a527 Add README
+4f2b908 Create LICENSE
+2825f6d CI setup (#1)
+35184b6 Initial commit
+[exit 0]
+RESOURCE STATE rebased-landed {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-rebased-landed"]}
+$ bash bin/fm-teardown.sh rebased-landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/project: already current
+teardown rebased-landed complete (window firstmate:fm-rebased-landed, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/rebased-landed/worktree)
+Backlog: rebased-landed just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home/data/backlog.md - move rebased-landed to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE rebased-landed {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+$ bash bin/fm-spawn.sh published-unique-parent /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/project sleep 2 --mode direct-PR --yolo off --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home/data/published-unique-parent/launch-brief.md records no ship branch; defaulting to legacy branch fm/published-unique-parent
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home/data/published-unique-parent/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode direct-PR - confirm its definition of done matches
+notice: published-unique-parent ships mode=direct-PR while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD df52b7a)
+HEAD is now at df52b7a Merge pull request #9 from cli/go-1.19-compat
+native allocation task=published-unique-parent source_ref=refs/remotes/origin/main base=df52b7a548d8476be1ec3ed3fd70d1aaeca28dbb worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/published-unique-parent/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned published-unique-parent harness=sleep kind=ship mode=direct-PR yolo=off window=firstmate:fm-published-unique-parent worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/published-unique-parent/worktree
+[exit 0]
+HISTORY {"task": "published-unique-parent", "public_merged_head": "e86b61c7b653a3946af9c06cd86a00ec05e27255", "local_head": "5fa7e20b8da391c4eb1a6b1a844f9596f46aedaa", "common_base": "7342e94fa62c8a8099fdaf6edb32d272ccbeac47", "unique_parent": true}
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/copies/published-unique-parent/worktree log --oneline --all --max-count=8
+5fa7e20 locally rebased PR patch
+6c89ee4 unique parent
+aef79c8 locally rebased PR patch
+df52b7a Merge pull request #9 from cli/go-1.19-compat
+e86b61c Allow relative PATH entries on Go 1.19+
+7342e94 Clarify differences vs. Go 1.19 behavior
+da4a527 Add README
+4f2b908 Create LICENSE
+[exit 0]
+RESOURCE STATE published-unique-parent {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-published-unique-parent"]}
+$ bash bin/fm-teardown.sh published-unique-parent
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: task delivery is not proven landed; preserving copy
+[exit 1]
+RESOURCE STATE published-unique-parent {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-published-unique-parent"]}
+Unique parent, committed bytes, task record and endpoint preserved.
+ALL LIVE PUBLIC-PR SCENARIOS PASSED; no forge writes performed.
+$ tmux -L fm-lab kill-server
+[exit 0]
+$ bash bin/fm-lab-home.sh teardown /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-j76bhmhj/home
+[exit 0]
+Disposable public clone, fixture data and private tmux server removed.

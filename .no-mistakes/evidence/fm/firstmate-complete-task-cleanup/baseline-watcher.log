@@ -1,0 +1,41 @@
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.baseline/.watch-lab-wk_nnrwr/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.baseline/.watch-lab-wk_nnrwr/home
+[exit 0]
+$ bash bin/fm-lab-home.sh tmux-dir /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.baseline/.watch-lab-wk_nnrwr/home
+/tmp/fml.TUM3VT
+[exit 0]
+$ tmux -L fm-lab -f /dev/null new-session -d -s test -n fm-delivery -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.baseline/.watch-lab-wk_nnrwr /bin/bash --noprofile --norc
+[exit 0]
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'first delivered result' Enter
+[exit 0]
+WAKE first delivered result
+1793311960	1	stale	test:fm-delivery	stale: test:fm-delivery
+$ bash bin/fm-wake-drain.sh
+1793311960	1	stale	test:fm-delivery	stale: test:fm-delivery
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 362477.1793311960.ZjU31Q
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+delivery done: delivered result
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 362477.1793311960.ZjU31Q
+[exit 0]
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'idle redraw' Enter
+[exit 0]
+QUIET idle redraw: 5 distinct live beacon timestamps; no queued wake
+Aged actual delivery suppression marker by 50000 seconds (13.9 hours).
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'idle redraw after twelve hours' Enter
+[exit 0]
+$ tmux -L fm-lab kill-server
+[exit 0]
+$ bash bin/fm-lab-home.sh teardown /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.baseline/.watch-lab-wk_nnrwr/home
+[exit 0]
+Disposable watcher lab and private tmux server removed.

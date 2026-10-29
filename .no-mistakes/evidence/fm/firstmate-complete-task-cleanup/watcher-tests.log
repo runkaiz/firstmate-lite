@@ -1,0 +1,24 @@
+FM_TEST_BEGIN 2026-10-29T22:06:31Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - a delivery surfaces once across settled hashes, stays quiet after twelve hours, and resets on a new generation in attended and away modes
+FM_TEST_END 2026-10-29T22:07:44Z tests/fm-watch-triage.test.sh exit=0 duration_ms=72942 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=72970
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=72942 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=72942
+FM_TEST_BEGIN 2026-10-29T22:07:44Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - a new delivery, decision, blocker or failure after done still surfaces
+FM_TEST_END 2026-10-29T22:08:16Z tests/fm-watch-triage.test.sh exit=0 duration_ms=31949 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=31976
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=31949 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=31949
+FM_TEST_BEGIN 2026-10-29T22:08:16Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - authoritative resumed activity clears the delivery bound and preserves the next first sight
+FM_TEST_END 2026-10-29T22:08:28Z tests/fm-watch-triage.test.sh exit=0 duration_ms=12389 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=12416
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=12389 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=12389
+FM_TEST_BEGIN 2026-10-29T22:08:28Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - a failed durable append cannot suppress the first delivery on retry
+FM_TEST_END 2026-10-29T22:08:35Z tests/fm-watch-triage.test.sh exit=0 duration_ms=6227 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=6254
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=6227 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=6227

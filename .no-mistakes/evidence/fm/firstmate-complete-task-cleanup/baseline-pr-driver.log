@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.pr-live.py", line 49, in <module>
+    teardown(id,ok=not unique)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<string>", line 60, in teardown
+AssertionError: ('rebased-landed', 1)

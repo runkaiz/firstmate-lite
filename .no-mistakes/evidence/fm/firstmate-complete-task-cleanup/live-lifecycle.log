@@ -1,0 +1,161 @@
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+[exit 0]
+$ bash bin/fm-lab-home.sh tmux-dir /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+/tmp/fml.PrjGHL
+[exit 0]
+$ tmux -L fm-lab -f /dev/null new-session -d -s firstmate -n main -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT /bin/bash --noprofile --norc
+[exit 0]
+$ tmux -L fm-lab set-option -g default-command /bin/bash --noprofile --norc
+[exit 0]
+$ bash bin/fm-spawn.sh landed /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/project sleep 2 --backend tmux --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/landed/launch-brief.md records no ship branch; defaulting to legacy branch fm/landed
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/landed/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD 0f46428)
+HEAD is now at 0f46428 initial
+native allocation task=landed source_ref=refs/heads/main base=0f464280ae6f5afaeab3a4f19db2ac984436521b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/landed/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned landed harness=sleep kind=ship mode=local-only yolo=off window=firstmate:fm-landed worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/landed/worktree
+[exit 0]
+RESOURCE STATE landed {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-landed"]}
+$ bash bin/fm-teardown.sh landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown landed complete (window firstmate:fm-landed, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/landed/worktree)
+Backlog: landed just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/backlog.md - move landed to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE landed {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+$ bash bin/fm-spawn.sh unique /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/project sleep 2 --backend tmux --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/unique/launch-brief.md records no ship branch; defaulting to legacy branch fm/unique
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/unique/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD 0f46428)
+HEAD is now at 0f46428 initial
+native allocation task=unique source_ref=refs/heads/main base=0f464280ae6f5afaeab3a4f19db2ac984436521b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/unique/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned unique harness=sleep kind=ship mode=local-only yolo=off window=firstmate:fm-unique worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/unique/worktree
+[exit 0]
+$ bash bin/fm-teardown.sh unique
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: unlanded HEAD is not contained in refs/heads/main; preserving copy
+[exit 1]
+RESOURCE STATE unique {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-unique"]}
+Landed unique commit on disposable project main: 12763f0972f5f3ec168cc4e2dddf8fd11d6db72d
+$ bash bin/fm-teardown.sh unique
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+teardown unique complete (window firstmate:fm-unique, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/unique/worktree)
+Backlog: unique just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/backlog.md - move unique to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE unique {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+$ bash bin/fm-spawn.sh residual /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/project sleep 2 --backend tmux --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/residual/launch-brief.md records no ship branch; defaulting to legacy branch fm/residual
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/residual/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD 12763f0)
+HEAD is now at 12763f0 unique local work
+native allocation task=residual source_ref=refs/heads/main base=12763f0972f5f3ec168cc4e2dddf8fd11d6db72d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/residual/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned residual harness=sleep kind=ship mode=local-only yolo=off window=firstmate:fm-residual worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/residual/worktree
+[exit 0]
+$ bash bin/fm-teardown.sh residual
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/residual/worktree; preserving copy
+.session/transcript
+Inspect and preserve these paths, including ignored session evidence, before retrying teardown.
+[exit 1]
+RESOURCE STATE residual {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-residual"]}
+Preserved residual session outside disposable copy in lab task data.
+$ bash bin/fm-teardown.sh residual
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+teardown residual complete (window firstmate:fm-residual, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/residual/worktree)
+Backlog: residual just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/backlog.md - move residual to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE residual {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+$ bash bin/fm-spawn.sh scout /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/project sleep 2 --backend tmux --scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+Preparing worktree (detached HEAD 12763f0)
+HEAD is now at 12763f0 unique local work
+native allocation task=scout source_ref=refs/heads/main base=12763f0972f5f3ec168cc4e2dddf8fd11d6db72d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/scout/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned scout harness=sleep kind=scout window=firstmate:fm-scout worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/scout/worktree
+[exit 0]
+$ bash bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout task scout has no report at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/scout/report.md.
+The report is the work product. Have the crewmate write it, or use --force after explicit discard approval.
+[exit 1]
+RESOURCE STATE scout {"copy_exists": true, "meta_exists": true, "reservation_exists": true, "windows": ["main", "fm-scout"]}
+$ bash bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ bash bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+teardown scout complete (window firstmate:fm-scout, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/scout/worktree)
+Backlog: scout just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/backlog.md - move scout to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE scout {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+Scout report remains after tab/copy/metadata removal.
+$ bash bin/fm-spawn.sh interrupted /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/project sleep 2 --backend tmux --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/interrupted/launch-brief.md records no ship branch; defaulting to legacy branch fm/interrupted
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/interrupted/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD 12763f0)
+HEAD is now at 12763f0 unique local work
+native allocation task=interrupted source_ref=refs/heads/main base=12763f0972f5f3ec168cc4e2dddf8fd11d6db72d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/interrupted/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned interrupted harness=sleep kind=ship mode=local-only yolo=off window=firstmate:fm-interrupted worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/interrupted/worktree
+[exit 0]
+$ tmux -L fm-lab kill-window -t firstmate:fm-interrupted
+[exit 0]
+Simulated interruption after actual endpoint and copy removal, before record retirement.
+RESOURCE STATE interrupted {"copy_exists": false, "meta_exists": true, "reservation_exists": true, "windows": ["main"]}
+$ bash bin/fm-teardown.sh interrupted
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown interrupted complete (window firstmate:fm-interrupted, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/copies/interrupted/worktree)
+Backlog: interrupted just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home/data/backlog.md - move interrupted to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+RESOURCE STATE interrupted {"copy_exists": false, "meta_exists": false, "reservation_exists": false, "windows": ["main"]}
+ALL LIVE LIFECYCLE SCENARIOS PASSED
+$ tmux -L fm-lab kill-server
+[exit 0]
+$ bash bin/fm-lab-home.sh teardown /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.cleanup-lab-htnlljr5/home
+[exit 0]
+Disposable lab and private tmux server removed.

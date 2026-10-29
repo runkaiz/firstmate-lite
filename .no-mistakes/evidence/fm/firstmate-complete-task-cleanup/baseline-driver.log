@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-live.py", line 93, in <module>
+    quiet('idle redraw after twelve hours')
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-live.py", line 65, in quiet
+    assert proc.poll() is None, 'Unexpected wake: '+queue()
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: Unexpected wake: 1793311967	2	stale	test:fm-delivery	stale: test:fm-delivery
+

@@ -1,0 +1,138 @@
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-lab-0bl4xxuv/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-lab-0bl4xxuv/home
+[exit 0]
+$ bash bin/fm-lab-home.sh tmux-dir /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-lab-0bl4xxuv/home
+/tmp/fml.50FG1F
+[exit 0]
+$ tmux -L fm-lab -f /dev/null new-session -d -s test -n fm-delivery -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-lab-0bl4xxuv /bin/bash --noprofile --norc
+[exit 0]
+Watcher fixture is in away mode.
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'first delivered result' Enter
+[exit 0]
+WAKE first delivered result
+1793311982	1	stale	test:fm-delivery	stale: test:fm-delivery
+$ bash bin/fm-wake-drain.sh
+1793311982	1	stale	test:fm-delivery	stale: test:fm-delivery
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 385085.1793311982.jrrIJE
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+delivery done: delivered result
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Away mode owns watcher supervision; load /afk and ensure the daemon is running instead of starting normal supervision directly.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 385085.1793311982.jrrIJE
+[exit 0]
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'idle redraw' Enter
+[exit 0]
+QUIET idle redraw: 5 distinct live beacon timestamps; no queued wake
+Aged actual delivery suppression marker by 50000 seconds (13.9 hours).
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'idle redraw after twelve hours' Enter
+[exit 0]
+QUIET idle redraw after twelve hours: 5 distinct live beacon timestamps; no queued wake
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'new decision after done' Enter
+[exit 0]
+WAKE new decision after done
+1793311994	2	stale	test:fm-delivery	stale: test:fm-delivery
+$ bash bin/fm-wake-drain.sh
+1793311994	2	stale	test:fm-delivery	stale: test:fm-delivery
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 394182.1793311994.2G9eEY
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+delivery [key=new] needs-decision: choose release
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 394182.1793311994.2G9eEY
+[exit 0]
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'resolved call and second delivery' Enter
+[exit 0]
+WAKE resolved call and second delivery
+1793311997	3	stale	test:fm-delivery	stale: test:fm-delivery
+$ bash bin/fm-wake-drain.sh
+1793311997	3	stale	test:fm-delivery	stale: test:fm-delivery
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 397143.1793311997.bYzWQU
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+delivery done: second delivery
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 397143.1793311997.bYzWQU
+[exit 0]
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'second delivery idle' Enter
+[exit 0]
+QUIET second delivery idle: 5 distinct live beacon timestamps; no queued wake
+$ tmux -L fm-lab send-keys -t test:fm-delivery printf '%s\n' 'new status generation' Enter
+[exit 0]
+WAKE new status generation
+1793312004	4	stale	test:fm-delivery	stale: test:fm-delivery
+$ bash bin/fm-wake-drain.sh
+1793312004	4	stale	test:fm-delivery	stale: test:fm-delivery
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 407441.1793312004.HqLyzv
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+delivery done: second delivery
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 407441.1793312004.HqLyzv
+[exit 0]
+$ tmux -L fm-lab capture-pane -p -t test:fm-delivery
+bash-5.3$ printf '%s\n' 'first delivered result'
+first delivered result
+bash-5.3$ printf '%s\n' 'idle redraw'
+idle redraw
+bash-5.3$ printf '%s\n' 'idle redraw after twelve hours'
+idle redraw after twelve hours
+bash-5.3$ printf '%s\n' 'new decision after done'
+new decision after done
+bash-5.3$ printf '%s\n' 'resolved call and second delivery'
+resolved call and second delivery
+bash-5.3$ printf '%s\n' 'second delivery idle'
+second delivery idle
+bash-5.3$ printf '%s\n' 'new status generation'
+new status generation
+bash-5.3$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+ALL LIVE WATCHER SCENARIOS PASSED
+$ tmux -L fm-lab kill-server
+[exit 0]
+$ bash bin/fm-lab-home.sh teardown /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M64TZWBQA10NCA1ZZX5VRMAT/.watch-lab-0bl4xxuv/home
+[exit 0]
+Disposable watcher lab and private tmux server removed.
