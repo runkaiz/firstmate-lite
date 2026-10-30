@@ -4,6 +4,14 @@
 # bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
 # PR ships use this script's existing landed-work proof, while local-only ships
 # and scouts require source ancestry. --force is unsupported. A live/unverified owner refuses.
+# `--preserve-untracked <relative-path>` (repeatable, native copies only, never
+# with --force) is the guarded next action when that clean gate refuses solely
+# for leftovers the caller inspected and classified as task-owned generated
+# artifacts: after the endpoint, landed-work and process-free proofs pass, each
+# named path moves to data/<id>/preserved-artifacts/ through
+# fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
+# A refusal or interruption leaves the copy, task records and journal in place,
+# and rerunning the same command completes the preservation idempotently.
 # Only the recorded idle endpoint is closed; remaining copy processes refuse
 # removal rather than being reaped. Git removal uses no force and keeps branch
 # refs. An interrupted removal with an absent, unregistered copy retires only
@@ -413,11 +421,17 @@ ID=$1
 TEARDOWN_LOST_SLOT_EXIT=4
 FORCE=
 LEGACY_RECORD_GIVEN=0
+PRESERVE_PATHS=()
 shift
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --force) FORCE=--force ;;
     --legacy-record) LEGACY_RECORD_GIVEN=1 ;;
+    --preserve-untracked)
+      [ "$#" -ge 2 ] && [ -n "$2" ] || { echo "error: invalid teardown request" >&2; exit 2; }
+      PRESERVE_PATHS+=("$2")
+      shift
+      ;;
     *)
       echo "error: invalid teardown request" >&2
       exit 2
@@ -425,6 +439,10 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
+if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$FORCE" = --force ]; then
+  echo "error: --preserve-untracked never combines with --force" >&2
+  exit 2
+fi
 fm_backlog_directory_present "$STATE" "state directory" || {
   echo "error: teardown refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
   exit 1
@@ -752,10 +770,17 @@ CLEANUP_RECOVERY=$TEARDOWN_CLEANUP_RECOVERY
 KIND=$TEARDOWN_META_KIND
 WORKTREE_ALLOCATOR=$(fm_git_worktree_meta_allocator "$META" "$STATE/$ID.git-worktree") || exit 1
 case "$WORKTREE_ALLOCATOR" in treehouse|git) ;; *) echo 'REFUSED: unknown recorded worktree allocator' >&2; exit 1 ;; esac
+if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
+  echo 'REFUSED: --preserve-untracked supports only native task copies; nothing was changed' >&2
+  exit 1
+fi
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
   fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
-  if [ -d "$WT" ]; then fm_git_worktree_clean "$WT" || exit 1; fi
+  if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
+    echo "next: inspect each path; only for task-owned generated artifacts, rerun teardown with --preserve-untracked <path> per leftover" >&2
+    exit 1
+  fi
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
     native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
     case "$native_endpoint_state" in
@@ -2270,6 +2295,16 @@ teardown_native_pr_landed() {
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
     NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
+  fi
+  if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ -d "$WT" ]; then
+    fm_git_worktree_landed "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
+      "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+    task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free; nothing preserved' >&2; exit 1; }
+    [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
+    fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}" || {
+      echo "REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes" >&2
+      exit 1
+    }
   fi
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
