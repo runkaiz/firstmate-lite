@@ -281,10 +281,10 @@ for kind in ship scout remote; do
   pass "native $kind selects exact accepted source on divergence and refuses duplicate spawn"
 done
 
-for scenario in tmux-manual tmux-rebased tmux-close tmux-retain herdr-manual; do
+for scenario in tmux-manual tmux-rebased tmux-spend tmux-close tmux-retain herdr-manual; do
   backend=${scenario%%-*}
   retirement=${scenario#*-}
-  [ "$retirement" != rebased ] || retirement=manual
+  case "$retirement" in rebased|spend) retirement=manual ;; esac
   make_case "missing-$scenario"
   printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
   id=missing-endpoint
@@ -301,6 +301,10 @@ for scenario in tmux-manual tmux-rebased tmux-close tmux-retain herdr-manual; do
   allocate "$id" || fail 'missing endpoint fixture allocation failed'
   WT=$FM_GIT_WORKTREE_PATH
   native_mode=local-only
+  if [ "$scenario" = tmux-spend ]; then
+    : > "$HOME_DIR/config/pipeline-spend"
+    git -C "$WT" switch -qc "fm/$id"
+  fi
   if [ "$scenario" = tmux-rebased ]; then
     native_mode=no-mistakes
     git clone -q --bare "$PROJ" "$CASE/origin.git"
@@ -329,7 +333,14 @@ else
 fi
 SH
   chmod +x "$fakebin/gh"
-  printf '#!/usr/bin/env bash\nexit 0\n' > "$fakebin/no-mistakes"
+  cat > "$fakebin/no-mistakes" <<'SH'
+#!/usr/bin/env bash
+# Model the detached update checker observed in no-mistakes v1.84.0.
+if [ "$*" = axi ] && [ "${NO_MISTAKES_NO_UPDATE_CHECK:-}" != 1 ]; then
+  (exec sleep 1) </dev/null >/dev/null 2>&1 &
+fi
+exit 0
+SH
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "$1" in
