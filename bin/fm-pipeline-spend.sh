@@ -26,6 +26,8 @@
 # export yet, so this script reads the database read-only (mode=ro), located
 # by bin/fm-nm-run-lib.sh's fm_nm_state_db, and bounded by 30 seconds per
 # no-mistakes or database call.
+# This read-only query disables no-mistakes' background update check so it
+# cannot leave a detached process holding the copy teardown is about to remove.
 #
 # Attribution. A task's runs are the runs no-mistakes recorded for the task
 # copy's repository and current branch since that branch was created:
@@ -136,7 +138,7 @@ else
   # line is the oldest surviving entry, normally the branch's creation.
   SINCE=$(git -C "$WT" reflog show --date=unix --format=%gd "refs/heads/$BRANCH" -- 2>/dev/null \
     | tail -1 | sed -n 's/.*@{\([0-9][0-9]*\)}$/\1/p') || SINCE=
-  OVERVIEW=$(fm_nm_run_checked "$WT" "$TIMEOUT" axi) || true
+  OVERVIEW=$(NO_MISTAKES_NO_UPDATE_CHECK=1 fm_nm_run_checked "$WT" "$TIMEOUT" axi) || true
   REPO=$(fm_nm_strip_quotes "$(printf '%s\n' "$OVERVIEW" | sed -n 's/^repo:[[:space:]]*//p' | head -1)")
   if [ -z "$REPO" ]; then
     REASON="no-mistakes resolved no repository for the task copy"
