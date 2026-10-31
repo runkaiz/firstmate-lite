@@ -192,7 +192,7 @@ Claude and grok use the slash form shown here; codex uses the same names with `$
 | `/ahoy` | One bounded catch-up on current local work, relevant conversation continuity, and outstanding decisions; optional `detail`, `file`, `visual`/`lavish`, and `live`/`include PRs` modes add detail, artifacts, or network enrichment |
 | `/bearings` | Transitional alias to `/ahoy`, with the same options and one output |
 | `/updatefirstmate` | Guardedly fast-forward this home to the current upstream commit, then reread its instructions |
-| `/stow` | File current knowledge and open records; Pi verifies the receipt and saves early before native compaction, with `save-only` available; see the [stow workflow](.agents/skills/stow/SKILL.md#pi-command-and-automatic-preservation) for scheduling limits |
+| `/stow` | File current knowledge and open records, and reconcile underway work; Pi verifies the receipt and saves early before native compaction, with `save-only` available; see the [stow workflow](.agents/skills/stow/SKILL.md) for reconciliation safeguards and scheduling limits |
 
 Ahoy invocation examples (`/bearings` remains an alias):
 

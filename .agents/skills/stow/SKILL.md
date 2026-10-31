@@ -1,6 +1,6 @@
 ---
 name: stow
-description: Sweep the current session for uncaptured durable knowledge, file it to disk, persist the open work records this session knows are unfiled or now wrong, and curate the home's tiered, decaying startup memory before a context reset; on Pi the native command supplies early-save/native-compaction assistance. Use when the captain invokes /stow (e.g. "/stow", "stow what you've learned"), before a session reset or context compaction, or periodically to keep operational memory current.
+description: Sweep the current session for uncaptured durable knowledge, file it to disk, persist the open work records this session knows are unfiled or now wrong, reconcile underway work through guarded cleanup and recovery, and curate the home's tiered, decaying startup memory before a context reset; on Pi the native command supplies early-save/native-compaction assistance. Use when the captain invokes /stow (e.g. "/stow", "stow what you've learned"), before a session reset or context compaction, or periodically to keep operational memory current.
 user-invocable: true
 metadata:
   internal: true
@@ -269,9 +269,30 @@ A reset destroys whatever exists only in this session, and that includes what yo
 So before the reset, make sure the important open work you are holding in context is durably recorded: file what was never filed, and correct what you now know is stale.
 
 Judge for yourself what is important and which record each thing belongs to, and write it through the owner that already governs that record.
-One bound holds: this covers the open work you are actually holding in context, not the records at large.
-It is not a reconciliation of durable records against repository or forge reality, cannot become one on input this volatile, and must never be reported as one.
+This sweep covers the open work you are holding in context; the underway-work reconciliation below is the separate, evidence-driven check of the records at large.
 Where the right correction is a judgment you cannot make, leave the record alone and raise the question instead of guessing.
+
+## Underway-work reconciliation
+
+Each pass also reconciles this home's underway work so nothing stale is left behind and anything genuinely ongoing gets finished.
+Skip it in a lock-refused read-only session, and report the skip.
+Run `bin/fm-reconcile-underway.sh` with this home's explicit `FM_HOME`, passing `--archive` for every archived-record directory the startup `NATIVE_RESERVATION` diagnostics or an earlier archiving step named; its header owns the input join, the classes and the line format.
+It only reads, and it proposes for each In-flight row, task record and native reservation one class and the exact guarded next command.
+The helper and guarded commands own the mechanical proofs, so treat each line as a proposal you verify, never as authority:
+
+- `captain-held`: leave the task, its copy and its hold untouched.
+- `landed`: run the printed teardown.
+  Before keeping any `--preserve-untracked` path, inspect it and keep it only if it is a task-owned generated artifact; any other leftover is evidence, so surface it instead.
+  A delivered scout without a task record gets the printed queue close with its report link when eligible under the helper's contract.
+- `record-archived`: confirm the archive is the task's own record, run the printed restore, then rerun the helper and act on the new class.
+- `ongoing` with a relaunch: load `stuck-crewmate-recovery` and recover through its relaunch path with a progress note; a live worker is left to ordinary supervision.
+- `needs-captain`: surface one concrete decision, such as approving a local merge, merging a ready PR, or keeping the commits on their branch through teardown's `--retain-branch`, and run nothing until the captain answers.
+- `unretirable`, `stale-row` and `unknown`: report each with its evidence; correct a stale row only with a link or reason you can cite.
+
+When a printed command refuses, record its refusal as evidence and leave that task as it is.
+Never add `--force`, discard or move unlanded work, merge, waive a check, answer or release a captain hold, or delete a branch to make a line succeed.
+
+
 
 ## One-time migration of unmarked entries
 
@@ -295,10 +316,11 @@ Report the outcome in plain captain-facing language with all of these facts:
 - each archived entry's reason, each autonomous offload's live destination and actual relief, and, when a pinned candidate was proposed, the `proposed-offload` section with every candidate's fields;
 - every unresolved exception, every concrete captain decision opened for an over-budget result;
 - each open record this pass filed or corrected, and each one it deliberately left alone with the judgment it is waiting on;
+- the underway-work reconciliation outcome: what was retired or closed with its link, what was relaunched, each captain decision raised, and each refused, unretirable, stale or unknown task with its evidence;
 - whether the session is safe to reset, only when all durable findings are captured, no tier-owned finding is waiting on an unreachable declared tier, every open record this session held is filed or explicitly left with its reason, and the post-pass result is within budget with no exception or pending budget decision.
 
 State what reset-safe means in the same breath as the claim: nothing this session knew has been lost.
-It is never a claim that the home's durable records are correct, because this pass checks no record the session did not name.
+It is never a claim that the home's durable records are correct: the reconciliation covers underway work only, as far as its evidence reaches.
 Do not hide an over-budget result behind a reset-safe claim.
 
 ## Scope exclusion: no skill storage by the pass

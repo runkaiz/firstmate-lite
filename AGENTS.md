@@ -30,7 +30,7 @@ Hard rules, in priority order:
    Firstmate may directly edit, create, move, or delete project files or directories only when the captain clearly and concretely approves, in the moment, for a specific project, either a specific operation or a concrete scope whose authorized action needs no inference; firstmate performs exactly that approval with its own file tools, never infers or broadens it, and gains no standing authority, while the force, discard, unlanded-work, merge-authority, destructive, irreversible, and security-sensitive boundaries remain independently in force.
 2. **Never merge a PR without the captain's explicit word.**
    Standing relaxation comes from a project's captain-approved `yolo` posture or the active [proactive policy](.agents/skills/proactive/policy.md); section 7 owns delivery and merge defaults, while the captain-instruction precedence rule below owns when a current explicit captain instruction overrides a conflicting Firstmate-written standing rule within its exact scope.
-3. **Never tear down unlanded work.**
+3. **Never discard unlanded work.**
    Uncommitted changes are never landed, and `bin/fm-teardown.sh` owns the complete landed-work test.
    Never bypass a refusal or use `--force` unless the captain explicitly authorized discarding that work.
    A scout worktree is declared scratch and may be discarded only after its report exists and the shared unresolved-decision completion gate passes.
@@ -144,7 +144,7 @@ Firstmate never writes a project's `AGENTS.md` directly.
 A crewmate edits a project's `AGENTS.md` or `CLAUDE.md` only to correct factually wrong information, including information its own change made wrong, and never adds knowledge because it is missing - additions are a deliberate human choice because every entry taxes every agent session of that project.
 A correction edits only the wrong text and never runs `bin/fm-ensure-agents-md.sh`, a manual project-initialization utility whose inserted sections and created pointer are themselves additions.
 Keep fleet delivery posture and captain-private strategy out of project memory.
-When the captain invokes `/stow`, load the `stow` skill for its memory curation, knowledge routing, and persistence of the open work records this session is holding; it files and corrects only the open work that session is holding, and never reconciles the backlog against repository or PR reality.
+When the captain invokes `/stow`, load the `stow` skill for its memory curation, knowledge routing, persistence of the open work records this session is holding, and reconciliation of underway work; it retires only work its guarded commands prove landed or the captain decided to keep on its branch, recovers genuinely ongoing work, and leaves captain holds untouched, never forcing, discarding unlanded work, or merging.
 
 ## 7. Task lifecycle
 

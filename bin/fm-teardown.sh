@@ -2,9 +2,10 @@
 # allocator=git metadata selects native removal regardless of current config;
 # absent allocator keeps legacy pooled/Orca behavior. Native copies always face
 # bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
-# PR ships use this script's existing landed-work proof, while local-only ships
-# and scouts require the native library's source/base proof. Legacy local-only
-# reservations also accept local default-branch ancestry. --force is unsupported.
+# PR ships use this script's existing landed-work proof; scouts use the native
+# library's source/base proof; local-only ships use teardown_native_local_landed
+# (unchanged base, local ancestry, or identical patch ids in local history,
+# also for legacy origin-recorded reservations). --force is unsupported.
 # A live/unverified owner refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
@@ -60,19 +61,22 @@
 # lift the deferral (it authorizes discarding unlanded WORK, never the
 # captain's question), and bin/fm-captain-hold.sh answer stays the only act
 # that closes the call.
-# REFUSES if the worktree holds work that has not LANDED, because cleanup
+# Except for explicit native branch retention, REFUSES unlanded work, because cleanup
 # hard-resets/removes the worktree and kills its processes. Work has landed when it is
 # proven by the task's own merged PR and contained local work, or, when no PR
 # is recorded, by equivalent content in the refreshed default branch.
-# Publishing a branch to any remote does not prove landing. Local-only work
-# must be merged into the local default branch before cleanup.
+# Publishing a branch to any remote does not prove landing. Native local-only
+# retirement uses the proofs above; legacy local-only cleanup accepts ancestry
+# or patch equivalence in the default branch, refusing uncontained merge commits.
 # A recorded base_branch selects the corresponding origin branch for content
 # proof when the task has no recorded PR.
 # Squash merges collapse the branch's commits, so per-commit patch ids against main
 # no longer match, and a pipeline rebase can leave the local worktree diverged from
 # the PR head. A merged PR proves landing when its head contains the local HEAD
 # or every local-side commit since their merge base has an equivalent patch in
-# the PR-side history. Published local commits participate in this proof too:
+# the PR-side history, or (no-mistakes only) pipeline_submission_published
+# binds this exact HEAD as the submission whose pushed head is the merged
+# PR head. Published local commits participate in this proof too:
 # excluding them could discard unique work merely because it reached a remote.
 # Path-set coverage alone cannot prove that edits to those paths landed.
 # Without a recorded PR, the content-in-default proof remains available below.
@@ -230,6 +234,11 @@
 #   contain this copy's HEAD. No patch equivalence is accepted on this path.
 #   This does not change mode/pr metadata, merge local divergence, waive any
 #   dirt/owner gate, or authorize force. The backlog note names this delivery.
+#   --retain-branch (native ships only, never with --force or sibling proof)
+#   retires a clean copy whose HEAD is contained in its recorded branch= ref,
+#   after the captain decided that work stays on its branch unlanded. It pins
+#   refs/firstmate/retained-work/<id>, deletes no ref, keeps every dirt/owner
+#   gate, and the backlog note names the retained refs instead of a landing.
 #   --force skips ordinary-task dirty and landed-work checks, skips scout report
 #   checks, and discards secondmate child work for kind=secondmate. Only use it
 #   when the captain has explicitly said to discard the work.
@@ -434,6 +443,8 @@ LEGACY_RECORD_GIVEN=0
 PRESERVE_PATHS=()
 SIBLING_PR=
 SIBLING_HEAD=
+RETAIN_BRANCH=0
+RETAINED_HEAD=
 shift
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -446,6 +457,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --landed-pr) SIBLING_PR=${2:?missing PR URL}; shift ;;
     --landed-head) SIBLING_HEAD=${2:?missing PR head}; shift ;;
+    --retain-branch) RETAIN_BRANCH=1 ;;
     *)
       echo "error: invalid teardown request" >&2
       exit 2
@@ -461,6 +473,9 @@ if [ -n "$SIBLING_PR$SIBLING_HEAD" ]; then
   fm_pr_url_parse "$SIBLING_PR" && fm_pr_head_valid "$SIBLING_HEAD" && [ -z "$FORCE" ] || {
     echo 'REFUSED: sibling landing requires a canonical PR URL and exact head, without force' >&2; exit 1;
   }
+fi
+if [ "$RETAIN_BRANCH" = 1 ] && [ -n "$FORCE$SIBLING_PR$SIBLING_HEAD" ]; then
+  echo 'REFUSED: --retain-branch never combines with --force or sibling landing proof' >&2; exit 1
 fi
 fm_backlog_directory_present "$STATE" "state directory" || {
   echo "error: teardown refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
@@ -1080,6 +1095,50 @@ $local_commits
 EOF
 }
 
+# Dotted-path view of TOON output: `a.b.c=value` for scalar keys only, quotes
+# stripped. Table rows and list headers are skipped, never misattributed.
+nm_toon_paths() {
+  awk '{
+    match($0, /^ */); depth = RLENGTH / 2; line = substr($0, RLENGTH + 1)
+    if (RLENGTH % 2 || line !~ /^[A-Za-z_][A-Za-z0-9_]*:/) next
+    key = line; sub(/:.*/, "", key)
+    value = line; sub(/^[^:]*:[ ]*/, "", value)
+    name[depth] = key; path = name[0]
+    for (i = 1; i <= depth; i++) path = path "." name[i]
+    if (value == "") next
+    if (value ~ /^".*"$/) value = substr(value, 2, length(value) - 2)
+    print path "=" value
+  }'
+}
+
+# Bounded residual for a merged no-mistakes PR whose pipeline rebased or
+# reworded the submission (review/document rounds), so neither containment nor
+# per-commit patch ids match. The residual is bounded by the pipeline's own
+# persisted push binding, read fresh and read-only through
+# `no-mistakes axi sync --check`: this checked-out branch's exact HEAD
+# is the run's submitted head, the run completed, the head it pushed is the
+# forge-verified head of this task's merged PR, and the PR state is merged.
+# Any local commit after submission changes HEAD and refuses; an unreadable,
+# ambiguous or differently bound result refuses.
+# This proves committed delivery only: preservation validates tracked cleanliness
+# and leftover coverage, and removal still requires the full clean-copy proof.
+pipeline_submission_published() { # <merged-pr-head>
+  local pr_head=$1 current branch out paths path count want
+  [ "$MODE" = no-mistakes ] || return 1
+  current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
+  branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null) || return 1
+  out=$(fm_nm_run_checked "$WT" "$NM_TEARDOWN_TIMEOUT" axi sync --check) || return 1
+  paths=$(printf '%s\n' "$out" | nm_toon_paths)
+  for want in "branch_sync.local.branch=$branch" "branch_sync.local.head=$current" \
+    branch_sync.pipeline.status=completed \
+    "branch_sync.pipeline.submitted_head=$current" \
+    "branch_sync.pipeline.pushed_head=$pr_head" branch_sync.pr_state=merged; do
+    path=${want%%=*}
+    count=$(printf '%s\n' "$paths" | grep -c "^$path=" || true)
+    [ "$count" = 1 ] && printf '%s\n' "$paths" | grep -qxF -- "$want" || return 1
+  done
+}
+
 pr_is_merged() {
   local branch=$1 target view state remainder head resolved_url current landed=0
   if [ -n "$PR_URL" ]; then
@@ -1105,6 +1164,8 @@ pr_is_merged() {
   if git -C "$WT" merge-base --is-ancestor "$current" "$head" 2>/dev/null; then
     landed=1
   elif local_patches_are_in_pr_head "$head"; then
+    landed=1
+  elif pipeline_submission_published "$head"; then
     landed=1
   fi
   [ "$landed" = 1 ] || return 1
@@ -1195,7 +1256,9 @@ backlog_done_args() {
       BACKLOG_DONE_ARGS=(--report "$data_relative/$ID/report.md")
       ;;
     *)
-      if [ "$MODE" = local-only ]; then
+      if [ -n "$RETAINED_HEAD" ]; then
+        BACKLOG_DONE_ARGS=(--note "copy retired unlanded; commits retained on $RETAINED_HEAD")
+      elif [ "$MODE" = local-only ]; then
         if [ -n "$SIBLING_PR" ]; then
           BACKLOG_DONE_ARGS=(--note "landed via $SIBLING_PR at $SIBLING_HEAD")
         else
@@ -1524,6 +1587,17 @@ validate_worktree_teardown_safety() {
   fi
   unpushed=$(printf '%s\n' "$unpushed_raw" | head -5)
 
+  # The native clean and landing gate (fm_git_worktree_safe) already passed
+  # under this run's locks and re-runs at removal; only dirt is rechecked.
+  if [ "${NATIVE_PROOF_ACCEPTED:-0}" = 1 ]; then
+    if [ -n "$dirty" ]; then
+      echo "REFUSED: worktree $WT has uncommitted changes." >&2
+      report_worktree_dirt "$dirty"
+      return 1
+    fi
+    return 0
+  fi
+
   if [ "$MODE" = local-only ]; then
     if [ -n "$SIBLING_PR" ]; then
       if [ -n "$dirty" ] || ! sibling_pr_landed; then
@@ -1532,7 +1606,8 @@ validate_worktree_teardown_safety() {
       return 0
     fi
     DEFAULT=$(default_branch) || { echo "REFUSED: cannot determine default branch for $PROJ; expected origin/HEAD, main, or master." >&2; return 1; }
-    if ! unmerged_raw=$(git -C "$WT" log --oneline HEAD --not "$DEFAULT" -- 2>/dev/null); then
+    # Commits whose identical patch is already on $DEFAULT (git cherry `-`) landed.
+    if ! unmerged_raw=$(git -C "$WT" log --merges --oneline "$DEFAULT..HEAD" -- 2>/dev/null || exit 1; git -C "$WT" cherry -v "$DEFAULT" HEAD 2>/dev/null | sed -n 's/^+ //p'; exit "${PIPESTATUS[0]}"); then
       if worktree_safety_blocked_by_lock "commits not on $DEFAULT"; then
         return "$TEARDOWN_WORKTREE_SAFETY_LOCK_BLOCKED"
       fi
@@ -2351,26 +2426,147 @@ teardown_native_pr_landed() {
   branch=$(git -C "$WT" rev-parse --abbrev-ref HEAD) || return 1
   work_is_landed "$branch"
 }
+# Native local-only landing: an unchanged copy (no task commits, even when its
+# source history was later replaced), local ancestry, or every local commit
+# having an identical patch id in local history (a squash or cherry-pick of a
+# single commit). The local branch is the reservation's refs/heads source, or
+# for a legacy origin-recorded reservation the local base/default branch.
 teardown_native_local_landed() {
-  local name
-  name=$(default_branch) || return 1
-  git -C "$WT" merge-base --is-ancestor HEAD "refs/heads/$name"
+  local ref cherry merges
+  fm_git_worktree_unchanged_base "$STATE" "$ID" "$PROJ" && return 0
+  ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || return 1
+  case "$ref" in
+    refs/heads/*) ;;
+    *) ref=${BASE_BRANCH:-}; [ -n "$ref" ] || ref=$(default_branch) || return 1; ref="refs/heads/$ref" ;;
+  esac
+  git -C "$PROJ" show-ref --verify --quiet "$ref" || return 1
+  git -C "$WT" merge-base --is-ancestor HEAD "$ref" && return 0
+  merges=$(git -C "$WT" rev-list --merges "$ref..HEAD" --) || return 1
+  [ -z "$merges" ] || return 1
+  cherry=$(git -C "$WT" cherry "$ref" HEAD) || return 1
+  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
+}
+# --retain-branch: the captain decided this ship's commits stay on its branch
+# rather than landing through this task. Only the copy is retired: HEAD must be
+# contained in the recorded branch= ref, and that commit is also pinned at
+# refs/firstmate/retained-work/<id> so the work outlives a later branch delete.
+# It never claims landing; the backlog note names the retained refs.
+teardown_native_branch_retained() {
+  local branch tip head
+  branch=$(fm_meta_get "$META" branch) || return 1
+  [ -n "$branch" ] && git check-ref-format --branch "$branch" >/dev/null 2>&1 || return 1
+  tip=$(git -C "$PROJ" rev-parse --verify --quiet "refs/heads/$branch^{commit}") || return 1
+  head=$(git -C "$WT" rev-parse --verify HEAD) || return 1
+  git -C "$WT" merge-base --is-ancestor "$head" "$tip" || return 1
+  fm_git_worktree_pin "$PROJ" "refs/firstmate/retained-work/$ID" "$head" || return 1
+  RETAINED_HEAD="refs/heads/$branch and refs/firstmate/retained-work/$ID at $head"
 }
 if [ -n "$SIBLING_PR" ] && [ -d "$WT" ]; then
   sibling_pr_landed || { echo 'REFUSED: exact sibling PR landing is not proven; preserving copy' >&2; exit 1; }
 fi
+if [ "$RETAIN_BRANCH" = 1 ] && { [ "$WORKTREE_ALLOCATOR" != git ] || [ "$KIND" != ship ]; }; then
+  echo 'REFUSED: --retain-branch applies only to native ship copies' >&2; exit 1
+fi
+# A Herdr close may reposition shared workspace order, so the whole
+# destructive sequence below (worktree return, pane close, record removal)
+# runs under the named-session presentation lock, acquired BEFORE anything is
+# returned or erased: a contended lock refuses here while the isolated copy,
+# every durable record, and the endpoint are all still intact for a plain
+# rerun. An unresolvable lock path (for example an unreachable server) also
+# refuses before any destructive step.
+TEARDOWN_HERDR_SESSION=
+TEARDOWN_HERDR_PANE=
+if [ "$BACKEND" = herdr ]; then
+  teardown_herdr_preflight_target "$T" "$ID" || exit 1
+  fm_backend_herdr_parse_target "$T" || exit 1
+  TEARDOWN_HERDR_SESSION=$FM_BACKEND_HERDR_SESSION
+  TEARDOWN_HERDR_PANE=$FM_BACKEND_HERDR_PANE
+fi
+
+
+teardown_close_endpoint() {
+  HERDR_PRESENTATION_JOURNAL="$STATE/$ID.herdr-presentation"
+  HERDR_PRESENTATION_RETIRE_CANDIDATE=0
+  HERDR_PRESENTATION_SESSION=
+  HERDR_PRESENTATION_PANE=
+  if [ "$BACKEND" = herdr ] \
+     && { [ -e "$HERDR_PRESENTATION_JOURNAL" ] || [ -L "$HERDR_PRESENTATION_JOURNAL" ]; }; then
+    fm_backend_source herdr || true
+    HERDR_PRESENTATION_SESSION=$(meta_value "$META" herdr_session)
+    HERDR_PRESENTATION_WORKSPACE=$(meta_value "$META" herdr_workspace_id)
+    HERDR_PRESENTATION_PANE=$(meta_value "$META" herdr_pane_id)
+    if [ -n "$HERDR_PRESENTATION_SESSION" ] \
+       && [ -n "$HERDR_PRESENTATION_WORKSPACE" ] \
+       && [ -n "$HERDR_PRESENTATION_PANE" ] \
+       && [ "$T" = "$HERDR_PRESENTATION_SESSION:$HERDR_PRESENTATION_PANE" ] \
+       && fm_backend_herdr_projection_endpoint_matches_journal \
+         "$HERDR_PRESENTATION_SESSION" "$HERDR_PRESENTATION_WORKSPACE" \
+         "$HERDR_PRESENTATION_JOURNAL" "$ID"; then
+      HERDR_PRESENTATION_RETIRE_CANDIDATE=1
+    fi
+  fi
+
+  if [ "$HERDR_PRESENTATION_RETIRE_CANDIDATE" = 1 ]; then
+    # The presentation lock was acquired before entering cleanup; a
+    # contended lock already refused this teardown while everything was intact.
+    if teardown_herdr_session_lock_held "$HERDR_PRESENTATION_SESSION"; then
+      # stderr is deliberately NOT discarded here. This is the highest-frequency
+      # projected-close call site, and the helper's only stderr output is a real
+      # warning - unverifiable workspace.move support, a refused focus-unsafe
+      # close, an unconfirmed repositioned-workspace removal, or a failed exact
+      # restore.
+      # Swallowing them left a wrong active workspace with no operator-visible
+      # signal at all. The close stays non-fatal exactly as before: the presence
+      # gate below is what decides whether any durable record may be removed.
+      fm_backend_herdr_projection_close_pane_focus_preserving \
+        "$HERDR_PRESENTATION_SESSION" "$HERDR_PRESENTATION_PANE" || true
+    else
+      echo "warning: herdr presentation focus lock unavailable; refusing a concurrent focus-unsafe pane close" >&2
+    fi
+  elif [ "$BACKEND" = herdr ]; then
+    if teardown_herdr_session_lock_held "$TEARDOWN_HERDR_SESSION"; then
+      fm_backend_herdr_kill_serialized "$TEARDOWN_HERDR_SESSION" "$TEARDOWN_HERDR_PANE" 2>/dev/null || true
+    else
+      echo "warning: herdr session presentation lock path is unavailable; skipping the pane close rather than closing unlocked" >&2
+    fi
+  elif [ "$BACKEND" != orca ] && [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
+    fm_backend_kill "$BACKEND" "$T" "$(meta_value "$META" zellij_tab_id)" "fm-$ID" \
+      || endpoint_close_refusal "$ID" "$BACKEND" "$T" 1 || exit 1
+  fi
+  # A refused, skipped, or failed Herdr close must never erase a live task's
+  # durable endpoint identity: unless the exact pane is confirmed gone, retain
+  # every record and stop before any removal below so a later rerun can retry
+  # the locked close. Only a structured not-found proves the pane gone; unknown
+  # presence, missing or malformed endpoint identity, and missing confirmation
+  # machinery all refuse.
+  if [ "$BACKEND" = herdr ]; then
+    fm_backend_source herdr || true
+    if ! declare -F fm_backend_herdr_endpoint_confirmed_gone >/dev/null 2>&1; then
+      echo "error: herdr endpoint confirmation is unavailable for $ID; retaining every durable task record" >&2
+      exit 1
+    fi
+    if ! fm_backend_herdr_endpoint_confirmed_gone "$T"; then
+      echo "error: herdr pane $T for $ID is not confirmed gone after its close was refused, skipped, or failed; retaining every durable task record - rerun teardown once the close can run under the session lock" >&2
+      exit 1
+    fi
+  fi
+}
+
+NATIVE_PROOF_ACCEPTED=0
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ -n "$SIBLING_PR" ]; then
     NATIVE_LANDING_CHECK=(sibling_pr_landed)
-  elif [ "$KIND" = ship ] && [ "$MODE" = local-only ] \
-    && [[ "$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref)" = refs/remotes/* ]]; then
+  elif [ "$RETAIN_BRANCH" = 1 ]; then
+    NATIVE_LANDING_CHECK=(teardown_native_branch_retained)
+  elif [ "$KIND" = ship ] && [ "$MODE" = local-only ]; then
     NATIVE_LANDING_CHECK=(teardown_native_local_landed)
-  elif [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
+  elif [ "$KIND" = ship ]; then
     NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
   fi
   if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ -d "$WT" ]; then
     fm_git_worktree_landed "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
       "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+    teardown_close_endpoint
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free; nothing preserved' >&2; exit 1; }
     [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
     fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}" || {
@@ -2380,6 +2576,7 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   fi
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+  NATIVE_PROOF_ACCEPTED=1
 fi
 
 if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
@@ -2396,21 +2593,6 @@ if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
   fi
 fi
 
-# A Herdr close may reposition shared workspace order, so the whole
-# destructive sequence below (worktree return, pane close, record removal)
-# runs under the named-session presentation lock, acquired BEFORE anything is
-# returned or erased: a contended lock refuses here while the isolated copy,
-# every durable record, and the endpoint are all still intact for a plain
-# rerun. An unresolvable lock path (for example an unreachable server) also
-# refuses before any destructive step.
-TEARDOWN_HERDR_SESSION=
-TEARDOWN_HERDR_PANE=
-if [ "$BACKEND" = herdr ]; then
-  teardown_herdr_preflight_target "$T" "$ID" || exit 1
-  fm_backend_herdr_parse_target "$T" || exit 1
-  TEARDOWN_HERDR_SESSION=$FM_BACKEND_HERDR_SESSION
-  TEARDOWN_HERDR_PANE=$FM_BACKEND_HERDR_PANE
-fi
 
 BACKLOG_CLOSED=0
 BACKLOG_TRANSITION=$TEARDOWN_BACKLOG_TRANSITION
@@ -2597,7 +2779,6 @@ elif [ -d "$WT" ] && [ "$KIND" != secondmate ]; then
   fm_treehouse_slot_owner_release "$WT" "$ID"
 fi
 
-HERDR_PRESENTATION_JOURNAL="$STATE/$ID.herdr-presentation"
 # teardown_herdr_journal_orphaned: true when the task's own journal names
 # nothing the session-start sweep could still close - a version 1 attempt whose
 # token-bearing projected workspace is confirmed gone, or a version 2 binding of
@@ -2614,53 +2795,7 @@ teardown_herdr_journal_orphaned() {
     [ "$FM_BACKEND_HERDR_JOURNAL_SESSION:$FM_BACKEND_HERDR_JOURNAL_PANE_ID" = "$T" ]
   fi
 }
-HERDR_PRESENTATION_RETIRE_CANDIDATE=0
-HERDR_PRESENTATION_SESSION=
-HERDR_PRESENTATION_PANE=
-if [ "$BACKEND" = herdr ] \
-   && { [ -e "$HERDR_PRESENTATION_JOURNAL" ] || [ -L "$HERDR_PRESENTATION_JOURNAL" ]; }; then
-  fm_backend_source herdr || true
-  HERDR_PRESENTATION_SESSION=$(meta_value "$META" herdr_session)
-  HERDR_PRESENTATION_WORKSPACE=$(meta_value "$META" herdr_workspace_id)
-  HERDR_PRESENTATION_PANE=$(meta_value "$META" herdr_pane_id)
-  if [ -n "$HERDR_PRESENTATION_SESSION" ] \
-     && [ -n "$HERDR_PRESENTATION_WORKSPACE" ] \
-     && [ -n "$HERDR_PRESENTATION_PANE" ] \
-     && [ "$T" = "$HERDR_PRESENTATION_SESSION:$HERDR_PRESENTATION_PANE" ] \
-     && fm_backend_herdr_projection_endpoint_matches_journal \
-       "$HERDR_PRESENTATION_SESSION" "$HERDR_PRESENTATION_WORKSPACE" \
-       "$HERDR_PRESENTATION_JOURNAL" "$ID"; then
-    HERDR_PRESENTATION_RETIRE_CANDIDATE=1
-  fi
-fi
-
-if [ "$HERDR_PRESENTATION_RETIRE_CANDIDATE" = 1 ]; then
-  # The presentation lock was acquired before the worktree return above; a
-  # contended lock already refused this teardown while everything was intact.
-  if teardown_herdr_session_lock_held "$HERDR_PRESENTATION_SESSION"; then
-    # stderr is deliberately NOT discarded here. This is the highest-frequency
-    # projected-close call site, and the helper's only stderr output is a real
-    # warning - unverifiable workspace.move support, a refused focus-unsafe
-    # close, an unconfirmed repositioned-workspace removal, or a failed exact
-    # restore.
-    # Swallowing them left a wrong active workspace with no operator-visible
-    # signal at all. The close stays non-fatal exactly as before: the presence
-    # gate below is what decides whether any durable record may be removed.
-    fm_backend_herdr_projection_close_pane_focus_preserving \
-      "$HERDR_PRESENTATION_SESSION" "$HERDR_PRESENTATION_PANE" || true
-  else
-    echo "warning: herdr presentation focus lock unavailable; refusing a concurrent focus-unsafe pane close" >&2
-  fi
-elif [ "$BACKEND" = herdr ]; then
-  if teardown_herdr_session_lock_held "$TEARDOWN_HERDR_SESSION"; then
-    fm_backend_herdr_kill_serialized "$TEARDOWN_HERDR_SESSION" "$TEARDOWN_HERDR_PANE" 2>/dev/null || true
-  else
-    echo "warning: herdr session presentation lock path is unavailable; skipping the pane close rather than closing unlocked" >&2
-  fi
-elif [ "$BACKEND" != orca ] && [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
-  fm_backend_kill "$BACKEND" "$T" "$(meta_value "$META" zellij_tab_id)" "fm-$ID" \
-    || endpoint_close_refusal "$ID" "$BACKEND" "$T" 1 || exit 1
-fi
+teardown_close_endpoint
 if [ "$HERDR_PRESENTATION_RETIRE_CANDIDATE" = 1 ]; then
   if [ "$(fm_backend_herdr_pane_agent_state "$HERDR_PRESENTATION_SESSION" "$HERDR_PRESENTATION_PANE")" = dead ]; then
     rm -f "$HERDR_PRESENTATION_JOURNAL"
@@ -2670,23 +2805,6 @@ if [ "$HERDR_PRESENTATION_RETIRE_CANDIDATE" = 1 ]; then
 elif [ "$BACKEND" = herdr ] \
      && { [ -e "$HERDR_PRESENTATION_JOURNAL" ] || [ -L "$HERDR_PRESENTATION_JOURNAL" ]; }; then
   echo "warning: herdr presentation journal for $ID was not retired by its close; no workspace cleanup was attempted" >&2
-fi
-# A refused, skipped, or failed Herdr close must never erase a live task's
-# durable endpoint identity: unless the exact pane is confirmed gone, retain
-# every record and stop before any removal below so a later rerun can retry
-# the locked close. Only a structured not-found proves the pane gone; unknown
-# presence, missing or malformed endpoint identity, and missing confirmation
-# machinery all refuse.
-if [ "$BACKEND" = herdr ]; then
-  fm_backend_source herdr || true
-  if ! declare -F fm_backend_herdr_endpoint_confirmed_gone >/dev/null 2>&1; then
-    echo "error: herdr endpoint confirmation is unavailable for $ID; retaining every durable task record" >&2
-    exit 1
-  fi
-  if ! fm_backend_herdr_endpoint_confirmed_gone "$T"; then
-    echo "error: herdr pane $T for $ID is not confirmed gone after its close was refused, skipped, or failed; retaining every durable task record - rerun teardown once the close can run under the session lock" >&2
-    exit 1
-  fi
 fi
 
 
@@ -2747,8 +2865,8 @@ rm -f "$STATE/$ID.turn-ended" "$STATE/$ID.progress" \
   "$STATE/.$ID.branch-outcome-index" \
   "$STATE/.secondmate-relaunch-$ID" "$STATE/.secondmate-relaunch-bound-$ID"
 # The steering inbox (bin/fm-task-inbox-lib.sh) is runtime state for the
-# retired endpoint; teardown only runs after landing is confirmed, so any
-# leftover unhandled steer here is moot rather than unlanded work.
+# retired endpoint; its removal follows the retirement proofs above and does
+# not attest that every unhandled steer was implemented.
 # state/<id>.git-hooks is the spawn-owned commit-msg strip directory, left
 # read-only by its installer.
 chmod u+w "$STATE/$ID.git-hooks" 2>/dev/null || true

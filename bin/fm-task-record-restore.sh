@@ -4,6 +4,7 @@
 # All five arguments are explicit operator assertions, not archive discovery.
 # The digest binds the exact archived bytes; generation and endpoint bind the
 # original contract. Native reservation identity must agree independently.
+# Ship records need exactly one supported mode; scout records carry none.
 # Changed metadata, pending retirement, symlinks and ambiguous fields refuse.
 # Identical metadata is an idempotent replay; an interrupted publication's
 # staging links are retired only by exact inode/byte and complete link custody.
@@ -53,12 +54,18 @@ if not re.fullmatch(r'[0-9a-f]{64}', sys.argv[2]):
 if hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest() != sys.argv[2]:
     sys.exit(1)
 PY
-for key in project worktree allocator kind mode spawn_gen; do
+for key in project worktree allocator kind spawn_gen; do
   fm_git_worktree_field "$TMP" "$key" >/dev/null || refuse "ambiguous or missing $key"
 done
 [ "$(fm_meta_get "$TMP" allocator)" = git ] || refuse 'only native records are supported'
-case "$(fm_meta_get "$TMP" kind)" in ship|scout) ;; *) refuse 'unsupported task kind' ;; esac
-case "$(fm_meta_get "$TMP" mode)" in local-only|direct-PR|no-mistakes) ;; *) refuse 'unsupported delivery contract' ;; esac
+case "$(fm_meta_get "$TMP" kind)" in
+  ship)
+    fm_git_worktree_field "$TMP" mode >/dev/null || refuse 'ambiguous or missing mode'
+    case "$(fm_meta_get "$TMP" mode)" in local-only|direct-PR|no-mistakes) ;; *) refuse 'unsupported delivery contract' ;; esac
+    ;;
+  scout) ! grep -q '^mode=' "$TMP" || refuse 'scout record names a delivery contract' ;;
+  *) refuse 'unsupported task kind' ;;
+esac
 [ "$(fm_meta_get "$TMP" spawn_gen)" = "$GENERATION" ] && [ -n "$GENERATION" ] || refuse 'generation mismatch'
 case "$GENERATION" in .*|*[!A-Za-z0-9._-]*) refuse 'invalid generation' ;; esac
 fm_backend_validate_task_endpoint "$TMP" "$ID" || refuse 'endpoint identity is invalid'

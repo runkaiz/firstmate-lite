@@ -15,6 +15,8 @@
 # path preserves that commit at refs/firstmate/retained-bases/<base> before
 # removal; the original source ref is never rewritten. Teardown owns explicit
 # delivery proofs; those predicates run independently of source-ref refresh.
+# fm_git_worktree_pin is the only custody-ref writer: create-only, and an
+# existing ref must already name the same commit.
 # fm_git_worktree_preserve is the only way leftovers leave a copy: it renames
 # exactly the named untracked or ignored paths, on the same filesystem and never
 # over an existing destination, into a private preservation root, and refuses
@@ -209,23 +211,33 @@ fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path> [<lande
   fm_git_worktree_landed "$@"
 }
 
+fm_git_worktree_pin() { # <project> <ref> <commit> - create-only custody ref
+  if ! git -C "$1" show-ref --verify --quiet "$2"; then
+    git -C "$1" update-ref "$2" "$3" '' || return 1
+  fi
+  [ "$(git -C "$1" rev-parse --verify "$2^{commit}")" = "$3" ]
+}
+
+# An unchanged copy (HEAD equals the reservation's recorded base) holds no task
+# commits, whatever later happened to its source ref. The base stays in Git
+# custody at refs/firstmate/retained-bases/<base>. Callers run identity first.
+fm_git_worktree_unchanged_base() { # <state> <id> <project>
+  local base
+  base=$(fm_git_worktree_field "$1/$2.git-worktree" base) || return 1
+  [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" = "$base" ] || return 1
+  fm_git_worktree_pin "$3" "refs/firstmate/retained-bases/$base" "$base"
+}
+
 fm_git_worktree_landed() { # same arguments as safe; landing proof only, no dirt gate
-  local ref base retained
+  local ref
   fm_git_worktree_identity "$@" || return 1
   [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0
   ref=$(fm_git_worktree_field "$1/$2.git-worktree" source_ref) || return 1
   case "$ref" in refs/heads/*|refs/remotes/origin/*) ;; *) return 1 ;; esac
   git check-ref-format "$ref" || return 1
-  # An unchanged scratch copy contains no task commits. Keep the original base
-  # in Git custody even when its source was subsequently deleted or replaced.
-  # A ship's explicit delivery predicate still owns its publication contract.
-  base=$(fm_git_worktree_field "$1/$2.git-worktree" base) || return 1
-  if [ -z "${6:-}" ] && [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" = "$base" ]; then
-    retained="refs/firstmate/retained-bases/$base"
-    if ! git -C "$4" show-ref --verify --quiet "$retained"; then
-      git -C "$4" update-ref "$retained" "$base" '' || return 1
-    fi
-    [ "$(git -C "$4" rev-parse --verify "$retained")" = "$base" ] || return 1
+  # A ship's explicit delivery predicate owns its publication contract; it may
+  # itself accept the unchanged-base proof below (local-only does).
+  if [ -z "${6:-}" ] && fm_git_worktree_unchanged_base "$1" "$2" "$4"; then
     return 0
   fi
   if [ -n "${6:-}" ]; then

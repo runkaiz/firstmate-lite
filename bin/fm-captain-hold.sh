@@ -130,7 +130,8 @@
 # so the process-event runner's feed seam is unchanged.
 #
 # `complete` is the shared investigation and visual-review completion gate.
-# It attests, in the origin task's metadata, the reviewed inventory of
+# It attests, in the origin task's metadata (or data/<origin-id>/captain-call-inventory.meta
+# for a record-less report), the reviewed inventory of
 # captain-held tasks that carry the origin's unresolved captain calls.
 # `--none` is an explicit semantic attestation that the just-reviewed surface
 # has no unresolved captain call, and is refused while the origin still has an
@@ -143,7 +144,7 @@
 # keyed status decision is transferred to its durable owner with a
 # `captain-held [key=...]` status close naming the inventory. Later review
 # passes may add ids. A post-teardown visual review can complete against the
-# surviving report and tasks without recreating task state.
+# surviving report and tasks without recreating a task record.
 # `verify` is read-only and is called by scout teardown, so teardown cannot
 # erase a source before this gate has succeeded: every recorded inventory
 # entry must still satisfy the same durability and origin checks as `complete`,
@@ -1701,12 +1702,20 @@ command_complete() {
   validate_slug origin-id "$origin"
   shift
   meta="$STATE/$origin.meta"
-  [ -f "$meta" ] && has_meta=1
+  if [ -f "$meta" ]; then
+    has_meta=1
+  elif [ -f "$DATA/$origin/report.md" ]; then
+    meta="$DATA/$origin/captain-call-inventory.meta"
+    has_meta=1
+  fi
   if [ "$has_meta" = 1 ]; then
     CAPTAIN_META_LOCK=$(fm_meta_lock_path "$meta") || fail "could not resolve task metadata lock"
     fm_lock_acquire_wait "$CAPTAIN_META_LOCK"
     CAPTAIN_META_LOCK_HELD=1
-    [ -f "$meta" ] || fail "task metadata disappeared while recording completion"
+    if [ ! -f "$meta" ]; then
+      [ "$meta" = "$DATA/$origin/captain-call-inventory.meta" ] || fail "task metadata disappeared while recording completion"
+      : > "$meta" || fail "cannot record report completion inventory"
+    fi
   fi
   require_tasks_axi
   origin_exists_here "$origin" || fail "origin $origin is not owned by the active home $FM_HOME"
@@ -1786,6 +1795,9 @@ command_verify() {
   [ "$#" -eq 1 ] || { usage >&2; exit 2; }
   validate_slug origin-id "$origin"
   meta="$STATE/$origin.meta"
+  if [ ! -f "$meta" ] && [ -f "$DATA/$origin/report.md" ]; then
+    meta="$DATA/$origin/captain-call-inventory.meta"
+  fi
   [ -f "$meta" ] || fail "origin metadata is absent: $meta"
   require_tasks_axi
   reviewed=$(meta_value "$meta" decisions_reviewed)
