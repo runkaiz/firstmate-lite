@@ -4200,6 +4200,49 @@ test_terminal_delivery_resumed_activity_rearms() {
   pass "authoritative resumed activity clears the delivery bound and preserves the next first sight"
 }
 
+test_terminal_delivery_stale_busy_record() {
+  local dir state out capture gen mode message
+  command -v tasks-axi >/dev/null 2>&1 || { echo 'skip: tasks-axi not found'; return 0; }
+  for mode in attended away; do
+    dir=$(make_hold_home "delivery-sticky-busy-$mode" 'done: delivered result' nohold) || fail 'fixture failed'
+    state="$dir/state"; out="$dir/watch.out"; capture="$dir/pane.txt"
+    printf 'window=test:fm-held-merge\nkind=ship\nharness=claude\nbackend=tmux\n' > "$state/held-merge.meta"
+    gen=$("$ROOT/bin/fm-busy-event.sh" arm "$state" held-merge --source claude-hook --event user-prompt-submit) || fail 'busy arm failed'
+    # A retained hook record predates completion, independently of pane redraws.
+    set_mtime "$(( $(date +%s) - 60 ))" "$state/held-merge.busy-state"
+    [ "$mode" != away ] || touch "$state/.afk"
+    FM_HOLD_CREW_STATE='state: working · source: pane · harness busy' \
+      hold_watch_surface "$dir" "$out" "$capture" 'idle first result' || fail 'sticky busy swallowed first result'
+    ack_stopped_cycle "$state" || fail 'could not acknowledge delivery'
+    FM_HOLD_CREW_STATE='state: working · source: pane · harness busy' \
+      hold_watch_churn "$dir" "$out" "$capture" 'stale busy redraw' 3 || fail 'sticky busy re-alarmed delivered result'
+    [ ! -e "$state/.stale-since-$(hold_key)" ] || fail 'sticky completion started wedge timer'
+    ack_stopped_cycle "$state" || fail 'could not acknowledge churn round'
+    # Exercise the real steering record format, independently of a new busy
+    # hook. An unhandled follow-up must invalidate completion suppression.
+    message=$(bash -c '. "$1/bin/fm-task-inbox-lib.sh"; fm_task_inbox_write "$2" held-merge "new follow-up"' _ "$ROOT" "$state") || fail 'inbox write failed'
+    FM_HOLD_CREW_STATE='state: working · source: pane · harness busy' \
+      hold_watch_churn "$dir" "$out" "$capture" 'pending follow-up' 1 || fail 'pending inbox lost busy handling'
+    [ ! -e "$state/.terminal-resurfaced-$(hold_key)" ] || fail 'pending inbox retained completion bound'
+    mv "$message" "$state/held-merge.inbox/handled/"
+    ack_stopped_cycle "$state" || fail 'could not acknowledge inbox round'
+    "$ROOT/bin/fm-busy-event.sh" apply "$state" held-merge busy --gen "$gen" --source claude-hook --event user-prompt-submit || fail 'new turn failed'
+    FM_HOLD_CREW_STATE='state: working · source: pane · harness busy' \
+      hold_watch_churn "$dir" "$out" "$capture" 'new actual turn' 1 || fail 'new turn failed to absorb'
+    [ ! -e "$state/.terminal-resurfaced-$(hold_key)" ] || fail 'new turn retained completion bound'
+  done
+  # An unrelated stale record cannot overrule another positive busy source.
+  dir=$(make_hold_home delivery-untrusted-busy 'done: delivered result' nohold) || fail 'fixture failed'
+  state="$dir/state"; out="$dir/watch.out"; capture="$dir/pane.txt"
+  "$ROOT/bin/fm-busy-event.sh" arm "$state" held-merge --source claude-hook --event user-prompt-submit >/dev/null || fail 'busy arm failed'
+  set_mtime "$(( $(date +%s) - 60 ))" "$state/held-merge.busy-state"
+  FM_HOLD_CREW_STATE='state: working · source: pane · harness busy' \
+    hold_watch_churn "$dir" "$out" "$capture" 'untrusted stale record' 1 || fail 'untrusted record suppressed activity'
+  [ ! -e "$state/.terminal-resurfaced-$(hold_key)" ] || fail 'untrusted stale record armed delivery suppression'
+  [ -e "$state/.stale-since-$(hold_key)" ] || fail 'untrusted record lost activity wedge timer'
+  pass 'a pre-completion busy record cannot re-alarm delivered work; a new busy event restores activity detection'
+}
+
 test_terminal_delivery_failed_append_keeps_first_delivery() {
   local dir state out capture rc
   command -v tasks-axi >/dev/null 2>&1 \
@@ -6820,6 +6863,7 @@ test_stale_churn_without_a_captain_call_still_alarms
 test_terminal_delivery_redraw_bound
 test_terminal_delivery_new_events_remain_actionable
 test_terminal_delivery_resumed_activity_rearms
+test_terminal_delivery_stale_busy_record
 test_terminal_delivery_failed_append_keeps_first_delivery
 test_failed_wake_append_does_not_arm_the_captain_hold_throttle
 test_reheld_captain_call_starts_its_own_resurface_window

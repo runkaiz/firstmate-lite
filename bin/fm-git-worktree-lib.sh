@@ -9,10 +9,12 @@
 # Fields (exactly one each): schema, task, home, project, common, root, path,
 # base, source_ref. Metadata allocator=git selects this lifecycle permanently;
 # absent allocator means legacy Treehouse, independently of current config.
-# Removal requires matching identity, no dirt/untracked (including ignored),
-# and HEAD contained in the current recorded source ref, unless teardown supplies
-# its existing landed-work predicate for a PR ship. fm-teardown.sh owns that
-# predicate's proofs; it never exempts dirt or changes ownership checks.
+# Removal requires matching identity and no dirt/untracked (including ignored).
+# Without a teardown-owned delivery predicate, HEAD must be contained in the
+# current recorded source ref or equal the original base. The unchanged-base
+# path preserves that commit at refs/firstmate/retained-bases/<base> before
+# removal; the original source ref is never rewritten. Teardown owns explicit
+# delivery proofs; those predicates run independently of source-ref refresh.
 # fm_git_worktree_preserve is the only way leftovers leave a copy: it renames
 # exactly the named untracked or ignored paths, on the same filesystem and never
 # over an existing destination, into a private preservation root, and refuses
@@ -23,7 +25,7 @@
 # rerun after interruption verifies and receipts a moved path instead of
 # overwriting or losing it. Which leftovers are disposable task-owned generated
 # artifacts is the caller's judgment; this primitive only moves, never deletes.
-# Remote source checks refresh only the recorded origin branch and refuse on
+# Remote ancestry checks refresh only the recorded origin branch and refuse on
 # fetch failure; local refs are not fetched. Never deletes a branch. Task-record retirement/replay
 # in fm-backlog-transition-lib.sh owns final reservation retirement when task
 # metadata or a pending-close marker remains after copy removal.
@@ -208,10 +210,30 @@ fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path> [<lande
 }
 
 fm_git_worktree_landed() { # same arguments as safe; landing proof only, no dirt gate
-  local ref
+  local ref base retained
   fm_git_worktree_identity "$@" || return 1
   [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0
   ref=$(fm_git_worktree_field "$1/$2.git-worktree" source_ref) || return 1
+  case "$ref" in refs/heads/*|refs/remotes/origin/*) ;; *) return 1 ;; esac
+  git check-ref-format "$ref" || return 1
+  # An unchanged scratch copy contains no task commits. Keep the original base
+  # in Git custody even when its source was subsequently deleted or replaced.
+  # A ship's explicit delivery predicate still owns its publication contract.
+  base=$(fm_git_worktree_field "$1/$2.git-worktree" base) || return 1
+  if [ -z "${6:-}" ] && [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" = "$base" ]; then
+    retained="refs/firstmate/retained-bases/$base"
+    if ! git -C "$4" show-ref --verify --quiet "$retained"; then
+      git -C "$4" update-ref "$retained" "$base" '' || return 1
+    fi
+    [ "$(git -C "$4" rev-parse --verify "$retained")" = "$base" ] || return 1
+    return 0
+  fi
+  if [ -n "${6:-}" ]; then
+    if ! declare -F "$6" >/dev/null || ! "$6"; then
+      fm_git_worktree_error 'task delivery is not proven landed; preserving copy'; return 1
+    fi
+    return 0
+  fi
   case "$ref" in
     refs/heads/*) ;;
     refs/remotes/origin/*)
@@ -222,11 +244,7 @@ fm_git_worktree_landed() { # same arguments as safe; landing proof only, no dirt
     *) return 1 ;;
   esac
   git -C "$4" show-ref --verify --quiet "$ref" || return 1
-  if [ -n "${6:-}" ]; then
-    if ! declare -F "$6" >/dev/null || ! "$6"; then
-      fm_git_worktree_error 'task delivery is not proven landed; preserving copy'; return 1
-    fi
-  elif ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
+  if ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
     fm_git_worktree_error "unlanded HEAD is not contained in $ref; preserving copy"; return 1
   fi
 }

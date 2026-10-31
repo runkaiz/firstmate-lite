@@ -3,7 +3,9 @@
 # absent allocator keeps legacy pooled/Orca behavior. Native copies always face
 # bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
 # PR ships use this script's existing landed-work proof, while local-only ships
-# and scouts require source ancestry. --force is unsupported. A live/unverified owner refuses.
+# and scouts require the native library's source/base proof. Legacy local-only
+# reservations also accept local default-branch ancestry. --force is unsupported.
+# A live/unverified owner refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
 # for leftovers the caller inspected and classified as task-owned generated
@@ -220,6 +222,14 @@
 # never left leased forever. If the treehouse return fails, teardown leaves the
 # leased home and state in place instead of hiding a still-held lease.
 # Usage: fm-teardown.sh <task-id> [--force] [--legacy-record]
+#                         [--landed-pr <URL> --landed-head <SHA>]
+#   --landed-pr and --landed-head explicitly supply sibling publication proof
+#   for a local-only producer. The canonical GitHub URL must match origin,
+#   the forge must return that exact merged PR/head and the expected base,
+#   its merge commit must be in the refreshed origin base, and its head must
+#   contain this copy's HEAD. No patch equivalence is accepted on this path.
+#   This does not change mode/pr metadata, merge local divergence, waive any
+#   dirt/owner gate, or authorize force. The backlog note names this delivery.
 #   --force skips ordinary-task dirty and landed-work checks, skips scout report
 #   checks, and discards secondmate child work for kind=secondmate. Only use it
 #   when the captain has explicitly said to discard the work.
@@ -422,6 +432,8 @@ TEARDOWN_LOST_SLOT_EXIT=4
 FORCE=
 LEGACY_RECORD_GIVEN=0
 PRESERVE_PATHS=()
+SIBLING_PR=
+SIBLING_HEAD=
 shift
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -432,6 +444,8 @@ while [ "$#" -gt 0 ]; do
       PRESERVE_PATHS+=("$2")
       shift
       ;;
+    --landed-pr) SIBLING_PR=${2:?missing PR URL}; shift ;;
+    --landed-head) SIBLING_HEAD=${2:?missing PR head}; shift ;;
     *)
       echo "error: invalid teardown request" >&2
       exit 2
@@ -442,6 +456,11 @@ done
 if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$FORCE" = --force ]; then
   echo "error: --preserve-untracked never combines with --force" >&2
   exit 2
+fi
+if [ -n "$SIBLING_PR$SIBLING_HEAD" ]; then
+  fm_pr_url_parse "$SIBLING_PR" && fm_pr_head_valid "$SIBLING_HEAD" && [ -z "$FORCE" ] || {
+    echo 'REFUSED: sibling landing requires a canonical PR URL and exact head, without force' >&2; exit 1;
+  }
 fi
 fm_backlog_directory_present "$STATE" "state directory" || {
   echo "error: teardown refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
@@ -1133,6 +1152,36 @@ work_is_landed() {
   content_in_default
 }
 
+# Explicit sibling evidence does not rewrite pr= or mode=. It proves only
+# this copy's HEAD is contained in the exact merged producer head. In
+# particular, patch/path similarity and a published branch are insufficient.
+sibling_pr_landed() {
+  local remote expected_repo view base merge head
+  [ "$KIND" = ship ] && [ "$MODE" = local-only ] || return 1
+  fm_pr_url_parse "$SIBLING_PR" || return 1
+  expected_repo="https://github.com/$FM_PR_PATH"
+  remote=$(git -C "$PROJ" config --get-all remote.origin.url) || return 1
+  remote=${remote%.git}
+  case "$remote" in
+    git@github.com:*) remote="https://github.com/${remote#git@github.com:}" ;;
+    ssh://git@github.com/*) remote="https://github.com/${remote#ssh://git@github.com/}" ;;
+  esac
+  [ "$remote" = "$expected_repo" ] || return 1
+  base=${BASE_BRANCH:-}
+  [ -n "$base" ] || base=$(default_branch) || return 1
+  view=$(cd "$WT" && gh pr view "$SIBLING_PR" --json url,state,headRefOid,baseRefName,mergeCommit) || return 1
+  merge=$(printf '%s\n' "$view" | jq -ser --arg url "$SIBLING_PR" --arg head "$SIBLING_HEAD" --arg base "$base" '
+    select(length == 1) | .[0]
+    | select(.url == $url and .state == "MERGED" and .headRefOid == $head and .baseRefName == $base)
+    | .mergeCommit.oid | select(type == "string" and test("^[0-9a-f]{40}$|^[0-9a-f]{64}$"))
+  ') || return 1
+  ensure_commit_object "$SIBLING_PR" "$SIBLING_HEAD" || return 1
+  git -C "$WT" fetch --quiet --no-tags --no-write-fetch-head origin "refs/heads/$base:refs/remotes/origin/$base" || return 1
+  git -C "$WT" merge-base --is-ancestor "$merge" "refs/remotes/origin/$base" || return 1
+  head=$(git -C "$WT" rev-parse --verify HEAD) || return 1
+  git -C "$WT" merge-base --is-ancestor "$head" "$SIBLING_HEAD"
+}
+
 # The completion links this teardown already holds locally. A scout's
 # deliverable is its report, a local-only ship lands on local main, and every
 # other ship carries the PR recorded on its own record.
@@ -1147,7 +1196,11 @@ backlog_done_args() {
       ;;
     *)
       if [ "$MODE" = local-only ]; then
-        BACKLOG_DONE_ARGS=(--note "local main")
+        if [ -n "$SIBLING_PR" ]; then
+          BACKLOG_DONE_ARGS=(--note "landed via $SIBLING_PR at $SIBLING_HEAD")
+        else
+          BACKLOG_DONE_ARGS=(--note "local main")
+        fi
       elif [ -n "$PR_URL" ]; then
         BACKLOG_DONE_ARGS=(--pr "$PR_URL")
       fi
@@ -1472,6 +1525,12 @@ validate_worktree_teardown_safety() {
   unpushed=$(printf '%s\n' "$unpushed_raw" | head -5)
 
   if [ "$MODE" = local-only ]; then
+    if [ -n "$SIBLING_PR" ]; then
+      if [ -n "$dirty" ] || ! sibling_pr_landed; then
+        echo 'REFUSED: exact sibling PR landing is not proven; preserving copy' >&2; return 1;
+      fi
+      return 0
+    fi
     DEFAULT=$(default_branch) || { echo "REFUSED: cannot determine default branch for $PROJ; expected origin/HEAD, main, or master." >&2; return 1; }
     if ! unmerged_raw=$(git -C "$WT" log --oneline HEAD --not "$DEFAULT" -- 2>/dev/null); then
       if worktree_safety_blocked_by_lock "commits not on $DEFAULT"; then
@@ -2292,8 +2351,21 @@ teardown_native_pr_landed() {
   branch=$(git -C "$WT" rev-parse --abbrev-ref HEAD) || return 1
   work_is_landed "$branch"
 }
+teardown_native_local_landed() {
+  local name
+  name=$(default_branch) || return 1
+  git -C "$WT" merge-base --is-ancestor HEAD "refs/heads/$name"
+}
+if [ -n "$SIBLING_PR" ] && [ -d "$WT" ]; then
+  sibling_pr_landed || { echo 'REFUSED: exact sibling PR landing is not proven; preserving copy' >&2; exit 1; }
+fi
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
-  if [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
+  if [ -n "$SIBLING_PR" ]; then
+    NATIVE_LANDING_CHECK=(sibling_pr_landed)
+  elif [ "$KIND" = ship ] && [ "$MODE" = local-only ] \
+    && [[ "$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref)" = refs/remotes/* ]]; then
+    NATIVE_LANDING_CHECK=(teardown_native_local_landed)
+  elif [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
     NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
   fi
   if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ -d "$WT" ]; then
