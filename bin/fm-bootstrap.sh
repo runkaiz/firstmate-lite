@@ -15,6 +15,7 @@
 #                 "HOME_SUMMARY: <ledger never published|not republished since
 #                 <stamp>>; <n> failed attempt(s) ... last: <recorded failure>",
 #                 "BACKLOG_RECONCILE: <id>: <what this home could not reconcile>",
+#                 "NATIVE_RESERVATION: native reservation without task record: <path>; <recovery pointer>",
 #                 "BACKLOG_RECONCILE: code-root <file> is not this home's <file>; ...",
 #                 "TANGLE: <remediation>",
 #          A TANGLE line means the firstmate primary checkout (FM_ROOT) is stranded
@@ -915,6 +916,19 @@ if network_phase && fm_backend_list_contains "$COMMON_TOOLS" gh; then
   fm_timing_record phase gh-auth "$__fm_timing_stamp"
 fi
 local_phase && detect_local_config
+
+# Native reservations survive interrupted allocation and archived registrations.
+# Report them through the existing startup diagnostic pass; never infer an
+# endpoint or automatically restore/delete the record or its copy.
+if local_phase; then
+  for orphan_reservation in "$STATE/"*.git-worktree; do
+    [ -e "$orphan_reservation" ] || [ -L "$orphan_reservation" ] || continue
+    orphan_meta=${orphan_reservation%.git-worktree}.meta
+    if [ ! -e "$orphan_meta" ] && [ ! -L "$orphan_meta" ]; then
+      echo "NATIVE_RESERVATION: native reservation without task record: $orphan_reservation; inspect allocation or use bin/fm-task-record-restore.sh for a verified archive"
+    fi
+  done
+fi
 
 if [ "${FM_BOOTSTRAP_DETECT_ONLY:-0}" != 1 ]; then
   # secondmate_sync consumes SECONDMATE_RESPAWNED_IDS from the liveness sweep, so

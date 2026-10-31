@@ -185,6 +185,33 @@ if remove_copy content; then fail 'unlanded committed work was discarded'; fi
 [ -d "$WT" ] && [ -f "$HOME_DIR/state/content.git-worktree" ] || fail 'refusal lost copy/record'
 pass 'native cleanup preserves untracked, ignored, dirty and unlanded content'
 
+for source in local remote; do
+  make_case "replaced-base-$source"
+  ref="refs/heads/$MAIN"
+  if [ "$source" = remote ]; then
+    git clone -q --bare "$PROJ" "$CASE/origin.git"
+    git -C "$PROJ" remote add origin "$CASE/origin.git"
+    git -C "$PROJ" fetch -q origin
+    ref="refs/remotes/origin/$MAIN"
+  fi
+  fm_git_worktree_allocate "$HOME_DIR/state" unchanged "$HOME_DIR" "$PROJ" "$COPY_ROOT" "$BASE" "$ref" || fail 'base fixture failed'
+  WT=$FM_GIT_WORKTREE_PATH
+  rewritten=$(printf 'replacement\n' | git -C "$PROJ" -c user.name=Tests -c user.email=tests@example.invalid commit-tree "$BASE^{tree}")
+  git -C "$PROJ" update-ref "$ref" "$rewritten"
+  [ "$source" != remote ] || git -C "$CASE/origin.git" update-ref "refs/heads/$MAIN" "$rewritten"
+  printf 'ignored\n' > "$WT/.gitignore"
+  printf 'evidence\n' > "$WT/ignored"
+  if remove_copy unchanged; then fail 'unchanged-base shortcut discarded dirty or ignored artifacts'; fi
+  rm "$WT/.gitignore" "$WT/ignored"
+  if fm_git_worktree_safe "$HOME_DIR/state" unchanged "$HOME_DIR" "$PROJ" "$WT" missing_proof; then
+    fail 'unchanged-base shortcut bypassed explicit delivery contract'
+  fi
+  remove_copy unchanged || fail 'clean unchanged base stranded after source replacement'
+  [ "$(git -C "$PROJ" rev-parse "refs/firstmate/retained-bases/$BASE")" = "$BASE" ] || fail 'original base lost commit custody'
+  [ "$(git -C "$PROJ" rev-parse "$ref")" = "$rewritten" ] || fail 'cleanup rewrote source history'
+  pass "unchanged $source base retires after source replacement while retaining original commit custody"
+done
+
 make_case remote-landing
 git clone -q --bare "$PROJ" "$CASE/origin.git"
 git -C "$PROJ" remote add origin "file://$CASE/origin.git"
@@ -281,10 +308,10 @@ for kind in ship scout remote; do
   pass "native $kind selects exact accepted source on divergence and refuses duplicate spawn"
 done
 
-for scenario in tmux-manual tmux-rebased tmux-spend tmux-close tmux-retain herdr-manual; do
+for scenario in tmux-manual tmux-rebased tmux-sibling tmux-c2 tmux-spend tmux-close tmux-retain herdr-manual; do
   backend=${scenario%%-*}
   retirement=${scenario#*-}
-  case "$retirement" in rebased|spend) retirement=manual ;; esac
+  case "$retirement" in rebased|sibling|c2|spend) retirement=manual ;; esac
   make_case "missing-$scenario"
   printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
   id=missing-endpoint
@@ -301,6 +328,29 @@ for scenario in tmux-manual tmux-rebased tmux-spend tmux-close tmux-retain herdr
   allocate "$id" || fail 'missing endpoint fixture allocation failed'
   WT=$FM_GIT_WORKTREE_PATH
   native_mode=local-only
+  native_pr_head=
+  native_merge_head=
+  if [ "$scenario" = tmux-sibling ] || [ "$scenario" = tmux-c2 ]; then
+    git clone -q --bare "$PROJ" "$CASE/origin.git"
+    git -C "$PROJ" remote add origin https://github.com/fixture/project.git
+    git -C "$PROJ" config "url.file://$CASE/origin.git.insteadOf" https://github.com/fixture/project.git
+    git -C "$PROJ" fetch -q origin
+    printf 'producer delivery\n' > "$WT/delivered"
+    git -C "$WT" add delivered
+    git -C "$WT" -c user.name=test -c user.email=test@example.invalid commit -qm producer
+    original=$(git -C "$WT" rev-parse HEAD)
+    if [ "$scenario" = tmux-c2 ]; then
+      # Model a pre-local-source-selection reservation, with accepted local
+      # main ahead of origin. Only local ancestry may authorize retirement.
+      sed "s|^source_ref=.*|source_ref=refs/remotes/origin/$MAIN|" "$HOME_DIR/state/$id.git-worktree" > "$CASE/legacy-reservation"
+      cp "$CASE/legacy-reservation" "$HOME_DIR/state/$id.git-worktree"
+      git -C "$PROJ" merge --ff-only "$original" >/dev/null
+    else
+      native_pr_head=$(printf 'publisher\n' | git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid commit-tree "$original^{tree}" -p "$original")
+      native_merge_head=$(printf 'squashed publisher\n' | git -C "$PROJ" -c user.name=test -c user.email=test@example.invalid commit-tree "$native_pr_head^{tree}" -p "$BASE")
+      git -C "$CASE/origin.git" fetch -q "$PROJ" "$native_merge_head:refs/heads/$MAIN" "$native_pr_head:refs/pull/1/head"
+    fi
+  fi
   if [ "$scenario" = tmux-spend ]; then
     : > "$HOME_DIR/config/pipeline-spend"
     git -C "$WT" switch -qc "fm/$id"
@@ -327,7 +377,13 @@ for scenario in tmux-manual tmux-rebased tmux-spend tmux-close tmux-retain herdr
   cat > "$fakebin/gh" <<'SH'
 #!/usr/bin/env bash
 if [ "$1 $2" = 'pr view' ]; then
-  printf '%s\t%s\thttps://example.invalid/fixture/project/pull/1\n' "${FM_TEST_NATIVE_PR_STATE:-MERGED}" "${FM_TEST_NATIVE_PR_HEAD:?}"
+  if [ -n "${FM_TEST_NATIVE_MERGE_HEAD:-}" ]; then
+    printf '{"state":"%s","url":"%s","headRefOid":"%s","baseRefName":"%s","mergeCommit":{"oid":"%s"}}\n' \
+      "${FM_TEST_NATIVE_PR_STATE:-MERGED}" "${FM_TEST_PR_URL:-https://github.com/fixture/project/pull/1}" \
+      "${FM_TEST_PR_VIEW_HEAD:-$FM_TEST_NATIVE_PR_HEAD}" "${FM_TEST_PR_VIEW_BASE:-$FM_TEST_NATIVE_BASE}" "${FM_TEST_PR_VIEW_MERGE:-$FM_TEST_NATIVE_MERGE_HEAD}"
+  else
+    printf '%s\t%s\thttps://example.invalid/fixture/project/pull/1\n' "${FM_TEST_NATIVE_PR_STATE:-MERGED}" "${FM_TEST_NATIVE_PR_HEAD:?}"
+  fi
 else
   exit 1
 fi
@@ -381,17 +437,79 @@ SH
       'herdr_tab_id=w1:t1' 'herdr_pane_id=w1:p1' >> "$HOME_DIR/state/$id.meta"
   fi
   run_native_teardown() {
+    local sibling_args=()
+    if [ "$scenario" = tmux-sibling ]; then
+      sibling_args=(--landed-pr https://github.com/fixture/project/pull/1 --landed-head "$native_pr_head")
+    fi
     env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
       FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
       FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
       FM_TEST_HERDR_SOCKET="$CASE/herdr.sock" \
       FM_TEST_NATIVE_PR_HEAD="${native_pr_head:-}" \
-      bash "$ROOT/bin/fm-teardown.sh" "$id"
+      FM_TEST_NATIVE_MERGE_HEAD="${native_merge_head:-}" FM_TEST_NATIVE_BASE="$MAIN" \
+      bash "$ROOT/bin/fm-teardown.sh" "$id" "${sibling_args[@]+"${sibling_args[@]}"}"
   }
+  if [ "$scenario" = tmux-manual ]; then
+    cp "$HOME_DIR/state/$id.meta" "$CASE/archived.meta"
+    rm "$HOME_DIR/state/$id.meta"
+    out=$(env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+      FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bash "$ROOT/bin/fm-bootstrap.sh" 2>&1)
+    assert_contains "$out" "native reservation without task record: $HOME_DIR/state/$id.git-worktree" 'startup missed orphan native reservation'
+    [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'orphan diagnosis restored metadata automatically'
+    restore_record() {
+      env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-task-record-restore.sh" "$id" "$CASE/archived.meta" \
+        "$1" s1792922400.123.456 "$2"
+    }
+    digest=$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$CASE/archived.meta")
+    if restore_record "${digest%?}x" "$target"; then fail 'restoration accepted wrong digest'; fi
+    if restore_record "$digest" 'other:fm-missing-endpoint'; then fail 'restoration accepted another endpoint'; fi
+    if env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-task-record-restore.sh" "$id" "$CASE/archived.meta" "$digest" another-generation "$target"; then
+      fail 'restoration accepted another spawn incarnation'
+    fi
+    printf 'successor-busy-generation\n' > "$HOME_DIR/state/$id.busy-gen"
+    if restore_record "$digest" "$target"; then fail 'restoration adopted successor busy incarnation'; fi
+    rm "$HOME_DIR/state/$id.busy-gen"
+    mkdir "$HOME_DIR/state/.control-$id.lock"
+    printf '%s\n' "$$" > "$HOME_DIR/state/.control-$id.lock/pid"
+    if restore_record "$digest" "$target"; then fail 'restoration ignored lifecycle lock'; fi
+    rm "$HOME_DIR/state/.control-$id.lock/pid"
+    rmdir "$HOME_DIR/state/.control-$id.lock"
+    cp "$HOME_DIR/state/$id.git-worktree" "$CASE/reservation-before-restore"
+    sed 's/^task=.*/task=foreign/' "$CASE/reservation-before-restore" > "$HOME_DIR/state/$id.git-worktree"
+    if restore_record "$digest" "$target"; then fail 'restoration accepted foreign reservation'; fi
+    cp "$CASE/reservation-before-restore" "$HOME_DIR/state/$id.git-worktree"
+    [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'refused restore published metadata'
+    restore_record "$digest" "$target" || fail 'valid archived native metadata could not be restored'
+    cmp "$CASE/archived.meta" "$HOME_DIR/state/$id.meta" || fail 'restoration changed original contract bytes'
+    if restore_record "$digest" "$target"; then fail 'restoration replaced an existing record'; fi
+    pass 'archived native metadata restoration binds exact bytes, generation, endpoint and reservation'
+  fi
   if out=$(FM_TEST_ENDPOINT_UNREADABLE=1 run_native_teardown 2>&1); then
     fail "$backend unreadable endpoint permitted native removal"
   fi
   assert_contains "$out" 'live or unverified endpoint' "$backend refused for the wrong reason"
+  if [ "$scenario" = tmux-sibling ]; then
+    for proof_fault in open wrong-url wrong-head wrong-base wrong-merge private-divergence; do
+      case "$proof_fault" in
+        open) out=$(FM_TEST_NATIVE_PR_STATE=OPEN run_native_teardown 2>&1); rc=$? ;;
+        wrong-url) out=$(FM_TEST_PR_URL=https://github.com/foreign/project/pull/1 run_native_teardown 2>&1); rc=$? ;;
+        wrong-head) out=$(FM_TEST_PR_VIEW_HEAD="$BASE" run_native_teardown 2>&1); rc=$? ;;
+        wrong-base) out=$(FM_TEST_PR_VIEW_BASE=another-branch run_native_teardown 2>&1); rc=$? ;;
+        wrong-merge) out=$(FM_TEST_PR_VIEW_MERGE="$original" run_native_teardown 2>&1); rc=$? ;;
+        private-divergence)
+          printf 'private change\n' > "$WT/private"
+          git -C "$WT" add private
+          git -C "$WT" -c user.name=test -c user.email=test@example.invalid commit -qm private
+          out=$(run_native_teardown 2>&1); rc=$?
+          git -C "$WT" branch retained-private HEAD
+          git -C "$WT" checkout -q --detach "$original"
+          ;;
+      esac
+      [ "$rc" != 0 ] || fail "sibling proof accepted $proof_fault"
+      [ -f "$HOME_DIR/state/$id.meta" ] && [ -d "$WT" ] || fail 'sibling refusal removed ownership'
+      assert_contains "$out" 'sibling PR landing is not proven' 'sibling proof failed for wrong reason'
+    done
+  fi
   if [ "$scenario" = tmux-rebased ]; then
     if out=$(FM_TEST_NATIVE_PR_STATE=OPEN run_native_teardown 2>&1); then
       fail 'native teardown accepted an unmerged rebased PR'
@@ -497,6 +615,14 @@ SH
   [ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] && [ ! -e "$HOME_DIR/state/$id.git-worktree" ] \
     || fail "$backend missing endpoint cleanup left copy or records"
   [ ! -e "$HOME_DIR/state/$id.backlog-close" ] || fail "$scenario replay left its retirement marker"
+  if [ "$scenario" = tmux-sibling ]; then
+    [ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$BASE" ] || fail 'sibling proof merged private local history'
+    git -C "$PROJ" show-ref --verify --quiet refs/heads/retained-private || fail 'sibling cleanup deleted retained private lineage'
+    pass 'exact sibling PR landing retires a contained local producer without merging private divergence'
+  elif [ "$scenario" = tmux-c2 ]; then
+    [ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$original" ] || fail 'legacy local-only retirement changed accepted local history'
+    pass 'legacy native local-only reservation accepts documented local default ancestry'
+  fi
   git -C "$PROJ" update-ref "refs/heads/$MAIN" "$alternate"
   BASE=$alternate
   allocate "$id" || fail "$scenario replay stranded future allocation"
