@@ -1,0 +1,79 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/socket-home
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+Preparing worktree (detached HEAD ba46eac)
+HEAD is now at ba46eac initial
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65f28ed6491671","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},"type":"workspace_created","workspace":{"active_tab_id":"w1:t1","agent_status":"unknown","focused":true,"label":"stow-cleanup","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"}}}
+{"id":"cli:pane:list","result":{"panes":[{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65f28ed6491671","workspace_id":"w1"}],"type":"pane_list"}}
+HOME_FOR_NEXT=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+COPY_FOR_NEXT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree
+CASE_FOR_NEXT=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve
+
+$ bash bin/fm-herdr-lab.sh run fm-lab-stow-gate pane process-info --pane w1:p1
+{"id":"cli:pane:process_info","result":{"process_info":{"foreground_process_group_id":2880008,"foreground_processes":[{"argv":["/bin/bash"],"cmdline":"/bin/bash","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","name":"bash","pid":2880008},{"cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree","name":"bash","pid":2880051}],"pane_id":"w1:p1","shell_pid":2880008},"type":"pane_process_info"}}
+
+EXPECTED REFUSAL: td
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh herdr-preserve
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree; preserving copy
+?? build/output
+build/output
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: inspect each path; only for task-owned generated artifacts, rerun teardown with --preserve-untracked <path> per leftover
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh herdr-preserve --preserve-untracked build
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: native copy still has processes; nothing preserved
+
+$ bash bin/fm-herdr-lab.sh run fm-lab-stow-gate pane list
+{"id":"cli:pane:list","result":{"panes":[],"type":"pane_list"}}
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh herdr-preserve --preserve-untracked build
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home/data/herdr-preserve/preserved-artifacts/files/build
+teardown herdr-preserve complete (window fm-lab-stow-gate:w1:p1, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/copies/herdr-preserve/worktree)
+Backlog: herdr-preserve is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-queue.sh show herdr-preserve
+task:
+  id: herdr-preserve
+  title: Live herdr-preserve exercise.
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-10-31
+  links: local main
+  body: ""
+  archived: no
+# Backlog
+
+## In flight
+
+## Queued
+
+## Done
+- [x] herdr-preserve - Live herdr-preserve exercise. - local main (kind: ship) (done 2026-10-31)
+
+$ cat /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/extra-world/herdr-preserve/home/data/herdr-preserve/preserved-artifacts/files/build/output
+Herdr generated bytes
+SCENARIO PASS: real Herdr shell closes; foreign process refuses preservation; after it exits, cleanup preserves bytes and closes queue

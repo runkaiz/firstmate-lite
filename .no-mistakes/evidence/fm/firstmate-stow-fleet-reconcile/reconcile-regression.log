@@ -1,0 +1,33 @@
+Preparing worktree (detached HEAD 651bf33)
+HEAD is now at 651bf33 initial
+Preparing worktree (detached HEAD 651bf33)
+HEAD is now at 651bf33 initial
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+Preparing worktree (detached HEAD 648dd73)
+HEAD is now at 648dd73 landed
+ok - underway work classifies as held, landed, needs-captain, ongoing, archived, unretirable and stale without mutation
+ok - archive hashing works without sha256sum and failed hashing proposes no restore
+ok - a proposed restore runs as printed and the restored record reclassifies on rerun
+ok - verified record-less scout queue closure preserves native resources
+ok - record-less inventories retain their entries and reject unresolved captain calls

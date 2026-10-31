@@ -1,0 +1,36 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/socket-home
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/generated/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/generated/home
+Preparing worktree (detached HEAD c2992ef)
+HEAD is now at c2992ef initial
+generated	landed	bin/fm-teardown.sh generated --preserve-untracked build	inspect generated leftovers before preserving: build; other leftovers refuse teardown: notes; local work is in local history
+generated	landed	bin/fm-teardown.sh generated --preserve-untracked build	inspect generated leftovers before preserving: build; other leftovers refuse teardown: notes; local work is in local history
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/unknown-pr/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/unknown-pr/home
+Preparing worktree (detached HEAD c2992ef)
+HEAD is now at c2992ef initial
+unknown-pr	unknown	-	PR https://github.com/runkaiz/firstmate-lite/pull/999999999 state unreadable
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/merged-pr/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/merged-pr/home
+Preparing worktree (detached HEAD c2d10ea)
+HEAD is now at c2d10ea initial
+merged-pr	landed	bin/fm-teardown.sh merged-pr	merged https://github.com/runkaiz/firstmate-lite/pull/13
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/no-archive/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/no-archive/home
+Preparing worktree (detached HEAD e5311e3)
+HEAD is now at e5311e3 initial
+no-archive	unretirable	-	native reservation without task record; no archive given holds it
+no-archive	needs-captain	-	scout report needs captain-call inventory verification; copy and reservation stay preserved
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/home
+Preparing worktree (detached HEAD 8a44be3)
+HEAD is now at 8a44be3 initial
+archive-tamper	record-archived	FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/home bin/fm-task-record-restore.sh archive-tamper /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/archive/archive-tamper.meta 1e0293fc127ee4686cf791f179be75a6322e938b1ecbbb5ef82b02f7cceb06aa s1.archive-tamper fm-lab:fm-archive-tamper	archived scout record; restore verifies bytes, generation, endpoint and reservation
+REFUSED: archived task record: archive digest does not match
+archive-tamper	unretirable	-	ambiguous archives: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/archive/archive-tamper.meta /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/classifier-world/archive-tamper/duplicate/archive-tamper.meta
+SCENARIO PASS: read-only reconciliation checks real forge state, flags evidence leftovers, refuses ambiguous archives and unverified reports; tampered archive cannot restore

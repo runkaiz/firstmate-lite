@@ -1,0 +1,23 @@
+From https://github.com/runkaiz/firstmate-lite
+ * branch            main              -> FETCH_HEAD
+ * [new ref]         refs/pull/13/head -> delivered
+ * [new branch]      main              -> origin/main
+From https://github.com/runkaiz/firstmate-lite
+ * [new branch]      fm/firstmate-agent-work-management -> origin/fm/firstmate-agent-work-management
+ * [new branch]      fm/firstmate-ahoy-decisions-last -> origin/fm/firstmate-ahoy-decisions-last
+ * [new branch]      fm/firstmate-calm-codemode-visibility -> origin/fm/firstmate-calm-codemode-visibility
+ * [new branch]      fm/firstmate-ci-token-free-wait -> origin/fm/firstmate-ci-token-free-wait
+ * [new branch]      fm/firstmate-cleanup-repair-publication -> origin/fm/firstmate-cleanup-repair-publication
+ * [new branch]      fm/firstmate-complete-task-cleanup -> origin/fm/firstmate-complete-task-cleanup
+ * [new branch]      fm/firstmate-lite-away-progress-fix -> origin/fm/firstmate-lite-away-progress-fix
+ * [new branch]      fm/firstmate-lite-conditional-validation-fix -> origin/fm/firstmate-lite-conditional-validation-fix
+ * [new branch]      fm/firstmate-lite-public-ci-fix -> origin/fm/firstmate-lite-public-ci-fix
+ * [new branch]      fm/firstmate-native-archive-compatibility -> origin/fm/firstmate-native-archive-compatibility
+ * [new branch]      fm/firstmate-native-gh-migration -> origin/fm/firstmate-native-gh-migration
+ * [new branch]      fm/firstmate-post-update-self-check -> origin/fm/firstmate-post-update-self-check
+ * [new branch]      fm/firstmate-proactive-cleanup-publication -> origin/fm/firstmate-proactive-cleanup-publication
+ * [new branch]      fm/firstmate-proactive-mode -> origin/fm/firstmate-proactive-mode
+ * [new branch]      fm/firstmate-public-operating-parity -> origin/fm/firstmate-public-operating-parity
+ * [new branch]      fm/firstmate-retained-lifecycle-repair -> origin/fm/firstmate-retained-lifecycle-repair
+ * [new branch]      fm/firstmate-single-home-readiness -> origin/fm/firstmate-single-home-readiness
+ * [new branch]      no-mistakes/evidence -> origin/no-mistakes/evidence

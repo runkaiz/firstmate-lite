@@ -1,0 +1,70 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/socket-home
+
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/home
+Preparing worktree (detached HEAD 4934c11)
+HEAD is now at 4934c11 no-mistakes(document): Align waiting guidance with delegated CI ownership
+
+$ gh-axi pr view 13 --repo runkaiz/firstmate-lite
+pull_request:
+  number: 13
+  title: "fix: eliminate recurring agent turns during CI waits"
+  state: merged
+  author: runkaiz
+  draft: no
+  merged: "2026-10-29T21:56:02Z"
+  checks: "19 passed, 0 failed, 19 total"
+  body: "## Intent\n\nWhenever a worker waits for the CI results they ping every 8 minute or so i think, is there a smarter way to do this so we save tokens\n\nYeah go ahead\n\nApproved proposal: reuse existing PR monitoring for one worker handoff, token-free waiting and notification when action is needed. Identify whether recurring CI turns come from shell wait timeouts, supervision reviews or duplicate monitoring; eliminate unchanged CI-wait agent turns, not merely hide their messages. No new monitoring serv\n... (truncated, 13039 chars total - use --full to see complete body)"
+  comment_count: 0 — use --comments to see full comments
+  review_count: 0 — use --reviews to see full reviews
+
+EXPECTED REFUSAL: td --landed-pr https://github.com/runkaiz/firstmate-lite/pull/13 --landed-head acefea59811dddb14f2d2fcf0404f5dbe122cf4f
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh sibling --landed-pr https://github.com/runkaiz/firstmate-lite/pull/13 --landed-head acefea59811dddb14f2d2fcf0404f5dbe122cf4f
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: exact sibling PR landing is not proven; preserving copy
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh sibling --landed-pr https://github.com/runkaiz/firstmate-lite/pull/13 --landed-head 4934c1192a4c2abc8e3d480a80dfd33fac6ead89
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown sibling complete (window fm-lab:fm-sibling, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/copies/sibling/worktree)
+Backlog: sibling is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/remote-world/sibling/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-queue.sh show sibling
+task:
+  id: sibling
+  title: Delivered through sibling PR.
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-10-31
+  links: none
+  body: landed via https://github.com/runkaiz/firstmate-lite/pull/13 at 4934c1192a4c2abc8e3d480a80dfd33fac6ead89
+  archived: no
+# Backlog
+
+## In flight
+
+## Queued
+
+## Done
+- [x] sibling - Delivered through sibling PR. (kind: ship) (done 2026-10-31)
+  landed via https://github.com/runkaiz/firstmate-lite/pull/13 at 4934c1192a4c2abc8e3d480a80dfd33fac6ead89
+  landed via https://github.com/runkaiz/firstmate-lite/pull/13 at 4934c1192a4c2abc8e3d480a80dfd33fac6ead89
+SCENARIO PASS: real merged sibling PR proof closes automatic queue with exact publication note; mismatched head refuses

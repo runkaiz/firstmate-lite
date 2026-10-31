@@ -1,0 +1,11 @@
+pull_request:
+  number: 13
+  title: "fix: eliminate recurring agent turns during CI waits"
+  state: merged
+  author: runkaiz
+  draft: no
+  merged: "2026-10-29T21:56:02Z"
+  checks: "19 passed, 0 failed, 19 total"
+  body: "## Intent\n\nWhenever a worker waits for the CI results they ping every 8 minute or so i think, is there a smarter way to do this so we save tokens\n\nYeah go ahead\n\nApproved proposal: reuse existing PR monitoring for one worker handoff, token-free waiting and notification when action is needed. Identify whether recurring CI turns come from shell wait timeouts, supervision reviews or duplicate monitoring; eliminate unchanged CI-wait agent turns, not merely hide their messages. No new monitoring serv\n... (truncated, 13039 chars total - use --full to see complete body)"
+  comment_count: 0 — use --comments to see full comments
+  review_count: 0 — use --reviews to see full reviews

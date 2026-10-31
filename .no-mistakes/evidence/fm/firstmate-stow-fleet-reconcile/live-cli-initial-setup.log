@@ -1,0 +1,80 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/socket-home
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home
+Preparing worktree (detached HEAD 48079eb)
+HEAD is now at 48079eb initial
+
+EXPECTED REFUSAL: td
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh retained
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: task delivery is not proven landed; preserving copy
+
+EXPECTED REFUSAL: td --retain-branch
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh retained --retain-branch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/copies/retained/worktree; preserving copy
+ M kept
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: inspect each path; only for task-owned generated artifacts, rerun teardown with --preserve-untracked <path> per leftover
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-teardown.sh retained --retain-branch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown retained complete (window fm-lab:fm-retained, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/copies/retained/worktree)
+Backlog: retained is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-queue.sh show retained
+task:
+  id: retained
+  title: Live retained exercise.
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-10-31
+  links: none
+  body: copy retired unlanded; commits retained on refs/heads/fm/retained and refs/firstmate/retained-work/retained at 76fe6e5d5da6af251f5cd14791fa39b3e9776af0
+  archived: no
+# Backlog
+
+## In flight
+
+## Queued
+
+## Done
+- [x] retained - Live retained exercise. (kind: ship) (done 2026-10-31)
+  copy retired unlanded; commits retained on refs/heads/fm/retained and refs/firstmate/retained-work/retained at 76fe6e5d5da6af251f5cd14791fa39b3e9776af0
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/retained/project show-ref
+76fe6e5d5da6af251f5cd14791fa39b3e9776af0 refs/firstmate/retained-work/retained
+76fe6e5d5da6af251f5cd14791fa39b3e9776af0 refs/heads/fm/retained
+48079eb47bfe88b5c5a6f79f1e900bf93cf251bb refs/heads/main
+SCENARIO PASS: explicit retention preserves both refs and automatically closes the queue
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/archive-scout/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/archive-scout/home
+Preparing worktree (detached HEAD cd37721)
+HEAD is now at cd37721 initial
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-reconcile-underway.sh --archive /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/archive-scout/archive
+archive-scout	record-archived	FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/archive-scout/home bin/fm-task-record-restore.sh archive-scout /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/world/archive-scout/archive/archive-scout.meta 991a3168ef528a53a245f04d8db9ed5aa2c0a7d6832591e14532a48c39153964 s1.archive-scout fm-lab:fm-archive-scout	archived scout record; restore verifies bytes, generation, endpoint and reservation
+ASSERTION FAILED: test a47def3c5f20f8fab2f6e1672c5175660db67a8810b5d2522210f35cd7650ea2 = 69e181b1fc13f7c9b86cc5cda0728bf361b0bcb5e4a7c097aa49a7775c9694d9

@@ -1,0 +1,51 @@
+ok - sibling-PR, retained-branch and legacy local-main notes survive serialization and repeated replay
+ok - malformed and foreign completion notes refuse without changing the queue or consuming the marker
+Preparing worktree (detached HEAD 61a0661)
+HEAD is now at 61a0661 initial
+Restored retire-scout metadata with sha256=5b8a4228a206db30112b0cbe55fc24e6c06457ed65b818eaedb4e2f1f3000439; endpoint and copy unchanged.
+ok - archived scout record restores byte-exactly and an unchanged copy retires despite replaced source history
+Preparing worktree (detached HEAD f25f39c)
+HEAD is now at f25f39c initial
+ok - unchanged local-only copy retires with its base retained when the source history was replaced
+Preparing worktree (detached HEAD f271172)
+HEAD is now at f271172 initial
+ok - local-only delivery landed as an identical patch retires, while a commit with no equivalent still refuses
+Preparing worktree (detached HEAD b4a88bd)
+HEAD is now at b4a88bd initial
+ok - native and legacy teardown reject unlanded merge resolutions and accept ancestral merges
+Preparing worktree (detached HEAD 35a0eee)
+HEAD is now at 35a0eee initial
+ok - branch-kept commits retire only by explicit retention, with the branch kept and the commit pinned
+Preparing worktree (detached HEAD eca3665)
+HEAD is now at eca3665 initial
+ok - a merged PR rewritten by its pipeline retires only when the pipeline binds this exact clean HEAD to the merged head
+Preparing worktree (detached HEAD f392d2f)
+HEAD is now at f392d2f initial
+ok - pipeline delivery proof permits covered leftovers while tracked edits and incorrect bindings refuse
+Preparing worktree (detached HEAD f439024)
+HEAD is now at f439024 initial
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+ok - herdr-success closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 5799f29)
+HEAD is now at 5799f29 initial
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+ok - herdr-failed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD ac42d70)
+HEAD is now at ac42d70 initial
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+ok - herdr-unconfirmed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 6a1da5b)
+HEAD is now at 6a1da5b initial
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+ok - herdr-foreign closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 71e2c49)
+HEAD is now at 71e2c49 initial
+lsof: WARNING: can't stat() cifs file system /var/mnt/phoenix
+      Output information may be incomplete.
+ok - tmux-success closes the recorded shell before preserving and retiring the native copy

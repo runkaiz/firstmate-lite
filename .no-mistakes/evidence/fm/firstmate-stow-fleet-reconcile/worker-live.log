@@ -1,0 +1,54 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/worker-world/socket-home
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/worker-world/worker/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M69TSNF6DPBES61HZAJ9RD02/.test-live/worker-world/worker/home
+Preparing worktree (detached HEAD 3d1cb7d)
+HEAD is now at 3d1cb7d initial
+
+$ tmux -L fm-lab display-message -p -t fm-lab:fm-worker \#\{pane_width\}x#\{pane_height\}\ #\{pane_current_command\}
+120x40 codex
+
+$ tmux -L fm-lab capture-pane -p -t fm-lab:fm-worker
+
+  Update available · 0.165.0 → 0.166.0
+  Release notes: https://github.com/openai/codex/releases/latest
+
+› 1. Update now (runs `sh -c 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh'`)
+  2. Skip
+  3. Skip until next version
+
+  enter continue · esc skip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+worker	ongoing	-	local-only worker live; local history does not prove completion
+worker	ongoing	bin/fm-control.sh worker relaunch	scout endpoint gone before its report
+SCENARIO PASS: real Codex worker stays ongoing; missing worker with unfinished report gets guarded relaunch advice
