@@ -129,7 +129,7 @@ printf 'advance\n' > "$PROJ/advance"; git -C "$PROJ" add advance; git -C "$PROJ"
 git -C "$PROJ" "${GIT_ID[@]}" cherry-pick "$left" >/dev/null
 git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit right >/dev/null
 cherry=$(git -C "$WT" cherry "$MAIN" HEAD)
-[ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- ' || fail 'merge fixture lacks patch-equivalent ordinary commits'
+if [ -z "$cherry" ] || printf '%s\n' "$cherry" | grep -qv '^- '; then fail 'merge fixture lacks patch-equivalent ordinary commits'; fi
 
 fingerprint() {
   python3 - "$HOME_DIR" <<'PYTHON'
@@ -228,7 +228,7 @@ captain hold pending --reason 'choose direction' --origin reserved-draft >/dev/n
 captain complete reserved-draft pending >/dev/null || fail 'record report inventory'
 captain verify reserved-draft >/dev/null || fail 'verify report inventory'
 captain complete reserved-draft --none >/dev/null || fail 'repeat report inventory'
-tasks-axi done pending --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'close pending fixture'
+tasks-axi 'done' pending --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'close pending fixture'
 if captain verify reserved-draft >/dev/null 2>&1; then fail 'verification forgot the unresolved inventory entry'; fi
 printf 'needs-decision [key=direction]: choose direction\n' > "$HOME_DIR/state/draft.status"
 if captain complete draft --none >/dev/null 2>&1; then fail 'completion accepted an open status decision'; fi

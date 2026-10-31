@@ -82,6 +82,7 @@ assert_closed_note() {
 # Exercise the persisted close protocol independently of copy removal, including
 # replay after a crash and retry after the queue has already closed the row.
 replay_note() {
+  # shellcheck disable=SC2016 # positional parameters expand in the child shell
   env FM_HOME="$HOME_DIR" bash -c '
     . "$1/bin/fm-tasks-axi-lib.sh"
     . "$1/bin/fm-backlog-transition-lib.sh"
@@ -100,6 +101,7 @@ for note in "landed via https://github.com/fixture/project/pull/7 at $head" \
   HOME_DIR="$TMP_ROOT/note-home"
   fm_test_spawn_home "$HOME_DIR" codex
   automatic_backlog
+  # shellcheck disable=SC2016 # positional parameters expand in the child shell
   out=$(env FM_HOME="$HOME_DIR" bash -c '
     . "$1/bin/fm-tasks-axi-lib.sh"
     . "$1/bin/fm-backlog-transition-lib.sh"
@@ -201,7 +203,7 @@ commit_in "$PROJ" advance advance advance
 git -C "$PROJ" "${GIT_ID[@]}" cherry-pick "$left" >/dev/null
 git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit right >/dev/null
 cherry=$(git -C "$WT" cherry "$MAIN" HEAD)
-[ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- ' || fail 'merge fixture lacks equivalent ordinary patches'
+if [ -z "$cherry" ] || printf '%s\n' "$cherry" | grep -qv '^- '; then fail 'merge fixture lacks equivalent ordinary patches'; fi
 if out=$(teardown 2>&1); then fail 'native teardown lost unlanded merge resolution'; fi
 assert_contains "$out" 'task delivery is not proven landed' 'native merge refusal reason'
 retained || fail 'merge refusal lost native resources'
@@ -452,7 +454,7 @@ SH
   chmod +x "$FAKE/herdr" "$FAKE/tmux" "$FAKE/close-endpoint"
   preserve_teardown() { FM_TEST_CASE="$CASE" teardown --preserve-untracked build; }
   if out=$(FM_TEST_CASE="$CASE" teardown 2>&1); then fail 'plain teardown discarded generated leftovers'; fi
-  [ ! -e "$CASE/closed" ] && kill -0 "$endpoint_pid" || fail 'plain refusal closed the endpoint'
+  if [ -e "$CASE/closed" ] || ! kill -0 "$endpoint_pid"; then fail 'plain refusal closed the endpoint'; fi
   case "$scenario" in
     herdr-failed|herdr-unconfirmed)
       if out=$(FM_TEST_CLOSE_FAIL="${scenario#herdr-}" preserve_teardown 2>&1); then fail 'unproven close allowed preservation'; fi
