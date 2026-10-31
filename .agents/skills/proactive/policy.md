@@ -3,6 +3,7 @@
 Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
 New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
 Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Approved landing includes wrap-up: carry worker, tab and copy retirement through, including [ship-landing](../ship-landing/SKILL.md)'s guarded preservation of task-owned generated leftovers, until cleanup succeeds or a genuine refusal needs the captain.
 Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
 That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
 

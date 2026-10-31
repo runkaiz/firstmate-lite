@@ -13,6 +13,16 @@
 # and HEAD contained in the current recorded source ref, unless teardown supplies
 # its existing landed-work predicate for a PR ship. fm-teardown.sh owns that
 # predicate's proofs; it never exempts dirt or changes ownership checks.
+# fm_git_worktree_preserve is the only way leftovers leave a copy: it renames
+# exactly the named untracked or ignored paths, on the same filesystem and never
+# over an existing destination, into a private preservation root, and refuses
+# before moving anything when tracked edits exist, a name is tracked, unsafe or
+# missing, or any leftover is not covered by a name. Each path's pre-move
+# manifest (relative path, inode, mode, size, sha256 or link target) is journaled
+# before the rename and must match after it before the path is receipted, so a
+# rerun after interruption verifies and receipts a moved path instead of
+# overwriting or losing it. Which leftovers are disposable task-owned generated
+# artifacts is the caller's judgment; this primitive only moves, never deletes.
 # Remote source checks refresh only the recorded origin branch and refuse on
 # fetch failure; local refs are not fetched. Never deletes a branch. Task-record retirement/replay
 # in fm-backlog-transition-lib.sh owns final reservation retirement when task
@@ -111,7 +121,7 @@ fm_git_worktree_clean() { # <path> - unknown ignored files are work too
   if [ -n "$status$others" ]; then
     fm_git_worktree_error "dirty or untracked content at $1; preserving copy"
     printf '%s\n' "$status" "$others" | sed '/^$/d' | head -20 >&2
-    printf 'Inspect and preserve these paths, including ignored session evidence, before retrying teardown.\n' >&2
+    printf 'Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.\n' >&2
     return 1
   fi
 }
@@ -191,10 +201,16 @@ fm_git_worktree_allocate() { # <state> <id> <home> <project> <root> <base-commit
 }
 
 fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path> [<landed-function>]
-  local ref
   fm_git_worktree_identity "$@" || return 1
   [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0 # confirmed unregistered removal/reservation recovery
   fm_git_worktree_clean "$FM_GIT_WORKTREE_PATH" || return 1
+  fm_git_worktree_landed "$@"
+}
+
+fm_git_worktree_landed() { # same arguments as safe; landing proof only, no dirt gate
+  local ref
+  fm_git_worktree_identity "$@" || return 1
+  [ -d "$FM_GIT_WORKTREE_PATH" ] || return 0
   ref=$(fm_git_worktree_field "$1/$2.git-worktree" source_ref) || return 1
   case "$ref" in
     refs/heads/*) ;;
@@ -213,6 +229,122 @@ fm_git_worktree_safe() { # <state> <id> <home> <project> <expected-path> [<lande
   elif ! git -C "$FM_GIT_WORKTREE_PATH" merge-base --is-ancestor HEAD "$ref"; then
     fm_git_worktree_error "unlanded HEAD is not contained in $ref; preserving copy"; return 1
   fi
+}
+
+fm_git_worktree_manifest() { # <path> - sorted custody manifest; unreadable entries fail
+  perl -MFile::Find -MDigest::SHA -e '
+    use strict; use warnings;
+    local $SIG{__WARN__} = sub { die @_ };
+    my $root = shift; my @out;
+    sub esc { my $s = shift; $s =~ s/([\x00-\x1f\\])/sprintf("\\x%02x", ord $1)/ge; $s }
+    sub emit {
+      my ($p, $rel) = @_;
+      my @s = lstat($p) or die "cannot stat $p: $!\n";
+      my $kind = -l _ ? "l:" . esc(readlink($p) // die "cannot read link $p: $!\n")
+        : -d _ ? "d" : -f _ ? "f:$s[7]:" . Digest::SHA->new(256)->addfile($p)->hexdigest : "o";
+      push @out, join("\t", esc($rel), $s[1], $s[2], $kind);
+    }
+    if (-d $root && !-l $root) {
+      find({ no_chdir => 1, wanted => sub {
+        my $rel = substr($File::Find::name, length $root); emit($File::Find::name, ".$rel");
+      } }, $root);
+    } else { emit($root, ".") }
+    print "$_\n" for sort @out;
+  ' "$1"
+}
+
+fm_git_worktree_preserve() { # <copy> <preservation-root> <relative-path>... - caller proved identity, landing, quiescence
+  local copy=$1 root=$2 rel other part prefix entry status=0 status_file others_file uncovered=0 key journal src dst pre post sum
+  local -a leftovers=() parts=()
+  shift 2
+  [ "$#" -gt 0 ] || { fm_git_worktree_error 'no leftover named for preservation'; return 1; }
+  [ -d "$copy" ] && [ ! -L "$copy" ] || { fm_git_worktree_error 'copy is missing; nothing preserved'; return 1; }
+  case "$root" in /*) ;; *) fm_git_worktree_error 'preservation root must be absolute'; return 1 ;; esac
+  for rel in "$@"; do
+    case "/$rel/" in //*|*//*|*/./*|*/../*) fm_git_worktree_error "unsafe leftover name '$rel'; nothing moved"; return 1 ;; esac
+    case "$rel" in *[[:cntrl:]]*) fm_git_worktree_error 'leftover name has control characters; nothing moved'; return 1 ;; esac
+    for other in "$@"; do
+      [ "$other" = "$rel" ] && continue
+      case "$rel" in "$other"/*) fm_git_worktree_error "overlapping leftover names '$other' and '$rel'; nothing moved"; return 1 ;; esac
+    done
+    [ "$(printf '%s\n' "$@" | grep -Fxc -- "$rel")" = 1 ] || { fm_git_worktree_error "duplicate leftover name '$rel'"; return 1; }
+    prefix=$copy
+    part=${rel%/*}
+    if [ "$part" != "$rel" ]; then
+      IFS=/ read -ra parts <<< "$part"
+      for entry in "${parts[@]}"; do
+        prefix=$prefix/$entry
+        [ -d "$prefix" ] && [ ! -L "$prefix" ] || {
+          fm_git_worktree_error "'$rel' is not under real directories of the copy; nothing moved"; return 1;
+        }
+      done
+    fi
+    entry=$(git -C "$copy" ls-files -- ":(literal)$rel") || return 1
+    [ -z "$entry" ] || { fm_git_worktree_error "'$rel' names tracked content; nothing moved"; return 1; }
+  done
+  status_file=$(mktemp) || return 1
+  others_file=$(mktemp) || { rm -f "$status_file"; return 1; }
+  if ! git -C "$copy" status --porcelain=v1 -z --untracked-files=all > "$status_file" \
+     || ! git -C "$copy" ls-files -z --others > "$others_file"; then
+    rm -f "$status_file" "$others_file"
+    fm_git_worktree_error 'cannot read copy leftovers; nothing moved'; return 1
+  fi
+  status=0
+  while IFS= read -r -d '' entry; do
+    case "$entry" in
+      '?? '*) leftovers+=("${entry#?? }") ;;
+      *) status=1 ;;
+    esac
+  done < "$status_file"
+  while IFS= read -r -d '' entry; do leftovers+=("$entry"); done < "$others_file"
+  rm -f "$status_file" "$others_file"
+  [ "$status" = 0 ] || { fm_git_worktree_error 'tracked changes are unique work; nothing moved'; return 1; }
+  for entry in ${leftovers[@]+"${leftovers[@]}"}; do
+    entry=${entry%/}
+    for rel in "$@"; do
+      case "$entry" in "$rel"|"$rel"/*) continue 2 ;; esac
+    done
+    [ "$uncovered" -ge 10 ] || printf '  %s\n' "$entry" >&2
+    uncovered=$((uncovered + 1))
+  done
+  [ "$uncovered" = 0 ] || { fm_git_worktree_error "$uncovered leftover(s) above are not named; nothing moved"; return 1; }
+  mkdir -p -- "$root/files" "$root/journal" || return 1
+  case "$(cd "$root" && pwd -P)/" in "$(cd "$copy" && pwd -P)"/*)
+    fm_git_worktree_error 'preservation root is inside the copy'; return 1 ;;
+  esac
+  for rel in "$@"; do
+    src=$copy/$rel dst=$root/files/$rel
+    key=$(printf '%s' "$rel" | perl -MDigest::SHA=sha256_hex -0777 -ne 'print sha256_hex($_)') || return 1
+    if [ -e "$src" ] || [ -L "$src" ]; then
+      if [ -e "$dst" ] || [ -L "$dst" ]; then
+        fm_git_worktree_error "preserved '$rel' already exists; nothing overwritten or moved"; return 1
+      fi
+    elif [ ! -e "$dst" ] && [ ! -L "$dst" ] || [ ! -f "$root/journal/$key" ]; then
+      fm_git_worktree_error "'$rel' is neither in the copy nor a journaled preservation; nothing moved"; return 1
+    fi
+  done
+  for rel in "$@"; do
+    src=$copy/$rel dst=$root/files/$rel
+    key=$(printf '%s' "$rel" | perl -MDigest::SHA=sha256_hex -0777 -ne 'print sha256_hex($_)') || return 1
+    journal=$root/journal/$key
+    if [ -e "$src" ] || [ -L "$src" ]; then
+      pre=$(fm_git_worktree_manifest "$src") || { fm_git_worktree_error "cannot read '$rel'; it stays in the copy"; return 1; }
+      printf 'path\t%s\n%s\n' "$rel" "$pre" > "$journal.tmp" && mv -- "$journal.tmp" "$journal" || return 1
+      mkdir -p -- "$(dirname -- "$dst")" || return 1
+      perl -e 'my ($s, $d) = @ARGV; die "destination exists\n" if -e $d || -l $d; rename($s, $d) or die "$!\n"' "$src" "$dst" || {
+        fm_git_worktree_error "could not rename '$rel' within one filesystem; it stays in the copy"; return 1;
+      }
+    fi
+    pre=$(tail -n +2 "$journal") || return 1
+    post=$(fm_git_worktree_manifest "$dst") || { fm_git_worktree_error "cannot verify preserved '$rel'"; return 1; }
+    [ "$pre" = "$post" ] || { fm_git_worktree_error "preserved '$rel' does not match its journaled manifest"; return 1; }
+    sum=$(printf '%s\n' "$pre" | perl -MDigest::SHA=sha256_hex -0777 -ne 'print sha256_hex($_)') || return 1
+    if ! awk -F '\t' -v s="$sum" -v p="$rel" '$2 == s && $3 == p { found = 1 } END { exit !found }' "$root/receipt" 2>/dev/null; then
+      { [ ! -f "$root/receipt" ] || cat -- "$root/receipt"; printf '%s\t%s\t%s\n' "$(date +%s)" "$sum" "$rel"; } > "$root/receipt.tmp" \
+        && mv -- "$root/receipt.tmp" "$root/receipt" || return 1
+    fi
+    printf 'preserved: %s -> %s\n' "$rel" "$dst" >&2
+  done
 }
 
 fm_git_worktree_remove() { # same arguments as safe; caller proved endpoint gone/no processes

@@ -25,10 +25,14 @@ Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm
 
 Tear down a ship task only after landing is confirmed.
 A teardown refusal for uncommitted or unlanded work is a stop-and-investigate result, never an obstacle to bypass.
+When a native copy refuses only for untracked or ignored leftovers, inspect each listed path read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, the next action is the same teardown with `--preserve-untracked <path>` per leftover, whose script header owns the move, custody check and resume.
+Ignored status alone never proves an artifact disposable: tracked edits, unlanded commits, anything that could be unique work or session evidence, and uncertain ownership stay stop-and-escalate.
+With proactive mode on, take that preservation as part of the approved wrap-up without asking; with it off, report the classification and the exact command as the proposed next action.
 Never force teardown without explicit discard authority.
 After successful teardown, record completion, retain only the configured recent Done history, and re-evaluate queued work whose blockers and time gates have cleared.
 Treat the recorded worker, tab and disposable copy as one wrap-up through `bin/fm-teardown.sh`; an endpoint-only control exit is not task cleanup.
 If cleanup refuses or is interrupted, retain the task with the exact unresolved resource, refusal evidence and next safe action instead of marking wrap-up complete or repeatedly announcing unchanged idle workers.
+Write that next action, including any preservation command, into the backlog item note: the retained task record and In-flight item are what a restarted session reconciles, and it resumes the action from the note rather than re-asking.
 
 A secondmate is persistent and an empty queue is healthy.
 Retire one only on an explicit captain or main-firstmate decision, after loading `secondmate-provisioning`; its home must contain no work under way, and forced discard still requires explicit captain authority.

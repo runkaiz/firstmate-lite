@@ -505,6 +505,99 @@ SH
   pass "native $backend teardown retries a missing endpoint but preserves unreadable and live owners"
 done
 
+make_case preserve
+printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
+id=preserve-leftovers
+allocate "$id" || fail 'preservation fixture allocation failed'
+WT=$FM_GIT_WORKTREE_PATH
+KEEP="$HOME_DIR/data/$id/preserved-artifacts"
+fakebin=$(fm_fakebin "$CASE/fake")
+cat > "$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$1" in list-windows) printf 'main\n' ;; display-message) exit 1 ;; esac
+SH
+cat > "$fakebin/no-mistakes" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+chmod +x "$fakebin/tmux" "$fakebin/no-mistakes"
+fm_write_meta "$HOME_DIR/state/$id.meta" \
+  "window=native-fixture:fm-$id" "endpoint_task_id=$id" 'backend=tmux' \
+  "worktree=$WT" "project=$PROJ" 'kind=ship' 'mode=local-only' \
+  'spawn_gen=s1792922400.123.456' 'allocator=git'
+run_preserve_teardown() {
+  env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+    FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
+    bash "$ROOT/bin/fm-teardown.sh" "$id" "$@"
+}
+printf '__pycache__/\n' >> "$PROJ/.git/info/exclude"
+mkdir -p "$WT/__pycache__" "$WT/.cache"
+printf 'bytecode\n' > "$WT/__pycache__/mod.pyc"
+fm_git_init_commit "$WT/.cache/clone"
+clone_head=$(git -C "$WT/.cache/clone" rev-parse HEAD)
+leftovers_intact() {
+  [ "$(cat "$WT/__pycache__/mod.pyc")" = bytecode ] && [ -d "$WT/.cache/clone/.git" ] \
+    && [ -f "$HOME_DIR/state/$id.meta" ]
+}
+if out=$(run_preserve_teardown 2>&1); then fail 'leftover generated artifacts were discarded'; fi
+assert_contains "$out" '--preserve-untracked' 'clean refusal did not name the guarded next action'
+leftovers_intact || fail 'plain refusal changed leftovers or task records'
+if out=$(run_preserve_teardown --preserve-untracked .cache 2>&1); then fail 'an unnamed leftover was left behind'; fi
+assert_contains "$out" 'not named' 'partial naming refused for the wrong reason'
+leftovers_intact && [ ! -e "$KEEP/files" ] || fail 'partial naming moved something before refusing'
+printf 'unique edit\n' >> "$WT/README.md"
+if out=$(run_preserve_teardown --preserve-untracked .cache --preserve-untracked __pycache__ 2>&1); then
+  fail 'tracked unique work was retired beside generated artifacts'
+fi
+assert_contains "$out" 'tracked changes are unique work' 'tracked edit refused for the wrong reason'
+leftovers_intact && grep -q 'unique edit' "$WT/README.md" && [ ! -e "$KEEP/files" ] \
+  || fail 'unique-work refusal moved or lost content'
+git -C "$WT" checkout -q -- README.md
+for name in ../outside README.md /abs .cache/../__pycache__; do
+  if out=$(run_preserve_teardown --preserve-untracked "$name" 2>&1); then fail "unsafe name $name was accepted"; fi
+  leftovers_intact && [ ! -e "$KEEP/files" ] || fail "unsafe name $name moved content"
+done
+if out=$(run_preserve_teardown --force --preserve-untracked .cache 2>&1); then fail 'preservation combined with force'; fi
+real_mv=$(command -v mv)
+cat > "$fakebin/mv" <<'SH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  if [ "$arg" = "${FM_TEST_FAIL_MV_TARGET:-}" ]; then printf 'fixture interruption\n' >&2; exit 1; fi
+done
+exec "${FM_TEST_REAL_MV:?}" "$@"
+SH
+chmod +x "$fakebin/mv"
+if out=$(FM_TEST_REAL_MV="$real_mv" FM_TEST_FAIL_MV_TARGET="$KEEP/receipt" \
+  run_preserve_teardown --preserve-untracked .cache --preserve-untracked __pycache__ 2>&1); then
+  fail 'interrupted preservation reported completion'
+fi
+"$real_mv" "$fakebin/mv" "$CASE/mv-shim"
+[ -d "$WT" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ -f "$HOME_DIR/state/$id.git-worktree" ] \
+  || fail 'interrupted preservation retired the task before the copy was removed'
+[ ! -e "$WT/.cache" ] && [ -d "$KEEP/files/.cache/clone/.git" ] && [ ! -e "$KEEP/receipt" ] \
+  || fail 'interruption fixture did not stop between move and receipt'
+[ "$(cat "$WT/__pycache__/mod.pyc")" = bytecode ] || fail 'interruption moved past the failed path'
+mkdir -p "$KEEP/files/__pycache__"
+printf 'stale\n' > "$KEEP/files/__pycache__/mod.pyc"
+if out=$(run_preserve_teardown --preserve-untracked .cache --preserve-untracked __pycache__ 2>&1); then
+  fail 'preservation overwrote an existing destination'
+fi
+assert_contains "$out" 'nothing overwritten' 'existing destination refused for the wrong reason'
+[ "$(cat "$WT/__pycache__/mod.pyc")" = bytecode ] && [ "$(cat "$KEEP/files/__pycache__/mod.pyc")" = stale ] \
+  || fail 'no-overwrite refusal changed either copy'
+rm -r "$KEEP/files/__pycache__"
+out=$(run_preserve_teardown --preserve-untracked .cache --preserve-untracked __pycache__ 2>&1)
+expect_code 0 "$?" "restarted preservation did not complete teardown: $out"
+[ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] && [ ! -e "$HOME_DIR/state/$id.git-worktree" ] \
+  || fail 'restarted preservation left the copy or task records'
+[ "$(cat "$KEEP/files/__pycache__/mod.pyc")" = bytecode ] \
+  && [ "$(git -C "$KEEP/files/.cache/clone" rev-parse HEAD)" = "$clone_head" ] \
+  || fail 'preserved artifacts lost content'
+[ "$(cut -f3 "$KEEP/receipt" | sort | tr '\n' ' ')" = '.cache __pycache__ ' ] \
+  || fail "receipt does not record each preserved path once: $(cat "$KEEP/receipt")"
+pass 'native teardown preserves named generated leftovers, refuses unique or unnamed work, and resumes after interruption'
+
 fm_live_gate default-on FM_NATIVE_TMUX_LIVE_E2E tmux pgrep lsof
 
 LAB_HOME_HELPER=${LAB_HOME_HELPER:-$ROOT/bin/fm-lab-home.sh}
