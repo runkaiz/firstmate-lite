@@ -131,10 +131,32 @@ git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit right >/dev/null
 cherry=$(git -C "$WT" cherry "$MAIN" HEAD)
 [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- ' || fail 'merge fixture lacks patch-equivalent ordinary commits'
 
-before=$(cd "$HOME_DIR" && find state data -type f -exec sha256sum {} + | sort)
+fingerprint() {
+  python3 - "$HOME_DIR" <<'PYTHON'
+import hashlib, json, os, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+records = []
+def failed(error):
+    raise error
+for part in ("state", "data"):
+    for directory, _, files in os.walk(root / part, onerror=failed):
+        for name in files:
+            path = pathlib.Path(directory) / name
+            if path.is_symlink():
+                continue
+            records.append((str(path.relative_to(root)), hashlib.sha256(path.read_bytes()).hexdigest()))
+print(json.dumps(sorted(records)))
+PYTHON
+}
+cat > "$FAKE/sha256sum" <<'SH'
+#!/usr/bin/env bash
+exit 127
+SH
+chmod +x "$FAKE/sha256sum"
+before=$(fingerprint) || fail 'cannot fingerprint home before classification'
 out=$(env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" bash "$ROOT/bin/fm-reconcile-underway.sh" --archive "$ARCHIVE" 2>&1)
 expect_code 0 "$?" "classification failed: $out"
-after=$(cd "$HOME_DIR" && find state data -type f -exec sha256sum {} + | sort)
+after=$(fingerprint) || fail 'cannot fingerprint home after classification'
 [ "$before" = "$after" ] || fail 'classification changed home state'
 line() { printf '%s\n' "$out" | awk -F '\t' -v id="$1" '$1 == id'; }
 expect() { # <id> <class> <next-substring>
@@ -149,7 +171,7 @@ case "$(line landed | cut -f3)" in *notes*) fail 'non-generated leftover propose
 expect unlanded needs-captain -
 expect merged landed 'bin/fm-teardown.sh merged'
 expect gone-scout ongoing 'bin/fm-control.sh gone-scout relaunch'
-digest=$(sha256sum "$ARCHIVE/archived.meta" | cut -d' ' -f1)
+digest=$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "$ARCHIVE/archived.meta") || fail 'cannot hash fixture archive'
 expect archived record-archived "bin/fm-task-record-restore.sh archived $ARCHIVE/archived.meta $digest s1.archived native-fixture:fm-archived"
 expect orphan unretirable -
 expect reported landed 'bin/fm-queue.sh done reported --report data/reported/report.md'
@@ -165,6 +187,22 @@ expect unreadable unknown -
 expect merge-resolution needs-captain -
 [ "$(printf '%s\n' "$out" | wc -l | tr -d ' ')" = 17 ] || fail "unexpected classification lines: $out"
 pass 'underway work classifies as held, landed, needs-captain, ongoing, archived, unretirable and stale without mutation'
+
+real_python=$(command -v python3)
+cat > "$FAKE/python3" <<'SH'
+#!/usr/bin/env bash
+[ "${*: -1}" != "${FM_TEST_HASH_FAIL:?}" ] || exit 1
+exec "${FM_TEST_REAL_PYTHON:?}" "$@"
+SH
+chmod +x "$FAKE/python3"
+out=$(env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+  FM_TEST_REAL_PYTHON="$real_python" FM_TEST_HASH_FAIL="$ARCHIVE/archived.meta" \
+  bash "$ROOT/bin/fm-reconcile-underway.sh" --archive "$ARCHIVE" 2>&1)
+expect_code 0 "$?" "classification with unreadable hash failed: $out"
+expect archived unretirable -
+assert_contains "$(line archived)" 'cannot hash archived record' 'hash failure was not explained'
+rm "$FAKE/python3"
+pass 'archive hashing works without sha256sum and failed hashing proposes no restore'
 
 # The proposed restore command is exactly runnable and the rerun reclassifies.
 env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-task-record-restore.sh" archived "$ARCHIVE/archived.meta" "$digest" s1.archived native-fixture:fm-archived >/dev/null \

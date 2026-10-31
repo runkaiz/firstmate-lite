@@ -165,7 +165,10 @@ classify_reservation() { # <id> <row-kind> - reservation without a record
       else emit "$id" unretirable - 'native reservation without task record; no archive given holds it'
       fi ;;
     1)
-      sum=$(sha256sum "${found[0]}" | cut -d' ' -f1)
+      if ! sum=$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "${found[0]}" 2>/dev/null); then
+        emit "$id" unretirable - "cannot hash archived record ${found[0]}"
+        return
+      fi
       gen=$(fm_meta_get "${found[0]}" spawn_gen); target=$(fm_backend_target_of_meta "${found[0]}")
       emit "$id" record-archived \
         "FM_HOME=$(quote "$FM_HOME") bin/fm-task-record-restore.sh $(quote "$id") $(quote "${found[0]}") $sum $(quote "$gen") $(quote "$target")" \
