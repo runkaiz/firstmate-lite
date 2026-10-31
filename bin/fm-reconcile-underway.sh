@@ -23,7 +23,8 @@
 #                  are named as --preserve-untracked only for the caller to inspect first.
 #   ongoing        live worker, or work still owed with its endpoint gone (next
 #                  is the stuck-crewmate-recovery relaunch).
-#   needs-captain  unlanded or awaiting-merge work only the captain can decide.
+#   needs-captain  unlanded or awaiting-merge work, or a scout report whose
+#                  captain-call inventory verification has not passed.
 #   record-archived  a reservation without a record whose archive was found;
 #                  next restores it; rerun afterwards to classify.
 #   unretirable    no supported path (missing or ambiguous archive, unreadable copy).
