@@ -177,16 +177,19 @@ pass 'branch-kept commits retire only by explicit retention, with the branch kep
 
 # Rebased and reworded merged PR (audit: edf28acf submitted, PR #13 head
 # 4934c119 after rebase and document rounds rewrote the same lines).
-make_case pipeline ship no-mistakes
-printf 'pr=https://github.com/fixture/project/pull/7\n' >> "$HOME_DIR/state/$ID.meta"
-git -C "$WT" switch -qc "fm/$ID"
-commit_in "$WT" doc 'original wording' 'original submission'
-submitted=$(git -C "$WT" rev-parse HEAD)
-git -C "$PROJ" switch -qc published "$BASE"
-commit_in "$PROJ" advance 'base advance' 'advance'
-commit_in "$PROJ" doc 'reworded by the pipeline' 'rebased and documented'
-pr_head=$(git -C "$PROJ" rev-parse HEAD)
-git -C "$PROJ" switch -q "$MAIN"
+make_pipeline_case() {
+  make_case "$1" ship no-mistakes
+  printf 'pr=https://github.com/fixture/project/pull/7\n' >> "$HOME_DIR/state/$ID.meta"
+  git -C "$WT" switch -qc "fm/$ID"
+  commit_in "$WT" doc 'original wording' 'original submission'
+  submitted=$(git -C "$WT" rev-parse HEAD)
+  git -C "$PROJ" switch -qc published "$BASE"
+  commit_in "$PROJ" advance 'base advance' 'advance'
+  commit_in "$PROJ" doc 'reworded by the pipeline' 'rebased and documented'
+  pr_head=$(git -C "$PROJ" rev-parse HEAD)
+  git -C "$PROJ" switch -q "$MAIN"
+}
+make_pipeline_case pipeline
 write_sync() { # <submitted> <pushed> <clean> <pr-state>
   cat > "$CASE/sync" <<EOF
 branch_sync:
@@ -207,8 +210,8 @@ branch_sync:
   pr_state: $4
 EOF
 }
-pipeline_teardown() { FM_TEST_PR_HEAD=$pr_head FM_TEST_SYNC_FILE="$CASE/sync" teardown; }
-for fault in no-binding other-submission other-push unmerged dirty-claim open-pr; do
+pipeline_teardown() { FM_TEST_PR_HEAD=$pr_head FM_TEST_SYNC_FILE="$CASE/sync" teardown "$@"; }
+for fault in no-binding other-submission other-push unmerged open-pr; do
   write_sync "$submitted" "$pr_head" true merged
   rm_sync=0 state=MERGED
   case "$fault" in
@@ -216,7 +219,6 @@ for fault in no-binding other-submission other-push unmerged dirty-claim open-pr
     other-submission) write_sync "$BASE" "$pr_head" true merged ;;
     other-push) write_sync "$submitted" "$BASE" true merged ;;
     unmerged) write_sync "$submitted" "$pr_head" true open ;;
-    dirty-claim) write_sync "$submitted" "$pr_head" false merged ;;
     open-pr) state=OPEN ;;
   esac
   [ "$rm_sync" = 0 ] || rm "$CASE/sync"
@@ -232,6 +234,55 @@ out=$(pipeline_teardown 2>&1)
 expect_code 0 "$?" "pipeline-bound merged PR was not retired: $out"
 retired || fail 'pipeline-bound retirement left resources'
 pass 'a merged PR rewritten by its pipeline retires only when the pipeline binds this exact clean HEAD to the merged head'
+
+make_pipeline_case pipeline-preserve
+write_sync "$submitted" "$pr_head" false merged
+mkdir -p "$WT/build" "$WT/.cache"
+printf 'generated output\n' > "$WT/build/output"
+printf 'ignored cache\n' > "$WT/.cache/cache"
+printf '.cache/\n' >> "$PROJ/.git/info/exclude"
+keep="$HOME_DIR/data/$ID/preserved-artifacts"
+leftovers_untouched() {
+  retained && [ "$(cat "$WT/build/output")" = 'generated output' ] \
+    && [ "$(cat "$WT/.cache/cache")" = 'ignored cache' ] && [ ! -e "$keep" ]
+}
+if out=$(pipeline_teardown 2>&1); then fail 'plain pipeline teardown discarded leftovers'; fi
+leftovers_untouched || fail 'plain teardown changed leftovers'
+if out=$(pipeline_teardown --preserve-untracked build 2>&1); then fail 'pipeline preservation accepted unnamed ignored content'; fi
+assert_contains "$out" 'not named' 'coverage refusal did not reach the preservation gate'
+leftovers_untouched || fail 'incomplete preservation coverage moved artifacts'
+for staged in no yes; do
+  printf 'unique tracked edit\n' >> "$WT/doc"
+  [ "$staged" = no ] || git -C "$WT" add doc
+  if out=$(pipeline_teardown --preserve-untracked build --preserve-untracked .cache 2>&1); then
+    fail "pipeline preservation discarded tracked edits (staged=$staged)"
+  fi
+  assert_contains "$out" 'tracked changes are unique work' 'tracked-edit refusal reason'
+  leftovers_untouched || fail 'tracked-edit refusal moved artifacts'
+  git -C "$WT" reset -q --hard "$submitted"
+done
+for fault in submission pushed-head; do
+  if [ "$fault" = submission ]; then write_sync "$BASE" "$pr_head" false merged
+  else write_sync "$submitted" "$BASE" false merged
+  fi
+  if out=$(pipeline_teardown --preserve-untracked build --preserve-untracked .cache 2>&1); then
+    fail "preservation accepted a mismatched pipeline $fault"
+  fi
+  leftovers_untouched || fail 'binding refusal moved artifacts'
+done
+write_sync "$submitted" "$pr_head" false merged
+commit_in "$WT" later 'after submission' 'local work after submission'
+if out=$(pipeline_teardown --preserve-untracked build --preserve-untracked .cache 2>&1); then
+  fail 'preservation accepted work committed after submission'
+fi
+leftovers_untouched || fail 'post-submission refusal moved artifacts'
+git -C "$WT" reset -q --hard "$submitted"
+out=$(pipeline_teardown --preserve-untracked build --preserve-untracked .cache 2>&1)
+expect_code 0 "$?" "pipeline leftovers were not preserved: $out"
+retired || fail 'pipeline preservation left the copy or records'
+[ "$(cat "$keep/files/build/output")" = 'generated output' ] || fail 'pipeline preservation lost build output'
+[ "$(cat "$keep/files/.cache/cache")" = 'ignored cache' ] || fail 'pipeline preservation lost ignored cache'
+pass 'pipeline delivery proof permits covered leftovers while tracked edits and incorrect bindings refuse'
 
 SHELL_PIDS=()
 SHELL_SUPERVISORS=()

@@ -1114,11 +1114,11 @@ nm_toon_paths() {
 # reworded the submission (review/document rounds), so neither containment nor
 # per-commit patch ids match. The residual is bounded by the pipeline's own
 # persisted push binding, read fresh and read-only through
-# `no-mistakes axi sync --check`: this clean, checked-out branch's exact HEAD
+# `no-mistakes axi sync --check`: this checked-out branch's exact HEAD
 # is the run's submitted head, the run completed, the head it pushed is the
 # forge-verified head of this task's merged PR, and the PR state is merged.
-# Any local commit or edit after submission changes HEAD or cleanliness and
-# refuses; an unreadable, ambiguous or differently bound result refuses.
+# Any local commit after submission changes HEAD and refuses; an unreadable,
+# ambiguous or differently bound result refuses.
 pipeline_submission_published() { # <merged-pr-head>
   local pr_head=$1 current branch out paths path count want
   [ "$MODE" = no-mistakes ] || return 1
@@ -1127,7 +1127,7 @@ pipeline_submission_published() { # <merged-pr-head>
   out=$(fm_nm_run_checked "$WT" "$NM_TEARDOWN_TIMEOUT" axi sync --check) || return 1
   paths=$(printf '%s\n' "$out" | nm_toon_paths)
   for want in "branch_sync.local.branch=$branch" "branch_sync.local.head=$current" \
-    branch_sync.local.clean=true branch_sync.pipeline.status=completed \
+    branch_sync.pipeline.status=completed \
     "branch_sync.pipeline.submitted_head=$current" \
     "branch_sync.pipeline.pushed_head=$pr_head" branch_sync.pr_state=merged; do
     path=${want%%=*}
