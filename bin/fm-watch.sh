@@ -1540,13 +1540,51 @@ stale_wait_record() {  # <window-key>
 TERMINAL_DELIVERY_DECLARATION=
 TERMINAL_DELIVERY_END=
 TERMINAL_DELIVERY_IDENT=
+terminal_delivery_old_busy() { # <task>; a stale busy record is not a new turn
+  local task=$1 record message harness source
+  [ "$(status_line_verb "$(last_status_line "$STATE/$task.status")")" = 'done' ] || return 1
+  record=$(fm_busy_record_read "$STATE" "$task") || return 1
+  case "$record" in busy\ *) ;; *) return 1 ;; esac
+  harness=$(fm_meta_get "$STATE/$task.meta" harness)
+  source=${record#* }; source=${source%% *}
+  fm_busy_source_trusted "$harness" "$source" || return 1
+  # Ambiguous timestamp ordering keeps activity eligible. The declaration
+  # below also binds the exact busy sequence, independently of the pane hash.
+  [ "$STATE/$task.status" -nt "$STATE/$task.busy-state" ] || return 1
+  if [ -e "$STATE/$task.progress" ]; then
+    [ "$STATE/$task.status" -nt "$STATE/$task.progress" ] || return 1
+  fi
+  for message in "$STATE/$task.inbox/"*.msg; do
+    [ ! -e "$message" ] || return 1
+  done
+  return 0
+}
+
+terminal_delivery_working() { # <task>; active pipeline always wins
+  local task=$1 line src
+  line=$("$FM_CREW_STATE_BIN" "$task" 2>/dev/null) || return 1
+  case "$line" in 'state: working '*) ;; *) return 1 ;; esac
+  src=${line#*source: }; src=${src%% *}
+  case "$src" in
+    run-step) return 0 ;;
+    pane) ! terminal_delivery_old_busy "$task" ;;
+    *) return 1 ;;
+  esac
+}
+
 terminal_delivery_stale_bound() {  # <window-key> <task>
-  local key=$1 task=$2 f="$STATE/$2.status" record rc throttle rest signature gen
+  local key=$1 task=$2 f="$STATE/$2.status" record rc throttle rest signature gen busy message
   TERMINAL_DELIVERY_DECLARATION=
   [ "$(status_line_verb "$(last_status_line "$f")")" = 'done' ] || return 1
   [ -z "$STALE_WAIT_DECLARATION" ] || return 1
   task_captain_call_open "$task" && return 1
-  if crew_is_provably_working "$task"; then
+  for message in "$STATE/$task.inbox/"*.msg; do
+    if [ -e "$message" ]; then
+      rm -f "$STATE/.terminal-resurfaced-$key"
+      return 1
+    fi
+  done
+  if terminal_delivery_working "$task"; then
     rm -f "$STATE/.terminal-resurfaced-$key"
     return 1
   fi
@@ -1559,7 +1597,8 @@ terminal_delivery_stale_bound() {  # <window-key> <task>
   rest=${record#*$'\t'}
   TERMINAL_DELIVERY_IDENT=${rest%%$'\t'*}
   gen=$(fm_busy_current_gen "$STATE" "$task" || true)
-  TERMINAL_DELIVERY_DECLARATION="delivery:$gen:$signature:$TERMINAL_DELIVERY_END@$TERMINAL_DELIVERY_IDENT"
+  busy=$(fm_busy_record_read "$STATE" "$task" || true)
+  TERMINAL_DELIVERY_DECLARATION="delivery:$gen:$busy:$signature:$TERMINAL_DELIVERY_END@$TERMINAL_DELIVERY_IDENT"
   [ "$rc" -eq 1 ] || return 1
   throttle="$STATE/.terminal-resurfaced-$key"
   [ "$(cat "$throttle" 2>/dev/null || true)" = "$TERMINAL_DELIVERY_DECLARATION" ]
@@ -2771,7 +2810,8 @@ EOF
     # content cannot suppress stale detection. Read once per window per poll and
     # reused below so a busy verdict is consistent within one cycle.
     if window_is_busy "$w" "$tail40"; then busy_now=0; else busy_now=1; fi
-    if [ "$busy_now" -eq 0 ]; then
+    if [ "$busy_now" -eq 0 ] && terminal_delivery_old_busy "$task"; then busy_now=1; fi
+    if [ "$busy_now" -eq 0 ] && terminal_delivery_working "$task"; then
       rm -f "$STATE/.terminal-resurfaced-$key"
     fi
     if [ "$h" = "$prev" ]; then
@@ -2820,7 +2860,7 @@ EOF
           # authoritative source fm-crew-state.sh itself already prioritizes
           # over the log) a chance to override before trusting the log.
           if [ "$(cat "$sf" 2>/dev/null || true)" != "$h" ]; then
-            if crew_is_provably_working "$(window_to_task "$w" "$STATE")"; then
+            if terminal_delivery_working "$task"; then
               rm -f "$STATE/.terminal-resurfaced-$key"
               printf '%s' "$h" > "$sf"
               date +%s > "$ssf"
