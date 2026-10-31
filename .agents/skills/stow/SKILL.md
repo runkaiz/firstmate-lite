@@ -278,12 +278,12 @@ Each pass also reconciles this home's underway work so nothing stale is left beh
 Skip it in a lock-refused read-only session, and report the skip.
 Run `bin/fm-reconcile-underway.sh` with this home's explicit `FM_HOME`, passing `--archive` for every archived-record directory the startup `NATIVE_RESERVATION` diagnostics or an earlier archiving step named; its header owns the input join, the classes and the line format.
 It only reads, and it proposes for each In-flight row, task record and native reservation one class and the exact guarded next command.
-The commands own every proof, so treat each line as a proposal you verify, never as authority:
+The helper and guarded commands own the mechanical proofs, so treat each line as a proposal you verify, never as authority:
 
 - `captain-held`: leave the task, its copy and its hold untouched.
 - `landed`: run the printed teardown.
   Before keeping any `--preserve-untracked` path, inspect it and keep it only if it is a task-owned generated artifact; any other leftover is evidence, so surface it instead.
-  A row-only delivered scout gets the printed queue close with its report link.
+  A delivered scout without a task record gets the printed queue close with its report link when eligible under the helper's contract.
 - `record-archived`: confirm the archive is the task's own record, run the printed restore, then rerun the helper and act on the new class.
 - `ongoing` with a relaunch: load `stuck-crewmate-recovery` and recover through its relaunch path with a progress note; a live worker is left to ordinary supervision.
 - `needs-captain`: surface one concrete decision, such as approving a local merge, merging a ready PR, or keeping the commits on their branch through teardown's `--retain-branch`, and run nothing until the captain answers.

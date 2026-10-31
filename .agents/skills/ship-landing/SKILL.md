@@ -23,7 +23,7 @@ A captain instruction to merge is explicit authority; standing routine merge aut
 For any custom `state/<id>.check.sh` you write yourself, keep it an ordinary single-link mode-`0700` file, print one line only when firstmate should wake, print nothing otherwise, finish before `FM_CHECK_TIMEOUT`, then bind its current bytes with `bin/fm-check-register.sh <id>` before the watcher may execute it.
 Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm-teardown.sh` for a spawned task); never hand-compose an `rm` with `$STATE`/`$ID`.
 
-Tear down a ship task only after landing is confirmed.
+Retire a ship copy only through `bin/fm-teardown.sh`'s landing proof or its explicit captain-approved branch-retention path.
 A teardown refusal for uncommitted or unlanded work is a stop-and-investigate result, never an obstacle to bypass.
 When a native copy refuses only for untracked or ignored leftovers, inspect each listed path read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, the next action is the same teardown with `--preserve-untracked <path>` per leftover, whose script header owns the move, custody check and resume.
 Ignored status alone never proves an artifact disposable: tracked edits, unlanded commits, anything that could be unique work or session evidence, and uncertain ownership stay stop-and-escalate.

@@ -403,7 +403,6 @@ Startup reports orphan native reservations through the existing bootstrap diagno
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard.
 Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them, and `bin/fm-teardown.sh --preserve-untracked` moves inspected generated leftovers into the task's data directory rather than deleting them.
-PR ships use the task's merged-delivery proof across pipeline rebases; local-only ships and scouts retain the recorded source-ancestry requirement.
 Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
 
 ## Runtime backend (config/backend / FM_BACKEND)

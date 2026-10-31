@@ -101,8 +101,8 @@ A captain hold whose deferral date has passed remains answerable under the [queu
 
 ### Recording a reviewed inventory (`complete`)
 
-While originating task metadata is live, the `complete` subcommand unions the reviewed captain-held task ids, called the reviewed inventory, into `decision_keys=` and appends `decisions_reviewed=1`.
-A post-teardown visual review can complete against the surviving report and durable tasks without recreating volatile task metadata.
+The `complete` subcommand persists the reviewed captain-held task ids, called the reviewed inventory, using the attestation storage owned by the [`fm-captain-hold.sh` header](../bin/fm-captain-hold.sh).
+A review without a task record can complete against the surviving report and durable tasks, retaining its inventory for later verification without recreating volatile task metadata.
 
 `complete` accepts `--none` as an explicit semantic inventory result.
 `--none` is refused while the origin still has a lifecycle-open keyed status decision.
@@ -119,6 +119,7 @@ The event names the reviewed inventory.
 ### Checking before scout teardown (`verify`)
 
 Scout teardown calls the read-only `verify` subcommand after checking for the report and before removing any source state.
+The [underway reconciliation helper](../bin/fm-reconcile-underway.sh) also uses it before proposing a report-backed queue close for a scout without a task record.
 `verify` checks three things:
 
 - The recorded attestation exists.

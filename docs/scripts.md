@@ -134,7 +134,8 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-merge-authority-lib.sh` | Resolve merge authority at the gate, persist it against the accepted canonical PR, and identity-check its later poll consumption |
 | `fm-parent-channel-lib.sh` | Read historical parent-channel identity for safe status-log classification |
 | `fm-promote.sh`          | Promote a scout task in place to a protected ship task with an explicit delivery mode, write the ship instructions carrying that mode's definition of done, and supersede the task's brief so a later relaunch cannot revive stale scout delivery text |
-| `fm-teardown.sh` | Fail-closed teardown of landed ship worktrees and completed scout deliverables |
+| `fm-reconcile-underway.sh` | Read-only underway-work classification and guarded next-command proposals for the [stow workflow](../.agents/skills/stow/SKILL.md#underway-work-reconciliation) |
+| `fm-teardown.sh` | Fail-closed retirement of landed ship worktrees, explicitly branch-retained native ship copies, and completed scout deliverables |
 | `fm-harness.sh` | Detect the running harness and resolve crew harness, model, and native effort |
 | `fm-lock.sh`             | Per-home firstmate session lock                                                      |
 | `fm-inbox.sh`            | The captain's out-of-band capture surface: queue a note (optionally idempotent by request id), announce or repair its wake, record a durable primary reply, and emit bounded receipts and primary-readiness JSON |

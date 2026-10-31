@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # fm-reconcile-underway.sh - read-only classification of this home's underway
 # work, with the exact guarded next command per task. It never mutates a task,
-# copy, record, ref or the queue; the printed commands own every proof and gate
+# copy, record, ref or the queue; guarded commands recheck cleanup/restore proofs
 # (teardown's landed-work, clean and endpoint gates; restore's byte, generation
-# and reservation binding), so a wrong classification refuses there instead of
-# losing work. The /stow skill owns judgment and authority over these lines.
+# and reservation binding). Queue-close eligibility is checked here; /stow owns
+# judgment and authority over every proposal and must verify its evidence.
 #
 # Usage: FM_HOME=<home> fm-reconcile-underway.sh [--archive <state-dir>]...
 #   --archive  a directory of archived task records (<id>.meta), such as one a
@@ -15,8 +15,11 @@
 # where <next> is `-` when no command applies. Classes:
 #   captain-held   an open captain call (bin/fm-captain-hold.sh open); untouched.
 #   landed         delivery evidence found; next is the guarded teardown (or the
-#                  queue close for a row-only delivered scout). Generated
-#                  leftovers (build .cache node_modules __pycache__ .next out)
+#                  queue close for a delivered scout without a task record).
+#                  A queue close requires an In-flight scout row, its report
+#                  and captain-call inventory verification; with a reservation,
+#                  no archive may have been found. The copy and reservation stay.
+#                  Generated leftovers (build .cache node_modules __pycache__ .next out)
 #                  are named as --preserve-untracked only for the caller to inspect first.
 #   ongoing        live worker, or work still owed with its endpoint gone (next
 #                  is the stuck-crewmate-recovery relaunch).

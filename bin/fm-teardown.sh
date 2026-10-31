@@ -61,12 +61,13 @@
 # lift the deferral (it authorizes discarding unlanded WORK, never the
 # captain's question), and bin/fm-captain-hold.sh answer stays the only act
 # that closes the call.
-# REFUSES if the worktree holds work that has not LANDED, because cleanup
+# Except for explicit native branch retention, REFUSES unlanded work, because cleanup
 # hard-resets/removes the worktree and kills its processes. Work has landed when it is
 # proven by the task's own merged PR and contained local work, or, when no PR
 # is recorded, by equivalent content in the refreshed default branch.
-# Publishing a branch to any remote does not prove landing. Local-only work
-# must be merged into the local default branch before cleanup.
+# Publishing a branch to any remote does not prove landing. Native local-only
+# retirement uses the proofs above; legacy local-only cleanup accepts ancestry
+# or patch equivalence in the default branch, refusing uncontained merge commits.
 # A recorded base_branch selects the corresponding origin branch for content
 # proof when the task has no recorded PR.
 # Squash merges collapse the branch's commits, so per-commit patch ids against main
@@ -74,7 +75,7 @@
 # the PR head. A merged PR proves landing when its head contains the local HEAD
 # or every local-side commit since their merge base has an equivalent patch in
 # the PR-side history, or (no-mistakes only) pipeline_submission_published
-# binds this exact clean HEAD as the submission whose pushed head is the merged
+# binds this exact HEAD as the submission whose pushed head is the merged
 # PR head. Published local commits participate in this proof too:
 # excluding them could discard unique work merely because it reached a remote.
 # Path-set coverage alone cannot prove that edits to those paths landed.
@@ -1119,6 +1120,8 @@ nm_toon_paths() {
 # forge-verified head of this task's merged PR, and the PR state is merged.
 # Any local commit after submission changes HEAD and refuses; an unreadable,
 # ambiguous or differently bound result refuses.
+# This proves committed delivery only: preservation validates tracked cleanliness
+# and leftover coverage, and removal still requires the full clean-copy proof.
 pipeline_submission_published() { # <merged-pr-head>
   local pr_head=$1 current branch out paths path count want
   [ "$MODE" = no-mistakes ] || return 1
@@ -2504,7 +2507,7 @@ teardown_close_endpoint() {
   fi
 
   if [ "$HERDR_PRESENTATION_RETIRE_CANDIDATE" = 1 ]; then
-    # The presentation lock was acquired before the worktree return above; a
+    # The presentation lock was acquired before entering cleanup; a
     # contended lock already refused this teardown while everything was intact.
     if teardown_herdr_session_lock_held "$HERDR_PRESENTATION_SESSION"; then
       # stderr is deliberately NOT discarded here. This is the highest-frequency
@@ -2862,8 +2865,8 @@ rm -f "$STATE/$ID.turn-ended" "$STATE/$ID.progress" \
   "$STATE/.$ID.branch-outcome-index" \
   "$STATE/.secondmate-relaunch-$ID" "$STATE/.secondmate-relaunch-bound-$ID"
 # The steering inbox (bin/fm-task-inbox-lib.sh) is runtime state for the
-# retired endpoint; teardown only runs after landing is confirmed, so any
-# leftover unhandled steer here is moot rather than unlanded work.
+# retired endpoint; its removal follows the retirement proofs above and does
+# not attest that every unhandled steer was implemented.
 # state/<id>.git-hooks is the spawn-owned commit-msg strip directory, left
 # read-only by its installer.
 chmod u+w "$STATE/$ID.git-hooks" 2>/dev/null || true
