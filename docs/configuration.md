@@ -398,7 +398,7 @@ Local-only ships and scouts of registered local-only projects select accepted lo
 Other fresh allocations select current origin history when origin is configured, otherwise the local default branch; interrupted allocations and relaunch retain their recorded copy.
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 Startup reports orphan native reservations through the existing bootstrap diagnostics; [`fm-task-record-restore.sh`](../bin/fm-task-record-restore.sh) owns explicit restoration of byte-verified archived metadata without changing its original contract.
-For an explicitly identified sibling publication of local-only work, [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the exact PR landing proof and keeps the ordinary clean-copy and ownership gates.
+[`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard.

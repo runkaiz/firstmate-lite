@@ -2,9 +2,10 @@
 # allocator=git metadata selects native removal regardless of current config;
 # absent allocator keeps legacy pooled/Orca behavior. Native copies always face
 # bin/fm-git-worktree-lib.sh's exact ownership and clean/untracked gates;
-# PR ships use this script's existing landed-work proof, while local-only ships
-# and scouts require the native library's source/base proof. Legacy local-only
-# reservations also accept local default-branch ancestry. --force is unsupported.
+# PR ships use this script's existing landed-work proof; scouts use the native
+# library's source/base proof; local-only ships use teardown_native_local_landed
+# (unchanged base, local ancestry, or identical patch ids in local history,
+# also for legacy origin-recorded reservations). --force is unsupported.
 # A live/unverified owner refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
@@ -72,7 +73,9 @@
 # no longer match, and a pipeline rebase can leave the local worktree diverged from
 # the PR head. A merged PR proves landing when its head contains the local HEAD
 # or every local-side commit since their merge base has an equivalent patch in
-# the PR-side history. Published local commits participate in this proof too:
+# the PR-side history, or (no-mistakes only) pipeline_submission_published
+# binds this exact clean HEAD as the submission whose pushed head is the merged
+# PR head. Published local commits participate in this proof too:
 # excluding them could discard unique work merely because it reached a remote.
 # Path-set coverage alone cannot prove that edits to those paths landed.
 # Without a recorded PR, the content-in-default proof remains available below.
@@ -230,6 +233,11 @@
 #   contain this copy's HEAD. No patch equivalence is accepted on this path.
 #   This does not change mode/pr metadata, merge local divergence, waive any
 #   dirt/owner gate, or authorize force. The backlog note names this delivery.
+#   --retain-branch (native ships only, never with --force or sibling proof)
+#   retires a clean copy whose HEAD is contained in its recorded branch= ref,
+#   after the captain decided that work stays on its branch unlanded. It pins
+#   refs/firstmate/retained-work/<id>, deletes no ref, keeps every dirt/owner
+#   gate, and the backlog note names the retained refs instead of a landing.
 #   --force skips ordinary-task dirty and landed-work checks, skips scout report
 #   checks, and discards secondmate child work for kind=secondmate. Only use it
 #   when the captain has explicitly said to discard the work.
@@ -434,6 +442,8 @@ LEGACY_RECORD_GIVEN=0
 PRESERVE_PATHS=()
 SIBLING_PR=
 SIBLING_HEAD=
+RETAIN_BRANCH=0
+RETAINED_HEAD=
 shift
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -446,6 +456,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --landed-pr) SIBLING_PR=${2:?missing PR URL}; shift ;;
     --landed-head) SIBLING_HEAD=${2:?missing PR head}; shift ;;
+    --retain-branch) RETAIN_BRANCH=1 ;;
     *)
       echo "error: invalid teardown request" >&2
       exit 2
@@ -461,6 +472,9 @@ if [ -n "$SIBLING_PR$SIBLING_HEAD" ]; then
   fm_pr_url_parse "$SIBLING_PR" && fm_pr_head_valid "$SIBLING_HEAD" && [ -z "$FORCE" ] || {
     echo 'REFUSED: sibling landing requires a canonical PR URL and exact head, without force' >&2; exit 1;
   }
+fi
+if [ "$RETAIN_BRANCH" = 1 ] && [ -n "$FORCE$SIBLING_PR$SIBLING_HEAD" ]; then
+  echo 'REFUSED: --retain-branch never combines with --force or sibling landing proof' >&2; exit 1
 fi
 fm_backlog_directory_present "$STATE" "state directory" || {
   echo "error: teardown refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
@@ -1080,6 +1094,48 @@ $local_commits
 EOF
 }
 
+# Dotted-path view of TOON output: `a.b.c=value` for scalar keys only, quotes
+# stripped. Table rows and list headers are skipped, never misattributed.
+nm_toon_paths() {
+  awk '{
+    match($0, /^ */); depth = RLENGTH / 2; line = substr($0, RLENGTH + 1)
+    if (RLENGTH % 2 || line !~ /^[A-Za-z_][A-Za-z0-9_]*:/) next
+    key = line; sub(/:.*/, "", key)
+    value = line; sub(/^[^:]*:[ ]*/, "", value)
+    name[depth] = key; path = name[0]
+    for (i = 1; i <= depth; i++) path = path "." name[i]
+    if (value == "") next
+    if (value ~ /^".*"$/) value = substr(value, 2, length(value) - 2)
+    print path "=" value
+  }'
+}
+
+# Bounded residual for a merged no-mistakes PR whose pipeline rebased or
+# reworded the submission (review/document rounds), so neither containment nor
+# per-commit patch ids match. The residual is bounded by the pipeline's own
+# persisted push binding, read fresh and read-only through
+# `no-mistakes axi sync --check`: this clean, checked-out branch's exact HEAD
+# is the run's submitted head, the run completed, the head it pushed is the
+# forge-verified head of this task's merged PR, and the PR state is merged.
+# Any local commit or edit after submission changes HEAD or cleanliness and
+# refuses; an unreadable, ambiguous or differently bound result refuses.
+pipeline_submission_published() { # <merged-pr-head>
+  local pr_head=$1 current branch out paths path count want
+  [ "$MODE" = no-mistakes ] || return 1
+  current=$(git -C "$WT" rev-parse --verify HEAD 2>/dev/null) || return 1
+  branch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null) || return 1
+  out=$(fm_nm_run_checked "$WT" "$NM_TEARDOWN_TIMEOUT" axi sync --check) || return 1
+  paths=$(printf '%s\n' "$out" | nm_toon_paths)
+  for want in "branch_sync.local.branch=$branch" "branch_sync.local.head=$current" \
+    branch_sync.local.clean=true branch_sync.pipeline.status=completed \
+    "branch_sync.pipeline.submitted_head=$current" \
+    "branch_sync.pipeline.pushed_head=$pr_head" branch_sync.pr_state=merged; do
+    path=${want%%=*}
+    count=$(printf '%s\n' "$paths" | grep -c "^$path=" || true)
+    [ "$count" = 1 ] && printf '%s\n' "$paths" | grep -qxF -- "$want" || return 1
+  done
+}
+
 pr_is_merged() {
   local branch=$1 target view state remainder head resolved_url current landed=0
   if [ -n "$PR_URL" ]; then
@@ -1105,6 +1161,8 @@ pr_is_merged() {
   if git -C "$WT" merge-base --is-ancestor "$current" "$head" 2>/dev/null; then
     landed=1
   elif local_patches_are_in_pr_head "$head"; then
+    landed=1
+  elif pipeline_submission_published "$head"; then
     landed=1
   fi
   [ "$landed" = 1 ] || return 1
@@ -1195,7 +1253,9 @@ backlog_done_args() {
       BACKLOG_DONE_ARGS=(--report "$data_relative/$ID/report.md")
       ;;
     *)
-      if [ "$MODE" = local-only ]; then
+      if [ -n "$RETAINED_HEAD" ]; then
+        BACKLOG_DONE_ARGS=(--note "copy retired unlanded; commits retained on $RETAINED_HEAD")
+      elif [ "$MODE" = local-only ]; then
         if [ -n "$SIBLING_PR" ]; then
           BACKLOG_DONE_ARGS=(--note "landed via $SIBLING_PR at $SIBLING_HEAD")
         else
@@ -1524,6 +1584,17 @@ validate_worktree_teardown_safety() {
   fi
   unpushed=$(printf '%s\n' "$unpushed_raw" | head -5)
 
+  # The native clean and landing gate (fm_git_worktree_safe) already passed
+  # under this run's locks and re-runs at removal; only dirt is rechecked.
+  if [ "${NATIVE_PROOF_ACCEPTED:-0}" = 1 ]; then
+    if [ -n "$dirty" ]; then
+      echo "REFUSED: worktree $WT has uncommitted changes." >&2
+      report_worktree_dirt "$dirty"
+      return 1
+    fi
+    return 0
+  fi
+
   if [ "$MODE" = local-only ]; then
     if [ -n "$SIBLING_PR" ]; then
       if [ -n "$dirty" ] || ! sibling_pr_landed; then
@@ -1532,7 +1603,8 @@ validate_worktree_teardown_safety() {
       return 0
     fi
     DEFAULT=$(default_branch) || { echo "REFUSED: cannot determine default branch for $PROJ; expected origin/HEAD, main, or master." >&2; return 1; }
-    if ! unmerged_raw=$(git -C "$WT" log --oneline HEAD --not "$DEFAULT" -- 2>/dev/null); then
+    # Commits whose identical patch is already on $DEFAULT (git cherry `-`) landed.
+    if ! unmerged_raw=$(git -C "$WT" cherry -v "$DEFAULT" HEAD 2>/dev/null | sed -n 's/^+ //p'; exit "${PIPESTATUS[0]}"); then
       if worktree_safety_blocked_by_lock "commits not on $DEFAULT"; then
         return "$TEARDOWN_WORKTREE_SAFETY_LOCK_BLOCKED"
       fi
@@ -2351,21 +2423,54 @@ teardown_native_pr_landed() {
   branch=$(git -C "$WT" rev-parse --abbrev-ref HEAD) || return 1
   work_is_landed "$branch"
 }
+# Native local-only landing: an unchanged copy (no task commits, even when its
+# source history was later replaced), local ancestry, or every local commit
+# having an identical patch id in local history (a squash or cherry-pick of a
+# single commit). The local branch is the reservation's refs/heads source, or
+# for a legacy origin-recorded reservation the local base/default branch.
 teardown_native_local_landed() {
-  local name
-  name=$(default_branch) || return 1
-  git -C "$WT" merge-base --is-ancestor HEAD "refs/heads/$name"
+  local ref cherry
+  fm_git_worktree_unchanged_base "$STATE" "$ID" "$PROJ" && return 0
+  ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || return 1
+  case "$ref" in
+    refs/heads/*) ;;
+    *) ref=${BASE_BRANCH:-}; [ -n "$ref" ] || ref=$(default_branch) || return 1; ref="refs/heads/$ref" ;;
+  esac
+  git -C "$PROJ" show-ref --verify --quiet "$ref" || return 1
+  git -C "$WT" merge-base --is-ancestor HEAD "$ref" && return 0
+  cherry=$(git -C "$WT" cherry "$ref" HEAD) || return 1
+  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
+}
+# --retain-branch: the captain decided this ship's commits stay on its branch
+# rather than landing through this task. Only the copy is retired: HEAD must be
+# contained in the recorded branch= ref, and that commit is also pinned at
+# refs/firstmate/retained-work/<id> so the work outlives a later branch delete.
+# It never claims landing; the backlog note names the retained refs.
+teardown_native_branch_retained() {
+  local branch tip head
+  branch=$(fm_meta_get "$META" branch) || return 1
+  [ -n "$branch" ] && git check-ref-format --branch "$branch" >/dev/null 2>&1 || return 1
+  tip=$(git -C "$PROJ" rev-parse --verify --quiet "refs/heads/$branch^{commit}") || return 1
+  head=$(git -C "$WT" rev-parse --verify HEAD) || return 1
+  git -C "$WT" merge-base --is-ancestor "$head" "$tip" || return 1
+  fm_git_worktree_pin "$PROJ" "refs/firstmate/retained-work/$ID" "$head" || return 1
+  RETAINED_HEAD="refs/heads/$branch and refs/firstmate/retained-work/$ID at $head"
 }
 if [ -n "$SIBLING_PR" ] && [ -d "$WT" ]; then
   sibling_pr_landed || { echo 'REFUSED: exact sibling PR landing is not proven; preserving copy' >&2; exit 1; }
 fi
+if [ "$RETAIN_BRANCH" = 1 ] && { [ "$WORKTREE_ALLOCATOR" != git ] || [ "$KIND" != ship ]; }; then
+  echo 'REFUSED: --retain-branch applies only to native ship copies' >&2; exit 1
+fi
+NATIVE_PROOF_ACCEPTED=0
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ -n "$SIBLING_PR" ]; then
     NATIVE_LANDING_CHECK=(sibling_pr_landed)
-  elif [ "$KIND" = ship ] && [ "$MODE" = local-only ] \
-    && [[ "$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref)" = refs/remotes/* ]]; then
+  elif [ "$RETAIN_BRANCH" = 1 ]; then
+    NATIVE_LANDING_CHECK=(teardown_native_branch_retained)
+  elif [ "$KIND" = ship ] && [ "$MODE" = local-only ]; then
     NATIVE_LANDING_CHECK=(teardown_native_local_landed)
-  elif [ "$KIND" = ship ] && [ "$MODE" != local-only ]; then
+  elif [ "$KIND" = ship ]; then
     NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
   fi
   if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ -d "$WT" ]; then
@@ -2380,6 +2485,7 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   fi
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
+  NATIVE_PROOF_ACCEPTED=1
 fi
 
 if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
