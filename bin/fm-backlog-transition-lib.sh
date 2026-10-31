@@ -873,6 +873,28 @@ fm_backlog_close_marker_path() {  # <state-dir> <id>
   printf '%s/%s.backlog-close\n' "$1" "$2"
 }
 
+fm_backlog_close_note_valid() {  # <serialized-note> <id>
+  local note=$1 pattern branch retained_id head url
+  [ "$note" != 'local%20main' ] || return 0
+  pattern='^copy retired unlanded; commits retained on (refs/heads/[^ ]+) and refs/firstmate/retained-work/([^ ]+) at ([0-9a-f]+)$'
+  if [[ "$note" =~ $pattern ]]; then
+    branch=${BASH_REMATCH[1]}
+    retained_id=${BASH_REMATCH[2]}
+    head=${BASH_REMATCH[3]}
+    [ "$retained_id" = "$2" ] && git check-ref-format "$branch" \
+      && fm_pr_head_valid "$head"
+    return $?
+  fi
+  pattern='^landed via ([^ ]+) at ([0-9a-f]+)$'
+  if [[ "$note" =~ $pattern ]]; then
+    url=${BASH_REMATCH[1]}
+    head=${BASH_REMATCH[2]}
+    fm_pr_url_parse "$url" && fm_pr_head_valid "$head"
+    return $?
+  fi
+  return 1
+}
+
 fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <expected-id> <state-dir>
   local marker=$1 authorized_data data_resolved expected_id=$3 state=$4
   local id='' data='' marker_spawn_gen='' cleanup_incomplete=0 mode=close line raw_bytes arg_value
@@ -983,7 +1005,7 @@ fm_backlog_close_marker_validate() {  # <marker-path> <authorized-data-dir> <exp
     0) ;;
     2)
       case "${args[0]}" in
-        --note) [ "${args[1]}" = "local%20main" ] ;;
+        --note) fm_backlog_close_note_valid "${args[1]}" "$id" ;;
         --pr)
           arg_value=${args[1]}
           [ "${#arg_value}" -le 2048 ] \
@@ -1191,7 +1213,7 @@ fm_backlog_close_marker_replay() {  # <state-dir> <marker-path> <authorized-data
   native_reservation=$FM_BACKLOG_CLOSE_VALIDATED_NATIVE
   [ "$mode" = close ] || mode_flags=("--$mode")
   args=("${FM_BACKLOG_CLOSE_VALIDATED_ARGS[@]+"${FM_BACKLOG_CLOSE_VALIDATED_ARGS[@]}"}")
-  if [ "${args[0]-}" = --note ]; then
+  if [ "${args[0]-}" = --note ] && [ "${args[1]-}" = 'local%20main' ]; then
     args[1]="local main"
   fi
   meta="$state/$id.meta"

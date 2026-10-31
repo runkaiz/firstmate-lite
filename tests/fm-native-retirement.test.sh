@@ -65,6 +65,75 @@ commit_in() { # <dir> <file> <content> <message>
 retained() { [ -d "$WT" ] && [ -f "$HOME_DIR/state/$ID.meta" ] && [ -f "$HOME_DIR/state/$ID.git-worktree" ]; }
 retired() { [ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$ID.meta" ] && [ ! -e "$HOME_DIR/state/$ID.git-worktree" ]; }
 
+automatic_backlog() {
+  printf 'markdown\n' > "$HOME_DIR/config/backlog-backend"
+  printf 'backend = "markdown"\n' > "$HOME_DIR/.tasks.toml"
+  printf '# Backlog\n\n## In flight\n\n- **%s** - Retire copy.\n\n## Queued\n\n## Done\n' "$ID" > "$HOME_DIR/data/backlog.md"
+}
+
+assert_closed_note() {
+  local out
+  out=$(env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-queue.sh" show "$ID") || fail "queue read failed: $out"
+  assert_contains "$out" 'state: done' 'retirement did not close the queue row'
+  assert_contains "$(cat "$HOME_DIR/data/backlog.md")" "$1" 'completion lost the exact delivery note'
+  [ ! -e "$HOME_DIR/state/$ID.backlog-close" ] || fail 'completion left a pending close'
+}
+
+# Exercise the persisted close protocol independently of copy removal, including
+# replay after a crash and retry after the queue has already closed the row.
+replay_note() {
+  env FM_HOME="$HOME_DIR" bash -c '
+    . "$1/bin/fm-tasks-axi-lib.sh"
+    . "$1/bin/fm-backlog-transition-lib.sh"
+    fm_backlog_close_marker_replay "$FM_HOME/state" "$FM_HOME/state/$2.backlog-close" "$FM_HOME/data" || {
+      printf "%s\n" "$FM_BACKLOG_TRANSITION_ERROR" >&2
+      exit 1
+    }
+  ' bash "$ROOT" "$ID"
+}
+
+head=$(printf '%040d' 1)
+ID=retire-note
+for note in "landed via https://github.com/fixture/project/pull/7 at $head" \
+  "copy retired unlanded; commits retained on refs/heads/kept%20branch and refs/firstmate/retained-work/$ID at $head" \
+  'local main'; do
+  HOME_DIR="$TMP_ROOT/note-home"
+  fm_test_spawn_home "$HOME_DIR" codex
+  automatic_backlog
+  out=$(env FM_HOME="$HOME_DIR" bash -c '
+    . "$1/bin/fm-tasks-axi-lib.sh"
+    . "$1/bin/fm-backlog-transition-lib.sh"
+    fm_backlog_close_marker_write "$FM_HOME/state" "$2" "$FM_HOME/data" note-generation --note "$3" || {
+      printf "%s\n" "$FM_BACKLOG_TRANSITION_ERROR" >&2
+      exit 1
+    }
+  ' bash "$ROOT" "$ID" "$note" 2>&1) || fail "note could not be serialized: $note: $out"
+  cp "$HOME_DIR/state/$ID.backlog-close" "$TMP_ROOT/saved-close"
+  replay_note || fail "note replay failed: $note"
+  assert_closed_note "$note"
+  cp "$TMP_ROOT/saved-close" "$HOME_DIR/state/$ID.backlog-close"
+  replay_note || fail "repeated note replay failed: $note"
+  assert_closed_note "$note"
+done
+pass 'sibling-PR, retained-branch and legacy local-main notes survive serialization and repeated replay'
+
+for note in "landed via https://github.com/fixture/project/pull/7 at short" \
+  "landed via https://github.com/fixture/project/pull/0 at $head" \
+  "copy retired unlanded; commits retained on refs/heads/bad..branch and refs/firstmate/retained-work/$ID at $head" \
+  "copy retired unlanded; commits retained on refs/heads/kept and refs/firstmate/retained-work/another-task at $head" \
+  'arbitrary completion claim'; do
+  automatic_backlog
+  before=$(cat "$HOME_DIR/data/backlog.md")
+  marker="$HOME_DIR/state/$ID.backlog-close"
+  printf 'id=%s\ndata=%s\nspawn_gen=note-generation\narg=--note\narg=%s\n' \
+    "$ID" "$HOME_DIR/data" "$note" > "$marker"
+  if out=$(replay_note 2>&1); then fail "invalid completion note replayed: $note"; fi
+  assert_contains "$out" 'invalid pending-close arguments' 'invalid note refused for the wrong reason'
+  [ -f "$marker" ] || fail 'invalid note replay removed its marker'
+  [ "$(cat "$HOME_DIR/data/backlog.md")" = "$before" ] || fail 'invalid note replay changed the queue'
+done
+pass 'malformed and foreign completion notes refuse without changing the queue or consuming the marker'
+
 # A + B: archived scout record whose recorded source was replaced by unrelated
 # history, with no task commits (audit: validation-overhead-audit).
 make_case scout scout ''
@@ -152,6 +221,7 @@ pass 'native and legacy teardown reject unlanded merge resolutions and accept an
 
 # C: unlanded commits kept by the recorded branch ref (operating-adoption shape).
 make_case retain ship local-only
+automatic_backlog
 git -C "$WT" switch -qc "fm/$ID"
 commit_in "$WT" kept 'kept' 'kept on branch'
 head=$(git -C "$WT" rev-parse HEAD)
@@ -173,6 +243,7 @@ retired || fail 'branch retention left resources'
 [ "$(git -C "$PROJ" rev-parse "refs/heads/fm/$ID")" = "$head" ] || fail 'retention moved or deleted the branch'
 [ "$(git -C "$PROJ" rev-parse "refs/firstmate/retained-work/$ID")" = "$head" ] || fail 'retained work was not pinned'
 [ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$BASE" ] || fail 'retention landed the work on main'
+assert_closed_note "copy retired unlanded; commits retained on refs/heads/fm/$ID and refs/firstmate/retained-work/$ID at $head"
 pass 'branch-kept commits retire only by explicit retention, with the branch kept and the commit pinned'
 
 # Rebased and reworded merged PR (audit: edf28acf submitted, PR #13 head
