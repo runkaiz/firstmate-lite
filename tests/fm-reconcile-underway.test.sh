@@ -24,11 +24,15 @@ mkdir -p "$ARCHIVE"
 FAKE=$(fm_fakebin "$TMP_ROOT/fake")
 cat > "$FAKE/tmux" <<'SH'
 #!/usr/bin/env bash
-case "$1" in list-windows) printf 'main\n' ;; display-message) exit 1 ;; esac
+case "$1" in
+  list-windows) printf 'main\nfm-live-local\nfm-live-scout\nfm-live-pr\n' ;;
+  display-message)
+    case "${*: -1}" in '#{pane_current_command}') printf 'codex\n' ;; *) exit 1 ;; esac ;;
+esac
 SH
 cat > "$FAKE/gh" <<'SH'
 #!/usr/bin/env bash
-[ "$1 $2" = 'pr view' ] && { printf 'MERGED\n'; exit 0; }
+[ "$1 $2" = 'pr view' ] && { [ "$3" != 'https://github.com/fixture/project/pull/404' ] || exit 1; printf 'MERGED\n'; exit 0; }
 exit 1
 SH
 chmod +x "$FAKE/tmux" "$FAKE/gh"
@@ -81,6 +85,52 @@ row reported scout
 mkdir -p "$HOME_DIR/data/reported"; printf '# r\n' > "$HOME_DIR/data/reported/report.md"
 row stale ship
 
+row reserved-report scout
+copy reserved-report
+mkdir -p "$HOME_DIR/data/reserved-report"
+printf '# delivered\n' > "$HOME_DIR/data/reserved-report/report.md"
+row draft scout
+mkdir -p "$HOME_DIR/data/draft"
+printf '# draft\n' > "$HOME_DIR/data/draft/report.md"
+row reserved-draft scout
+copy reserved-draft
+mkdir -p "$HOME_DIR/data/reserved-draft"
+printf '# draft\n' > "$HOME_DIR/data/reserved-draft/report.md"
+for id in reported reserved-report; do
+  env FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" PATH="$FAKE:$PATH" \
+    bash "$ROOT/bin/fm-captain-hold.sh" complete "$id" --none >/dev/null || fail "complete $id"
+  [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'completion recreated a task record'
+done
+for kind in local scout pr; do
+  id="live-$kind"
+  row "$id" "$([ "$kind" = scout ] && printf scout || printf ship)"
+  copy "$id"
+  case "$kind" in
+    local) meta "$id" ship mode=local-only; printf 'editing\n' > "$WT/in-progress" ;;
+    scout) meta "$id" scout; mkdir -p "$HOME_DIR/data/$id"; printf '# draft\n' > "$HOME_DIR/data/$id/report.md" ;;
+    pr) meta "$id" ship mode=no-mistakes pr=https://github.com/fixture/project/pull/3
+      printf 'new work\n' > "$WT/after-merge" ;;
+  esac
+done
+row unreadable ship
+copy unreadable; meta unreadable ship mode=no-mistakes pr=https://github.com/fixture/project/pull/404
+
+row merge-resolution ship
+copy merge-resolution; meta merge-resolution ship mode=local-only branch=fm/merge-resolution
+git -C "$WT" switch -qc fm/merge-resolution
+printf 'left\n' > "$WT/conflict"; git -C "$WT" add conflict; git -C "$WT" "${GIT_ID[@]}" commit -qm left
+left=$(git -C "$WT" rev-parse HEAD)
+git -C "$PROJ" switch -qc right "$BASE"
+printf 'right\n' > "$PROJ/conflict"; git -C "$PROJ" add conflict; git -C "$PROJ" "${GIT_ID[@]}" commit -qm right
+if git -C "$WT" "${GIT_ID[@]}" merge right >/dev/null 2>&1; then fail 'expected merge conflict'; fi
+printf 'unique resolution\n' > "$WT/conflict"; git -C "$WT" add conflict; git -C "$WT" "${GIT_ID[@]}" commit -qm resolution
+git -C "$PROJ" switch -q "$MAIN"
+printf 'advance\n' > "$PROJ/advance"; git -C "$PROJ" add advance; git -C "$PROJ" "${GIT_ID[@]}" commit -qm advance
+git -C "$PROJ" "${GIT_ID[@]}" cherry-pick "$left" >/dev/null
+git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit right >/dev/null
+cherry=$(git -C "$WT" cherry "$MAIN" HEAD)
+[ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- ' || fail 'merge fixture lacks patch-equivalent ordinary commits'
+
 before=$(cd "$HOME_DIR" && find state data -type f -exec sha256sum {} + | sort)
 out=$(env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" bash "$ROOT/bin/fm-reconcile-underway.sh" --archive "$ARCHIVE" 2>&1)
 expect_code 0 "$?" "classification failed: $out"
@@ -104,7 +154,16 @@ expect archived record-archived "bin/fm-task-record-restore.sh archived $ARCHIVE
 expect orphan unretirable -
 expect reported landed 'bin/fm-queue.sh done reported --report data/reported/report.md'
 expect stale stale-row -
-[ "$(printf '%s\n' "$out" | wc -l | tr -d ' ')" = 9 ] || fail "unexpected classification lines: $out"
+expect reserved-report landed 'bin/fm-queue.sh done reserved-report --report data/reserved-report/report.md'
+assert_contains "$(line reserved-report)" 'copy and reservation stay preserved' 'reserved scout preservation missing'
+expect draft needs-captain -
+expect reserved-draft needs-captain -
+expect live-local ongoing -
+expect live-scout ongoing -
+expect live-pr ongoing -
+expect unreadable unknown -
+expect merge-resolution needs-captain -
+[ "$(printf '%s\n' "$out" | wc -l | tr -d ' ')" = 17 ] || fail "unexpected classification lines: $out"
 pass 'underway work classifies as held, landed, needs-captain, ongoing, archived, unretirable and stale without mutation'
 
 # The proposed restore command is exactly runnable and the rerun reclassifies.
@@ -113,5 +172,29 @@ env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-task-record-restore.sh" archived "$AR
 out=$(env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" bash "$ROOT/bin/fm-reconcile-underway.sh" 2>&1)
 expect archived ongoing 'bin/fm-control.sh archived relaunch'
 pass 'a proposed restore runs as printed and the restored record reclassifies on rerun'
+
+if env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-reconcile-underway.sh" --no-forge >/dev/null 2>&1; then
+  fail 'removed forge opt-out was accepted'
+fi
+for id in reported reserved-report; do
+  cmd=$(line "$id" | cut -f3)
+  (cd "$ROOT" && env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" bash -c "$cmd") >/dev/null || fail "queue close failed for $id"
+done
+[ -f "$HOME_DIR/state/reserved-report.git-worktree" ] || fail 'queue close lost reservation'
+[ -d "$(fm_git_worktree_field "$HOME_DIR/state/reserved-report.git-worktree" path)" ] || fail 'queue close lost copy'
+pass 'verified record-less scout queue closure preserves native resources'
+
+captain() { env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" bash "$ROOT/bin/fm-captain-hold.sh" "$@"; }
+tasks-axi add pending fixture --kind ship --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'add pending call'
+captain hold pending --reason 'choose direction' --origin reserved-draft >/dev/null || fail 'hold pending call'
+captain complete reserved-draft pending >/dev/null || fail 'record report inventory'
+captain verify reserved-draft >/dev/null || fail 'verify report inventory'
+captain complete reserved-draft --none >/dev/null || fail 'repeat report inventory'
+tasks-axi done pending --file "$HOME_DIR/data/backlog.md" >/dev/null || fail 'close pending fixture'
+if captain verify reserved-draft >/dev/null 2>&1; then fail 'verification forgot the unresolved inventory entry'; fi
+printf 'needs-decision [key=direction]: choose direction\n' > "$HOME_DIR/state/draft.status"
+if captain complete draft --none >/dev/null 2>&1; then fail 'completion accepted an open status decision'; fi
+if captain verify draft >/dev/null 2>&1; then fail 'failed completion licensed queue closure'; fi
+pass 'record-less inventories retain their entries and reject unresolved captain calls'
 
 fm_test_cleanup

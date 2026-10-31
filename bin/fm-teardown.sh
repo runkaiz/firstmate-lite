@@ -1604,7 +1604,7 @@ validate_worktree_teardown_safety() {
     fi
     DEFAULT=$(default_branch) || { echo "REFUSED: cannot determine default branch for $PROJ; expected origin/HEAD, main, or master." >&2; return 1; }
     # Commits whose identical patch is already on $DEFAULT (git cherry `-`) landed.
-    if ! unmerged_raw=$(git -C "$WT" cherry -v "$DEFAULT" HEAD 2>/dev/null | sed -n 's/^+ //p'; exit "${PIPESTATUS[0]}"); then
+    if ! unmerged_raw=$(git -C "$WT" log --merges --oneline "$DEFAULT..HEAD" -- 2>/dev/null || exit 1; git -C "$WT" cherry -v "$DEFAULT" HEAD 2>/dev/null | sed -n 's/^+ //p'; exit "${PIPESTATUS[0]}"); then
       if worktree_safety_blocked_by_lock "commits not on $DEFAULT"; then
         return "$TEARDOWN_WORKTREE_SAFETY_LOCK_BLOCKED"
       fi
@@ -2429,7 +2429,7 @@ teardown_native_pr_landed() {
 # single commit). The local branch is the reservation's refs/heads source, or
 # for a legacy origin-recorded reservation the local base/default branch.
 teardown_native_local_landed() {
-  local ref cherry
+  local ref cherry merges
   fm_git_worktree_unchanged_base "$STATE" "$ID" "$PROJ" && return 0
   ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || return 1
   case "$ref" in
@@ -2438,6 +2438,8 @@ teardown_native_local_landed() {
   esac
   git -C "$PROJ" show-ref --verify --quiet "$ref" || return 1
   git -C "$WT" merge-base --is-ancestor HEAD "$ref" && return 0
+  merges=$(git -C "$WT" rev-list --merges "$ref..HEAD" --) || return 1
+  [ -z "$merges" ] || return 1
   cherry=$(git -C "$WT" cherry "$ref" HEAD) || return 1
   [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
 }

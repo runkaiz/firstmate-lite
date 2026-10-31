@@ -6,10 +6,9 @@
 # and reservation binding), so a wrong classification refuses there instead of
 # losing work. The /stow skill owns judgment and authority over these lines.
 #
-# Usage: FM_HOME=<home> fm-reconcile-underway.sh [--archive <state-dir>]... [--no-forge]
+# Usage: FM_HOME=<home> fm-reconcile-underway.sh [--archive <state-dir>]...
 #   --archive  a directory of archived task records (<id>.meta), such as one a
 #              registration archive left; repeatable, never discovered.
-#   --no-forge skip PR state reads; PR ships then classify as unknown.
 # Inputs: In-flight queue rows, state/<id>.meta records (ship/scout) and
 # state/<id>.git-worktree native reservations, joined by task id.
 # Output, one tab-separated line per task: <id> <class> <next> <evidence>
@@ -29,13 +28,11 @@
 #   unknown        endpoint or PR state could not be read; nothing is proposed.
 set -u
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-usage() { sed -n '9,13p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '9,12p' "$0" | sed 's/^# \{0,1\}//'; }
 ARCHIVES=()
-FORGE=1
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --archive) [ "$#" -ge 2 ] && [ -d "$2" ] || { echo 'error: --archive needs a directory' >&2; exit 2; }; ARCHIVES+=("$2"); shift ;;
-    --no-forge) FORGE=0 ;;
     --help|-h) usage; exit 0 ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -90,7 +87,7 @@ emit_teardown() { # <id> <copy> <evidence>
 
 # Advisory local-only landing read; teardown_native_local_landed is the proof.
 local_landed() { # <copy> <reservation-or-empty> <project>
-  local ref base
+  local ref base merges cherry
   base=$( [ -n "$2" ] && fm_git_worktree_field "$2" base 2>/dev/null ) || base=
   [ -n "$base" ] && [ "$(git -C "$1" rev-parse HEAD 2>/dev/null)" = "$base" ] && return 0
   ref=$( [ -n "$2" ] && fm_git_worktree_field "$2" source_ref 2>/dev/null ) || ref=
@@ -99,7 +96,11 @@ local_landed() { # <copy> <reservation-or-empty> <project>
     *) ref=$(git -C "$3" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null) && ref="refs/heads/${ref#origin/}" \
          || { git -C "$3" show-ref --verify --quiet refs/heads/main && ref=refs/heads/main; } || ref=refs/heads/master ;;
   esac
-  ! git -C "$1" cherry "$ref" HEAD 2>/dev/null | grep -q '^+' && git -C "$1" rev-parse --verify --quiet "$ref" >/dev/null
+  git -C "$1" merge-base --is-ancestor HEAD "$ref" 2>/dev/null && return 0
+  merges=$(git -C "$1" rev-list --merges "$ref..HEAD" -- 2>/dev/null) || return 1
+  [ -z "$merges" ] || return 1
+  cherry=$(git -C "$1" cherry "$ref" HEAD 2>/dev/null) || return 1
+  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
 }
 
 classify_record() { # <id> <meta>
@@ -112,19 +113,17 @@ classify_record() { # <id> <meta>
   [ -z "$target" ] || endpoint=$(fm_backend_agent_state "$backend" "$target" 2>/dev/null)
   case "$endpoint" in alive|dead|missing) ;; *) emit "$id" unknown - "endpoint $endpoint"; return ;; esac
   if [ "$kind" = scout ]; then
+    [ "$endpoint" = alive ] && { emit "$id" ongoing - 'scout worker live; report existence does not prove completion'; return; }
     if [ -f "$DATA/$id/report.md" ]; then
-      [ "$endpoint" = alive ] && { emit "$id" landed "bin/fm-control.sh $(quote "$id") exit" "report delivered; worker still live"; return; }
       emit_teardown "$id" "$wt" "scout report data/$id/report.md; teardown also needs the captain-call inventory"
-    elif [ "$endpoint" = alive ]; then emit "$id" ongoing - 'scout worker live, no report yet'
     else emit "$id" ongoing "bin/fm-control.sh $(quote "$id") relaunch" 'scout endpoint gone before its report'
     fi
     return
   fi
   if [ "$mode" = local-only ]; then
+    [ "$endpoint" = alive ] && { emit "$id" ongoing - 'local-only worker live; local history does not prove completion'; return; }
     if [ -d "$wt" ] && local_landed "$wt" "$res" "$proj"; then
-      [ "$endpoint" = alive ] && { emit "$id" landed "bin/fm-control.sh $(quote "$id") exit" 'local work in local history; worker still live'; return; }
       emit_teardown "$id" "$wt" 'local work is in local history'
-    elif [ "$endpoint" = alive ]; then emit "$id" ongoing - 'local-only worker live'
     elif [ -d "$wt" ]; then
       emit "$id" needs-captain - "unlanded local-only commits on $(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null): approve bin/fm-merge-local.sh, or decide teardown --retain-branch"
     else emit "$id" unretirable - 'local-only copy missing'
@@ -138,11 +137,10 @@ classify_record() { # <id> <meta>
     fi
     return
   fi
-  [ "$FORGE" = 1 ] || { emit "$id" unknown - "PR $pr not read (--no-forge)"; return; }
   prstate=$( (cd "${wt:-$proj}" 2>/dev/null || cd "$proj" || exit 1; gh pr view "$pr" --json state --jq .state) 2>/dev/null) || prstate=
   case "$prstate" in
     MERGED)
-      [ "$endpoint" = alive ] && { emit "$id" landed "bin/fm-control.sh $(quote "$id") exit" "merged $pr; worker still live"; return; }
+      [ "$endpoint" = alive ] && { emit "$id" ongoing - "merged $pr; live worker may have subsequent work"; return; }
       emit_teardown "$id" "$wt" "merged $pr" ;;
     OPEN)
       if [ "$endpoint" = alive ]; then emit "$id" ongoing - "worker live; $pr open"; return; fi
@@ -155,13 +153,17 @@ classify_record() { # <id> <meta>
   esac
 }
 
-classify_reservation() { # <id> - reservation without a record
+classify_reservation() { # <id> <row-kind> - reservation without a record
   local id=$1 dir found=() sum gen target
   for dir in ${ARCHIVES[@]+"${ARCHIVES[@]}"}; do
     [ -f "$dir/$id.meta" ] && [ ! -L "$dir/$id.meta" ] && found+=("$dir/$id.meta")
   done
   case "${#found[@]}" in
-    0) emit "$id" unretirable - 'native reservation without task record; no archive given holds it' ;;
+    0)
+      if [ "$2" = scout ] && [ -f "$DATA/$id/report.md" ]; then
+        classify_row "$id" "$2" 'copy and reservation stay preserved'
+      else emit "$id" unretirable - 'native reservation without task record; no archive given holds it'
+      fi ;;
     1)
       sum=$(sha256sum "${found[0]}" | cut -d' ' -f1)
       gen=$(fm_meta_get "${found[0]}" spawn_gen); target=$(fm_backend_target_of_meta "${found[0]}")
@@ -172,11 +174,15 @@ classify_reservation() { # <id> - reservation without a record
   esac
 }
 
-classify_row() { # <id> <kind> - In-flight row without record or reservation
+classify_row() { # <id> <kind> [preservation-note] - In-flight row without a record
   local rel
   if [ "$2" = scout ] && [ -f "$DATA/$1/report.md" ]; then
+    if ! FM_HOME="$FM_HOME" bash "$SCRIPT_DIR/fm-captain-hold.sh" verify "$1" >/dev/null 2>&1; then
+      emit "$1" needs-captain - "scout report needs captain-call inventory verification; ${3:-no task record or reservation}"
+      return
+    fi
     rel="${DATA##*/}/$1/report.md" # relative to the backlog root, as teardown records it
-    emit "$1" landed "bin/fm-queue.sh done $(quote "$1") --report $(quote "$rel")" 'delivered scout report; no record or copy remains'
+    emit "$1" landed "bin/fm-queue.sh done $(quote "$1") --report $(quote "$rel")" "delivered scout report; ${3:-no task record or reservation}"
   else
     emit "$1" stale-row - 'In-flight row has no record, copy or report'
   fi
@@ -194,7 +200,7 @@ while IFS= read -r id; do
   if FM_HOME="$FM_HOME" bash "$SCRIPT_DIR/fm-captain-hold.sh" open "$id" >/dev/null 2>&1; then
     emit "$id" captain-held - 'open captain call; leave untouched'
   elif [ -f "$meta" ]; then classify_record "$id" "$meta"
-  elif [ -f "$STATE/$id.git-worktree" ]; then classify_reservation "$id"
+  elif [ -f "$STATE/$id.git-worktree" ]; then classify_reservation "$id" "$(printf '%s\n' "$ROWS" | awk -F '\t' -v id="$id" '$1 == id {print $2}')"
   else classify_row "$id" "$(printf '%s\n' "$ROWS" | awk -F '\t' -v id="$id" '$1 == id {print $2}')"
   fi
 done <<< "$ids"

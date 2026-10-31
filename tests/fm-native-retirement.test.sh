@@ -119,6 +119,37 @@ retired || fail 'patch-equivalent retirement left resources'
 git -C "$PROJ" show-ref --verify --quiet "refs/heads/fm/$ID" || fail 'retirement deleted the task branch'
 pass 'local-only delivery landed as an identical patch retires, while a commit with no equivalent still refuses'
 
+make_case merge-resolution ship local-only
+git -C "$WT" switch -qc "fm/$ID"
+commit_in "$WT" conflict left left
+left=$(git -C "$WT" rev-parse HEAD)
+git -C "$PROJ" switch -qc right "$BASE"
+commit_in "$PROJ" conflict right right
+if git -C "$WT" "${GIT_ID[@]}" merge right >/dev/null 2>&1; then fail 'expected merge conflict'; fi
+commit_in "$WT" conflict 'unique resolution' resolution
+git -C "$PROJ" switch -q "$MAIN"
+commit_in "$PROJ" advance advance advance
+git -C "$PROJ" "${GIT_ID[@]}" cherry-pick "$left" >/dev/null
+git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit right >/dev/null
+cherry=$(git -C "$WT" cherry "$MAIN" HEAD)
+[ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- ' || fail 'merge fixture lacks equivalent ordinary patches'
+if out=$(teardown 2>&1); then fail 'native teardown lost unlanded merge resolution'; fi
+assert_contains "$out" 'task delivery is not proven landed' 'native merge refusal reason'
+retained || fail 'merge refusal lost native resources'
+cp "$HOME_DIR/state/$ID.meta" "$CASE/native.meta"
+sed 's/^allocator=git$/allocator=treehouse/' "$CASE/native.meta" > "$HOME_DIR/state/$ID.meta"
+mv "$HOME_DIR/state/$ID.git-worktree" "$CASE/reservation"
+if out=$(teardown 2>&1); then fail 'legacy teardown lost unlanded merge resolution'; fi
+assert_contains "$out" 'work not yet merged into local' 'legacy merge refusal reason'
+[ -d "$WT" ] && [ -f "$HOME_DIR/state/$ID.meta" ] || fail 'legacy merge refusal lost resources'
+mv "$CASE/native.meta" "$HOME_DIR/state/$ID.meta"
+mv "$CASE/reservation" "$HOME_DIR/state/$ID.git-worktree"
+git -C "$PROJ" "${GIT_ID[@]}" merge -s ours --no-edit "fm/$ID" >/dev/null
+out=$(teardown 2>&1)
+expect_code 0 "$?" "ancestral merge was not retired: $out"
+retired || fail 'ancestral merge retirement left resources'
+pass 'native and legacy teardown reject unlanded merge resolutions and accept ancestral merges'
+
 # C: unlanded commits kept by the recorded branch ref (operating-adoption shape).
 make_case retain ship local-only
 git -C "$WT" switch -qc "fm/$ID"
