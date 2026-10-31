@@ -79,6 +79,27 @@ The rebased PR fixture publishes the original submission before rebasing, refuse
 The same shared removal gate applies across harnesses; it introduces no vendor-output check.
 The fixture covers tmux and Herdr adapter paths; the unchanged Zellij, cmux and Orca endpoint owners retain their existing verification and limitations below.
 
+Retained-copy recovery was verified on 2026-10-31 UTC with Git 2.56.0 and GNU Bash 5.3.9 using isolated Git repositories and stubbed endpoints:
+
+```sh
+FM_NATIVE_TMUX_LIVE_E2E=0 bash bin/fm-test-run.sh tests/fm-git-worktree.test.sh
+FM_TEST_ONLY=test_terminal_delivery_stale_busy_record bash tests/fm-watch-triage.test.sh
+```
+
+```text
+ok - unchanged local base retires after source replacement while retaining original commit custody
+ok - unchanged remote base retires after source replacement while retaining original commit custody
+ok - archived native metadata restoration binds exact bytes, generation, endpoint and reservation
+ok - exact sibling PR landing retires a contained local producer without merging private divergence
+ok - legacy native local-only reservation accepts documented local default ancestry
+ok - a pre-completion busy record cannot re-alarm delivered work; a new busy event restores activity detection
+```
+
+The native fixture combines sibling landing with ignored-artifact preservation and interrupted-retirement replay, and refuses mismatched PR identity, head, base, merge ancestry and private divergence.
+The watcher fixture exercises a trusted Claude hook record in attended and away modes, pending steering input, fresh busy events and an untrusted record that must retain activity detection.
+It tests ordering of existing semantic records rather than introducing a vendor-output signal; no live harness prompts or Herdr lifecycle operations are needed for these checks.
+The shared watcher path applies across primary harnesses and runtime backends, while record-source eligibility stays owned by `fm_busy_sources_for_harness` and the native copy allocator remains limited to tmux and Herdr.
+
 ## Worker profile evidence
 
 Verified on 2026-10-25 UTC with Pi 1.4.0 and Node 22.23.2 using the installed SDK, in-memory credentials/settings, an isolated resource loader and no prompt or network access.

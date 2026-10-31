@@ -4,7 +4,9 @@
 # All five arguments are explicit operator assertions, not archive discovery.
 # The digest binds the exact archived bytes; generation and endpoint bind the
 # original contract. Native reservation identity must agree independently.
-# Existing metadata, pending retirement, symlinks and ambiguous fields refuse.
+# Changed metadata, pending retirement, symlinks and ambiguous fields refuse.
+# Identical metadata is an idempotent replay; an interrupted publication's
+# staging links are retired only by exact inode/byte and complete link custody.
 # The task control, project allocation and metadata locks serialize publication
 # with ordinary lifecycle operations. Teardown still owns every removal gate.
 set -eu
@@ -46,8 +48,10 @@ trap cleanup EXIT
 cp "$ARCHIVE" "$TMP"
 python3 - "$TMP" "$DIGEST" <<'PY' || refuse 'archive digest does not match'
 import hashlib, re, sys
-assert re.fullmatch(r'[0-9a-f]{64}', sys.argv[2])
-assert hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest() == sys.argv[2]
+if not re.fullmatch(r'[0-9a-f]{64}', sys.argv[2]):
+    sys.exit(1)
+if hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest() != sys.argv[2]:
+    sys.exit(1)
 PY
 for key in project worktree allocator kind mode spawn_gen; do
   fm_git_worktree_field "$TMP" "$key" >/dev/null || refuse "ambiguous or missing $key"
@@ -70,7 +74,7 @@ CONTROL=$lock
 lock=$(fm_meta_lock_path "$META") || refuse 'cannot resolve metadata lock'
 fm_lock_try_acquire "$lock" || refuse 'task metadata is busy'
 META_LOCK=$lock
-[ ! -e "$META" ] && [ ! -L "$META" ] || refuse 'task record already exists'
+[ ! -L "$META" ] || refuse 'task record is a symlink'
 [ ! -e "$STATE/$ID.backlog-close" ] && [ ! -L "$STATE/$ID.backlog-close" ] || refuse 'retirement is pending'
 if [ -e "$STATE/$ID.busy-gen" ] || [ -L "$STATE/$ID.busy-gen" ]; then
   [ -f "$STATE/$ID.busy-gen" ] && [ ! -L "$STATE/$ID.busy-gen" ] || refuse 'unsafe busy generation'
@@ -78,8 +82,29 @@ if [ -e "$STATE/$ID.busy-gen" ] || [ -L "$STATE/$ID.busy-gen" ]; then
   [ "$archived_busy" = "$(cat "$STATE/$ID.busy-gen")" ] || refuse 'busy generation mismatch'
 fi
 fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJECT" "$WORKTREE" || refuse 'reservation identity mismatch'
-# A hard link is an exclusive publish: even a non-cooperating writer cannot
-# have its record replaced. Removing the staging link leaves an ordinary file.
-ln "$TMP" "$META" || refuse 'task record appeared during restoration'
-rm "$TMP"
+# Exclusive publication never overwrites a record. A retry can reconcile a
+# killed writer between link and unlink, without trusting unrelated temp files.
+python3 - "$TMP" "$META" "$ID" <<'PY' || refuse 'publication or replay could not be proved'
+import os, pathlib, stat, sys
+src, dst = map(pathlib.Path, sys.argv[1:3])
+try:
+    os.link(src, dst)
+except FileExistsError:
+    info = dst.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or dst.read_bytes() != src.read_bytes():
+        sys.exit(1)
+    links = []
+    for candidate in dst.parent.glob(f'.{sys.argv[3]}.restore.*'):
+        item = candidate.lstat()
+        if (item.st_dev, item.st_ino) == (info.st_dev, info.st_ino):
+            if not stat.S_ISREG(item.st_mode):
+                sys.exit(1)
+            links.append(candidate)
+    if info.st_nlink != 1 + len(links):
+        sys.exit(1)
+    for candidate in links:
+        candidate.unlink()
+else:
+    src.unlink()
+PY
 echo "Restored $ID metadata with sha256=$DIGEST; endpoint and copy unchanged."

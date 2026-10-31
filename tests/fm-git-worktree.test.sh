@@ -439,7 +439,7 @@ SH
   run_native_teardown() {
     local sibling_args=()
     if [ "$scenario" = tmux-sibling ]; then
-      sibling_args=(--landed-pr https://github.com/fixture/project/pull/1 --landed-head "$native_pr_head")
+      sibling_args=(--landed-pr https://github.com/fixture/project/pull/1 --landed-head "$native_pr_head" --preserve-untracked generated)
     fi
     env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
       FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
@@ -462,6 +462,7 @@ SH
     }
     digest=$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$CASE/archived.meta")
     if restore_record "${digest%?}x" "$target"; then fail 'restoration accepted wrong digest'; fi
+    if PYTHONOPTIMIZE=1 restore_record "${digest%?}x" "$target"; then fail 'optimized Python bypassed digest validation'; fi
     if restore_record "$digest" 'other:fm-missing-endpoint'; then fail 'restoration accepted another endpoint'; fi
     if env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-task-record-restore.sh" "$id" "$CASE/archived.meta" "$digest" another-generation "$target"; then
       fail 'restoration accepted another spawn incarnation'
@@ -481,7 +482,12 @@ SH
     [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'refused restore published metadata'
     restore_record "$digest" "$target" || fail 'valid archived native metadata could not be restored'
     cmp "$CASE/archived.meta" "$HOME_DIR/state/$id.meta" || fail 'restoration changed original contract bytes'
-    if restore_record "$digest" "$target"; then fail 'restoration replaced an existing record'; fi
+    ln "$HOME_DIR/state/$id.meta" "$HOME_DIR/state/.$id.restore.interrupted"
+    restore_record "$digest" "$target" || fail 'interrupted metadata publication could not replay'
+    [ ! -e "$HOME_DIR/state/.$id.restore.interrupted" ] || fail 'publication replay retained staging link'
+    printf 'changed-contract=true\n' >> "$HOME_DIR/state/$id.meta"
+    if restore_record "$digest" "$target"; then fail 'restoration replaced a changed existing record'; fi
+    cp "$CASE/archived.meta" "$HOME_DIR/state/$id.meta"
     pass 'archived native metadata restoration binds exact bytes, generation, endpoint and reservation'
   fi
   if out=$(FM_TEST_ENDPOINT_UNREADABLE=1 run_native_teardown 2>&1); then
@@ -527,6 +533,12 @@ SH
     assert_contains "$out" 'not proven landed' 'unique commit failed for an unrelated reason'
     [ -f "$WT/unique" ] && [ -f "$HOME_DIR/state/$id.meta" ] || fail 'unique-work refusal lost evidence'
     git -C "$WT" checkout -q --detach "$original"
+  fi
+  if [ "$scenario" = tmux-sibling ]; then
+    printf 'generated/\n' > "$CASE/ignore-generated"
+    git -C "$PROJ" config core.excludesFile "$CASE/ignore-generated"
+    mkdir "$WT/generated"
+    printf 'owned evidence\n' > "$WT/generated/result"
   fi
   bash -c 'cd "$1" && printf ready > "$2" && exec sleep 60' _ "$WT" "$CASE/ready" &
   owner=$!
@@ -618,6 +630,7 @@ SH
   if [ "$scenario" = tmux-sibling ]; then
     [ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$BASE" ] || fail 'sibling proof merged private local history'
     git -C "$PROJ" show-ref --verify --quiet refs/heads/retained-private || fail 'sibling cleanup deleted retained private lineage'
+    [ "$(cat "$HOME_DIR/data/$id/preserved-artifacts/files/generated/result")" = 'owned evidence' ] || fail 'sibling retirement lost generated artifacts'
     pass 'exact sibling PR landing retires a contained local producer without merging private divergence'
   elif [ "$scenario" = tmux-c2 ]; then
     [ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$original" ] || fail 'legacy local-only retirement changed accepted local history'

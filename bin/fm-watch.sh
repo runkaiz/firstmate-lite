@@ -1541,14 +1541,19 @@ TERMINAL_DELIVERY_DECLARATION=
 TERMINAL_DELIVERY_END=
 TERMINAL_DELIVERY_IDENT=
 terminal_delivery_old_busy() { # <task>; a stale busy record is not a new turn
-  local task=$1 record message
+  local task=$1 record message harness source
   [ "$(status_line_verb "$(last_status_line "$STATE/$task.status")")" = 'done' ] || return 1
   record=$(fm_busy_record_read "$STATE" "$task") || return 1
   case "$record" in busy\ *) ;; *) return 1 ;; esac
-  # File ordering is conservative at equal timestamps: an unchanged completion
-  # still gets its first alarm, and the bound below includes the busy sequence.
-  [ ! "$STATE/$task.busy-state" -nt "$STATE/$task.status" ] || return 1
-  [ ! "$STATE/$task.progress" -nt "$STATE/$task.status" ] || return 1
+  harness=$(fm_meta_get "$STATE/$task.meta" harness)
+  source=${record#* }; source=${source%% *}
+  fm_busy_source_trusted "$harness" "$source" || return 1
+  # Ambiguous timestamp ordering keeps activity eligible. The declaration
+  # below also binds the exact busy sequence, independently of the pane hash.
+  [ "$STATE/$task.status" -nt "$STATE/$task.busy-state" ] || return 1
+  if [ -e "$STATE/$task.progress" ]; then
+    [ "$STATE/$task.status" -nt "$STATE/$task.progress" ] || return 1
+  fi
   for message in "$STATE/$task.inbox/"*.msg; do
     [ ! -e "$message" ] || return 1
   done
