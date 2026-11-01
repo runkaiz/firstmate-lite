@@ -98,8 +98,9 @@
 # still use the independent content proof below.
 # A failed lookup for a recorded PR refuses. Only an unrecorded PR may use
 # the content fallback, which also refuses when inconclusive.
-# Uncommitted changes are never landed; dirty refusals distinguish untracked-only
-# leftovers from tracked edits and list at most ten non-exempt untracked paths.
+# Uncommitted changes are never landed; non-native dirty refusals distinguish
+# untracked-only leftovers from tracked edits and list at most ten non-exempt
+# untracked paths. Native leftover summaries follow native_leftover_next_action.
 # local-only projects additionally accept work merged into the local default
 # branch (firstmate performs that merge after configured approval) as a fallback
 # for the common case where there is no remote at all.
