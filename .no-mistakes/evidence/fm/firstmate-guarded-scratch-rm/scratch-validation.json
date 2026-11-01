@@ -1,0 +1,260 @@
+[
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "no-mistakes-unset",
+      "scratch-example",
+      "--mode",
+      "no-mistakes"
+    ],
+    "DIR": "<unset>",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/no-mistakes-unset/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "no-mistakes-unset",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "direct-PR-unset",
+      "scratch-example",
+      "--mode",
+      "direct-PR"
+    ],
+    "DIR": "<unset>",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/direct-PR-unset/brief.md (ship, mode=direct-PR; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "direct-PR-unset",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "local-only-unset",
+      "scratch-example",
+      "--mode",
+      "local-only"
+    ],
+    "DIR": "<unset>",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/local-only-unset/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "local-only-unset",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "scout-unset",
+      "scratch-example",
+      "--scout"
+    ],
+    "DIR": "<unset>",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/scout-unset/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "scout-unset",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "no-mistakes-empty",
+      "scratch-example",
+      "--mode",
+      "no-mistakes"
+    ],
+    "DIR": "",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/no-mistakes-empty/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "no-mistakes-empty",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "direct-PR-empty",
+      "scratch-example",
+      "--mode",
+      "direct-PR"
+    ],
+    "DIR": "",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/direct-PR-empty/brief.md (ship, mode=direct-PR; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "direct-PR-empty",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "local-only-empty",
+      "scratch-example",
+      "--mode",
+      "local-only"
+    ],
+    "DIR": "",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/local-only-empty/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "local-only-empty",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "scout-empty",
+      "scratch-example",
+      "--scout"
+    ],
+    "DIR": "",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/scout-empty/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "scout-empty",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "no-mistakes-hostile",
+      "scratch-example",
+      "--mode",
+      "no-mistakes"
+    ],
+    "DIR": "$(touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/INJECTED) `false` *",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/no-mistakes-hostile/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "no-mistakes-hostile",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "direct-PR-hostile",
+      "scratch-example",
+      "--mode",
+      "direct-PR"
+    ],
+    "DIR": "$(touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/INJECTED) `false` *",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/direct-PR-hostile/brief.md (ship, mode=direct-PR; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "direct-PR-hostile",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "local-only-hostile",
+      "scratch-example",
+      "--mode",
+      "local-only"
+    ],
+    "DIR": "$(touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/INJECTED) `false` *",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/local-only-hostile/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "local-only-hostile",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bin/fm-brief.sh",
+      "scout-hostile",
+      "scratch-example",
+      "--scout"
+    ],
+    "DIR": "$(touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/INJECTED) `false` *",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/home/data/scout-hostile/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "case": "scout-hostile",
+    "generated_rule": "   When clearing scratch folders, use a guarded explicit path such as `rm -rf -- \"${DIR:?}/sub\"`, never `cd` then `rm -rf` with a relative glob.",
+    "literal_guard_preserved": true
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      "rm -rf -- \"${DIR:?}/sub\""
+    ],
+    "DIR": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/folder with spaces [*]",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "cleanup": "only explicit subfolder removed; parent and sibling retained",
+    "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6CEZ64EFAMTAQ1QWJ9XBEQS/.scratch-validation-8l8gtv53/folder with spaces [*]"
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      "rm -rf -- \"${DIR:?}/sub\""
+    ],
+    "DIR": "<unset>",
+    "exit": 127,
+    "stdout": "",
+    "stderr": "bash: line 1: DIR: parameter null or not set\n"
+  },
+  {
+    "guard": "unset",
+    "result": "shell refused before rm; sentinels retained"
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      "rm -rf -- \"${DIR:?}/sub\""
+    ],
+    "DIR": "",
+    "exit": 127,
+    "stdout": "",
+    "stderr": "bash: line 1: DIR: parameter null or not set\n"
+  },
+  {
+    "guard": "empty",
+    "result": "shell refused before rm; sentinels retained"
+  }
+]
