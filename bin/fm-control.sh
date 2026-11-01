@@ -155,6 +155,10 @@ fm_refuse_if_gate_agent
 
 if [ -z "${FM_HOME+x}" ] || [ -z "${FM_HOME:-}" ]; then
   echo "error: FM_HOME is not set; fm-control refuses to resolve a task without an explicit firstmate home" >&2
+  # Name the remedy, never apply it: a guessed home could act on another home's task.
+  printf 'next: name the home explicitly; for the home at this code root that is:\n  FM_HOME=%q %q' "$FM_ROOT" "$SCRIPT_DIR/fm-control.sh" >&2
+  [ "$#" = 0 ] || printf ' %q' "$@" >&2
+  printf '\n' >&2
   exit 1
 fi
 [ -d "$FM_HOME" ] || {

@@ -737,6 +737,136 @@ expect_code 0 "$?" "restarted preservation did not complete teardown: $out"
   || fail "receipt does not record each preserved path once: $(cat "$KEEP/receipt")"
 pass 'native teardown preserves named generated leftovers, refuses unique or unnamed work, and resumes after interruption'
 
+make_case weave
+printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
+mkdir -p "$PROJ/web" "$PROJ/scripts" "$PROJ/docs"
+printf '{}\n' > "$PROJ/web/package.json"
+printf 'print(1)\n' > "$PROJ/scripts/run.py"
+printf 'notes\n' > "$PROJ/docs/notes.md"
+git -C "$PROJ" add web scripts docs
+git -C "$PROJ" -c user.name=Tests -c user.email=tests@example.invalid commit -qm 'project layout'
+BASE=$(git -C "$PROJ" rev-parse HEAD)
+id=weave-leftovers
+allocate "$id" || fail 'weave fixture allocation failed'
+WT=$FM_GIT_WORKTREE_PATH
+KEEP="$HOME_DIR/data/$id/preserved-artifacts"
+USER_HOME="$CASE/user-home"
+mkdir -p "$USER_HOME/.chrome-devtools-axi/sessions/weave-task"
+fakebin=$(fm_fakebin "$CASE/fake")
+cat > "$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$1" in list-windows) printf 'main\n' ;; display-message) exit 1 ;; esac
+SH
+cat > "$fakebin/no-mistakes" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+# The fixture tool mirrors the real stop: it resolves the session record from
+# CHROME_DEVTOOLS_AXI_SESSION under $HOME and terminates the pid it names.
+cat > "$fakebin/chrome-devtools-axi" <<'SH'
+#!/usr/bin/env bash
+[ "$1" = stop ] || exit 2
+session=${CHROME_DEVTOOLS_AXI_SESSION:-default}
+printf 'stop session=%s cwd=%s\n' "$session" "$PWD" >> "${FM_TEST_BRIDGE_LOG:?}"
+if [ "$session" = default ]; then record=$HOME/.chrome-devtools-axi/bridge.pid
+else record=$HOME/.chrome-devtools-axi/sessions/$session/bridge.pid; fi
+pid=$(sed -n 's/.*"pid":\([0-9]*\).*/\1/p' "$record")
+[ -n "$pid" ] && kill "$pid"
+SH
+chmod +x "$fakebin/tmux" "$fakebin/no-mistakes" "$fakebin/chrome-devtools-axi"
+BRIDGE_LOG="$CASE/bridge.log"
+: > "$BRIDGE_LOG"
+fm_write_meta "$HOME_DIR/state/$id.meta" \
+  "window=native-fixture:fm-$id" "endpoint_task_id=$id" 'backend=tmux' \
+  "worktree=$WT" "project=$PROJ" 'kind=ship' 'mode=local-only' \
+  'spawn_gen=s1792922400.123.456' 'allocator=git'
+run_weave_teardown() {
+  env PATH="$fakebin:$PATH" HOME="$USER_HOME" FM_TEST_BRIDGE_LOG="$BRIDGE_LOG" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+    FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
+    bash "$ROOT/bin/fm-teardown.sh" "$id" "$@"
+}
+printf '.cache/\n' >> "$PROJ/.git/info/exclude"
+mkdir -p "$WT/.cache/jdk" "$WT/.cache/CoffeeMud" "$WT/build" "$WT/web/out" "$WT/web/node_modules/pkg/lib" \
+  "$WT/web/.next/cache" "$WT/scripts/__pycache__"
+for f in .cache/jdk/a .cache/jdk/b .cache/CoffeeMud/c build/out.bin web/out/index.html \
+  web/node_modules/pkg/index.js web/node_modules/pkg/lib/x.js web/next-env.d.ts web/.next/cache/y \
+  scripts/__pycache__/run.pyc; do
+  printf 'generated %s\n' "$f" > "$WT/$f"
+done
+weave_intact() {
+  [ "$(cat "$WT/web/node_modules/pkg/lib/x.js")" = 'generated web/node_modules/pkg/lib/x.js' ] \
+    && [ -f "$WT/.cache/jdk/a" ] && [ -f "$HOME_DIR/state/$id.meta" ] && [ ! -e "$KEEP/files" ]
+}
+expected_cmd="--preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out"
+if out=$(run_weave_teardown 2>&1); then fail 'weave leftovers were discarded'; fi
+assert_contains "$out" '.cache (3 files)' 'refusal did not collapse the cache root with its count'
+assert_contains "$out" 'web/node_modules (2 files)' 'refusal did not collapse a nested leftover root'
+assert_contains "$out" 'web/next-env.d.ts (1 file)' 'refusal did not name a single-file root'
+assert_contains "$out" "$expected_cmd" 'refusal did not print the exact preservation command for every root'
+assert_contains "$out" "FM_HOME=$HOME_DIR" 'printed command does not name this home'
+case "$out" in *pkg/lib/x.js*) fail "refusal dumped individual leftover files: $out" ;; esac
+list="$HOME_DIR/data/$id/teardown-leftovers.txt"
+if [ "$(wc -l < "$list" | tr -d ' ')" != 10 ] || ! grep -Fxq web/node_modules/pkg/lib/x.js "$list"; then
+  fail "full leftover list is missing or incomplete: $(cat "$list" 2>/dev/null)"
+fi
+weave_intact || fail 'summarized refusal changed leftovers or task records'
+if out=$(run_weave_teardown --preserve-untracked .cache/jdk --preserve-untracked .cache/CoffeeMud 2>&1); then
+  fail 'partially named weave leftovers were accepted'
+fi
+assert_contains "$out" '7 leftover(s) above are not named' 'partial naming refused for the wrong reason'
+assert_contains "$out" 'web/out (1 file)' 'uncovered leftovers were not summarized by root'
+assert_contains "$out" "$expected_cmd" 'partial refusal did not print the corrected command'
+case "$out" in *pkg/lib/x.js*) fail "partial refusal dumped individual leftover files: $out" ;; esac
+weave_intact || fail 'partial naming moved something before refusing'
+if out=$(run_weave_teardown --preserve-untracked docs --preserve-untracked web --preserve-untracked .cache \
+  --preserve-untracked build --preserve-untracked scripts 2>&1); then
+  fail 'a tracked directory with no leftovers was accepted'
+fi
+assert_contains "$out" "'docs' names tracked content and holds no leftovers" 'empty tracked directory refused for the wrong reason'
+weave_intact || fail 'empty tracked directory refusal moved content'
+pass 'native teardown summarizes leftovers by root, keeps the full list, and prints the exact preservation command'
+
+all_weave_names=(--preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts)
+weave_pids=()
+start_in_copy() { # <argv0> - a process whose cwd is the copy
+  (cd "$WT" && exec -a "$1" sleep 300) &
+  weave_pids+=("$!")
+  LAST_PID=$!
+}
+stop_weave_pids() { kill "${weave_pids[@]}" 2>/dev/null || true; wait 2>/dev/null || true; weave_pids=(); }
+start_in_copy /opt/axi/bin/chrome-devtools-axi-bridge
+bridge=$LAST_PID
+printf '{"pid":%s,"port":9999}' "$((bridge + 100000))" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
+if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail 'an unproven bridge was treated as task-owned'; fi
+assert_contains "$out" 'not proven task-owned' 'unproven bridge refused for the wrong reason'
+kill -0 "$bridge" 2>/dev/null || fail 'teardown stopped a bridge not proven owned by the task'
+[ ! -s "$BRIDGE_LOG" ] || fail "unproven bridge reached the tool's stop: $(cat "$BRIDGE_LOG")"
+weave_intact || fail 'unproven bridge refusal moved content'
+printf '{"pid":%s,"port":9999}' "$bridge" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
+start_in_copy unrelated-helper
+if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail 'a non-bridge copy process was ignored'; fi
+assert_contains "$out" 'beside other process' 'mixed processes refused for the wrong reason'
+kill -0 "$bridge" 2>/dev/null || fail 'teardown stopped the bridge while another copy process blocked cleanup'
+[ ! -s "$BRIDGE_LOG" ] || fail "mixed processes reached the tool's stop: $(cat "$BRIDGE_LOG")"
+weave_intact || fail 'mixed process refusal moved content'
+kill "$LAST_PID"; wait "$LAST_PID" 2>/dev/null || true
+out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1)
+rc=$?
+stop_weave_pids
+expect_code 0 "$rc" "owned bridge and directory preservation did not complete teardown: $out"
+assert_contains "$(cat "$BRIDGE_LOG")" "stop session=weave-task cwd=$WT" "the tool's own stop did not run from the copy with the owning session"
+assert_contains "$out" "'web' holds tracked content; naming its leftover roots instead" 'directory expansion was not reported'
+[ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'owned-bridge teardown left the copy or task record'
+for f in web/node_modules/pkg/lib/x.js web/next-env.d.ts web/.next/cache/y web/out/index.html .cache/jdk/a \
+  build/out.bin scripts/__pycache__/run.pyc; do
+  [ "$(cat "$KEEP/files/$f")" = "generated $f" ] || fail "preserved artifact $f lost content"
+done
+[ ! -e "$KEEP/files/web/package.json" ] && [ ! -e "$KEEP/files/scripts/run.py" ] || fail 'tracked files were moved with leftovers'
+[ "$(cut -f3 "$KEEP/receipt" | LC_ALL=C sort | tr '\n' ' ')" = '.cache build scripts/__pycache__ web/.next web/next-env.d.ts web/node_modules web/out ' ] \
+  || fail "receipt does not record each expanded root once: $(cat "$KEEP/receipt")"
+pass 'native teardown expands a named tracked directory to its leftover roots and stops only a task-owned browser bridge'
+
 fm_live_gate default-on FM_NATIVE_TMUX_LIVE_E2E tmux pgrep lsof
 
 LAB_HOME_HELPER=${LAB_HOME_HELPER:-$ROOT/bin/fm-lab-home.sh}

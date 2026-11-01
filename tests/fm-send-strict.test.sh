@@ -118,6 +118,7 @@ test_unset_fm_home_fails() {
     "$SEND" sess:win "hello" >/dev/null 2>"$err"; rc=$?
   [ "$rc" -ne 0 ] || fail "unset FM_HOME should fail"
   assert_contains "$(cat "$err")" "FM_HOME is not set" "unset FM_HOME diagnostic should be explicit"
+  assert_contains "$(cat "$err")" "FM_HOME=$dir $SEND sess:win hello" "unset FM_HOME diagnostic should print the exact explicit-home rerun"
   [ ! -s "$log" ] || fail "unset FM_HOME still attempted a send"$'\n'"$(cat "$log")"
   pass "fm-send strict: unset FM_HOME fails before target resolution"
 }
