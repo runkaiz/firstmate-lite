@@ -338,6 +338,7 @@ fm_git_worktree_preserve() { # <copy> <preservation-root> <relative-path>... - c
   local copy=$1 root=$2 rel other part prefix entry status=0 status_file others_file uncovered=0 key journal src dst pre post sum
   local roots_out count journaled jfile
   local -a leftovers=() parts=() names=() found=() uncovered_paths=()
+  # shellcheck disable=SC2034 # Read by fm-teardown.sh after preservation fails.
   FM_GIT_WORKTREE_UNCOVERED=0
   shift 2
   [ "$#" -gt 0 ] || { fm_git_worktree_error 'no leftover named for preservation'; return 1; }
@@ -428,6 +429,7 @@ fm_git_worktree_preserve() { # <copy> <preservation-root> <relative-path>... - c
   done
   if [ "$uncovered" != 0 ]; then
     uncovered=$(printf '%s\n' "${uncovered_paths[@]}" | LC_ALL=C sort -u | wc -l | tr -d ' ')
+    # shellcheck disable=SC2034 # Read by fm-teardown.sh after preservation fails.
     FM_GIT_WORKTREE_UNCOVERED=$uncovered
     printf 'Leftovers not covered by any name, by top-level root:\n' >&2
     others_file=$(mktemp) || return 1
