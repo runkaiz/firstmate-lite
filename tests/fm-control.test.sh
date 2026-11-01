@@ -619,6 +619,20 @@ test_window_label_is_refused_with_the_exact_id() {
   pass "fm-control: a legacy window label is refused and the exact task id is named"
 }
 
+test_unset_fm_home_names_the_remedy_without_resolving() {
+  local dir out rc
+  dir=$(new_case nohome)
+  add_task "$dir" t1 claude
+  alive_as "$dir" claude
+  out=$(env -u FM_HOME PATH="$dir/fakebin:$PATH" FM_FAKE_DIR="$dir/fake" FM_ROOT_OVERRIDE="$dir/home" \
+    bash "$CONTROL" t1 exit 2>&1); rc=$?
+  expect_code 1 "$rc" "an unset FM_HOME should refuse"
+  assert_contains "$out" "FM_HOME is not set" "the refusal should keep naming the explicit-home contract"
+  assert_contains "$out" "FM_HOME=$dir/home $CONTROL t1 exit" "the refusal should print the exact rerun naming the detected home"
+  [ -z "$(literals "$dir")" ] || fail "a refused unset-home control must send no bytes"
+  pass "fm-control: unset FM_HOME refuses and names the exact explicit-home rerun"
+}
+
 test_explicit_endpoint_is_refused() {
   local dir out rc
   dir=$(new_case endpoint)
@@ -1390,6 +1404,7 @@ test_orca_refuses_an_escape_harness_interrupt
 test_unverified_state_backends_refuse_stop_verbs
 test_state_verified_backends_are_exactly_tmux_and_herdr
 test_window_label_is_refused_with_the_exact_id
+test_unset_fm_home_names_the_remedy_without_resolving
 test_explicit_endpoint_is_refused
 test_unknown_task_is_refused
 test_record_bound_to_another_task_is_refused

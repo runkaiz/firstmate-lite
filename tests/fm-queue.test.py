@@ -69,6 +69,19 @@ class QueueTests(unittest.TestCase):
         self.archive.write_text(archive)
         return self.file.read_bytes(), self.archive.read_bytes()
 
+    def test_add_usage_error_shows_full_form_and_names_misused_title_flag(self):
+        result = self.call("add", "fix-login", "--kind", "ship", "--title", "Fix it", good=False)
+        self.assertIn('add <id> "<title>"', result.stderr)
+        self.assertIn("--blocked-by", result.stderr)
+        self.assertIn('example: add fix-login "Fix the login redirect"', result.stderr)
+        self.assertIn("--title is not an add flag", result.stderr)
+        self.assertFalse(self.file.exists() and "fix-login" in self.file.read_text())
+        plain = self.call("add", good=False)
+        self.assertIn('add <id> "<title>"', plain.stderr)
+        self.assertNotIn("--title is not an add flag", plain.stderr)
+        self.call("add", "fix-login", "Fix the login redirect", "--kind", "ship")
+        self.assertEqual(self.task("fix-login")["title"], "Fix the login redirect")
+
     def test_user_backend_refusal_preserves_existing_and_absent_queues(self):
         self.call("add", "stable", "Existing", "--body", "Original intent")
         self.call("update", "stable", "--body", "Revised intent")

@@ -15,8 +15,12 @@
 # fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
 # A refusal or interruption leaves the copy, task records and journal in place,
 # and rerunning the same command completes the preservation idempotently.
+# A leftover refusal summarizes by root and prints the exact preserve command
+# (native_leftover_next_action); a named directory holding tracked content
+# stands for the leftover roots beneath it.
 # Only the recorded idle endpoint is closed; remaining copy processes refuse
-# removal rather than being reaped. Git removal uses no force and keeps branch
+# removal rather than being reaped, except a task-owned chrome-devtools-axi
+# bridge (stop_owned_browser_bridges). Git removal uses no force and keeps branch
 # refs. An interrupted removal with an absent, unregistered copy retires only
 # its matching reservation. Pooled tasks are never migrated or removed by this.
 # Tear down a finished task: return the treehouse worktree, release the Orca
@@ -94,8 +98,9 @@
 # still use the independent content proof below.
 # A failed lookup for a recorded PR refuses. Only an unrecorded PR may use
 # the content fallback, which also refuses when inconclusive.
-# Uncommitted changes are never landed; dirty refusals distinguish untracked-only
-# leftovers from tracked edits and list at most ten non-exempt untracked paths.
+# Uncommitted changes are never landed; non-native dirty refusals distinguish
+# untracked-only leftovers from tracked edits and list at most ten non-exempt
+# untracked paths. Native leftover summaries follow native_leftover_next_action.
 # local-only projects additionally accept work merged into the local default
 # branch (firstmate performs that merge after configured approval) as a fallback
 # for the common case where there is no remote at all.
@@ -808,11 +813,41 @@ if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
   echo 'REFUSED: --preserve-untracked supports only native task copies; nothing was changed' >&2
   exit 1
 fi
+# Leftover refusal advice: full list to data/<id>/teardown-leftovers.txt and the
+# exact command naming the minimal roots; the caller still inspects them.
+native_leftover_next_action() {  # <copy>
+  local copy=$1 list="$DATA/$ID/teardown-leftovers.txt" roots tracked_changes cmd count root total
+  tracked_changes=$(git -C "$copy" status --porcelain --untracked-files=no) || tracked_changes=unreadable
+  if [ -n "$tracked_changes" ]; then
+    echo "next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them" >&2
+    return 0
+  fi
+  mkdir -p -- "$DATA/$ID" || return 0
+  roots=$(fm_git_worktree_leftover_roots "$copy" "" "$list") || {
+    echo "next: inspect each path; only for task-owned generated artifacts, rerun teardown with --preserve-untracked <root> per leftover root" >&2
+    return 0
+  }
+  [ -n "$roots" ] || return 0
+  cmd=$(printf 'FM_HOME=%q %q %q' "$FM_HOME" "$FM_ROOT/bin/fm-teardown.sh" "$ID")
+  [ "$RETAIN_BRANCH" != 1 ] || cmd="$cmd --retain-branch"
+  if [ -n "$SIBLING_PR" ]; then
+    cmd="$cmd --landed-pr $(printf '%q' "$SIBLING_PR") --landed-head $(printf '%q' "$SIBLING_HEAD")"
+  fi
+  [ "$LEGACY_RECORD_GIVEN" != 1 ] || cmd="$cmd --legacy-record"
+  total=0
+  while IFS=$'\t' read -r count root; do
+    cmd="$cmd --preserve-untracked $(printf '%q' "$root")"
+    total=$((total + count))
+  done <<< "$roots"
+  echo "full leftover list ($total path(s)): $list" >&2
+  echo "next: inspect those roots; only if every one is task-owned generated output, run:" >&2
+  echo "  $cmd" >&2
+}
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
   fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
   if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
-    echo "next: inspect each path; only for task-owned generated artifacts, rerun teardown with --preserve-untracked <path> per leftover" >&2
+    native_leftover_next_action "$WT"
     exit 1
   fi
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
@@ -1839,6 +1874,82 @@ $dir_pids"
   TASK_PIDS=$(printf '%s\n' "$pids" | grep -E '^[0-9]+$' | sort -un || true)
 }
 
+# A chrome-devtools-axi bridge left running in a native copy is stopped through
+# the tool's own `stop` when each bridge is proven owned: command names
+# chrome-devtools-axi-bridge, cwd under the copy, and exactly one of this user's
+# session records names that pid. Remaining copy processes refuse removal
+# after a bounded wait; nothing here signals a process directly.
+browser_bridge_pidfile_pid() {  # <pid-file>
+  perl -MJSON::PP -0777 -ne '
+    my $d = eval { JSON::PP::decode_json($_) };
+    print $d->{pid} if ref $d eq "HASH" && defined $d->{pid} && $d->{pid} =~ /\A[0-9]+\z/;
+  ' -- "$1" 2>/dev/null
+}
+
+browser_bridge_session_for_pid() {  # <state-dir> <pid> -> session name, or fail
+  local state_dir=$1 pid=$2 pidfile session match=
+  for pidfile in "$state_dir/bridge.pid" "$state_dir"/sessions/*/bridge.pid; do
+    [ -f "$pidfile" ] && [ ! -L "$pidfile" ] || continue
+    [ "$(browser_bridge_pidfile_pid "$pidfile")" = "$pid" ] || continue
+    if [ "$pidfile" = "$state_dir/bridge.pid" ]; then
+      session=default
+    else
+      session=${pidfile%/bridge.pid}
+      session=${session##*/}
+      printf '%s' "$session" | LC_ALL=C grep -Eq '^[A-Za-z0-9._-]{1,64}$' || return 1
+      case "$session" in default|*[!.]*) ;; *) return 1 ;; esac
+    fi
+    [ -z "$match" ] || return 1
+    match=$session
+  done
+  [ -n "$match" ] || return 1
+  printf '%s\n' "$match"
+}
+
+stop_owned_browser_bridges() {  # <copy>; uses and refreshes TASK_PIDS
+  local copy=$1 state_dir pid cmd bridge session waited=0
+  local -a bridges=() sessions=()
+  [ -n "$TASK_PIDS" ] || return 0
+  while IFS= read -r pid; do
+    [ -n "$pid" ] || continue
+    cmd=$(ps -p "$pid" -o command= 2>/dev/null) || continue
+    case "$cmd" in *chrome-devtools-axi-bridge*) bridges+=("$pid") ;; esac
+  done <<< "$TASK_PIDS"
+  [ "${#bridges[@]}" -gt 0 ] || return 1
+  command -v chrome-devtools-axi >/dev/null 2>&1 || {
+    echo "teardown: chrome-devtools-axi bridge ${bridges[*]} runs in the copy but the tool is not on PATH to stop it; stopping nothing" >&2
+    return 1
+  }
+  state_dir=${HOME:+$HOME/.chrome-devtools-axi}
+  for bridge in "${bridges[@]}"; do
+    if [ -z "$state_dir" ] || ! session=$(browser_bridge_session_for_pid "$state_dir" "$bridge"); then
+      echo "teardown: chrome-devtools-axi bridge $bridge runs in the copy but no single session record of this user names it; not proven task-owned, stopping nothing" >&2
+      return 1
+    fi
+    sessions+=("$session")
+  done
+  for i in "${!bridges[@]}"; do
+    bridge=${bridges[$i]} session=${sessions[$i]}
+    # Re-prove right before the stop, which acts on whatever pid the record names.
+    [ "$(browser_bridge_session_for_pid "$state_dir" "$bridge" 2>/dev/null)" = "$session" ] || return 1
+    echo "teardown: stopping task-owned chrome-devtools-axi bridge $bridge (session $session) for $ID" >&2
+    if [ "$session" = default ]; then
+      (cd "$copy" && env -u CHROME_DEVTOOLS_AXI_SESSION -u CHROME_DEVTOOLS_AXI_PORT chrome-devtools-axi stop) >/dev/null 2>&1 || true
+    else
+      (cd "$copy" && env -u CHROME_DEVTOOLS_AXI_PORT CHROME_DEVTOOLS_AXI_SESSION="$session" chrome-devtools-axi stop) >/dev/null 2>&1 || true
+    fi
+  done
+  while :; do
+    task_pids_under_roots "$copy" || return 1
+    [ -n "$TASK_PIDS" ] || return 0
+    [ "$waited" -lt 20 ] || break
+    sleep 0.25
+    waited=$((waited + 1))
+  done
+  echo "teardown: copy processes remain after stopping its chrome-devtools-axi bridge: $(printf '%s' "$TASK_PIDS" | tr '\n' ' ')" >&2
+  return 1
+}
+
 reap_task_backend_process_group() {  # <label>
   local label=$1 leader leader_start pgid current_pgid own_pgid
   if [ "$BACKEND" != tmux ]; then
@@ -2568,9 +2679,10 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
       "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
     teardown_close_endpoint
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free; nothing preserved' >&2; exit 1; }
-    [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
+    stop_owned_browser_bridges "$WT" || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
     fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}" || {
       echo "REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes" >&2
+      [ "${FM_GIT_WORKTREE_UNCOVERED:-0}" = 0 ] || native_leftover_next_action "$WT"
       exit 1
     }
   fi
@@ -2813,7 +2925,7 @@ fi
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ -d "$WT" ]; then
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free' >&2; exit 1; }
-    [ -z "$TASK_PIDS" ] || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
+    stop_owned_browser_bridges "$WT" || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
   fi
   fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1

@@ -21,7 +21,8 @@
 # exactly the named untracked or ignored paths, on the same filesystem and never
 # over an existing destination, into a private preservation root, and refuses
 # before moving anything when tracked edits exist, a name is tracked, unsafe or
-# missing, or any leftover is not covered by a name. Each path's pre-move
+# missing, or any leftover is not covered by a name; a named directory holding
+# tracked content expands to its leftover roots. Each path's pre-move
 # manifest (relative path, inode, mode, size, sha256 or link target) is journaled
 # before the rename and must match after it before the path is receipted, so a
 # rerun after interruption verifies and receipts a moved path instead of
@@ -118,13 +119,63 @@ fm_git_worktree_identity() { # <state> <id> <home> <project> [<expected-path>]
   FM_GIT_WORKTREE_PATH=$path
 }
 
+# Collapse leftovers to their minimal roots (shallowest ancestor holding no
+# tracked content) as "<count>\t<root>"; optionally only the NUL-separated
+# <paths-file>, and optionally write every leftover to <full-list-file>. Read-only.
+fm_git_worktree_leftover_roots() { # <copy> [<paths-file>] [<full-list-file>]
+  local copy=$1 paths=${2:-} list=${3:-} tracked own=0 rc=0
+  tracked=$(mktemp) || return 1
+  if [ -z "$paths" ]; then
+    paths=$(mktemp) || { rm -f "$tracked"; return 1; }
+    own=1
+    git -C "$copy" ls-files -z --others > "$paths" || rc=1
+  fi
+  [ "$rc" = 0 ] && git -C "$copy" ls-files -z > "$tracked" || rc=1
+  if [ "$rc" = 0 ]; then
+    perl -e '
+      use strict; use warnings;
+      my ($tracked, $paths, $list) = @ARGV; my (%dir, %count); local $/ = "\0";
+      open(my $t, "<", $tracked) or die "$!\n";
+      while (my $p = <$t>) { chomp $p; my @c = split m{/}, $p; pop @c;
+        my $pre = ""; for (@c) { $pre .= ($pre eq "" ? "" : "/") . $_; $dir{$pre} = 1 } }
+      open(my $in, "<", $paths) or die "$!\n";
+      my $out; if ($list ne "") { open($out, ">", $list) or die "$!\n" }
+      my %seen;
+      while (my $p = <$in>) { chomp $p; $p =~ s{/+$}{}; next if $p eq "" || $seen{$p}++;
+        print $out "$p\n" if $out;
+        my $root = ""; for (split m{/}, $p) { $root .= ($root eq "" ? "" : "/") . $_; last unless $dir{$root} }
+        $count{$root}++ }
+      if ($out) { close($out) or die "$!\n" }
+      print "$count{$_}\t$_\n" for sort keys %count;
+    ' "$tracked" "$paths" "$list" || rc=1
+  fi
+  rm -f "$tracked"
+  [ "$own" = 0 ] || rm -f "$paths"
+  return "$rc"
+}
+
+fm_git_worktree_print_roots() { # reads "<count>\t<root>" lines; prints a bounded summary to stderr
+  awk -F '\t' '
+    NR <= 20 { printf "  %s (%d file%s)\n", $2, $1, ($1 == 1 ? "" : "s") }
+    END { if (NR > 20) printf "  ... and %d more root(s)\n", NR - 20 }
+  ' >&2
+}
+
 fm_git_worktree_clean() { # <path> - unknown ignored files are work too
-  local status others
+  local status others tracked_changes
   status=$(git -C "$1" status --porcelain --untracked-files=all) || return 1
   others=$(git -C "$1" ls-files --others) || return 1
   if [ -n "$status$others" ]; then
     fm_git_worktree_error "dirty or untracked content at $1; preserving copy"
-    printf '%s\n' "$status" "$others" | sed '/^$/d' | head -20 >&2
+    tracked_changes=$(printf '%s\n' "$status" | sed -e '/^$/d' -e '/^?? /d')
+    if [ -n "$tracked_changes" ]; then
+      printf 'Tracked changes (unique work; never preserved):\n' >&2
+      printf '%s\n' "$tracked_changes" | head -20 >&2
+    fi
+    if [ -n "$others" ]; then
+      printf 'Untracked or ignored leftovers, by top-level root:\n' >&2
+      fm_git_worktree_leftover_roots "$1" | fm_git_worktree_print_roots
+    fi
     printf 'Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.\n' >&2
     return 1
   fi
@@ -285,11 +336,50 @@ fm_git_worktree_manifest() { # <path> - sorted custody manifest; unreadable entr
 
 fm_git_worktree_preserve() { # <copy> <preservation-root> <relative-path>... - caller proved identity, landing, quiescence
   local copy=$1 root=$2 rel other part prefix entry status=0 status_file others_file uncovered=0 key journal src dst pre post sum
-  local -a leftovers=() parts=()
+  local roots_out count journaled jfile
+  local -a leftovers=() parts=() names=() found=() uncovered_paths=()
+  # shellcheck disable=SC2034 # Read by fm-teardown.sh after preservation fails.
+  FM_GIT_WORKTREE_UNCOVERED=0
   shift 2
   [ "$#" -gt 0 ] || { fm_git_worktree_error 'no leftover named for preservation'; return 1; }
   [ -d "$copy" ] && [ ! -L "$copy" ] || { fm_git_worktree_error 'copy is missing; nothing preserved'; return 1; }
   case "$root" in /*) ;; *) fm_git_worktree_error 'preservation root must be absolute'; return 1 ;; esac
+  # A named directory holding tracked content stands for the leftover roots
+  # under it (plus journaled paths an interrupted run moved); each faces the
+  # checks below as if named.
+  roots_out=
+  for rel in "$@"; do
+    case "/$rel/" in //*|*//*|*/./*|*/../*) fm_git_worktree_error "unsafe leftover name '$rel'; nothing moved"; return 1 ;; esac
+    case "$rel" in *[[:cntrl:]]*) fm_git_worktree_error 'leftover name has control characters; nothing moved'; return 1 ;; esac
+    entry=$(git -C "$copy" ls-files -- ":(literal)$rel") || return 1
+    if [ -z "$entry" ] || [ ! -d "$copy/$rel" ] || [ -L "$copy/$rel" ]; then
+      names+=("$rel"); continue
+    fi
+    if [ -z "$roots_out" ]; then
+      roots_out=$(fm_git_worktree_leftover_roots "$copy") || { fm_git_worktree_error 'cannot read copy leftovers; nothing moved'; return 1; }
+      [ -n "$roots_out" ] || roots_out=$'\n'
+    fi
+    found=()
+    while IFS=$'\t' read -r count entry; do
+      case "$entry" in "$rel"/*) found+=("$entry") ;; esac
+    done <<< "$roots_out"
+    for jfile in "$root"/journal/*; do
+      [ -f "$jfile" ] || continue
+      case "$jfile" in *.tmp) continue ;; esac
+      journaled=$(head -n 1 -- "$jfile") || return 1
+      journaled=${journaled#path$'\t'}
+      case "$journaled" in "$rel"/*) ;; *) continue ;; esac
+      [ ! -e "$copy/$journaled" ] && [ ! -L "$copy/$journaled" ] || continue
+      for other in ${found[@]+"${found[@]}"}; do
+        case "$journaled" in "$other"|"$other"/*) continue 2 ;; esac
+      done
+      found+=("$journaled")
+    done
+    [ "${#found[@]}" -gt 0 ] || { fm_git_worktree_error "'$rel' names tracked content and holds no leftovers; nothing moved"; return 1; }
+    printf "'%s' holds tracked content; naming its leftover roots instead: %s\n" "$rel" "${found[*]}" >&2
+    names+=("${found[@]}")
+  done
+  set -- "${names[@]}"
   for rel in "$@"; do
     case "/$rel/" in //*|*//*|*/./*|*/../*) fm_git_worktree_error "unsafe leftover name '$rel'; nothing moved"; return 1 ;; esac
     case "$rel" in *[[:cntrl:]]*) fm_git_worktree_error 'leftover name has control characters; nothing moved'; return 1 ;; esac
@@ -334,10 +424,20 @@ fm_git_worktree_preserve() { # <copy> <preservation-root> <relative-path>... - c
     for rel in "$@"; do
       case "$entry" in "$rel"|"$rel"/*) continue 2 ;; esac
     done
-    [ "$uncovered" -ge 10 ] || printf '  %s\n' "$entry" >&2
+    uncovered_paths+=("$entry")
     uncovered=$((uncovered + 1))
   done
-  [ "$uncovered" = 0 ] || { fm_git_worktree_error "$uncovered leftover(s) above are not named; nothing moved"; return 1; }
+  if [ "$uncovered" != 0 ]; then
+    uncovered=$(printf '%s\n' "${uncovered_paths[@]}" | LC_ALL=C sort -u | wc -l | tr -d ' ')
+    # shellcheck disable=SC2034 # Read by fm-teardown.sh after preservation fails.
+    FM_GIT_WORKTREE_UNCOVERED=$uncovered
+    printf 'Leftovers not covered by any name, by top-level root:\n' >&2
+    others_file=$(mktemp) || return 1
+    printf '%s\0' "${uncovered_paths[@]}" > "$others_file"
+    fm_git_worktree_leftover_roots "$copy" "$others_file" | fm_git_worktree_print_roots
+    rm -f "$others_file"
+    fm_git_worktree_error "$uncovered leftover(s) above are not named; nothing moved"; return 1
+  fi
   mkdir -p -- "$root/files" "$root/journal" || return 1
   case "$(cd "$root" && pwd -P)/" in "$(cd "$copy" && pwd -P)"/*)
     fm_git_worktree_error 'preservation root is inside the copy'; return 1 ;;

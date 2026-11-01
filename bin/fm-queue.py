@@ -684,7 +684,8 @@ def output(task, store, options, message=None):
 def parser():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.epilog = '''Commands (aliases share the same authority):
-  add/create <id> "<title>" [--body-file PATH] [--idea | --outcome]
+  add/create <id> "<title>" [--body-file PATH] [--kind KIND] [--repo NAME]
+       [--priority 0-4] [--blocked-by ID]... [--idea | --outcome]
   authorize <id> --body-file PATH [--kind ship|scout|task]
   show/view <id> [--full | --history]    list [--state STATE] [--fields a,b]
   ready [--repo NAME] [--include-held]
@@ -825,10 +826,15 @@ def execute(options, stores):
                           "order": [locate(store.archive, task) for task in store.records[identifier]]}, ensure_ascii=False))
         return
     require(verb in ("add", "show", "start", "done", "reopen", "update", "hold", "unhold", "block", "unblock", "rm", "authorize"), f"unsupported native queue command: {verb}")
+    if verb == "add" and len(items) != 2:
+        title_hint = ("; --title is not an add flag: pass the title as the second positional argument"
+                      if options.title is not None and len(items) == 1 else "")
+        require(False, 'usage: add <id> "<title>" [--body TEXT | --body-file PATH] [--kind KIND] [--repo NAME] '
+                       '[--priority 0-4] [--blocked-by ID]... [--idea | --outcome]' + title_hint
+                       + '; example: add fix-login "Fix the login redirect" --kind ship')
     require(items, f"{verb} requires a task ID")
     predecessor = None
     if verb == "add":
-        require(len(items) == 2, 'add <id> "<title>"')
         identifier, title = items
         require(identifier not in store.all, f"identity already exists in active queue or archive: {identifier}")
         idea = options.idea or options.kind == "idea"

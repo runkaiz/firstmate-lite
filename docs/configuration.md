@@ -401,8 +401,9 @@ Startup reports orphan native reservations through the existing bootstrap diagno
 [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
-It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard.
+It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser-helper shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_bridges` ownership checks.
 Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them, and `bin/fm-teardown.sh --preserve-untracked` moves inspected generated leftovers into the task's data directory rather than deleting them.
+Teardown summarizes leftover roots and offers a preservation command; its header and referenced helpers own the full-list location, directory expansion and custody mechanics.
 Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
 
 ## Runtime backend (config/backend / FM_BACKEND)
