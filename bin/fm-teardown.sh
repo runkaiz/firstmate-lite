@@ -1874,10 +1874,10 @@ $dir_pids"
 }
 
 # A chrome-devtools-axi bridge left running in a native copy is stopped through
-# the tool's own `stop` only when every copy process belongs to bridges proven
-# owned: command names chrome-devtools-axi-bridge, cwd under the copy, and
-# exactly one of this user's session records names that pid. Otherwise the
-# caller refuses as before; nothing here signals a process directly.
+# the tool's own `stop` when each bridge is proven owned: command names
+# chrome-devtools-axi-bridge, cwd under the copy, and exactly one of this user's
+# session records names that pid. Remaining copy processes refuse removal
+# after a bounded wait; nothing here signals a process directly.
 browser_bridge_pidfile_pid() {  # <pid-file>
   perl -MJSON::PP -0777 -ne '
     my $d = eval { JSON::PP::decode_json($_) };
@@ -1905,23 +1905,8 @@ browser_bridge_session_for_pid() {  # <state-dir> <pid> -> session name, or fail
   printf '%s\n' "$match"
 }
 
-browser_bridge_tree_member() {  # <pid> <bridge-pid>
-  local pid=$1 bridge=$2 cur depth=0 pgid
-  [ "$pid" = "$bridge" ] && return 0
-  pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d '[:space:]')
-  [ "$pgid" = "$bridge" ] && return 0
-  cur=$pid
-  while [ "$depth" -lt 64 ]; do
-    cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d '[:space:]')
-    case "$cur" in ''|*[!0-9]*|0|1) return 1 ;; esac
-    [ "$cur" = "$bridge" ] && return 0
-    depth=$((depth + 1))
-  done
-  return 1
-}
-
 stop_owned_browser_bridges() {  # <copy>; uses and refreshes TASK_PIDS
-  local copy=$1 state_dir pid cmd bridge session owned waited=0
+  local copy=$1 state_dir pid cmd bridge session waited=0
   local -a bridges=() sessions=()
   [ -n "$TASK_PIDS" ] || return 0
   while IFS= read -r pid; do
@@ -1930,17 +1915,6 @@ stop_owned_browser_bridges() {  # <copy>; uses and refreshes TASK_PIDS
     case "$cmd" in *chrome-devtools-axi-bridge*) bridges+=("$pid") ;; esac
   done <<< "$TASK_PIDS"
   [ "${#bridges[@]}" -gt 0 ] || return 1
-  while IFS= read -r pid; do
-    [ -n "$pid" ] || continue
-    owned=0
-    for bridge in "${bridges[@]}"; do
-      if browser_bridge_tree_member "$pid" "$bridge"; then owned=1; break; fi
-    done
-    [ "$owned" = 1 ] || {
-      echo "teardown: a chrome-devtools-axi bridge runs in the copy beside other process $pid; stopping nothing" >&2
-      return 1
-    }
-  done <<< "$TASK_PIDS"
   command -v chrome-devtools-axi >/dev/null 2>&1 || {
     echo "teardown: chrome-devtools-axi bridge ${bridges[*]} runs in the copy but the tool is not on PATH to stop it; stopping nothing" >&2
     return 1

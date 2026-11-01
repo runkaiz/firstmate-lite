@@ -859,11 +859,15 @@ weave_intact || fail 'unproven bridge refusal moved content'
 printf '{"pid":%s,"port":9999}' "$bridge" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
 start_in_copy unrelated-helper
 if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail 'a non-bridge copy process was ignored'; fi
-assert_contains "$out" 'beside other process' 'mixed processes refused for the wrong reason'
-kill -0 "$bridge" 2>/dev/null || fail 'teardown stopped the bridge while another copy process blocked cleanup'
-[ ! -s "$BRIDGE_LOG" ] || fail "mixed processes reached the tool's stop: $(cat "$BRIDGE_LOG")"
+assert_contains "$out" "copy processes remain after stopping its chrome-devtools-axi bridge: $LAST_PID" 'mixed processes refused without naming the remaining pid'
+if kill -0 "$bridge" 2>/dev/null; then fail 'teardown left the proven bridge running'; fi
+kill -0 "$LAST_PID" 2>/dev/null || fail 'teardown stopped the unrelated copy process'
+assert_contains "$(cat "$BRIDGE_LOG")" "stop session=weave-task cwd=$WT" "mixed processes did not stop the proven bridge through the tool"
 weave_intact || fail 'mixed process refusal moved content'
 kill "$LAST_PID"; wait "$LAST_PID" 2>/dev/null || true
+start_in_copy /opt/axi/bin/chrome-devtools-axi-bridge
+bridge=$LAST_PID
+printf '{"pid":%s,"port":9999}' "$bridge" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
 out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1)
 rc=$?
 stop_weave_pids
