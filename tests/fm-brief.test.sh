@@ -238,6 +238,9 @@ test_forge_selection_renders_correct_cli() {
   brief="$home/data/brief-forge-default/brief.md"
   assert_grep "3. Use native gh for GitHub operations with complete selective --json fields" "$brief" \
     "a brief with no --forge must render the exact pre-existing gh Rule 3 line"
+  # shellcheck disable=SC2016 # Literal generated brief text.
+  assert_grep 'When clearing scratch folders, use a guarded explicit path such as `rm -rf -- "${DIR:?}/sub"`, never `cd` then `rm -rf` with a relative glob.' "$brief" \
+    "a ship brief must carry the guarded scratch-cleanup rule"
   # shellcheck disable=SC2016 # Backticks are literal generated brief text.
   assert_grep 'open a PR with `gh`' "$brief" \
     "a direct-PR brief with no --forge must still tell the worker to open the PR with gh"
@@ -853,6 +856,8 @@ test_scout_and_secondmate_scaffold() {
   assert_present "$brief" "scout brief was not scaffolded"
   assert_grep "SCOUT task" "$brief" "scout brief must declare itself a scout task"
   assert_grep "report.md" "$brief" "scout brief must point at the report deliverable"
+  # shellcheck disable=SC2016 # Literal generated brief text.
+  assert_grep 'When clearing scratch folders, use a guarded explicit path such as `rm -rf -- "${DIR:?}/sub"`, never `cd` then `rm -rf` with a relative glob.' "$brief" "scout brief must carry the guarded scratch-cleanup rule"
   assert_grep "## Captain's intent" "$brief" "scout brief missing Captain's intent subsection"
   assert_grep "## Firstmate spec" "$brief" "scout brief missing Firstmate spec subsection"
   assert_grep "{FIRSTMATE_SPEC}" "$brief" "scout brief missing the spec placeholder"
