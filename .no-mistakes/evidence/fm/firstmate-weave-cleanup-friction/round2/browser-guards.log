@@ -1,0 +1,48 @@
+$ chrome-devtools-axi stop
+status: stopped (no-op)
+[exit 0]
+$ chrome-devtools-axi stop
+status: stopped (no-op)
+[exit 0]
+$ chrome-devtools-axi start
+status: ready
+port: 9297
+[exit 0]
+$ chrome-devtools-axi start
+status: ready
+port: 9283
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: chrome-devtools-axi bridge 1268681 runs in the copy but no single session record of this user names it; not proven task-owned, stopping nothing
+REFUSED: native copy still has processes; nothing preserved
+[exit 1]
+PASS: mismatched record refuses cleanup and leaves bridge alive.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: a chrome-devtools-axi bridge runs in the copy beside other process 1274381; stopping nothing
+REFUSED: native copy still has processes; nothing preserved
+[exit 1]
+PASS: unrelated copy process refuses cleanup and leaves both processes alive.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: stopping task-owned chrome-devtools-axi bridge 1268681 (session fm-lab-friction-round2) for friction-live
+'web' holds tracked content; naming its leftover roots instead: web/.next web/next-env.d.ts web/node_modules web/out
+'scripts' holds tracked content; naming its leftover roots instead: scripts/__pycache__
+preserved: web/.next -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/web/.next
+preserved: web/next-env.d.ts -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/web/next-env.d.ts
+preserved: web/node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/web/node_modules
+preserved: web/out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/web/out
+preserved: .cache -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/.cache
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/build
+preserved: scripts/__pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/friction-live/preserved-artifacts/files/scripts/__pycache__
+teardown friction-live complete (window fm-lab-friction:fm-friction-live, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/copies/friction-live/worktree)
+Backlog: friction-live just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home/data/backlog.md - move friction-live to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+PASS: parent names preserve all 16,735 file hashes, exclude tracked files, remove task copy and records, stop the task bridge, leave the unrelated session alive.
+$ chrome-devtools-axi stop
+status: stopped
+[exit 0]

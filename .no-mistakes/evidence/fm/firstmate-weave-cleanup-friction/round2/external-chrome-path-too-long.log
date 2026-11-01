@@ -1,0 +1,30 @@
+[1262299:1262299:1031/204135.748045:FATAL:chrome/browser/process_singleton_posix.cc:315] Socket path too long: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/tmp/org.chromium.Chromium.SvikwA/SingletonSocket.
+Received signal 6
+#0 0x55a8807ac953 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x7382952)
+#1 0x55a88561e644 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0xc1f4643)
+#2 0x7fc2c03e8fb0 (/usr/lib64/libc.so.6+0x19faf)
+#3 0x7fc2c03e8e8e (/usr/lib64/libc.so.6+0x19e8d)
+#4 0x7fc2c03d07b3 (/usr/lib64/libc.so.6+0x17b2)
+#5 0x55a885614a85 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0xc1eaa84)
+#6 0x55a8855d49ed (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0xc1aa9ec)
+#7 0x55a8855d493d (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0xc1aa93c)
+#8 0x55a87efe4bc2 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x5bbabc1)
+#9 0x55a87f898379 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x646e378)
+#10 0x55a8806797f6 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x724f7f5)
+#11 0x55a880679b4f (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x724fb4e)
+#12 0x55a880679b04 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x724fb03)
+#13 0x55a87feb5b69 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x6a8bb68)
+#14 0x55a87feb63d3 (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x6a8c3d2)
+#15 0x55a87feb924c (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x6a8f24b)
+#16 0x55a87f86f19e (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x644519d)
+#17 0x55a87f86fa9f (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x6445a9e)
+#18 0x7fc2c03d2681 (/usr/lib64/libc.so.6+0x3680)
+#19 0x7fc2c03d2798 (/usr/lib64/libc.so.6+0x3797)
+#20 0x55a880a7003a (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/browser/chrome/linux-156.0.8078.80/chrome-linux64/chrome+0x7646039)
+  r8: 000016400006c6f1  r9: 0000000000000001 r10: 000016400006c6f1 r11: 0000000000000246
+ r12: 00007fffb73d0388 r13: 000055a800000000 r14: 0000000000000006 r15: 00007fffb73d08b0
+  di: 00000000001342db  si: 00000000001342db  bp: 00007fffb73d0230  bx: 00000000001342db
+  dx: 0000000000000006  ax: 0000000000000000  cx: 00007fc2c0443d0c  sp: 00007fffb73d0200
+  ip: 00007fc2c0443d0c efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+ trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+[end of stack trace]

@@ -1,0 +1,49 @@
+$ ps -p 1241234 -o pid,ppid,pgid,sid,args
+    PID    PPID    PGID     SID COMMAND
+1241234    2256 1241234 1241234 node /var/home/runkai/.local/share/pi-node/node-v22.23.2-linux-x64/lib/node_modules/chrome-devtools-axi/dist/bin/chrome-devtools-axi-bridge.js
+[exit 0]
+COPY PROCESS: 1241234    2256 1241234 1241234 node
+COPY PROCESS: 1241245 1241234 1241234 1241234 chrome-devtools
+COPY PROCESS: 1241306 1241245 1241306 1241306 node
+COPY PROCESS: 1241407 1241245 1241407 1241407 chrome
+COPY PROCESS: 1241410    2256 1241409 1241409 chrome_crashpad
+$ ps -p 1241409,1241409 -o pid,ppid,pgid,sid,args
+    PID    PPID    PGID     SID COMMAND
+[exit 1]
+COPY PROCESS: 1241412    2256 1241411 1241411 chrome_crashpad
+$ ps -p 1241411,1241411 -o pid,ppid,pgid,sid,args
+    PID    PPID    PGID     SID COMMAND
+[exit 1]
+COPY PROCESS: 1241415 1241407 1241407 1241407 chrome
+COPY PROCESS: 1241416 1241407 1241407 1241407 chrome
+COPY PROCESS: 1241755 1241415 1241407 1241407 chrome
+COPY PROCESS: 1241758 1241407 1241407 1241407 chrome
+COPY PROCESS: 1241784 1241416 1241407 1241407 chrome
+COPY PROCESS: 1241831 1241416 1241407 1241407 chrome
+COPY PROCESS: 1241861 1241416 1241407 1241407 chrome
+COPY PROCESS: 1241876 1241416 1241407 1241407 chrome
+COPY PROCESS: 1243962 1241416 1241407 1241407 chrome
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: a chrome-devtools-axi bridge runs in the copy beside other process 1241410; stopping nothing
+REFUSED: native copy still has processes; nothing preserved
+[exit 1]
+FAIL: valid task-owned local browser still blocks automatic cleanup.
+$ chrome-devtools-axi stop
+status: stopped
+[exit 0]
+$ chrome-devtools-axi start
+status: ready
+port: 9297
+[exit 0]
+$ chrome-devtools-axi start
+status: ready
+port: 9283
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked web --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: a chrome-devtools-axi bridge runs in the copy beside other process 1255778; stopping nothing
+REFUSED: native copy still has processes; nothing preserved
+[exit 1]

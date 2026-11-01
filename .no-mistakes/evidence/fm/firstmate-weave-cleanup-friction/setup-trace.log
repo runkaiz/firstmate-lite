@@ -1,0 +1,1824 @@
++ set -eu
++++ dirname bin/fm-teardown.sh
+++ cd bin
+++ pwd
++ SCRIPT_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/..
+++ pwd
++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT
++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ DATA=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/data
++ CONFIG=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tasks-axi-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tasks-axi-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tasks-axi-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-timeout-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-timeout-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-timeout-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-git-worktree-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-git-worktree-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-git-worktree-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lock-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lock-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lock-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-classify-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-classify-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-classify-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gate-refuse-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gate-refuse-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gate-refuse-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-pr-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-pr-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-pr-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-env-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-env-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-env-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-secondmate-parent-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-secondmate-parent-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-secondmate-parent-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-operational-input.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-operational-input.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-operational-input.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-marker-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-marker-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-marker-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-nm-run-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-nm-run-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-nm-run-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-wake-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-wake-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-wake-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-path-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-path-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-path-lib.sh ']'
++ for _teardown_source in fm-tasks-axi-lib.sh fm-backlog-transition-lib.sh fm-timeout-lib.sh fm-backend.sh fm-git-worktree-lib.sh fm-control-lib.sh fm-lock-lib.sh fm-classify-lib.sh fm-gate-refuse-lib.sh fm-pr-lib.sh fm-env-lib.sh fm-secondmate-parent-lib.sh fm-operational-input.sh fm-marker-lib.sh fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-nm-run-lib.sh fm-wake-lib.sh fm-path-lib.sh fm-lease-lib.sh
++ teardown_require_source /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lease-lib.sh
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lease-lib.sh ']'
++ '[' '!' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lease-lib.sh ']'
++ unset _teardown_source
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tasks-axi-lib.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tasks-axi-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ FM_QUEUE_CLI=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-queue.py
+++ '[' 0 = 1 ']'
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh
+++ FM_BACKLOG_TRANSITION_SKIP=
+++ FM_BACKLOG_TRANSITION_ERROR=
+++ FM_BACKLOG_ROW_RESULT=
+++ FM_BACKLOG_ROW_STATE=
+++ FM_BACKLOG_ROW_ERROR=
+++ FM_BACKLOG_ROW_HOLD_KIND=
+++ FM_BACKLOG_CLOSE_REPLAY_RESULT=
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-timeout-lib.sh
++++ set -u
+++ declare -F fm_pr_url_parse
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backlog-transition-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-pr-lib.sh
++++ FM_PR_PROVIDER=
++++ FM_PR_URL=
++++ FM_PR_HOST=
++++ FM_PR_PATH=
++++ FM_PR_OWNER=
++++ FM_PR_REPO=
++++ FM_PR_NUMBER=
++++ FM_PR_DATA_PROVIDER=
++++ FM_PR_DATA_URL=
++++ FM_PR_DATA_HOST=
++++ FM_PR_DATA_PATH=
++++ FM_PR_DATA_NUMBER=
++++ FM_PR_META_PROVIDER=
++++ FM_PR_META_URL=
++++ FM_PR_META_HOST=
++++ FM_PR_META_PATH=
++++ FM_PR_META_NUMBER=
++++ FM_PR_REG_ID=
++++ FM_PR_REG_PROVIDER=
++++ FM_PR_REG_URL=
++++ FM_PR_REG_HOST=
++++ FM_PR_REG_PATH=
++++ FM_PR_REG_NUMBER=
++++ FM_PR_REG_DATA_HASH=
++++ FM_PR_REG_TEMPLATE_HASH=
++++ FM_PR_REG_DATA_IDENTITY=
++++ FM_PR_REG_CHECK_IDENTITY=
++++ FM_PR_POLL_DATA_TMP=
++++ FM_PR_POLL_CHECK_TMP=
++++ FM_PR_POLL_REG_TMP=
++++ FM_PR_POLL_DATA_DEST=
++++ FM_PR_POLL_CHECK_DEST=
++++ FM_PR_POLL_REG_DEST=
++++ FM_PR_POLL_EXPECT_ID=
++++ FM_PR_POLL_EXPECT_PROVIDER=
++++ FM_PR_POLL_EXPECT_URL=
++++ FM_PR_POLL_EXPECT_HOST=
++++ FM_PR_POLL_EXPECT_PATH=
++++ FM_PR_POLL_EXPECT_NUMBER=
++++ FM_PR_POLL_EXPECT_DATA_HASH=
++++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
++++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
++++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
++++ FM_PR_POLL_TEMPLATE=
++++ FM_PR_POLL_STATE_DEVICE=
++++ FM_PR_POLL_SNAPSHOT_ID=
++++ FM_PR_POLL_SNAPSHOT_PROVIDER=
++++ FM_PR_POLL_SNAPSHOT_URL=
++++ FM_PR_POLL_SNAPSHOT_HOST=
++++ FM_PR_POLL_SNAPSHOT_PATH=
++++ FM_PR_POLL_SNAPSHOT_NUMBER=
++++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
++++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
++++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_REG_HASH=
++++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
++++ FM_PR_POLL_REARM_DATA_IDENTITY=
++++ FM_PR_POLL_REARM_CHECK_IDENTITY=
++++ FM_PR_RETIRE_ID=
++++ FM_PR_RETIRE_PROVIDER=
++++ FM_PR_RETIRE_URL=
++++ FM_PR_RETIRE_HOST=
++++ FM_PR_RETIRE_PATH=
++++ FM_PR_RETIRE_NUMBER=
++++ FM_PR_RETIRE_DATA_HASH=
++++ FM_PR_RETIRE_TEMPLATE_HASH=
++++ FM_PR_RETIRE_DATA_IDENTITY=
++++ FM_PR_RETIRE_CHECK_IDENTITY=
++++ FM_PR_RETIRE_REG_HASH=
++++ FM_PR_RETIRE_REG_IDENTITY=
++++ FM_PR_RETIRE_RECEIPT_HASH=
++++ FM_PR_RETIRE_RECEIPT_IDENTITY=
++++ FM_PR_RECORD_STATE=
++++ FM_PR_RECORD_MERGED=
++++ FM_PR_POLL_RETIREMENT_REJECTED=
+++ FM_BACKLOG_ROW_SHOW_WEDGED=0
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh
+++ FM_BACKEND_SCRIPT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-backend.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ FM_BACKEND_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
+++ unset FM_BACKEND_SCRIPT
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/..
++++ pwd
+++ FM_BACKEND_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT
+++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT
+++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ FM_BACKEND_CONFIG_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
+++ FM_BACKEND_KNOWN='tmux herdr zellij orca cmux'
+++ FM_BACKEND_SPAWN='tmux herdr zellij orca cmux'
+++ FM_BACKEND_CMUX_BUNDLE_ID=com.cmuxterm.app
+++ FM_BACKEND_VISIBLE_CAPTURE='tmux herdr zellij'
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-git-worktree-lib.sh
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control-lib.sh
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lock-lib.sh
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-classify-lib.sh
++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-classify-lib.sh ']'
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ _FM_CLASSIFY_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ uname -s
+++ _FM_CLASSIFY_UNAME_S=Linux
+++ FM_CREW_STATE_BIN=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-crew-state.sh
+++ case $- in
+++ _fm_classify_nounset=on
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-timeout-lib.sh
++++ set -u
+++ '[' on = on ']'
+++ unset _fm_classify_nounset
+++ FM_CLASSIFY_CAPTAIN_RE_DEFAULT='done:|needs-decision:|blocked:|failed:|PR ready|checks green|ready in branch|merged'
+++ FM_CLASSIFY_PAUSED_VERB_DEFAULT=paused
+++ FM_PAUSE_RESURFACE_SECS_DEFAULT=14400
+++ FM_CLASSIFY_RESOLVE_VERB_DEFAULT=resolved
+++ FM_CLASSIFY_CAPTAIN_HELD_VERB_DEFAULT=captain-held
+++ FM_CLASSIFY_EVENT_WINDOW_LINES=200
+++ FM_CLASSIFY_RESERVED_KEY_PREFIXES_DEFAULT=pending-reply-
+++ FM_OPEN_DECISIONS_FOLD_VERSION=9
+++ FM_STATUS_SNAPSHOT_EVENT_LINE=
+++ FM_STATUS_SNAPSHOT_EVENT_MTIME=
+++ FM_STATUS_SNAPSHOT_EVENT_ENDPOINT=
+++ STATUS_PRESENTATION_REPORTED=
+++ STATUS_PRESENTATION_CLASSIFIED=
+++ _FM_CLASSIFY_KEYLESS_PHASE=$'\036default'
+++ FM_GATE_HUMAN_DECISION='ask-user: authority decision'
+++ FM_WORKTREE_WRITE_PRUNE='.git node_modules .venv venv __pycache__ .mypy_cache .pytest_cache .ruff_cache .tox target dist build .next .cache vendor'
+++ FM_WORKTREE_WRITE_MAXDEPTH=6
+++ FM_WORKTREE_WRITE_TIMEOUT=10
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gate-refuse-lib.sh
+++ FM_GATE_REFUSE_EXIT=3
+++ FM_GATE_LAB_MARKER=.fm-lab-home
+++ FM_GATE_LAB_TOKEN='fm-lab-home v1'
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-pr-lib.sh
+++ FM_PR_PROVIDER=
+++ FM_PR_URL=
+++ FM_PR_HOST=
+++ FM_PR_PATH=
+++ FM_PR_OWNER=
+++ FM_PR_REPO=
+++ FM_PR_NUMBER=
+++ FM_PR_DATA_PROVIDER=
+++ FM_PR_DATA_URL=
+++ FM_PR_DATA_HOST=
+++ FM_PR_DATA_PATH=
+++ FM_PR_DATA_NUMBER=
+++ FM_PR_META_PROVIDER=
+++ FM_PR_META_URL=
+++ FM_PR_META_HOST=
+++ FM_PR_META_PATH=
+++ FM_PR_META_NUMBER=
+++ FM_PR_REG_ID=
+++ FM_PR_REG_PROVIDER=
+++ FM_PR_REG_URL=
+++ FM_PR_REG_HOST=
+++ FM_PR_REG_PATH=
+++ FM_PR_REG_NUMBER=
+++ FM_PR_REG_DATA_HASH=
+++ FM_PR_REG_TEMPLATE_HASH=
+++ FM_PR_REG_DATA_IDENTITY=
+++ FM_PR_REG_CHECK_IDENTITY=
+++ FM_PR_POLL_DATA_TMP=
+++ FM_PR_POLL_CHECK_TMP=
+++ FM_PR_POLL_REG_TMP=
+++ FM_PR_POLL_DATA_DEST=
+++ FM_PR_POLL_CHECK_DEST=
+++ FM_PR_POLL_REG_DEST=
+++ FM_PR_POLL_EXPECT_ID=
+++ FM_PR_POLL_EXPECT_PROVIDER=
+++ FM_PR_POLL_EXPECT_URL=
+++ FM_PR_POLL_EXPECT_HOST=
+++ FM_PR_POLL_EXPECT_PATH=
+++ FM_PR_POLL_EXPECT_NUMBER=
+++ FM_PR_POLL_EXPECT_DATA_HASH=
+++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
+++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
+++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
+++ FM_PR_POLL_TEMPLATE=
+++ FM_PR_POLL_STATE_DEVICE=
+++ FM_PR_POLL_SNAPSHOT_ID=
+++ FM_PR_POLL_SNAPSHOT_PROVIDER=
+++ FM_PR_POLL_SNAPSHOT_URL=
+++ FM_PR_POLL_SNAPSHOT_HOST=
+++ FM_PR_POLL_SNAPSHOT_PATH=
+++ FM_PR_POLL_SNAPSHOT_NUMBER=
+++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
+++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
+++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_REG_HASH=
+++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
+++ FM_PR_POLL_REARM_DATA_IDENTITY=
+++ FM_PR_POLL_REARM_CHECK_IDENTITY=
+++ FM_PR_RETIRE_ID=
+++ FM_PR_RETIRE_PROVIDER=
+++ FM_PR_RETIRE_URL=
+++ FM_PR_RETIRE_HOST=
+++ FM_PR_RETIRE_PATH=
+++ FM_PR_RETIRE_NUMBER=
+++ FM_PR_RETIRE_DATA_HASH=
+++ FM_PR_RETIRE_TEMPLATE_HASH=
+++ FM_PR_RETIRE_DATA_IDENTITY=
+++ FM_PR_RETIRE_CHECK_IDENTITY=
+++ FM_PR_RETIRE_REG_HASH=
+++ FM_PR_RETIRE_REG_IDENTITY=
+++ FM_PR_RETIRE_RECEIPT_HASH=
+++ FM_PR_RETIRE_RECEIPT_IDENTITY=
+++ FM_PR_RECORD_STATE=
+++ FM_PR_RECORD_MERGED=
+++ FM_PR_POLL_RETIREMENT_REJECTED=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-secondmate-parent-lib.sh
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-nm-run-lib.sh
+++ FM_NM_GATE_LINE_RE='^[[:space:]]*gate:[[:space:]]*'
+++ FM_NM_AWAITING_AGENT_RE='^[[:space:]]*awaiting_agent:'
+++ FM_NM_GATE_SCALAR_RE='^[[:space:]]*(status|state):[[:space:]]*"?(awaiting_approval|fix_review)"?[[:space:]]*$'
+++ FM_NM_GATE_ROW_RE='^[[:space:]]*[^,]+,[[:space:]]*"?(awaiting_approval|fix_review)"?[[:space:]]*,'
++ '[' 1 -lt 1 ']'
++ fm_task_id_path_safe friction-live
++ local id=friction-live
++ local LC_ALL=C
++ case "$id" in
++ ID=friction-live
++ TEARDOWN_LOST_SLOT_EXIT=4
++ FORCE=
++ LEGACY_RECORD_GIVEN=0
++ PRESERVE_PATHS=()
++ SIBLING_PR=
++ SIBLING_HEAD=
++ RETAIN_BRANCH=0
++ RETAINED_HEAD=
++ shift
++ '[' 0 -gt 0 ']'
++ '[' 0 -gt 0 ']'
++ '[' -n '' ']'
++ '[' 0 = 1 ']'
++ fm_backlog_directory_present /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state 'state directory'
++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state 'label=state directory' check=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' / ']'
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-wake-lib.sh
++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-wake-lib.sh ']'
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ FM_WAKE_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/..
++++ pwd
+++ FM_WAKE_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT
+++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT
+++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ FM_WAKE_QUEUE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.wake-queue
+++ FM_WAKE_QUEUE_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.wake-queue.lock
+++ FM_LOCK_STALE_AFTER=2
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-path-lib.sh
++++ uname
+++ _FM_UNAME=Linux
+++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ '[' 5 -gt 4 ']'
+++ FM_WATCHER_MATCHED_IDENTITY=
+++ FM_WATCHER_HEALTHY_PID=
+++ FM_WATCHER_HEALTHY_IDENTITY=
+++ FM_WATCHER_VERDICT_OK=false
+++ FM_WATCHER_VERDICT_REASON=stale-beacon
+++ FM_RECOVERY_MARKER_TOKEN=
+++ FM_RECOVERY_MARKER_ACTION=none
+++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
+++ FM_RECOVERY_HANDOVER_TOKEN=
+++ FM_RECOVERY_HANDOVER_SEQ=
+++ FM_WAKE_STATUS_KEY=
+++ FM_WAKE_STATUS_HISTORICAL=false
+++ FM_WAKE_EVENT_LINE=
+++ FM_WAKE_UNREAD_LINES=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lease-lib.sh
+++ FM_LEASE_REFUSE_EXIT=6
++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-lease-lib.sh ']'
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ pwd
+++ FM_LEASE_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
+++ FM_LEASE_GUARD_LOCK=
++ '[' '' = --force ']'
++ fm_lease_guard friction-live 'teardown (fm-teardown)'
++ local task=friction-live 'action=teardown (fm-teardown)' actor lock lease_actor
++ fm_lease_valid_id friction-live
++ case "${1:-}" in
++ return 0
+++ fm_lease_actor
+++ local actor=main
+++ case "$actor" in
+++ printf '%s\n' main
++ actor=main
++ case "${PI_CODING_AGENT:-}:${FM_SUPERVISION_ACTOR:-}" in
+++ fm_lease_path friction-live
+++ printf '%s/.lease-%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state friction-live
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.lease-friction-live ']'
++ fm_lease_home_runs_host
++ command -v fm_supervision_host_enabled
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-supervision-engine-lib.sh
+++ FM_SUPERVISION_ENGINES_VERIFIED=claude
+++ FM_SUPERVISION_HOST_COOLDOWN=300
+++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-supervision-engine-lib.sh = bin/fm-teardown.sh ']'
++ fm_supervision_host_enabled /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config/supervision-host-off ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config/supervision-host-off ']'
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config/supervision-host ']'
+++ fm_supervision_host_primary
+++ '[' '' = 1 ']'
++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-supervision-engine-lib.sh
+++ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-harness.sh
++ '[' codex = claude ']'
++ return 0
++ META=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta kind
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=kind line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ship
++ '[' ship = secondmate ']'
++ TREEHOUSE_PROJECT_LOCK=
++ TREEHOUSE_PROJECT_LOCK_HELD=0
++ TREEHOUSE_SLOT_LOCK_REQUIRED=0
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ fm_git_worktree_meta_allocator /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ local count value=treehouse
++++ grep -c '^allocator=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ case "$count" in
++++ sed -n 's/^allocator=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ value=git
+++ case "$value" in
+++ '[' git '!=' git ']'
+++ printf '%s\n' git
++ TEARDOWN_LOCK_ALLOCATOR=git
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta kind
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=kind line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ship
++ TEARDOWN_LOCK_KIND=ship
++ '[' -n ship ']'
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta backend
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=backend line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s tmux
++ TEARDOWN_LOCK_BACKEND=tmux
++ '[' -n tmux ']'
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta worktree
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=worktree line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ TEARDOWN_LOCK_WT=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta project
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=project line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ TEARDOWN_LOCK_PROJECT=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ '[' ship '!=' secondmate ']'
++ '[' tmux '!=' orca ']'
++ '[' git = git ']'
++ TREEHOUSE_SLOT_LOCK_REQUIRED=1
+++ fm_treehouse_project_lock_path /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
+++ local project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project root origin identity hash top
+++ '[' -d /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project ']'
++++ fm_firstmate_root_home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++++ local home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home marker parent 'seen=|' depth=0
+++++ CDPATH=
+++++ cd -- /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++++ pwd -P
++++ home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/.fm-secondmate-parent ']'
++++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/.fm-secondmate-parent ']'
++++ printf '%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++++ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project remote get-url origin
++++ true
+++ origin=
+++ '[' -n '' ']'
++++ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project rev-parse --show-toplevel
+++ top=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++++ CDPATH=
++++ cd -- /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++++ pwd -P
+++ top=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
+++ identity=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++++ printf %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++++ git hash-object --stdin
+++ hash=7f4381af38d5a10ab56c712c6a4bd2a0a98093a4
+++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
+++ printf '%s/.treehouse-project-%s.lock\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state 7f4381af38d5a10ab56c712c6a4bd2a0a98093a4
++ TREEHOUSE_PROJECT_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ fm_path=.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++++ '[' .treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock '!=' .treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ']'
++++ printf -v base %s .treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state .treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
++ printf '%s\n' 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/pid
++ back=915353
++ '[' 915353 = 915353 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/pid
++ back=915353
++ '[' 915353 '!=' 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ return 0
++ return 0
++ TREEHOUSE_PROJECT_LOCK_HELD=1
++ CONTROL_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ CONTROL_LOCK_HELD=0
++ SM_LIVENESS_LOCK=
++ META_LOCK=
++ META_LOCK_HELD=0
++ DESCENDANT_LOCK_PATHS=()
++ trap teardown_release_locks EXIT
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++++ fm_path=.control-friction-live.lock
++++ '[' .control-friction-live.lock '!=' .control-friction-live.lock ']'
++++ printf -v base %s .control-friction-live.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state .control-friction-live.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
++ printf '%s\n' 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/pid
++ back=915353
++ '[' 915353 = 915353 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/pid
++ back=915353
++ '[' 915353 '!=' 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ return 0
++ return 0
++ CONTROL_LOCK_HELD=1
++ fm_refuse_if_gate_agent
++ fm_is_gate_agent .
++ local anchor=. common
++ '[' '' = 1 ']'
++ '[' '' = x ']'
+++ cd .
++++ git rev-parse --git-common-dir
+++ cd /var/home/runkai/.no-mistakes/repos/6b05071b95c8.git
+++ pwd -P
++ common=/var/home/runkai/.no-mistakes/repos/6b05071b95c8.git
++ case "$common" in
++ FM_GATE_REFUSE_REASON=path
++ FM_GATE_REFUSE_COMMON=/var/home/runkai/.no-mistakes/repos/6b05071b95c8.git
++ return 0
++ fm_gate_lab_permitted
++ local v
++ fm_gate_lab_home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ local home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home ']'
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/.fm-lab-home ']'
+++ sed -n 1p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/.fm-lab-home
++ '[' 'fm-lab-home v1' = 'fm-lab-home v1' ']'
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ for v in "${!FM_@}"
++ case "$v" in
++ return 0
++ echo 'fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ return 0
++ FM_LOCK_LOG_PREFIX=teardown
++ fm_backlog_record_present /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'task record' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'label=task record' root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ fm_backlog_record_parent_authorized /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'task record' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'label=task record' root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state parent_only= parent base parent_resolved expected_path
++ local path_resolved root_resolved root_prefix home_resolved final_matches=1
++ parent=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ base=friction-live.meta
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ root_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home ']'
++ case "$root" in
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ home_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ case "$root_resolved" in
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ parent_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ expected_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ '[' -z '' ']'
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ path_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ root_prefix=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/
++ case "$path_resolved" in
++ '[' 1 '!=' 1 ']'
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ return 0
+++ fm_meta_lock_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta dir base id
+++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ base=friction-live.meta
+++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ case "$base" in
+++ id=friction-live
+++ case "$id" in
+++ printf '%s/.meta-%s.lock\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state friction-live
++ META_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++++ fm_path=.meta-friction-live.lock
++++ '[' .meta-friction-live.lock '!=' .meta-friction-live.lock ']'
++++ printf -v base %s .meta-friction-live.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state .meta-friction-live.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
++ printf '%s\n' 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/pid
++ back=915353
++ '[' 915353 = 915353 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 915353
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/pid
++ back=915353
++ '[' 915353 '!=' 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ return 0
++ return 0
++ META_LOCK_HELD=1
++ fm_backlog_record_present /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'task record' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'label=task record' root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ fm_backlog_record_parent_authorized /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'task record' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta 'label=task record' root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state parent_only= parent base parent_resolved expected_path
++ local path_resolved root_resolved root_prefix home_resolved final_matches=1
++ parent=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ base=friction-live.meta
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ root_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state ']'
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home ']'
++ case "$root" in
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ home_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ case "$root_resolved" in
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ parent_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state
++ expected_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ '[' -z '' ']'
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ fm_backlog_canonical_existing /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ LC_ALL=C
+++ perl -MCwd=realpath -e $'\n    my $resolved = realpath($ARGV[0]);\n    exit 1 unless defined $resolved;\n    print $resolved;\n  ' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ path_resolved=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ root_prefix=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/
++ case "$path_resolved" in
++ '[' 1 '!=' 1 ']'
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ return 0
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta kind
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=kind line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ship
++ TEARDOWN_META_KIND=ship
++ '[' -n ship ']'
++ '[' ship '!=' secondmate ']'
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta cleanup_recovery
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=cleanup_recovery line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ''
++ TEARDOWN_CLEANUP_RECOVERY=
++ TEARDOWN_META_SPAWN_GEN=
++ TEARDOWN_LEGACY_PENDING=0
++ TEARDOWN_LEGACY_ACCEPTED=0
++ TEARDOWN_LEGACY_ENDPOINT=
++ TEARDOWN_LEGACY_RETAINED_STAMP=
++ TEARDOWN_LEGACY_PRESTAMP_SIZE=0
++ TEARDOWN_BACKLOG_APPLIES=0
++ TEARDOWN_BACKLOG_SKIP_REASON=
++ TEARDOWN_WINDOWLESS=0
++ TEARDOWN_WINDOWLESS_SHAPE=0
+++ LC_ALL=C
+++ grep -c '^window=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ TEARDOWN_WINDOW_COUNT=1
+++ LC_ALL=C
+++ grep -c '^backend=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ TEARDOWN_BACKEND_COUNT=1
++ case "$TEARDOWN_WINDOW_COUNT:$(fm_meta_get "$META" window)" in
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta window
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=window line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s fm-lab-friction:fm-friction-live
++ '[' '' '!=' orca ']'
++ fm_backlog_transition_applies /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/data ship
++ local config=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config data authorized_data=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/data kind=ship file root backend authorized_root
++ FM_BACKLOG_TRANSITION_SKIP=
++ '[' ship = none ']'
++ '[' ship = secondmate ']'
++ fm_backlog_backend_manual /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
++ local config_dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
+++ fm_backlog_backend_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config
+++ local config_dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config backend_file value
+++ backend_file=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config/backlog-backend
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/config/backlog-backend ']'
++++ tr -d '[:space:]'
+++ value=manual
+++ '[' -n manual ']'
+++ printf '%s\n' manual
+++ return 0
++ '[' manual = manual ']'
++ FM_BACKLOG_TRANSITION_SKIP='config/backlog-backend selects manual editing'
++ return 1
++ TEARDOWN_BACKLOG_GATE_STATUS=1
++ '[' 1 -eq 2 ']'
++ TEARDOWN_BACKLOG_SKIP_REASON='config/backlog-backend selects manual editing'
++ '[' 0 = 1 ']'
++ TEARDOWN_BACKLOG_TRANSITION=close
++ '[' 0 = 1 ']'
++ LOCAL_HANDOFF_LOCK=
++ LOCAL_REGISTRY_LOCK=
++ HANDOFF_WAKE_RETIRE_LOCK=
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta worktree
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=worktree line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ WT=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta project
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=project line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ PROJ=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ T_ORCA=
++ '[' 0 = 1 ']'
++ fm_backend_validate_task_endpoint /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta friction-live
++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta id=friction-live backend_count backend window worktree project binding_count binding
++ local session pane recorded_session workspace tab terminal worktree_id surface
++ FM_BACKEND_VALIDATED_BACKEND=
++ FM_BACKEND_VALIDATED_TARGET=
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
++ case "$id" in
+++ fm_backend_meta_exact_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta window
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=window count value
++++ grep -c '^window=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ '[' 1 -eq 1 ']'
++++ grep '^window=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++++ cut -d= -f2-
+++ value=fm-lab-friction:fm-friction-live
+++ '[' -n fm-lab-friction:fm-friction-live ']'
+++ printf %s fm-lab-friction:fm-friction-live
++ window=fm-lab-friction:fm-friction-live
+++ fm_backend_meta_exact_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta worktree
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=worktree count value
++++ grep -c '^worktree=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ '[' 1 -eq 1 ']'
++++ grep '^worktree=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++++ cut -d= -f2-
+++ value=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
+++ '[' -n /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
+++ fm_backend_meta_exact_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta project
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=project count value
++++ grep -c '^project=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ '[' 1 -eq 1 ']'
++++ grep '^project=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++++ cut -d= -f2-
+++ value=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
+++ '[' -n /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project ']'
+++ printf %s /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ case "$worktree$project$window" in
+++ grep -c '^backend=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ backend_count=1
++ case "$backend_count" in
+++ fm_backend_meta_exact_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta backend
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=backend count value
++++ grep -c '^backend=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ '[' 1 -eq 1 ']'
++++ grep '^backend=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++++ cut -d= -f2-
+++ value=tmux
+++ '[' -n tmux ']'
+++ printf %s tmux
++ backend=tmux
++ '[' -z tmux ']'
++ fm_backend_is_known tmux
++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
++ local 'list=tmux herdr zellij orca cmux' name=tmux
++ case "$name" in
++ case " $list " in
++ return 0
+++ grep -c '^endpoint_task_id=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++ binding_count=1
++ case "$binding_count" in
+++ fm_backend_meta_exact_value /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta endpoint_task_id
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=endpoint_task_id count value
++++ grep -c '^endpoint_task_id=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ '[' 1 -eq 1 ']'
++++ grep '^endpoint_task_id=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
++++ cut -d= -f2-
+++ value=friction-live
+++ '[' -n friction-live ']'
+++ printf %s friction-live
++ binding=friction-live
++ '[' -n friction-live ']'
++ '[' friction-live '!=' friction-live ']'
++ case "$backend" in
++ session=fm-lab-friction
++ pane=fm-friction-live
++ '[' fm-friction-live = fm-lab-friction:fm-friction-live ']'
++ '[' fm-friction-live '!=' fm-friction-live ']'
++ '[' -z fm-lab-friction ']'
++ FM_BACKEND_VALIDATED_BACKEND=tmux
++ FM_BACKEND_VALIDATED_TARGET=fm-lab-friction:fm-friction-live
++ return 0
++ BACKEND=tmux
++ T=fm-lab-friction:fm-friction-live
++ '[' tmux '!=' orca ']'
++ teardown_require_backend_prerequisites tmux friction-live
++ local backend=tmux task_id=friction-live
++ fm_backend_source tmux
++ local name=tmux adapter rel sibling
++ fm_backend_validate tmux
++ local name=tmux
++ fm_backend_is_known tmux
++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
++ local 'list=tmux herdr zellij orca cmux' name=tmux
++ case "$name" in
++ case " $list " in
++ return 0
++ return 0
++ adapter=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/backends/tmux.sh
++ case "$name" in
++ set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/backends/tmux.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/backends/tmux.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/backends/tmux.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh ']'
++ for rel in "$@"
++ sibling=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gemini-lib.sh
++ fm_backend_source_readable /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gemini-lib.sh
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gemini-lib.sh ']'
++ '[' -r /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gemini-lib.sh ']'
++ case "$name" in
++ '[' -z '' ']'
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/backends/tmux.sh
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh
++++ _FM_TMUX_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-tmux-lib.sh ']'
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-composer-lib.sh
+++++ FM_COMPOSER_UNICODE_SPACES=()
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0302\0205'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0302\0240'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0341\0232\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0201'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0202'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0203'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0204'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0205'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0206'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0207'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0210'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0211'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0212'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0250'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0251'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0257'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0201\0237'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0343\0200\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ unset -v _fm_composer_space_octal _fm_composer_space_utf8
+++++ FM_DELIVERY_BUSY_REGEX_DEFAULT='esc (to )?interrupt|Working(\.\.\.|…)|Ctrl\+c:cancel|ctrl\+c to stop|esc[[:space:]]+to[[:space:]]+cancel|esc twice to interrupt|^[[:space:]]*❭ Guide Devin while it works$'
+++++ FM_DELIVERY_CLAUDE_BUSY_REGEX_DEFAULT='esc to interrupt|…[[:space:]]+\([0-9]+[smh]'
+++++ FM_DELIVERY_DEVIN_BUSY_REGEX_DEFAULT='esc twice to interrupt|^[[:space:]]*❭ Guide Devin while it works$'
+++++ FM_DELIVERY_CODEX_BUSY_REGEX_DEFAULT='esc to interrupt'
+++++ FM_DELIVERY_OPENCODE_BUSY_REGEX_DEFAULT='esc interrupt'
+++++ FM_DELIVERY_PI_BUSY_REGEX_DEFAULT='Working\.\.\.'
+++++ FM_OMP_SPINNER_FRAMES_RE='(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)'
+++++ FM_DELIVERY_OMP_BUSY_REGEX_DEFAULT='Working…|^[[:space:]]*(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)[[:space:]]+[0-9]+[smh]'
+++++ FM_DELIVERY_GROK_BUSY_REGEX_DEFAULT='Ctrl\+c:cancel'
+++++ FM_DELIVERY_CURSOR_BUSY_REGEX_DEFAULT='ctrl\+c to stop'
+++++ FM_DELIVERY_AGY_BUSY_REGEX_DEFAULT='esc[[:space:]]+to[[:space:]]+cancel'
+++++ FM_DELIVERY_KIMI_BUSY_REGEX_DEFAULT='^[[:space:]]*(🌑|🌒|🌓|🌔|🌕|🌖|🌗|🌘)[[:space:]]+·[[:space:]]+'
++++++ printf '%s\n' ❯ › ⟩ → ❭
+++++ FM_COMPOSER_AGENT_PROMPT_GLYPHS=$'❯\n›\n⟩\n→\n❭'
++++++ printf '%s\n' '>' '$' % '#'
+++++ FM_COMPOSER_SHELL_PROMPT_GLYPHS=$'>\n$\n%\n#'
+++++ FM_COMPOSER_IDLE_RE_DEFAULT='^Type a message\.\.\.$|^Ask anything(\.\.\.|…)|^Plan, search, build anything$|^Add a follow-up$|^Ask Devin to build features, fix bugs, or work on your code$'
+++++ FM_COMPOSER_LEFTBAR_FOOTER_RE_DEFAULT='^(Build|Plan)[[:space:]]+·[[:space:]]+'
+++++ FM_COMPOSER_MODE_HINT_RE_DEFAULT='^[[:space:]]*(⏵|⏸)'
+++++ FM_COMPOSER_OMP_STATUS_RE_DEFAULT='^[[:space:]]*(π|󰵗)[[:space:]]+·[[:space:]]|^[[:space:]]*(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)[[:space:]]+[0-9]+[smh]([[:space:]]|$)|[[:space:]]·[[:space:]].*[0-9]+(\.[0-9]+)?%/[0-9]+K'
+++++ FM_COMPOSER_PI_STATUS_RE_DEFAULT='^\$[0-9]+(\.[0-9]+)?([[:space:]]|$)'
+++++ FM_COMPOSER_CAPTURE_LINES=20
+++++ FM_COMPOSER_PI_MAX_LINES=8
+++++ FM_COMPOSER_GROK_TITLE_OVERHANG=3
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
+++++ FM_CURSOR_PROBE_TIMEOUT=10
++++ unset _FM_TMUX_LIB_DIR
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh
++++ _FM_SESSION_LOCK_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh ']'
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
+++++ FM_CURSOR_PROBE_TIMEOUT=10
++++ unset _FM_SESSION_LOCK_LIB_DIR
++++ FM_HARNESS_RE='claude|codex|opencode|grok|kimi|^pi$|^pi-signed$|^omp$'
++++ FM_HARNESS_NAMES=(claude codex opencode grok kimi pi-signed pi omp)
++++ FM_HARNESS_IS_CLAUDE=0
++++ FM_SESSION_LOCK_FOREIGN_OWNER_PID=
++++ FM_LOCK_INSPECT_STATE=unknown
++++ FM_LOCK_INSPECT_PID=
++++ FM_LOCK_INSPECT_LIVE_HARNESS=unknown
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh
++++ _FM_AGENT_PROCESS_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-agent-process-lib.sh ']'
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh
+++++ _FM_SESSION_LOCK_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin
+++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-session-lock-lib.sh ']'
+++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-cursor-lib.sh
++++++ FM_CURSOR_PROBE_TIMEOUT=10
+++++ unset _FM_SESSION_LOCK_LIB_DIR
+++++ FM_HARNESS_RE='claude|codex|opencode|grok|kimi|^pi$|^pi-signed$|^omp$'
+++++ FM_HARNESS_NAMES=(claude codex opencode grok kimi pi-signed pi omp)
+++++ FM_HARNESS_IS_CLAUDE=0
+++++ FM_SESSION_LOCK_FOREIGN_OWNER_PID=
+++++ FM_LOCK_INSPECT_STATE=unknown
+++++ FM_LOCK_INSPECT_PID=
+++++ FM_LOCK_INSPECT_LIVE_HARNESS=unknown
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-gemini-lib.sh
++++ unset _FM_AGENT_PROCESS_LIB_DIR
++ _FM_BACKEND_TMUX_SOURCED=1
++ '[' 0 '!=' 1 ']'
++ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-guard.sh
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+++ grep '^pr=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ tail -1
+++ cut -d= -f2-
++ PR_URL=
+++ grep '^tasktmp=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ cut -d= -f2-
++ TASK_TMP=
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta busy_gen
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=busy_gen line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ''
++ BUSY_GEN=
++ '[' -z '' ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.busy-gen
+++ true
++ BUSY_GEN=
+++ fm_meta_get /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta orca_worktree_id
+++ local meta=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta key=orca_worktree_id line value=
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta ']'
+++ printf %s ''
++ ORCA_WORKTREE_ID=
++ ORCA_PATH_MATCH_VERIFIED=0
++ CLEANUP_RECOVERY=
++ KIND=ship
+++ fm_git_worktree_meta_allocator /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ local count value=treehouse
++++ grep -c '^allocator=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ count=1
+++ case "$count" in
++++ sed -n 's/^allocator=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.meta
+++ value=git
+++ case "$value" in
+++ '[' git '!=' git ']'
+++ printf '%s\n' git
++ WORKTREE_ALLOCATOR=git
++ case "$WORKTREE_ALLOCATOR" in
++ '[' 0 -gt 0 ']'
++ '[' git = git ']'
++ '[' '' '!=' --force ']'
++ fm_git_worktree_identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state friction-live /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ local record=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree key value home project common root container path top linked registered
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree schema
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=schema '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^schema=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=fm-git-worktree.v1
++ '[' -n fm-git-worktree.v1 ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree task
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=task '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^task=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=friction-live
++ '[' -n friction-live ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree home
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=home '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^home=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree project
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=project '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^project=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree common
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=common '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^common=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree root
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=root '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^root=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree path
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=path '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^path=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree base
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=base '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^base=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=8d15a478e6966dbdf9d3055c175f1390b99174f7
++ '[' -n 8d15a478e6966dbdf9d3055c175f1390b99174f7 ']'
++ for key in schema task home project common root path base source_ref
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree source_ref
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=source_ref '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^source_ref=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ value=refs/heads/main
++ '[' -n refs/heads/main ']'
+++ wc -l
+++ tr -d ' '
++ '[' 9 = 9 ']'
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree schema
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=schema '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^schema=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ '[' fm-git-worktree.v1 = fm-git-worktree.v1 ']'
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree task
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=task '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^task=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ '[' friction-live = friction-live ']'
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ pwd -P
++ home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home
+++ cd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
+++ pwd -P
++ project=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree home
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=home '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^home=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home ']'
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree project
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=project '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^project=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project ']'
+++ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project rev-parse --path-format=absolute --git-common-dir
++ common=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git
+++ pwd -P
++ common=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree common
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=common '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^common=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/project/.git ']'
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree root
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=root '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^root=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ root=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies
+++ fm_git_worktree_field /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree path
+++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
+++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree ']'
++++ awk -F= -v k=path '$1==k {n++} END {print n+0}' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
+++ '[' 1 = 1 ']'
+++ sed -n 's/^path=//p' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/friction-live.git-worktree
++ path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree
++ container=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree ']'
++ '[' -z /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree ']'
++ '[' /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/copies/friction-live/worktree ']'
++ return 1
++ exit 1
++ teardown_release_locks
++ local status=1 i
++ declare -F teardown_release_herdr_locks
++ (( i=0 - 1 ))
++ (( i >= 0 ))
++ DESCENDANT_LOCK_PATHS=()
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' -n '' ']'
++ '[' 1 = 1 ']'
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 915353
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/pid
++ pid=915353
++ '[' 915353 = 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.meta-friction-live.lock.owner.9Cw7tN
++ return 0
++ META_LOCK_HELD=0
++ '[' -n '' ']'
++ '[' 1 = 1 ']'
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 915353
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/pid
++ pid=915353
++ '[' 915353 = 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.control-friction-live.lock.owner.CnYNdl
++ return 0
++ CONTROL_LOCK_HELD=0
++ '[' 1 = 1 ']'
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=915353
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 915353
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/pid
++ pid=915353
++ '[' 915353 = 915353 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv/home/state/.treehouse-project-7f4381af38d5a10ab56c712c6a4bd2a0a98093a4.lock.owner.ApDG3m
++ return 0
++ TREEHOUSE_PROJECT_LOCK_HELD=0
++ fm_lease_guard_release
++ local lock=
++ '[' -n '' ']'
++ return 0
++ return 1

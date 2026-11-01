@@ -1,0 +1,215 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+[exit 0]
+$ git init -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project
+Initialized empty Git repository in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project/.git/
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project -c user.name=Lab -c user.email=lab@example.invalid commit -m initial
+[main (root-commit) c03bc9b] initial
+ 4 files changed, 4 insertions(+)
+ create mode 100644 README.md
+ create mode 100644 docs/notes.md
+ create mode 100644 scripts/run.py
+ create mode 100644 web/package.json
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project rev-parse HEAD
+c03bc9b4abfbd41a63328f6b913eaa17226e6091
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/s -f /dev/null new-session -d -s fm-lab-friction -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3 '/bin/bash --noprofile --norc'
+[exit 0]
+$ bash -c '. bin/fm-git-worktree-lib.sh; fm_git_worktree_allocate "$1/state" "$2" "$1" "$3" "$4" "$5" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home friction-live /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies c03bc9b4abfbd41a63328f6b913eaa17226e6091
+Preparing worktree (detached HEAD c03bc9b)
+HEAD is now at c03bc9b initial
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/friction-live/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (16729 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (16735 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/friction-live/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+VERIFIED: 16,735 files summarized under seven roots; full list retained; no files moved.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --retain-branch --legacy-record
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/friction-live/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (16729 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (16735 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/friction-live/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --retain-branch --legacy-record --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --landed-pr https://github.com/fixture/project/pull/1 --landed-head c03bc9b4abfbd41a63328f6b913eaa17226e6091 --legacy-record
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/friction-live/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (16729 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (16735 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/friction-live/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --landed-pr https://github.com/fixture/project/pull/1 --landed-head c03bc9b4abfbd41a63328f6b913eaa17226e6091 --legacy-record --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --retain-branch --legacy-record --preserve-untracked .cache/jdk
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+Leftovers not covered by any name, by top-level root:
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+error: native worktree: 6 leftover(s) above are not named; nothing moved
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+full leftover list (16735 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/friction-live/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --retain-branch --legacy-record --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+VERIFIED: initial and partial retries retain original authority options.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked .cache --preserve-untracked web --preserve-untracked build --preserve-untracked scripts
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+'web' holds tracked content; naming its leftover roots instead: web/.next web/next-env.d.ts web/node_modules web/out
+'scripts' holds tracked content; naming its leftover roots instead: scripts/__pycache__
+error: native worktree: tracked changes are unique work; nothing moved
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/friction-live/worktree restore README.md
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh friction-live --preserve-untracked docs
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: 'docs' names tracked content and holds no leftovers; nothing moved
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+VERIFIED: tracked edits and tracked-only folders refuse without moving generated files.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-queue.sh add fix-login --kind ship --title 'Fix it'
+error: usage: add <id> "<title>" [--body TEXT | --body-file PATH] [--kind KIND] [--repo NAME] [--priority 0-4] [--blocked-by ID]... [--idea | --outcome]; --title is not an add flag: pass the title as the second positional argument; example: add fix-login "Fix the login redirect" --kind ship
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-queue.sh add
+error: usage: add <id> "<title>" [--body TEXT | --body-file PATH] [--kind KIND] [--repo NAME] [--priority 0-4] [--blocked-by ID]... [--idea | --outcome]; example: add fix-login "Fix the login redirect" --kind ship
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-queue.sh add fix-login 'Fix the login redirect' --kind ship
+ok: add fix-login
+task:
+  id: fix-login
+  title: Fix the login redirect
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-01
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-queue.sh show fix-login --json
+{"ok": true, "task": {"id": "fix-login", "title": "Fix the login redirect", "state": "queued", "kind": "ship", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-01", "closed": null, "links": [], "body": "", "archived": false}}
+[exit 0]
+VERIFIED: wrong add syntax gives a usable example; corrected command persists the requested title.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control.sh absent-task relaunch --note 'Spaces; $(touch injected)'
+error: FM_HOME is not set; fm-control refuses to resolve a task without an explicit firstmate home
+next: name the home explicitly; for the home at this code root that is:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-control.sh absent-task relaunch --note Spaces\;\ \$\(touch\ injected\)
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-send.sh absent-task 'Spaces; $(touch injected)'
+error: FM_HOME is not set; fm-send refuses to resolve targets without an explicit firstmate home
+next: name the home explicitly; for the home at this code root that is:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-send.sh absent-task Spaces\;\ \$\(touch\ injected\)
+[exit 1]
+VERIFIED: control and send retain explicit-home refusal and quote original arguments safely.
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project rev-parse main
+c03bc9b4abfbd41a63328f6b913eaa17226e6091
+[exit 0]
+$ bash -c '. bin/fm-git-worktree-lib.sh; fm_git_worktree_allocate "$1/state" "$2" "$1" "$3" "$4" "$5" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home retry-live /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies c03bc9b4abfbd41a63328f6b913eaa17226e6091
+Preparing worktree (detached HEAD c03bc9b)
+HEAD is now at c03bc9b initial
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree switch -c lab-retained
+Switched to a new branch 'lab-retained'
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree -c user.name=Lab -c user.email=lab@example.invalid commit -m 'retained work'
+[lab-retained a32d328] retained work
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree rev-parse HEAD
+a32d328cf4dafa042dbed4ae26bcb99d129a5dff
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh retry-live --retain-branch --legacy-record
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (1 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/retry-live/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh retry-live --retain-branch --legacy-record --preserve-untracked build
+[exit 1]
+$ chrome-devtools-axi open 'data:text/html,<title>Cleanup lab</title><h1>Task-owned browser</h1>'
+page:
+  title: Cleanup lab
+  url: "data:text/html,<title>Cleanup lab</title><h1>Task-owned browser</h1>"
+  refs: 2
+snapshot:
+uid=g1:1_0 RootWebArea "Cleanup lab" url="data:text/html,<title>Cleanup lab</title><h1>Task-owned browser</h1>"
+  uid=g1:1_1 heading "Task-owned browser" level="1"
+help[1]:
+  Use `chrome-devtools-axi eval <expr>` for JS expressions. For multi-statement code, pass a function: `eval "() => { ...; return result }"`
+[exit 0]
+$ bash -c 'FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh retry-live --retain-branch --legacy-record --preserve-untracked build'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/retry-live/preserved-artifacts/files/build
+teardown retry-live complete (window fm-lab-friction:fm-retry-live, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/retry-live/worktree)
+Backlog: retry-live just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/backlog.md - move retry-live to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project rev-parse refs/heads/lab-retained
+a32d328cf4dafa042dbed4ae26bcb99d129a5dff
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project rev-parse refs/firstmate/retained-work/retry-live
+a32d328cf4dafa042dbed4ae26bcb99d129a5dff
+[exit 0]
+VERIFIED: printed retry executes successfully, preserves output, and retains the unlanded commit on its branch and retained-work ref.

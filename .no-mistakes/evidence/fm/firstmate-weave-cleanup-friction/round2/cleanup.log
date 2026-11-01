@@ -1,0 +1,3 @@
+Private tmux server stopped: exit 0
+Processes with cwd in disposable workspace: []
+Removed disposable homes, project, native copies, npm dependencies and Chrome download.

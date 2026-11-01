@@ -1,0 +1,36 @@
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project rev-parse main
+c03bc9b4abfbd41a63328f6b913eaa17226e6091
+[exit 0]
+$ bash -c '. bin/fm-git-worktree-lib.sh; fm_git_worktree_allocate "$1/state" "$2" "$1" "$3" "$4" "$5" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home ignored-cache /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies c03bc9b4abfbd41a63328f6b913eaa17226e6091
+Preparing worktree (detached HEAD c03bc9b)
+HEAD is now at c03bc9b initial
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/ignored-cache/worktree check-ignore .cache/jdk/a
+.cache/jdk/a
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh ignored-cache
+REFUSED: another Treehouse slot allocation or return is in progress for /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/project; nothing was changed
+[exit 1]
+Rerun after concurrent same-project cleanup released its allocation lock.
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/ignored-cache/worktree check-ignore .cache/jdk/a
+.cache/jdk/a
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh ignored-cache
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/ignored-cache/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (1 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/ignored-cache/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh ignored-cache --preserve-untracked .cache
+[exit 1]
+$ bash -c 'FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/bin/fm-teardown.sh ignored-cache --preserve-untracked .cache'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+preserved: .cache -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/ignored-cache/preserved-artifacts/files/.cache
+teardown ignored-cache complete (window fm-lab-friction:fm-ignored-cache, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/copies/ignored-cache/worktree)
+Backlog: ignored-cache just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.lv3/home/data/backlog.md - move ignored-cache to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+PASS: ignored generated file summarized and preserved by the printed command.

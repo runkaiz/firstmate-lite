@@ -1,0 +1,34 @@
+Preparing worktree (detached HEAD e385fab)
+HEAD is now at e385fab initial
+page:
+  title: cleanup regression
+  url: "data:text/html,<title>cleanup regression</title>"
+  refs: 1
+snapshot:
+uid=g3:1_0 RootWebArea "cleanup regression" url="data:text/html,<title>cleanup regression</title>"
+help[1]:
+  Use `chrome-devtools-axi eval <expr>` for JS expressions. For multi-statement code, pass a function: `eval "() => { ...; return result }"`
+PID PPID PGID SID COMMAND
+1190299    2256 1190299 1190299 node
+1190338 1190299 1190299 1190299 npm exec chrome
+1190391 1190338 1190299 1190299 chrome-devtools
+1190429 1190391 1190429 1190429 chrome
+1190431    2256 1190430 1190430 chrome_crashpad
+1190433    2256 1190432 1190432 chrome_crashpad
+1190436 1190429 1190429 1190429 chrome
+1190437 1190429 1190429 1190429 chrome
+1190459 1190436 1190429 1190429 chrome
+1190460 1190429 1190429 1190429 chrome
+1190489 1190437 1190429 1190429 chrome
+1190530 1190437 1190429 1190429 chrome
+1190531 1190437 1190429 1190429 chrome
+1190558 1190437 1190429 1190429 chrome
+1190569 1190437 1190429 1190429 chrome
+crashpad leaders: PID    PPID    PGID     SID COMMAND
+crashpad leaders: PID    PPID    PGID     SID COMMAND
+teardown: a chrome-devtools-axi bridge runs in the copy beside other process 1190431; stopping nothing
+REFUSED: native copy still has processes; preserving it
+status: stopped
+teardown browser-regression complete (window native-fixture:fm-browser-regression, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.browser-test/repro/copies/browser-regression/worktree)
+Backlog: browser-regression just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6AHC9AFYM09CJWRZYXBSTTT/.browser-test/repro/home/data/backlog.md - move browser-regression to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+ok - reported crashpad refusal reproduced; manual stop allows teardown
