@@ -828,6 +828,11 @@ native_leftover_next_action() {  # <copy>
   }
   [ -n "$roots" ] || return 0
   cmd=$(printf 'FM_HOME=%q %q %q' "$FM_HOME" "$FM_ROOT/bin/fm-teardown.sh" "$ID")
+  [ "$RETAIN_BRANCH" != 1 ] || cmd="$cmd --retain-branch"
+  if [ -n "$SIBLING_PR" ]; then
+    cmd="$cmd --landed-pr $(printf '%q' "$SIBLING_PR") --landed-head $(printf '%q' "$SIBLING_HEAD")"
+  fi
+  [ "$LEGACY_RECORD_GIVEN" != 1 ] || cmd="$cmd --legacy-record"
   total=0
   while IFS=$'\t' read -r count root; do
     cmd="$cmd --preserve-untracked $(printf '%q' "$root")"

@@ -682,8 +682,21 @@ leftovers_intact() {
 if out=$(run_preserve_teardown 2>&1); then fail 'leftover generated artifacts were discarded'; fi
 assert_contains "$out" '--preserve-untracked' 'clean refusal did not name the guarded next action'
 leftovers_intact || fail 'plain refusal changed leftovers or task records'
-if out=$(run_preserve_teardown --preserve-untracked .cache 2>&1); then fail 'an unnamed leftover was left behind'; fi
+printf 'branch=%s\n' "$MAIN" >> "$HOME_DIR/state/$id.meta"
+for proof in retain sibling; do
+  retry_args=(--retain-branch)
+  [ "$proof" != sibling ] || retry_args=(--landed-pr https://github.com/fixture/project/pull/1 --landed-head "$BASE")
+  if out=$(run_preserve_teardown "${retry_args[@]}" --legacy-record 2>&1); then
+    fail "$proof retry fixture discarded leftovers"
+  fi
+  retry_cmd=$(printf '%s\n' "$out" | sed -n '/^  FM_HOME=/p')
+  assert_contains "$retry_cmd" "${retry_args[*]} --legacy-record --preserve-untracked" "$proof retry lost original options"
+  leftovers_intact || fail "$proof retry advice changed leftovers or task records"
+done
+if out=$(run_preserve_teardown --retain-branch --legacy-record --preserve-untracked .cache 2>&1); then fail 'an unnamed leftover was left behind'; fi
 assert_contains "$out" 'not named' 'partial naming refused for the wrong reason'
+retry_cmd=$(printf '%s\n' "$out" | sed -n '/^  FM_HOME=/p')
+assert_contains "$retry_cmd" '--retain-branch --legacy-record --preserve-untracked' 'partial naming retry lost original options'
 leftovers_intact && [ ! -e "$KEEP/files" ] || fail 'partial naming moved something before refusing'
 printf 'unique edit\n' >> "$WT/README.md"
 if out=$(run_preserve_teardown --preserve-untracked .cache --preserve-untracked __pycache__ 2>&1); then
