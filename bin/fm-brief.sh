@@ -551,6 +551,7 @@ The report is the only thing that survives, so anything worth keeping must be in
 # Rules
 1. Never push to any remote and never open a PR.
 2. Stay inside this worktree; the only files you may write outside it are the report and the status file below.
+   When clearing scratch folders, use a guarded explicit path such as \`rm -rf -- "\${DIR:?}/sub"\`, never \`cd\` then \`rm -rf\` with a relative glob.
 3. Use native gh for GitHub operations with complete selective --json fields and deterministic --jq/parsing; consult current help. Preserve required identity and state evidence, handle errors and ambiguous or missing results explicitly, and keep guarded merge and no-mistakes authority. Use chrome-devtools-axi for browser operations.
 4. Report status by appending one line:
    \`$STATUS_APPEND\`
@@ -627,6 +628,7 @@ $RULE1
 2. Keep project edits inside this worktree; keep proof and scratch output outside it, under \`$DATA/$ID/\` or a temporary directory.
    Outside the worktree, write only that task material and the status and steering-inbox records authorized below.
    Leave the worktree clean before reporting done.
+   When clearing scratch folders, use a guarded explicit path such as \`rm -rf -- "\${DIR:?}/sub"\`, never \`cd\` then \`rm -rf\` with a relative glob.
 3. $FORGE_RULE_LINE
 4. Report status by appending one line:
    \`$STATUS_APPEND\`
