@@ -1,0 +1,354 @@
++ set -eu
++++ dirname bin/fm-proactive.sh
+++ cd bin
+++ pwd
++ SCRIPT_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++ pwd
++ ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++ CONFIG=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++ PREFERENCE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive
++ MODE=off
++ INVALID=0
++ command=off
++ '[' 1 -le 1 ']'
++ case "$command" in
++ read_preference
++ local stored
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive ']'
++ '[' '!' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive
+++ printf .
++ stored=$'on\n.'
++ case "$stored" in
++ MODE=on
++ cmp -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive /dev/fd/63
+++ printf %s $'on\n'
++ '[' 0 -eq 1 ']'
++ case "$command" in
++ write_preference off
++ local temporary
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/proactive ']'
++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh
++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh ']'
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ FM_WAKE_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
++++ pwd
+++ FM_WAKE_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
+++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
+++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary
+++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/state
+++ FM_WAKE_QUEUE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/state/.wake-queue
+++ FM_WAKE_QUEUE_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/state/.wake-queue.lock
+++ FM_LOCK_STALE_AFTER=2
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-path-lib.sh
++++ uname
+++ _FM_UNAME=Linux
+++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/state
+++ '[' 5 -gt 4 ']'
+++ FM_WATCHER_MATCHED_IDENTITY=
+++ FM_WATCHER_HEALTHY_PID=
+++ FM_WATCHER_HEALTHY_IDENTITY=
+++ FM_WATCHER_VERDICT_OK=false
+++ FM_WATCHER_VERDICT_REASON=stale-beacon
+++ FM_RECOVERY_MARKER_TOKEN=
+++ FM_RECOVERY_MARKER_ACTION=none
+++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
+++ FM_RECOVERY_HANDOVER_TOKEN=
+++ FM_RECOVERY_HANDOVER_SEQ=
+++ FM_WAKE_STATUS_KEY=
+++ FM_WAKE_STATUS_HISTORICAL=false
+++ FM_WAKE_EVENT_LINE=
+++ FM_WAKE_UNREAD_LINES=
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ fm_path=.proactive.lock
++++ '[' .proactive.lock '!=' .proactive.lock ']'
++++ printf -v base %s .proactive.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config .proactive.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock ']'
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.2scAQD
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3985827
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3985827
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock/pid
++ pid=3985808
++ '[' -n 3985808 ']'
++ '[' 3985808 = 3985827 ']'
++ fm_pid_alive 3985808
++ local pid=3985808
++ case "$pid" in
++ kill -0 3985808
++ FM_LOCK_HELD_PID=3985808
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/ ']'
++ sleep 0.1
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ fm_path=.proactive.lock
++++ '[' .proactive.lock '!=' .proactive.lock ']'
++++ printf -v base %s .proactive.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config .proactive.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock ']'
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.owner.lXJu7Y
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3985827
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3985827
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock/pid
++ pid=3985808
++ '[' -n 3985808 ']'
++ '[' 3985808 = 3985827 ']'
++ fm_pid_alive 3985808
++ local pid=3985808
++ case "$pid" in
++ kill -0 3985808
++ FM_LOCK_HELD_PID=3985808
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/ ']'
++ sleep 0.1
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ fm_path=.proactive.lock
++++ '[' .proactive.lock '!=' .proactive.lock ']'
++++ printf -v base %s .proactive.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3985827
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3985827
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock/pid
+++ true
++ pid=
++ '[' -n '' ']'
++ fm_pid_alive ''
++ local pid=
++ case "$pid" in
++ return 1
++ fm_lock_mid_acquire_is_fresh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock pid= mid_acquire_stale
++ case "$pid" in
++ mid_acquire_stale=2
++ '[' 2 -lt 2 ']'
+++ fm_path_age /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock m now
++++ fm_path_mtime /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
++++ '[' Linux = Darwin ']'
++++ stat -c %Y /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock
+++ m=
+++ echo 999999
+++ return
++ '[' 999999 -lt 2 ']'
++ return
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++ fm_lock_try_acquire_steal_mutex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal current
++ FM_LOCK_OWNER_DIR=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ fm_path=.proactive.lock.steal
++++ '[' .proactive.lock.steal '!=' .proactive.lock.steal ']'
++++ printf -v base %s .proactive.lock.steal
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3985827
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3985827
++ fm_lock_reap_dead_link /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal.steal owner pid token tomb current
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal.steal ']'
++ return 1
++ true
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal/pid
+++ true
++ '[' '' = 3985827 ']'
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal ']'
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock.steal
++++ fm_path=.proactive.lock.steal
++++ '[' .proactive.lock.steal '!=' .proactive.lock.steal ']'
++++ printf -v base %s .proactive.lock.steal
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/.proactive.lock/pid
+++ true
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/boundary/config/ ']'
++ return 1
++ return 1

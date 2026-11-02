@@ -1,0 +1,1922 @@
++ set -u
+++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh ']'
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ pwd
++ SCRIPT_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++ pwd
++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++ CONFIG=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config
++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++ WATCH_HOME_EXISTED=0
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 ']'
++ WATCH_HOME_EXISTED=1
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-push-transition-lib.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-push-transition-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ FM_PUSH_TRANSITION_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh
+++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh ']'
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ FM_WAKE_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++++ pwd
++++ FM_WAKE_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ FM_WAKE_QUEUE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue
++++ FM_WAKE_QUEUE_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ FM_LOCK_STALE_AFTER=2
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-path-lib.sh
+++++ uname
++++ _FM_UNAME=Linux
++++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' 5 -gt 4 ']'
++++ FM_WATCHER_MATCHED_IDENTITY=
++++ FM_WATCHER_HEALTHY_PID=
++++ FM_WATCHER_HEALTHY_IDENTITY=
++++ FM_WATCHER_VERDICT_OK=false
++++ FM_WATCHER_VERDICT_REASON=stale-beacon
++++ FM_RECOVERY_MARKER_TOKEN=
++++ FM_RECOVERY_MARKER_ACTION=none
++++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
++++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
++++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
++++ FM_RECOVERY_HANDOVER_TOKEN=
++++ FM_RECOVERY_HANDOVER_SEQ=
++++ FM_WAKE_STATUS_KEY=
++++ FM_WAKE_STATUS_HISTORICAL=false
++++ FM_WAKE_EVENT_LINE=
++++ FM_WAKE_UNREAD_LINES=
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh
+++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh ']'
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ _FM_CLASSIFY_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ _FM_CLASSIFY_UNAME_S=Linux
++++ FM_CREW_STATE_BIN=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-crew-state.sh
++++ case $- in
++++ _fm_classify_nounset=on
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-timeout-lib.sh
+++++ set -u
++++ '[' on = on ']'
++++ unset _fm_classify_nounset
++++ FM_CLASSIFY_CAPTAIN_RE_DEFAULT='done:|needs-decision:|blocked:|failed:|PR ready|checks green|ready in branch|merged'
++++ FM_CLASSIFY_PAUSED_VERB_DEFAULT=paused
++++ FM_PAUSE_RESURFACE_SECS_DEFAULT=14400
++++ FM_CLASSIFY_RESOLVE_VERB_DEFAULT=resolved
++++ FM_CLASSIFY_CAPTAIN_HELD_VERB_DEFAULT=captain-held
++++ FM_CLASSIFY_EVENT_WINDOW_LINES=200
++++ FM_CLASSIFY_RESERVED_KEY_PREFIXES_DEFAULT=pending-reply-
++++ FM_OPEN_DECISIONS_FOLD_VERSION=9
++++ FM_STATUS_SNAPSHOT_EVENT_LINE=
++++ FM_STATUS_SNAPSHOT_EVENT_MTIME=
++++ FM_STATUS_SNAPSHOT_EVENT_ENDPOINT=
++++ STATUS_PRESENTATION_REPORTED=
++++ STATUS_PRESENTATION_CLASSIFIED=
++++ _FM_CLASSIFY_KEYLESS_PHASE=$'\036default'
++++ FM_GATE_HUMAN_DECISION='ask-user: authority decision'
++++ FM_WORKTREE_WRITE_PRUNE='.git node_modules .venv venv __pycache__ .mypy_cache .pytest_cache .ruff_cache .tox target dist build .next .cache vendor'
++++ FM_WORKTREE_WRITE_MAXDEPTH=6
++++ FM_WORKTREE_WRITE_TIMEOUT=10
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
++++ FM_BACKEND_SCRIPT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
++++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ FM_BACKEND_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ unset FM_BACKEND_SCRIPT
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++++ pwd
++++ FM_BACKEND_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++++ FM_BACKEND_CONFIG_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config
++++ FM_BACKEND_KNOWN='tmux herdr zellij orca cmux'
++++ FM_BACKEND_SPAWN='tmux herdr zellij orca cmux'
++++ FM_BACKEND_CMUX_BUNDLE_ID=com.cmuxterm.app
++++ FM_BACKEND_VISIBLE_CAPTURE='tmux herdr zellij'
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-transition-lib.sh
++++ FM_TRANSITION_FIELD_SEP=$'\t'
+++ TRIAGE_LOG=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch-triage.log
+++ TRIAGE_LOG_MAX_BYTES=262144
+++ FM_WAKE_POST_OUTPUT_ACTION=
+++ FM_WATCH_DELIVERED_REASON=
+++ FM_WATCH_DELIVERY_PID=
+++ FM_WATCH_DELIVERY_IDENTITY=
+++ WATCH_DELIVERY_LOG=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch-deliveries.log
+++ WATCH_DELIVERY_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch-deliveries.lock
+++ WATCH_DELIVERY_MAX_BYTES=65536
+++ WATCH_DELIVERY_KEEP_LINES=64
+++ case "$WATCH_DELIVERY_MAX_BYTES" in
+++ case "$WATCH_DELIVERY_KEEP_LINES" in
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-pr-lib.sh
+++ FM_PR_PROVIDER=
+++ FM_PR_URL=
+++ FM_PR_HOST=
+++ FM_PR_PATH=
+++ FM_PR_OWNER=
+++ FM_PR_REPO=
+++ FM_PR_NUMBER=
+++ FM_PR_DATA_PROVIDER=
+++ FM_PR_DATA_URL=
+++ FM_PR_DATA_HOST=
+++ FM_PR_DATA_PATH=
+++ FM_PR_DATA_NUMBER=
+++ FM_PR_META_PROVIDER=
+++ FM_PR_META_URL=
+++ FM_PR_META_HOST=
+++ FM_PR_META_PATH=
+++ FM_PR_META_NUMBER=
+++ FM_PR_REG_ID=
+++ FM_PR_REG_PROVIDER=
+++ FM_PR_REG_URL=
+++ FM_PR_REG_HOST=
+++ FM_PR_REG_PATH=
+++ FM_PR_REG_NUMBER=
+++ FM_PR_REG_DATA_HASH=
+++ FM_PR_REG_TEMPLATE_HASH=
+++ FM_PR_REG_DATA_IDENTITY=
+++ FM_PR_REG_CHECK_IDENTITY=
+++ FM_PR_POLL_DATA_TMP=
+++ FM_PR_POLL_CHECK_TMP=
+++ FM_PR_POLL_REG_TMP=
+++ FM_PR_POLL_DATA_DEST=
+++ FM_PR_POLL_CHECK_DEST=
+++ FM_PR_POLL_REG_DEST=
+++ FM_PR_POLL_EXPECT_ID=
+++ FM_PR_POLL_EXPECT_PROVIDER=
+++ FM_PR_POLL_EXPECT_URL=
+++ FM_PR_POLL_EXPECT_HOST=
+++ FM_PR_POLL_EXPECT_PATH=
+++ FM_PR_POLL_EXPECT_NUMBER=
+++ FM_PR_POLL_EXPECT_DATA_HASH=
+++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
+++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
+++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
+++ FM_PR_POLL_TEMPLATE=
+++ FM_PR_POLL_STATE_DEVICE=
+++ FM_PR_POLL_SNAPSHOT_ID=
+++ FM_PR_POLL_SNAPSHOT_PROVIDER=
+++ FM_PR_POLL_SNAPSHOT_URL=
+++ FM_PR_POLL_SNAPSHOT_HOST=
+++ FM_PR_POLL_SNAPSHOT_PATH=
+++ FM_PR_POLL_SNAPSHOT_NUMBER=
+++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
+++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
+++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_REG_HASH=
+++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
+++ FM_PR_POLL_REARM_DATA_IDENTITY=
+++ FM_PR_POLL_REARM_CHECK_IDENTITY=
+++ FM_PR_RETIRE_ID=
+++ FM_PR_RETIRE_PROVIDER=
+++ FM_PR_RETIRE_URL=
+++ FM_PR_RETIRE_HOST=
+++ FM_PR_RETIRE_PATH=
+++ FM_PR_RETIRE_NUMBER=
+++ FM_PR_RETIRE_DATA_HASH=
+++ FM_PR_RETIRE_TEMPLATE_HASH=
+++ FM_PR_RETIRE_DATA_IDENTITY=
+++ FM_PR_RETIRE_CHECK_IDENTITY=
+++ FM_PR_RETIRE_REG_HASH=
+++ FM_PR_RETIRE_REG_IDENTITY=
+++ FM_PR_RETIRE_RECEIPT_HASH=
+++ FM_PR_RETIRE_RECEIPT_IDENTITY=
+++ FM_PR_RECORD_STATE=
+++ FM_PR_RECORD_MERGED=
+++ FM_PR_POLL_RETIREMENT_REJECTED=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-procevent-lib.sh
+++ FM_PROCEVENT_OWNER_LEASE_DEFAULT_SECONDS=600
+++ FM_PROCEVENT_OWNER_LEASE_MIN_SECONDS=1
+++ FM_PROCEVENT_OWNER_LEASE_MAX_SECONDS=86400
+++ FM_PROCEVENT_OWNER_CHECK_DEFAULT_SECONDS=15
+++ FM_PROCEVENT_OWNER_CHECK_MIN_SECONDS=1
+++ FM_PROCEVENT_OWNER_CHECK_MAX_SECONDS=3600
+++ FM_PROCEVENT_LAUNCH_FLOOR_DEFAULT_SECONDS=1
+++ FM_PROCEVENT_LAUNCH_FLOOR_MIN_SECONDS=1
+++ FM_PROCEVENT_LAUNCH_FLOOR_MAX_SECONDS=3600
+++ FM_PROCEVENT_LAUNCH_CONFIRM_DEFAULT_SECONDS=3
+++ FM_PROCEVENT_LAUNCH_CONFIRM_MIN_SECONDS=1
+++ FM_PROCEVENT_LAUNCH_CONFIRM_MAX_SECONDS=600
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-merge-outcome-lib.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-merge-outcome-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ _FM_MERGE_OUTCOME_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-pr-lib.sh
++++ FM_PR_PROVIDER=
++++ FM_PR_URL=
++++ FM_PR_HOST=
++++ FM_PR_PATH=
++++ FM_PR_OWNER=
++++ FM_PR_REPO=
++++ FM_PR_NUMBER=
++++ FM_PR_DATA_PROVIDER=
++++ FM_PR_DATA_URL=
++++ FM_PR_DATA_HOST=
++++ FM_PR_DATA_PATH=
++++ FM_PR_DATA_NUMBER=
++++ FM_PR_META_PROVIDER=
++++ FM_PR_META_URL=
++++ FM_PR_META_HOST=
++++ FM_PR_META_PATH=
++++ FM_PR_META_NUMBER=
++++ FM_PR_REG_ID=
++++ FM_PR_REG_PROVIDER=
++++ FM_PR_REG_URL=
++++ FM_PR_REG_HOST=
++++ FM_PR_REG_PATH=
++++ FM_PR_REG_NUMBER=
++++ FM_PR_REG_DATA_HASH=
++++ FM_PR_REG_TEMPLATE_HASH=
++++ FM_PR_REG_DATA_IDENTITY=
++++ FM_PR_REG_CHECK_IDENTITY=
++++ FM_PR_POLL_DATA_TMP=
++++ FM_PR_POLL_CHECK_TMP=
++++ FM_PR_POLL_REG_TMP=
++++ FM_PR_POLL_DATA_DEST=
++++ FM_PR_POLL_CHECK_DEST=
++++ FM_PR_POLL_REG_DEST=
++++ FM_PR_POLL_EXPECT_ID=
++++ FM_PR_POLL_EXPECT_PROVIDER=
++++ FM_PR_POLL_EXPECT_URL=
++++ FM_PR_POLL_EXPECT_HOST=
++++ FM_PR_POLL_EXPECT_PATH=
++++ FM_PR_POLL_EXPECT_NUMBER=
++++ FM_PR_POLL_EXPECT_DATA_HASH=
++++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
++++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
++++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
++++ FM_PR_POLL_TEMPLATE=
++++ FM_PR_POLL_STATE_DEVICE=
++++ FM_PR_POLL_SNAPSHOT_ID=
++++ FM_PR_POLL_SNAPSHOT_PROVIDER=
++++ FM_PR_POLL_SNAPSHOT_URL=
++++ FM_PR_POLL_SNAPSHOT_HOST=
++++ FM_PR_POLL_SNAPSHOT_PATH=
++++ FM_PR_POLL_SNAPSHOT_NUMBER=
++++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
++++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
++++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_REG_HASH=
++++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
++++ FM_PR_POLL_REARM_DATA_IDENTITY=
++++ FM_PR_POLL_REARM_CHECK_IDENTITY=
++++ FM_PR_RETIRE_ID=
++++ FM_PR_RETIRE_PROVIDER=
++++ FM_PR_RETIRE_URL=
++++ FM_PR_RETIRE_HOST=
++++ FM_PR_RETIRE_PATH=
++++ FM_PR_RETIRE_NUMBER=
++++ FM_PR_RETIRE_DATA_HASH=
++++ FM_PR_RETIRE_TEMPLATE_HASH=
++++ FM_PR_RETIRE_DATA_IDENTITY=
++++ FM_PR_RETIRE_CHECK_IDENTITY=
++++ FM_PR_RETIRE_REG_HASH=
++++ FM_PR_RETIRE_REG_IDENTITY=
++++ FM_PR_RETIRE_RECEIPT_HASH=
++++ FM_PR_RETIRE_RECEIPT_IDENTITY=
++++ FM_PR_RECORD_STATE=
++++ FM_PR_RECORD_MERGED=
++++ FM_PR_POLL_RETIREMENT_REJECTED=
+++ FM_MERGE_OUTCOME_ALREADY_RECORDED=false
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-merge-authority-lib.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-merge-authority-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ _FM_MERGE_AUTHORITY_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-pr-lib.sh
++++ FM_PR_PROVIDER=
++++ FM_PR_URL=
++++ FM_PR_HOST=
++++ FM_PR_PATH=
++++ FM_PR_OWNER=
++++ FM_PR_REPO=
++++ FM_PR_NUMBER=
++++ FM_PR_DATA_PROVIDER=
++++ FM_PR_DATA_URL=
++++ FM_PR_DATA_HOST=
++++ FM_PR_DATA_PATH=
++++ FM_PR_DATA_NUMBER=
++++ FM_PR_META_PROVIDER=
++++ FM_PR_META_URL=
++++ FM_PR_META_HOST=
++++ FM_PR_META_PATH=
++++ FM_PR_META_NUMBER=
++++ FM_PR_REG_ID=
++++ FM_PR_REG_PROVIDER=
++++ FM_PR_REG_URL=
++++ FM_PR_REG_HOST=
++++ FM_PR_REG_PATH=
++++ FM_PR_REG_NUMBER=
++++ FM_PR_REG_DATA_HASH=
++++ FM_PR_REG_TEMPLATE_HASH=
++++ FM_PR_REG_DATA_IDENTITY=
++++ FM_PR_REG_CHECK_IDENTITY=
++++ FM_PR_POLL_DATA_TMP=
++++ FM_PR_POLL_CHECK_TMP=
++++ FM_PR_POLL_REG_TMP=
++++ FM_PR_POLL_DATA_DEST=
++++ FM_PR_POLL_CHECK_DEST=
++++ FM_PR_POLL_REG_DEST=
++++ FM_PR_POLL_EXPECT_ID=
++++ FM_PR_POLL_EXPECT_PROVIDER=
++++ FM_PR_POLL_EXPECT_URL=
++++ FM_PR_POLL_EXPECT_HOST=
++++ FM_PR_POLL_EXPECT_PATH=
++++ FM_PR_POLL_EXPECT_NUMBER=
++++ FM_PR_POLL_EXPECT_DATA_HASH=
++++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
++++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
++++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
++++ FM_PR_POLL_TEMPLATE=
++++ FM_PR_POLL_STATE_DEVICE=
++++ FM_PR_POLL_SNAPSHOT_ID=
++++ FM_PR_POLL_SNAPSHOT_PROVIDER=
++++ FM_PR_POLL_SNAPSHOT_URL=
++++ FM_PR_POLL_SNAPSHOT_HOST=
++++ FM_PR_POLL_SNAPSHOT_PATH=
++++ FM_PR_POLL_SNAPSHOT_NUMBER=
++++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
++++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
++++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
++++ FM_PR_POLL_SNAPSHOT_REG_HASH=
++++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
++++ FM_PR_POLL_REARM_DATA_IDENTITY=
++++ FM_PR_POLL_REARM_CHECK_IDENTITY=
++++ FM_PR_RETIRE_ID=
++++ FM_PR_RETIRE_PROVIDER=
++++ FM_PR_RETIRE_URL=
++++ FM_PR_RETIRE_HOST=
++++ FM_PR_RETIRE_PATH=
++++ FM_PR_RETIRE_NUMBER=
++++ FM_PR_RETIRE_DATA_HASH=
++++ FM_PR_RETIRE_TEMPLATE_HASH=
++++ FM_PR_RETIRE_DATA_IDENTITY=
++++ FM_PR_RETIRE_CHECK_IDENTITY=
++++ FM_PR_RETIRE_REG_HASH=
++++ FM_PR_RETIRE_REG_IDENTITY=
++++ FM_PR_RETIRE_RECEIPT_HASH=
++++ FM_PR_RETIRE_RECEIPT_IDENTITY=
++++ FM_PR_RECORD_STATE=
++++ FM_PR_RECORD_MERGED=
++++ FM_PR_POLL_RETIREMENT_REJECTED=
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh
++++ set -u
++++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ FM_AFK_CONTRACT_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++++ pwd
++++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++++ FM_AFK_CONTRACT_STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh
++++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh ']'
++++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++++ pwd
+++++ _FM_CLASSIFY_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ _FM_CLASSIFY_UNAME_S=Linux
+++++ FM_CREW_STATE_BIN=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-crew-state.sh
+++++ case $- in
+++++ _fm_classify_nounset=on
+++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-timeout-lib.sh
++++++ set -u
+++++ '[' on = on ']'
+++++ unset _fm_classify_nounset
+++++ FM_CLASSIFY_CAPTAIN_RE_DEFAULT='done:|needs-decision:|blocked:|failed:|PR ready|checks green|ready in branch|merged'
+++++ FM_CLASSIFY_PAUSED_VERB_DEFAULT=paused
+++++ FM_PAUSE_RESURFACE_SECS_DEFAULT=14400
+++++ FM_CLASSIFY_RESOLVE_VERB_DEFAULT=resolved
+++++ FM_CLASSIFY_CAPTAIN_HELD_VERB_DEFAULT=captain-held
+++++ FM_CLASSIFY_EVENT_WINDOW_LINES=200
+++++ FM_CLASSIFY_RESERVED_KEY_PREFIXES_DEFAULT=pending-reply-
+++++ FM_OPEN_DECISIONS_FOLD_VERSION=9
+++++ FM_STATUS_SNAPSHOT_EVENT_LINE=
+++++ FM_STATUS_SNAPSHOT_EVENT_MTIME=
+++++ FM_STATUS_SNAPSHOT_EVENT_ENDPOINT=
+++++ STATUS_PRESENTATION_REPORTED=
+++++ STATUS_PRESENTATION_CLASSIFIED=
+++++ _FM_CLASSIFY_KEYLESS_PHASE=$'\036default'
+++++ FM_GATE_HUMAN_DECISION='ask-user: authority decision'
+++++ FM_WORKTREE_WRITE_PRUNE='.git node_modules .venv venv __pycache__ .mypy_cache .pytest_cache .ruff_cache .tox target dist build .next .cache vendor'
+++++ FM_WORKTREE_WRITE_MAXDEPTH=6
+++++ FM_WORKTREE_WRITE_TIMEOUT=10
++++ FM_AFK_CONTRACT_VERSION=2
++++ FM_AFK_CONTRACT_READABLE_VERSIONS='1 2'
++++ FM_AFK_CONTRACT_REACH_ANNOUNCED='No phone channel is configured; anything that needs you waits for your return.'
++++ FM_AFK_CONTRACT_SPEND_DEFAULT=-
++++ FM_AFK_CONTRACT_QUIET_HOLDS_NOTHING='you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.'
++++ _FM_AFK_CONTRACT_LOCK_TIMEOUT=120
++++ FM_AFK_CONTRACT_LOCK_HELD=
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh ']'
+++ FM_MERGE_AUTHORITY=
+++ FM_MERGE_AUTHORITY_REASON=
+++ FM_MERGE_AUTHORITY_RECORD_IDENTITY=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-check-lib.sh
+++ FM_CUSTOM_CHECK_HASH=
+++ FM_CUSTOM_CHECK_SNAPSHOT=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-busy-lib.sh
+++ FM_BUSY_LIB_VERSION=v1
+++ FM_BUSY_KIMI_VERIFIED_VERSIONS=
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-task-inbox-lib.sh
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-task-inbox-lib.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ _FM_TASK_INBOX_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh
+++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-wake-lib.sh ']'
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ FM_WAKE_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++++ pwd
++++ FM_WAKE_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++++ STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ FM_WAKE_QUEUE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue
++++ FM_WAKE_QUEUE_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ FM_LOCK_STALE_AFTER=2
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-path-lib.sh
+++++ uname
++++ _FM_UNAME=Linux
++++ mkdir -p /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' 5 -gt 4 ']'
++++ FM_WATCHER_MATCHED_IDENTITY=
++++ FM_WATCHER_HEALTHY_PID=
++++ FM_WATCHER_HEALTHY_IDENTITY=
++++ FM_WATCHER_VERDICT_OK=false
++++ FM_WATCHER_VERDICT_REASON=stale-beacon
++++ FM_RECOVERY_MARKER_TOKEN=
++++ FM_RECOVERY_MARKER_ACTION=none
++++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
++++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
++++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
++++ FM_RECOVERY_HANDOVER_TOKEN=
++++ FM_RECOVERY_HANDOVER_SEQ=
++++ FM_WAKE_STATUS_KEY=
++++ FM_WAKE_STATUS_HISTORICAL=false
++++ FM_WAKE_EVENT_LINE=
++++ FM_WAKE_UNREAD_LINES=
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
++++ FM_BACKEND_SCRIPT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
++++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-backend.sh
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ FM_BACKEND_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ unset FM_BACKEND_SCRIPT
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
+++++ pwd
++++ FM_BACKEND_DEFAULT_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
++++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++++ FM_BACKEND_CONFIG_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config
++++ FM_BACKEND_KNOWN='tmux herdr zellij orca cmux'
++++ FM_BACKEND_SPAWN='tmux herdr zellij orca cmux'
++++ FM_BACKEND_CMUX_BUNDLE_ID=com.cmuxterm.app
++++ FM_BACKEND_VISIBLE_CAPTURE='tmux herdr zellij'
+++ FM_TASK_INBOX_SCHEMA=fm-task-inbox.v1
+++ FM_TASK_INBOX_GRACE_DEFAULT=90
+++ FM_TASK_INBOX_RING_MAX_DEFAULT=3
+++ FM_TASK_INBOX_BUSY_MAX_DEFAULT=2
+++ FM_TASK_INBOX_LOCK_WAIT_DEFAULT=5
++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh
+++ set -u
+++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ pwd
+++ FM_AFK_CONTRACT_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/..
++++ pwd
+++ FM_ROOT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH
+++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
+++ FM_AFK_CONTRACT_STATE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh
+++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-classify-lib.sh ']'
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ pwd
++++ _FM_CLASSIFY_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++ _FM_CLASSIFY_UNAME_S=Linux
++++ FM_CREW_STATE_BIN=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-crew-state.sh
++++ case $- in
++++ _fm_classify_nounset=on
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-timeout-lib.sh
+++++ set -u
++++ '[' on = on ']'
++++ unset _fm_classify_nounset
++++ FM_CLASSIFY_CAPTAIN_RE_DEFAULT='done:|needs-decision:|blocked:|failed:|PR ready|checks green|ready in branch|merged'
++++ FM_CLASSIFY_PAUSED_VERB_DEFAULT=paused
++++ FM_PAUSE_RESURFACE_SECS_DEFAULT=14400
++++ FM_CLASSIFY_RESOLVE_VERB_DEFAULT=resolved
++++ FM_CLASSIFY_CAPTAIN_HELD_VERB_DEFAULT=captain-held
++++ FM_CLASSIFY_EVENT_WINDOW_LINES=200
++++ FM_CLASSIFY_RESERVED_KEY_PREFIXES_DEFAULT=pending-reply-
++++ FM_OPEN_DECISIONS_FOLD_VERSION=9
++++ FM_STATUS_SNAPSHOT_EVENT_LINE=
++++ FM_STATUS_SNAPSHOT_EVENT_MTIME=
++++ FM_STATUS_SNAPSHOT_EVENT_ENDPOINT=
++++ STATUS_PRESENTATION_REPORTED=
++++ STATUS_PRESENTATION_CLASSIFIED=
++++ _FM_CLASSIFY_KEYLESS_PHASE=$'\036default'
++++ FM_GATE_HUMAN_DECISION='ask-user: authority decision'
++++ FM_WORKTREE_WRITE_PRUNE='.git node_modules .venv venv __pycache__ .mypy_cache .pytest_cache .ruff_cache .tox target dist build .next .cache vendor'
++++ FM_WORKTREE_WRITE_MAXDEPTH=6
++++ FM_WORKTREE_WRITE_TIMEOUT=10
+++ FM_AFK_CONTRACT_VERSION=2
+++ FM_AFK_CONTRACT_READABLE_VERSIONS='1 2'
+++ FM_AFK_CONTRACT_REACH_ANNOUNCED='No phone channel is configured; anything that needs you waits for your return.'
+++ FM_AFK_CONTRACT_SPEND_DEFAULT=-
+++ FM_AFK_CONTRACT_QUIET_HOLDS_NOTHING='you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.'
+++ _FM_AFK_CONTRACT_LOCK_TIMEOUT=120
+++ FM_AFK_CONTRACT_LOCK_HELD=
+++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-afk-contract.sh = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh ']'
++ WATCH_LOCK=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ WATCH_PATH=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh
++ WATCHER_DOWNTIME_MARKER=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
+++ uname
++ '[' Linux = Darwin ']'
++ POLL=1
+++ fm_poll_derived_grace 1
+++ local poll=1 margin=60 derived
+++ case "$poll" in
+++ derived=61
+++ '[' 61 -ge 300 ']'
+++ derived=300
+++ printf '%s\n' 300
++ WATCHER_STALE_GRACE=300
+++ fm_watcher_stall_bound 1
+++ local poll=1 grace
++++ fm_poll_derived_grace 1
++++ local poll=1 margin=60 derived
++++ case "$poll" in
++++ derived=61
++++ '[' 61 -ge 300 ']'
++++ derived=300
++++ printf '%s\n' 300
+++ grace=300
+++ printf '%s\n' 900
++ WATCHER_STALL_BOUND=900
++ HEARTBEAT=999999
++ HEARTBEAT_MAX=7200
++ CHECK_INTERVAL=999999
++ CHECK_TIMEOUT=30
++ HOME_SUMMARY_INTERVAL=300
++ case "$HOME_SUMMARY_INTERVAL" in
++ SIGNAL_GRACE=0
++ CLEANUP_LOCK_BOUND=2
++ case "$CLEANUP_LOCK_BOUND" in
++ CLEANUP_LOCK_BOUND=2
++ '[' 2 -gt 0 ']'
++ TURNEND_CHURN_ABSORB_SECS=900
++ STALE_ESCALATE_SECS=240
++ BUSY_TURN_MAX_SECS=3600
++ PAUSE_RESURFACE_SECS=14400
++ EVENT_CAP_FAIL_MAX=3
++ _event_cap_key=
++ _event_cap_ok=0
++ _event_cap_fails=0
++ FM_WEDGE_DEMAND_INSPECT_COUNT=3
++ STALE_WAIT_DECLARATION=
++ CAPTAIN_CALL_IDENTITY=
++ TERMINAL_DELIVERY_DECLARATION=
++ TERMINAL_DELIVERY_END=
++ TERMINAL_DELIVERY_IDENT=
++ FM_ACTIVE_CHECK_PID=
++ FM_ACTIVE_CHECK_PGID=
++ FM_CHECK_OUTPUT=
++ FM_CHECK_RESULT=
++ FM_CHECK_SIGNAL_PENDING=
++ FM_CAPTURE_OUTPUT=
++ WATCHER_CAPTURE=
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh ']'
++ fm_procevent_launch_confirm_seconds
++ local value=
++ '[' -z '' ']'
++ printf '%s\n' 3
++ return 0
++ EVICTED_PID=
++ EVICTED_BEAT_AGE=
++ BEAT=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-watcher-beat
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++++ fm_path=.watch.lock
++++ '[' .watch.lock '!=' .watch.lock ']'
++++ printf -v base %s .watch.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .watch.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2 ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock.owner.tdymB2
++ return 0
++ return 0
++ '[' -n '' ']'
++ WATCHER_RECOVERY_PENDING=0
++ '[' -n '' ']'
++ '[' 0 '!=' 1 ']'
++ '[' 0 '!=' 1 ']'
++ fm_recovery_marker_reopen_announced /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ fm_recovery_transition /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down reopen-announced
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down action=reopen-announced target= value= bound=
++ case "$action" in
++ _fm_recovery_marker_reopen_announced /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down lock
++ lock=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .wake-queue.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ return 0
++ return 0
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ fm_path=.watcher-down.lock
++++ '[' .watcher-down.lock '!=' .watcher-down.lock ']'
++++ printf -v base %s .watcher-down.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .watcher-down.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ return 0
++ return 0
++ fm_recovery_marker_read /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down line extra
++ FM_RECOVERY_MARKER_TOKEN=
++ '[' -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down ']'
++ return 1
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1 ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.KbdpW1
++ return 0
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2 ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.d63FT2
++ return 0
++ return 0
++ fm_recovery_marker_arm_check /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ fm_recovery_transition /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down arm-check
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down action=arm-check target= value= bound=
++ case "$action" in
++ _fm_recovery_marker_arm_check /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ local status=0
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .wake-queue.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ return 0
++ return 0
++ fm_recovery_marker_arm_check_locked /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down lock line quarantine
++ FM_RECOVERY_MARKER_ACTION=none
++ lock=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ fm_path=.watcher-down.lock
++++ '[' .watcher-down.lock '!=' .watcher-down.lock ']'
++++ printf -v base %s .watcher-down.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .watcher-down.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ return 0
++ return 0
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down ']'
++ '[' -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue ']'
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.pbYFuo
++ return 0
++ return 0
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.Wkm20Q
++ return 0
++ return 0
++ '[' 0 = 1 ']'
++ '[' none = recover ']'
++ PR_POLL_CONTROL_LOCK=
++ PR_POLL_PUBLISH_LOCK=
++ trap watcher_cleanup EXIT
++ watcher_stop_signals
++ trap - HUP TERM
++ trap 'exit 1' INT
++ WATCHER_PID=3969710
++ printf '%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++ printf '%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-watch.sh
++ FM_WATCH_DELIVERY_PID=3969710
+++ fm_pid_identity 3969710
++ FM_WATCH_DELIVERY_IDENTITY='linux-starttime=81731177 cmdline-hex=62617368002d78002f7661722f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d364450573534504533454743375753575a4352513857482f62696e2f666d2d77617463682e736800'
++ printf '%s\n' 'linux-starttime=81731177 cmdline-hex=62617368002d78002f7661722f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d364450573534504533454743375753575a4352513857482f62696e2f666d2d77617463682e736800'
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat ']'
++ touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat
++ fm_pr_poll_retirement_recover_all /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-pr-poll.sh
++ local state=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state template=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-pr-poll.sh receipt id
++ FM_PR_POLL_RETIREMENT_REJECTED=
++ for receipt in "$state"/*.pr-poll-retirement
++ '[' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.pr-poll-retirement' ']'
++ '[' -L '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.pr-poll-retirement' ']'
++ continue
++ '[' -z '' ']'
++ :
++ '[' 1 -eq 1 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock/pid ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock/pid
++ '[' 3969710 '!=' 3969710 ']'
++ touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-watcher-beat
++ WATCH_USAGE_DATA=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/data
++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++ FM_STATE_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++ FM_DATA_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/data
++ FM_CONFIG_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config
++ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-usage-refresh.sh
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config/fleet-ledger ']'
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/procevent ']'
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .wake-queue.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ return 0
++ return 0
++ procevent_surface_queued
++ local key reason captured= stranded= unstarted=
++ PROCEVENT_SURFACED=
++ '[' -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue ']'
++ return 0
++ away_entry_surface_queued
++ local seen
++ '[' -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue ']'
++ return 0
++ resurface_after_downtime
++ '[' 0 = 1 ']'
++ '[' 0 -ne 1 ']'
++ fm_recovery_marker_arm_check_locked /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down
++ local marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down lock line quarantine
++ FM_RECOVERY_MARKER_ACTION=none
++ lock=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++++ fm_path=.watcher-down.lock
++++ '[' .watcher-down.lock '!=' .watcher-down.lock ']'
++++ printf -v base %s .watcher-down.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .watcher-down.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
++ fm_lock_prepare_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
++ printf '%s\n' 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/pid
++ back=3969710
++ '[' 3969710 = 3969710 ']'
++ ln -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ']'
++ fm_lock_claim /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/pid
++ back=3969710
++ '[' 3969710 '!=' 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ']'
++ fm_lock_claim_blocked_by_steal /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock allowed_steal_owner= steal
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ return 0
++ return 0
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down ']'
++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down ']'
++ '[' -s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue ']'
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watcher-down.lock.owner.Jjky0E
++ return 0
++ return 0
++ '[' none = recover ']'
++ return 0
++ fm_lock_release /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
+++ fm_lock_link_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/pid
++ pid=3969710
++ '[' 3969710 = 3969710 ']'
++ fm_lock_points_to_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK actual
+++ readlink /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ actual=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK = /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ']'
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.e6vZmK
++ return 0
++ inactive_out=
+++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
+++ FM_STATE_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-inactive-reconcile.sh scan
++ inactive_out=
++ '[' -n '' ']'
+++ age_of /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-check
+++ local f=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-check m now
++++ stat_mtime /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-check
++++ stat -c %Y /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-check
+++ m=
+++ echo 999999
+++ return
++ '[' 999999 -ge 999999 ']'
++ rejected_checks=
++ contribution_check_output=
++ for c in "$STATE"/*.check.sh
++ '[' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.check.sh' ']'
++ continue
++ '[' -n '' ']'
++ touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-check
++ '[' -n '' ']'
+++ scan_signals
+++ local f sig sf exclude
++++ status_scan_parent_channel_exclude /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ local state=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state exclude
++++ command -v fm_parent_channel_outbound_status
++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-parent-channel-lib.sh
++++++ d=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-parent-channel-lib.sh ']'
++++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
++++++ pwd
+++++ _FM_PARENT_CHANNEL_LIB_DIR=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin
+++++ . /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-secondmate-parent-lib.sh
+++++ FM_PARENT_CHANNEL_ID=
+++++ FM_PARENT_CHANNEL_ROUTE=
++++++ dirname /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ fm_parent_channel_outbound_status /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ local home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 state=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state destination rc=0
++++++ fm_parent_channel_destination /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++++ local home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 state=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state id rc=0
++++++ FM_PARENT_CHANNEL_ID=
++++++ FM_PARENT_CHANNEL_ROUTE=
+++++++ fm_parent_channel_home_id /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
+++++++ local home=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 marker id
+++++++ marker=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/.fm-secondmate-home
+++++++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/.fm-secondmate-home ']'
+++++++ '[' '!' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/.fm-secondmate-home ']'
+++++++ return 1
++++++ id=
++++++ rc=1
++++++ '[' 1 -eq 0 ']'
++++++ return 1
+++++ destination=
+++++ rc=1
+++++ '[' 1 -eq 0 ']'
+++++ return 1
++++ exclude=
++++ return 0
+++ exclude=
+++ for f in "$STATE"/*.status "$STATE"/*.turn-ended
+++ '[' '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.status' = '' ']'
+++ '[' '!' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.status' ']'
+++ case "$f" in
+++ '[' -L '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.status' ']'
+++ continue
+++ for f in "$STATE"/*.status "$STATE"/*.turn-ended
+++ '[' '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.turn-ended' = '' ']'
+++ '[' '!' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.turn-ended' ']'
+++ case "$f" in
+++ continue
+++ return 0
++ pending=
++ '[' -n '' ']'
++ IFS=
++ read -r w
+++ recorded_windows
+++ local meta w seen=
+++ for meta in "$STATE"/*.meta
+++ '[' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.meta' ']'
+++ continue
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.heartbeat-streak
+++ echo 0
++ streak=0
++ '[' 0 -gt 12 ']'
++ hb=999999
++ '[' 999999 -gt 7200 ']'
++ hb=7200
+++ age_of /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat
+++ local f=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat m now
++++ stat_mtime /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat
++++ stat -c %Y /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-heartbeat
+++ m=1793609340
+++ fm_epoch_seconds_to now
+++ printf -v now '%(%s)T' -1
+++ '[' 1793609340 -le 1793609340 ']'
+++ echo 0
++ '[' 0 -ge 7200 ']'
++ event_wait_or_sleep
++ local w b session first_backend= first_session= rec rc
++ windows=()
++ local windows
++ IFS=
++ read -r w
+++ recorded_windows
+++ local meta w seen=
+++ for meta in "$STATE"/*.meta
+++ '[' -e '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/*.meta' ']'
+++ continue
++ '[' 0 -eq 0 ']'
++ sleep 1
++ return
++ :
++ '[' 1 -eq 1 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock/pid ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin ']'
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock/pid
++ '[' 3969710 '!=' 3969710 ']'
++ touch /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.last-watcher-beat
++ WATCH_USAGE_DATA=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/data
++ FM_HOME=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2
++ FM_STATE_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++ FM_DATA_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/data
++ FM_CONFIG_OVERRIDE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config
++ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/bin/fm-usage-refresh.sh
++ '[' '!' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/config/fleet-ledger ']'
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/procevent ']'
++ fm_lock_acquire_wait /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .wake-queue.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.09fs4z
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock/pid
++ pid=3970011
++ '[' -n 3970011 ']'
++ '[' 3970011 = 3969710 ']'
++ fm_pid_alive 3970011
++ local pid=3970011
++ case "$pid" in
++ kill -0 3970011
++ FM_LOCK_HELD_PID=3970011
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/ ']'
++ sleep 0.1
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+++++ pwd -P
++++ dir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ printf '%s/%s\n' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state .wake-queue.lock
+++ lock_abs=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ mktemp -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.XXXXXX
++ ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ']'
++ fm_lock_discard_owner /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ local ownerdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX ']'
++ fm_lock_clean_known_files /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ rm -f /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX/pid /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX/fm-home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX/pid-identity /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX/role /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX/watcher-path
++ rmdir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.owner.FN2qNX
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock/pid
++ pid=3970011
++ '[' -n 3970011 ']'
++ '[' 3970011 = 3969710 ']'
++ fm_pid_alive 3970011
++ local pid=3970011
++ case "$pid" in
++ kill -0 3970011
++ FM_LOCK_HELD_PID=3970011
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/ ']'
++ sleep 0.1
++ fm_lock_try_acquire /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ fm_path=.wake-queue.lock
++++ '[' .wake-queue.lock '!=' .wake-queue.lock ']'
++++ printf -v base %s .wake-queue.lock
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock/pid
+++ true
++ pid=
++ '[' -n '' ']'
++ fm_pid_alive ''
++ local pid=
++ case "$pid" in
++ return 1
++ fm_lock_mid_acquire_is_fresh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock ''
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock pid= mid_acquire_stale
++ case "$pid" in
++ mid_acquire_stale=2
++ '[' 2 -lt 2 ']'
+++ fm_path_age /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock m now
++++ fm_path_mtime /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
++++ '[' Linux = Darwin ']'
++++ stat -c %Y /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock
+++ m=
+++ echo 999999
+++ return
++ '[' 999999 -lt 2 ']'
++ return
++ steal=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ fm_lock_try_acquire_steal_mutex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal current
++ FM_LOCK_OWNER_DIR=
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ fm_path=.wake-queue.lock.steal
++++ '[' .wake-queue.lock.steal '!=' .wake-queue.lock.steal ']'
++++ printf -v base %s .wake-queue.lock.steal
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
++ fm_current_pid current
++ local fm_pid
++ fm_pid=3969710
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 3969710
++ fm_lock_reap_dead_link /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal.steal owner pid token tomb current
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal.steal ']'
++ return 1
++ true
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal/pid
+++ true
++ '[' '' = 3969710 ']'
++ '[' -e /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ '[' -L /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal ']'
++ fm_lock_try_create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
+++ local lockdir=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal lock_abs
++++ fm_lock_abs_path /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal dir base
++++ fm_dirname_to dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ '[' -n /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ '[' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state '!=' /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++++ printf -v dir %s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ fm_basename_to base /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ local fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ case "$fm_path" in
++++ fm_path=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock.steal
++++ fm_path=.wake-queue.lock.steal
++++ '[' .wake-queue.lock.steal '!=' .wake-queue.lock.steal ']'
++++ printf -v base %s .wake-queue.lock.steal
+++++ cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++++ dir=
++++ return 1
+++ lock_abs=
+++ return 1
++ ownerdir=
++ return 1
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.wake-queue.lock/pid
+++ true
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ return 1
++ case "$lockdir" in
++ '[' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/ ']'
++ return 1
++ continue
++ :
++ '[' 1 -eq 1 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2 ']'
++ '[' '!' -d /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state ']'
++ echo 'watcher: exiting - state directory no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state'
+watcher: exiting - state directory no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
++ exit 1
++ watcher_cleanup
++ local cleanup_status=0 owns_lock=0 transition=release-lock
++ pr_poll_publish_release
++ '[' -z '' ']'
++ PR_POLL_PUBLISH_LOCK=
++ pr_poll_control_release
++ '[' -z '' ']'
++ PR_POLL_CONTROL_LOCK=
+++ cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state/.watch.lock/pid
+++ true
++ '[' '' = 3969710 ']'
++ fm_active_check_stop
++ local pid= pgid= i
++ '[' -n '' ']'
++ '[' -n '' ']'
++ return 0
++ fm_check_output_cleanup
++ '[' -z '' ']'
++ FM_CHECK_OUTPUT=
++ fm_capture_output_cleanup
++ '[' -z '' ']'
++ FM_CAPTURE_OUTPUT=
++ fm_custom_check_snapshot_cleanup
++ '[' -z '' ']'
++ FM_CUSTOM_CHECK_SNAPSHOT=
++ '[' 0 -eq 1 ']'
++ return 0

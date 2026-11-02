@@ -1,0 +1,10 @@
+base-delete: real watcher pid=3967865 blocked on live queue holder pid=3968203
+base-delete: still alive after 4 seconds: reproduced indefinite lock wait
+fixed-delete-1: real watcher pid=3969279 blocked on live queue holder pid=3969582
+fixed-delete-1: exited 1 with state-gone reason, no actionable wake, state remains absent
+fixed-delete-2: real watcher pid=3969710 blocked on live queue holder pid=3970011
+fixed-delete-2: exited 1 with state-gone reason, no actionable wake, state remains absent
+fixed-delete-3: real watcher pid=3970197 blocked on live queue holder pid=3970530
+fixed-delete-3: exited 1 with state-gone reason, no actionable wake, state remains absent
+fixed-release: real watcher pid=3970646 blocked on live queue holder pid=3970949
+fixed-release: waited without stealing live lock, then delivered signal and persisted wake after release

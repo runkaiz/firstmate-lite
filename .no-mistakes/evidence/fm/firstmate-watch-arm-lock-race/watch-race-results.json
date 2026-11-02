@@ -1,0 +1,37 @@
+[
+  {
+    "case": "base-delete",
+    "action": "delete",
+    "result": "still alive after 4 seconds: reproduced indefinite lock wait",
+    "elapsed_seconds": 5.33,
+    "stdout": ""
+  },
+  {
+    "case": "fixed-delete-1",
+    "action": "delete",
+    "result": "exited 1 with state-gone reason, no actionable wake, state remains absent",
+    "elapsed_seconds": 1.45,
+    "stdout": ""
+  },
+  {
+    "case": "fixed-delete-2",
+    "action": "delete",
+    "result": "exited 1 with state-gone reason, no actionable wake, state remains absent",
+    "elapsed_seconds": 1.45,
+    "stdout": ""
+  },
+  {
+    "case": "fixed-delete-3",
+    "action": "delete",
+    "result": "exited 1 with state-gone reason, no actionable wake, state remains absent",
+    "elapsed_seconds": 1.42,
+    "stdout": ""
+  },
+  {
+    "case": "fixed-release",
+    "action": "release",
+    "result": "waited without stealing live lock, then delivered signal and persisted wake after release",
+    "elapsed_seconds": 1.62,
+    "stdout": "signal: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-release/state/demo.status\n"
+  }
+]

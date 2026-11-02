@@ -1,0 +1,26 @@
+Real Bash watcher validation on Linux; disposable marked homes, no harness or backend stubs.
+Base: b3312f7464052666d996e97b97f37c84e69bcd88
+Target: a87f382912e753851aefc6d2c0dc45654fa2a9a8
+
+base-delete: still alive after 4 seconds: reproduced indefinite lock wait
+
+fixed-delete-1: exited 1 with state-gone reason, no actionable wake, state remains absent
+watcher: exiting - state directory no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-1/state
+
+fixed-delete-2: exited 1 with state-gone reason, no actionable wake, state remains absent
+watcher: exiting - state directory no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-2/state
+
+fixed-delete-3: exited 1 with state-gone reason, no actionable wake, state remains absent
+watcher: exiting - state directory no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-delete-3/state
+
+fixed-release: waited without stealing live lock, then delivered signal and persisted wake after release
+signal: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-release/state/demo.status
+Persisted durable queue:
+1793609345	1	signal	demo.status	needs-decision: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-release/state/demo.status
+1793609345	2	signal	demo.status	needs-decision: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DPW54PE3EGC7WSWZCRQ8WH/.test-watch-race/fixed-release/state/demo.status
+
+append status=1 state_exists=no
+normal preference write: PROACTIVE MODE: on
+preference writer blocked on real lock: deleting config returns status=1, no success output, config remains absent
+
+All lab homes and temporary baseline binaries were removed by driver cleanup.

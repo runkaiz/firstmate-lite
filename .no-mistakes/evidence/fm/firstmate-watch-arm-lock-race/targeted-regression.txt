@@ -1,0 +1,4 @@
+ok - watch-arm: an attached arm reports the wake its cycle delivered instead of a false failure
+ok - watch-arm: a watcher exits when its state directory is removed
+ok - watch-arm: a state directory removed before the queue lock still ends the watcher
+ok - watch-arm: a watcher exits when its home is removed
