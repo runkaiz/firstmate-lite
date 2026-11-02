@@ -1,0 +1,10 @@
+$ bin/fm-teardown.sh switch-probe
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown switch-probe complete (window primary:fm-switch-probe, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree)
+Backlog: switch-probe just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/data/backlog.md - move switch-probe to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+$ tmux -L fm-lab kill-server
+exit=0
+$ bin/fm-lab-home.sh teardown /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+exit=0

@@ -1,0 +1,21 @@
+SCENARIO: unlanded work refuses cleanup and preserves one-switch guard
+$ bin/fm-teardown.sh switch-probe
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  pending-validation.txt (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (1 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/data/switch-probe/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/bin/fm-teardown.sh switch-probe --preserve-untracked pending-validation.txt
+ [exit 1]
+observed: task, source, pending work, and quota-failover marker all retained
+SCENARIO: clean landed task retires own one-switch guard only
+$ bin/fm-teardown.sh switch-probe
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown switch-probe complete (window primary:fm-switch-probe, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree)
+Backlog: switch-probe just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/data/backlog.md - move switch-probe to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+ [exit 0]
+observed: own metadata and guard removed; similarly named task guard retained

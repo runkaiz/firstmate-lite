@@ -1,0 +1,3 @@
+# all fm-spawn-dispatch-profile tests passed
+ok - a spawn on a known-exhausted profile launches the next configured candidate
+ok - a spawn with every configured candidate exhausted defers with exit 75

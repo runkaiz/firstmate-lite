@@ -1,0 +1,2 @@
+ok - publishing a task branch does not authorize cleanup before landing
+ok - teardown retires the task's own watcher markers and orphaned presentation journal, leaving other tasks' markers alone

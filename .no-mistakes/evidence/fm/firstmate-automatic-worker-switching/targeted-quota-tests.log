@@ -1,0 +1,15 @@
+ok - a profile not known to be exhausted launches unchanged
+ok - quota-axi exhaustion moves the launch to the next configured candidate
+ok - a recorded quota failure moves launches until it expires
+ok - with every configured candidate exhausted the launch defers with exit 75
+ok - only an exact, unique matching entry supplies alternatives
+ok - failure records isolate runtimes, account sources, and exact models
+ok - multi-provider profiles require exact provider declarations for live evidence
+ok - live evidence binds to the account and remains consulted with unrelated records
+ok - pinned profiles ignore ambient quota while exact recorded failures remain effective
+ok - a genuine quota failure switches the worker once and never loops
+ok - relaunch records the stopped account and normalizes default metadata
+ok - transient rate limits and scrolled-away messages never trigger a switch
+ok - with no candidate left a quota-stopped worker is reported, not relaunched
+ok - an unnamed home is refused
+# all fm-quota-failover tests passed

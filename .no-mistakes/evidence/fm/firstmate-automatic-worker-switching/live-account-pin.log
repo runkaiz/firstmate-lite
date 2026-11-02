@@ -1,0 +1,9 @@
+$ bin/fm-quota-failover.sh record --harness codex --model quota-lab-exhausted --why isolated recorded limit
+ [exit 0]
+SCENARIO: unavailable pinned alternative refuses without changing account
+$ bin/fm-spawn.sh pinned-probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe --mode local-only --yolo off --harness codex --model quota-lab-exhausted --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+quota: codex quota-lab-exhausted is exhausted (recorded quota failure for codex quota-lab-exhausted until 1793621252 (isolated recorded limit)); using claude default instead
+error: config/claude-account pins Claude workers to /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/accounts/claude-a, which is not signed in (claude auth status); sign in with CLAUDE_CONFIG_DIR=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/accounts/claude-a claude, then /login, or change the pin
+ [exit 1]
+observed: pinned account bytes unchanged, no replacement task created

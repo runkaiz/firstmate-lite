@@ -1,0 +1,66 @@
+$ bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+ [exit 0]
+$ bin/fm-lab-home.sh tmux-dir /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+/tmp/fml.hnZw5d
+ [exit 0]
+$ tmux -L fm-lab new-session -d -x 120 -y 40 -s primary -c /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8 bash
+ [exit 0]
+$ tmux -L fm-lab display-message -p -t primary #{socket_path},#{pid},0
+/tmp/fml.hnZw5d/tmux-1000/fm-lab,1761359,0
+ [exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe init -b main
+Initialized empty Git repository in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe/.git/
+ [exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe -c user.name=Lab -c user.email=lab@example.invalid add README.md
+ [exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe -c user.name=Lab -c user.email=lab@example.invalid commit -m Initial disposable project
+[main (root-commit) f86d2eb] Initial disposable project
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+ [exit 0]
+$ bin/fm-brief.sh switch-probe probe --mode local-only --project /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/data/switch-probe/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+ [exit 0]
+$ bin/fm-quota-failover.sh record --harness pi --model opencode-go/kimi --why manually confirmed exhausted disposable account
+error: config/pi-account must hold 'ordinary' or one absolute path on line 1 and the providers this home may spend on line 2, separated by spaces, with no other lines or control characters: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/config/pi-account
+ [exit 1]
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/setup.py", line 39, in <module>
+    run(['bin/fm-quota-failover.sh','record','--harness','pi','--model','opencode-go/kimi','--why','manually confirmed exhausted disposable account'])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/setup.py", line 10, in run
+    if check and p.returncode: raise RuntimeError(args)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: ['bin/fm-quota-failover.sh', 'record', '--harness', 'pi', '--model', 'opencode-go/kimi', '--why', 'manually confirmed exhausted disposable account']
+$ bin/fm-quota-failover.sh record --harness pi --model opencode-go/kimi --why manually confirmed exhausted disposable account
+error: config/pi-account must name a readable, searchable existing directory (ordinary means ~/.pi/agent): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/config/pi-account -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/accounts/pi-a
+ [exit 1]
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/resume.py", line 3, in <module>
+    run(['bin/fm-quota-failover.sh','record','--harness','pi','--model','opencode-go/kimi','--why','manually confirmed exhausted disposable account'])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 10, in run
+RuntimeError: ['bin/fm-quota-failover.sh', 'record', '--harness', 'pi', '--model', 'opencode-go/kimi', '--why', 'manually confirmed exhausted disposable account']
+$ bin/fm-quota-failover.sh record --harness pi --model opencode-go/kimi --why manually confirmed exhausted disposable account
+ [exit 0]
+$ bin/fm-quota-failover.sh pick --harness pi --model opencode-go/kimi
+quota: pi opencode-go/kimi is exhausted (recorded quota failure for pi opencode-go/kimi until 1793621028 (manually confirmed exhausted disposable account)); using codex default instead
+codex||
+ [exit 0]
+$ bin/fm-spawn.sh switch-probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe --mode local-only --yolo off --harness pi --model opencode-go/kimi --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+quota: pi opencode-go/kimi is exhausted (recorded quota failure for pi opencode-go/kimi until 1793621028 (manually confirmed exhausted disposable account)); using codex default instead
+notice: switch-probe ships mode=local-only while the standing posture for probe is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: native worktree: root is inside project/primary/home
+ [exit 1]
+$ bin/fm-spawn.sh switch-probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe --mode local-only --yolo off --harness pi --model opencode-go/kimi --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+quota: pi opencode-go/kimi is exhausted (recorded quota failure for pi opencode-go/kimi until 1793621028 (manually confirmed exhausted disposable account)); using codex default instead
+notice: switch-probe ships mode=local-only while the standing posture for probe is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD f86d2eb)
+HEAD is now at f86d2eb Initial disposable project
+native allocation task=switch-probe source_ref=refs/heads/main base=f86d2eb3dc2532a71c49df5f2752865db7ec864d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned switch-probe harness=codex kind=ship mode=local-only yolo=off window=primary:fm-switch-probe worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree
+ [exit 0]

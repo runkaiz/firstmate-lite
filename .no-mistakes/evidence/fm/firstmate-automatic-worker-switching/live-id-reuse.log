@@ -1,0 +1,17 @@
+SCENARIO: a retired task ID can be reused without inheriting the switch guard
+$ bin/fm-spawn.sh switch-probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe --mode local-only --yolo off --harness pi --model opencode-go/kimi --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home
+quota: pi opencode-go/kimi is exhausted (recorded quota failure for pi opencode-go/kimi until 1793621028 (manually confirmed exhausted disposable account)); using codex default instead
+notice: switch-probe ships mode=local-only while the standing posture for probe is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD f86d2eb)
+HEAD is now at f86d2eb Initial disposable project
+native allocation task=switch-probe source_ref=refs/heads/main base=f86d2eb3dc2532a71c49df5f2752865db7ec864d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned switch-probe harness=codex kind=ship mode=local-only yolo=off window=primary:fm-switch-probe worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/copies/switch-probe/worktree
+ [exit 0]
+$ bin/fm-quota-failover.sh relaunch switch-probe
+no quota failure is visible in task 'switch-probe''s terminal; nothing changed
+ [exit 3]
+observed: reused ID starts a real Codex process; its recovery guard is fresh
+$ tmux -L fm-lab send-keys -t primary:fm-switch-probe C-c
+ [exit 0]

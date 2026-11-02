@@ -1,73 +1,57 @@
-$ fm-quota-failover.sh pick --harness codex --model model-a
-codex|model-a|
-exit=0
-
-$ fm-quota-failover.sh record --harness codex --model model-a --why disposable lab reported exhaustion
-exit=0
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-pi|provider/model-b|
-quota: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)); using pi provider/model-b instead
-exit=0
-
-$ fm-quota-failover.sh pick --harness codex --model model-other
-codex|model-other|
-exit=0
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-codex|model-a|
-exit=0
-
-$ fm-quota-failover.sh record --harness pi --model provider/model-b
-exit=0
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
-exit=75
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
-exit=75
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
-exit=75
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
-exit=75
-
-$ fm-quota-failover.sh pick --harness codex --model model-a
-deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
-exit=75
-
-$ fm-quota-failover.sh record --harness codex --model expired --until 1
-exit=0
-
-$ fm-quota-failover.sh pick --harness codex --model expired
-codex|expired|
-exit=0
-
-$ fm-quota-failover.sh record --harness claude --model scoped
-exit=0
-
-$ fm-quota-failover.sh pick --harness claude --model scoped
-codex|healthy|
-quota: claude scoped is exhausted (recorded quota failure for claude scoped until 1793617129 (recorded by firstmate)); using codex healthy instead
-exit=0
-
-$ fm-quota-failover.sh pick --harness claude --model scoped
-claude|scoped|
-exit=0
-
-$ fm-quota-failover.sh relaunch once
-error: task 'once' already switched runtime once after a quota failure (completed prior switch); not retrying, so firstmate decides the next step
-exit=1
-
-Persisted scope records:
-{"scope":{"harness":"codex","model":"model-a","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.codex"},"until":1793617129,"why":"disposable lab reported exhaustion"}
-{"scope":{"harness":"pi","model":"provider/model-b","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.pi/agent"},"until":1793617129,"why":"recorded by firstmate"}
-{"scope":{"harness":"codex","model":"expired","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.codex"},"until":1,"why":"recorded by firstmate"}
-{"scope":{"harness":"claude","model":"scoped","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/account-a"},"until":1793617129,"why":"recorded by firstmate"}
-
-All public CLI assertions passed. No quota-axi executable was supplied; unavailable evidence stayed unknown. No lifecycle command or external account was stubbed.
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/selector-home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/selector-home
+ [exit 0]
+SCENARIO: missing quota tool is uncertainty, not exhaustion
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+codex|gpt-6|
+ [exit 0]
+SCENARIO: record exhaustion switches only to the matched candidate
+$ bin/fm-quota-failover.sh record --harness codex --model gpt-6 --why isolated operator-recorded limit
+ [exit 0]
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+quota: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)); using pi opencode-go/kimi instead
+pi|opencode-go/kimi|
+ [exit 0]
+SCENARIO: a model-specific failure does not block another model
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-other
+codex|gpt-other|
+ [exit 0]
+SCENARIO: account A exhaustion leaves account B and another runtime available
+$ bin/fm-quota-failover.sh record --harness pi --model opencode-go/kimi --why isolated operator-recorded limit
+ [exit 0]
+$ bin/fm-quota-failover.sh pick --harness pi --model opencode-go/kimi
+deferred: pi opencode-go/kimi is exhausted (recorded quota failure for pi opencode-go/kimi until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+$ bin/fm-quota-failover.sh pick --harness pi --model opencode-go/kimi
+pi|opencode-go/kimi|
+ [exit 0]
+$ bin/fm-quota-failover.sh pick --harness pi-signed --model opencode-go/kimi
+pi-signed|opencode-go/kimi|
+ [exit 0]
+SCENARIO: expired failures no longer exclude a candidate
+$ bin/fm-quota-failover.sh record --harness claude --model sonnet --why isolated operator-recorded limit --until 1
+ [exit 0]
+$ bin/fm-quota-failover.sh pick --harness claude --model sonnet
+claude|sonnet|
+ [exit 0]
+SCENARIO: exhaustion cannot borrow an unrelated rule/default or ambiguous match
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+deferred: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+deferred: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+deferred: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+$ bin/fm-quota-failover.sh pick --harness codex --model gpt-6
+deferred: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+SCENARIO: all alternatives exhausted defer spawn before allocation
+$ bin/fm-quota-failover.sh record --harness pi --model opencode-go/kimi --why isolated operator-recorded limit
+ [exit 0]
+$ bin/fm-spawn.sh deferred-probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/home/projects/probe --mode local-only --yolo off --harness codex --model gpt-6 --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DGTGWQ2ZWJHTWJKS7JZMW8/.live-validation/selector-home
+deferred: codex gpt-6 is exhausted (recorded quota failure for codex gpt-6 until 1793621205 (isolated operator-recorded limit)) and no configured alternative exists or has quota left, so the work stays queued
+ [exit 75]
+observed: exit 75 and no task record or allocated copy

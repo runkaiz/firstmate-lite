@@ -1,0 +1,10 @@
+SCENARIO: real worker without quota error stays unchanged
+$ bin/fm-quota-failover.sh relaunch switch-probe
+no quota failure is visible in task 'switch-probe''s terminal; nothing changed
+ [exit 3]
+SCENARIO: repeated recovery is refused before lifecycle
+$ bin/fm-quota-failover.sh relaunch switch-probe
+error: task 'switch-probe' already switched runtime once after a quota failure (from=pi/opencode-go/kimi to=codex/default prior disposable attempt); not retrying, so firstmate decides the next step
+ [exit 1]
+$ tmux -L fm-lab send-keys -t primary:fm-switch-probe C-c
+ [exit 0]
