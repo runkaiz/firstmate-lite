@@ -1629,7 +1629,7 @@ PYTHON
 
 test_browser_mcp_attaches_to_supported_launches() {
   local harness kind rec id out profile_args target
-  for harness in claude codex opencode gemini; do
+  for harness in claude codex opencode; do
     for kind in ship scout; do
       id="browser-$harness-$kind"
       rec=$(make_spawn_case "$id" "$harness" "$id")
@@ -1669,7 +1669,7 @@ SH
 
 test_browser_mcp_bad_pin_refuses_supported_launches() {
   local harness kind rec id out
-  for harness in claude codex opencode gemini; do
+  for harness in claude codex opencode; do
     for kind in ship scout; do
       id="browser-bad-$harness-$kind"
       rec=$(make_spawn_case "$id" "$harness" "$id")
@@ -1687,6 +1687,30 @@ test_browser_mcp_bad_pin_refuses_supported_launches() {
     done
   done
   pass 'every supported runtime refuses invalid pins before provisioning ships and scouts'
+}
+
+test_browser_mcp_gemini_remains_unattached() {
+  local kind pin rec id out
+  for kind in ship scout; do
+    for pin in valid invalid; do
+      id="browser-gemini-$kind-$pin"
+      rec=$(make_spawn_case "$id" gemini "$id")
+      read_case_record "$rec"
+      if [ "$pin" = valid ]; then
+        write_browser_mcp_pins "$HOME_DIR"
+      else
+        write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+      fi
+      if [ "$kind" = scout ]; then
+        out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout)
+      else
+        out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+      fi
+      expect_code 0 "$?" "Gemini $kind with $pin browser pins failed: $out"
+      assert_browser_mcp_launch gemini "$id" absent
+    done
+  done
+  pass 'Gemini ships and scouts remain unattached regardless of browser pins'
 }
 
 test_browser_mcp_absent_and_unsupported_launches() {
@@ -2210,6 +2234,7 @@ test_non_claude_harness_ignores_claude_permission_mode() {
 }
 
 if [ "${1:-}" = --browser-mcp ]; then
+  test_browser_mcp_gemini_remains_unattached
   test_browser_mcp_attaches_to_supported_launches
   test_browser_mcp_bad_pin_refuses_supported_launches
   test_browser_mcp_absent_and_unsupported_launches
@@ -2275,6 +2300,7 @@ test_lavish_absent_config_preserves_destination_ambient
 test_browser_mcp_attaches_to_supported_launches
 test_browser_mcp_bad_pin_refuses_supported_launches
 test_browser_mcp_absent_and_unsupported_launches
+test_browser_mcp_gemini_remains_unattached
 test_claude_omits_config_dir_prefix_when_unset
 test_claude_permission_mode_bypass_matches_absent_launch
 test_claude_permission_mode_auto_swaps_only_the_permission_flag

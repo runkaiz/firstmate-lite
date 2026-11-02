@@ -56,8 +56,8 @@ On 2026-11-01, installed `codex --version` reported `codex-cli 0.165.0`; its `--
 The focused regression with `FM_BROWSER_MCP_CODEX_BIN="$(command -v codex)"` exited 0 on that date, including Codex consuming the generated override and returning the enabled stdio server with the exact launcher and pin-file argument.
 Installed `pi --version` reported `1.4.0`; `pi --help` and `pi mcp --help` expose user/project MCP files and no per-launch MCP server override, so Pi and Pi-signed remain explicitly unattached.
 OpenCode's [inline configuration](https://opencode.ai/docs/config/) and [local server schema](https://opencode.ai/docs/mcp-servers/) establish its per-launch configuration shape.
-Gemini's [MCP settings](https://geminicli.com/docs/tools/mcp-server/) use the existing per-task system-settings carrier verified by its adapter.
-OpenCode and Gemini executables were absent from PATH on that date, so their generated launch contracts have portable coverage but no live CLI or browser verification here.
+OpenCode's generated launch contract has portable coverage; its executable was absent from PATH for the verification above.
+Gemini remains unattached; the [runtime table](../configuration.md#browser-mcp-pin-configbrowser-mcp) records the system-settings carrier limitation, and the spawn regression checks that generated Gemini launches omit the browser server and disclose its absence.
 Other adapter references do not establish a per-launch MCP override; the runtime table in [configuration.md](../configuration.md#browser-mcp-pin-configbrowser-mcp) records those limits.
 
 ## Native Git task copies

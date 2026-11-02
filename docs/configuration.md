@@ -959,7 +959,7 @@ The launcher's header owns the file format, server flags, and lifetime contract.
 | `claude` | Attached on every template launch and relaunch. |
 | `codex` | Attached through a per-launch `-c` override of `mcp_servers.browser`, including on relaunch. |
 | `opencode` | Attached through the existing `OPENCODE_CONFIG_CONTENT`, preserving permission and model-effort settings. |
-| `gemini` | Attached through the existing per-task `GEMINI_CLI_SYSTEM_SETTINGS_PATH` file, preserving lifecycle hooks. |
+| `gemini` | Not attached: Gemini 0.66.0 ignores a user-owned per-task system-settings file supplied through `GEMINI_CLI_SYSTEM_SETTINGS_PATH`. |
 | `pi`, `pi-signed` | Not attached: the verified launch CLI has no per-launch MCP server configuration option. Pi 1.4.0 supports user/project MCP files, but Firstmate does not rewrite those files or replace its account directory to inject a server. |
 | `grok`, `kimi`, `cursor`, `omp`, `muse`, `rovo`, `agy`, `devin` | Not attached: no per-launch browser MCP configuration route is verified for these adapters. Existing MCP support in a runtime does not establish that launch override capability. |
 | Raw launch command | Not attached or checked; the command owner supplies its MCP configuration. |

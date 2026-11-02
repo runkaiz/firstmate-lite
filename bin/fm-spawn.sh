@@ -2228,14 +2228,13 @@ EXCLUDE_TOOLS=
 CLAUDE_MCP_FLAG=
 CODEX_MCP_FLAG=
 OPENCODE_MCP_MEMBER=
-GEMINI_MCP_MEMBER=
 BROWSER_MCP_INSTRUCTION="No browser tool is supplied by this launch on this runtime. If the session exposes no browser MCP tools, report that limitation; do not install or fetch a browser tool."
 if ! BROWSER_MCP_CONFIG_PRESENT=$(fm_config_source_present "$CONFIG/browser-mcp"); then
   exit 1
 fi
 if [ "$BROWSER_MCP_CONFIG_PRESENT" = 1 ] && [ "$RAW_LAUNCH" != 1 ]; then
   case "$HARNESS" in
-  claude | codex | opencode | gemini)
+  claude | codex | opencode)
     "$FM_ROOT/bin/fm-browser-mcp.sh" --check "$CONFIG/browser-mcp" >/dev/null || {
       echo "error: config/browser-mcp did not verify (above); fix or remove it - the worker was not launched" >&2
       exit 1
@@ -2259,9 +2258,6 @@ if [ "$BROWSER_MCP_CONFIG_PRESENT" = 1 ] && [ "$RAW_LAUNCH" != 1 ]; then
         print JSON::PP->new->canonical->encode({browser => {type => "local", command => [$s->{command}, @{$s->{args}}], enabled => JSON::PP::true}});
       ') || exit 1
       OPENCODE_MCP_MEMBER=",\"mcp\":$browser_mcp_json"
-      ;;
-    gemini)
-      GEMINI_MCP_MEMBER="\"mcpServers\":{\"browser\":$browser_mcp_server},"
       ;;
     esac
     BROWSER_MCP_INSTRUCTION='This launch configures the pinned browser MCP server. Use its browser tools; if they are unavailable, report the connection failure instead of installing or fetching a browser tool.'
@@ -4572,7 +4568,7 @@ BUSY_GEN=
       g_after=$(json_escape "touch $(shell_quote "$TURNEND"); $busy_cmd_prefix idle $busy_suffix --event after-agent >/dev/null 2>&1 || true; printf '{}'")
       g_sessionend=$(json_escape "$busy_cmd_prefix idle $busy_suffix --event session-end >/dev/null 2>&1 || true; printf '{}'")
       cat >"$STATE_REAL/$ID.gemini-settings.json" <<EOF
-{${GEMINI_MCP_MEMBER}"hooks":{"BeforeAgent":[{"hooks":[{"type":"command","command":"$g_before"}]}],"AfterAgent":[{"hooks":[{"type":"command","command":"$g_after"}]}],"SessionEnd":[{"hooks":[{"type":"command","command":"$g_sessionend"}]}]}}
+{"hooks":{"BeforeAgent":[{"hooks":[{"type":"command","command":"$g_before"}]}],"AfterAgent":[{"hooks":[{"type":"command","command":"$g_after"}]}],"SessionEnd":[{"hooks":[{"type":"command","command":"$g_sessionend"}]}]}}
 EOF
     fi
     ;;
