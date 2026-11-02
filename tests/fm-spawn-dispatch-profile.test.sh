@@ -1658,8 +1658,9 @@ SH
       expect_code 0 "$?" "$harness $kind relaunch failed: $out"
       assert_browser_mcp_launch "$harness" "$id" attached
       write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
-      out=$(FM_FAKE_DUPLICATE_WINDOW="${target#*:}" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" --relaunch "${profile_args[@]}")
-      [ "$?" -ne 0 ] || fail "$harness $kind relaunch accepted a drifted pin"
+      if out=$(FM_FAKE_DUPLICATE_WINDOW="${target#*:}" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" --relaunch "${profile_args[@]}"); then
+        fail "$harness $kind relaunch accepted a drifted pin"
+      fi
       assert_contains "$out" 'not the pinned chrome_sha256' 'relaunch must recheck the pins'
       [ ! -s "$LAUNCH_LOG" ] || fail 'invalid pins still launched a replacement'
       pass "$harness $kind launch and relaunch attach the pinned browser server"
@@ -1676,11 +1677,14 @@ test_browser_mcp_bad_pin_refuses_supported_launches() {
       read_case_record "$rec"
       write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
       if [ "$kind" = scout ]; then
-        out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout)
+        if out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout); then
+          fail "a drifted browser pin should refuse $harness $kind"
+        fi
       else
-        out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+        if out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR"); then
+          fail "a drifted browser pin should refuse $harness $kind"
+        fi
       fi
-      [ "$?" -ne 0 ] || fail "a drifted browser pin should refuse $harness $kind"
       assert_contains "$out" 'not the pinned chrome_sha256' 'refusal must name the drifted pin'
       [ ! -s "$LAUNCH_LOG" ] || fail 'a drifted browser pin still launched the worker'
       [ ! -f "$HOME_DIR/state/$id.meta" ] || fail 'a drifted browser pin provisioned a worker'
