@@ -9,14 +9,14 @@
 #   fm-procevent-quota.sh source-id
 #   fm-procevent-quota.sh retire [--provider <provider>]
 #
-# arm        Register a recurring quota-axi --json poll that wakes firstmate
+# arm        Register a recurring quota-axi --json --no-credential-refresh poll that wakes firstmate
 #            when the tracked provider's effectivePercentRemaining drops below
 #            <threshold> (default 10%) or when its runway.status becomes
 #            exhausted_now. The condition is deterministic, the action is only
 #            the durable `check: procevent:quota:<seq>` wake, and the watch is
 #            registered through `bin/fm-procevent.sh register`.
 # poll       The blocking child the generic runner executes; never run this
-#            directly in a conversational turn. It polls `quota-axi --json`
+#            directly in a conversational turn. It polls `quota-axi --json --no-credential-refresh`
 #            until quota drops below the threshold, invalid quota data stops
 #            the watch, or three consecutive transient command failures stop
 #            it. Missing or incompatible tools stop it immediately, and a
@@ -104,7 +104,7 @@ valid_percent() {
 }
 
 # quota_json [timeout]
-# Run `quota-axi --json` bounded by the given timeout.
+# Run `quota-axi --json --no-credential-refresh` bounded by the given timeout.
 # Exit status: 0 prints JSON; 1 timed out; 2 missing; 3 incompatible; 4 other failure.
 # A missing or incompatible quota-axi is an error condition, not a signal to fire.
 # Callers tolerate a bounded streak of 1/4 before going terminal; 2/3 stay distinct.
@@ -128,7 +128,7 @@ quota_json() {
     fi
     fm_quota_axi_version_compatible "$output" || return 3
     rc=0
-    output=$(fm_run_timed "$timeout" quota-axi --json 2>/dev/null </dev/null) || rc=$?
+    output=$(fm_run_timed "$timeout" quota-axi --json --no-credential-refresh 2>/dev/null </dev/null) || rc=$?
     if [ "$rc" -ne 0 ]; then
       if fm_timed_out "$rc"; then
         return 1
@@ -140,7 +140,7 @@ quota_json() {
     output=$(quota-axi --version 2>/dev/null </dev/null) || rc=$?
     [ "$rc" -eq 0 ] || return 4
     fm_quota_axi_version_compatible "$output" || return 3
-    output=$(quota-axi --json 2>/dev/null </dev/null) || return 4
+    output=$(quota-axi --json --no-credential-refresh 2>/dev/null </dev/null) || return 4
   fi
   printf '%s\n' "$output"
 }

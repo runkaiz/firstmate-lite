@@ -1226,7 +1226,7 @@ After the answer, code applies all remaining checks and ranking:
 
 - The confidence floor and the matched rule's `approval` and `floor`.
 - Each candidate's `provider` and `floor`.
-- Every applicable account-wide and model/product row from one `quota-axi --json` snapshot.
+- Every applicable account-wide and model/product row from one quota snapshot, following the [dispatch credential policy](../.agents/skills/quota-array-dispatch/SKILL.md#1-eligibility).
 - The numeric `spendPriority` argmax over candidates, using each candidate's limiting row.
 
 The [shared quota library](../bin/fm-quota-axi-lib.sh) accepts schema 5 and schema 6 and implements the [account-matching contract](../.agents/skills/quota-array-dispatch/SKILL.md#1-eligibility).
@@ -1297,18 +1297,18 @@ Bootstrap selects delivery prerequisites from the project registry and recorded 
 | Selected workflow | Additional prerequisites |
 | --- | --- |
 | Local-only delivery | No GitHub authentication or validation daemon requirement. |
-| Direct-PR delivery | `gh` with GitHub authentication and compatible `gh-axi`. |
+| Direct-PR delivery | `gh` with GitHub authentication. |
 | No-mistakes or conditional delivery | GitHub tooling plus `no-mistakes` v1.46.0 or newer. |
 | Missing, unreadable or unknown delivery input | Conservative GitHub and no-mistakes prerequisites. |
 | Automatic backlog backend | Shipped native queue and Python 3.9+; no external tasks-axi executable. |
-| Configured crew dispatch | `jq` and compatible `quota-axi`. |
+| Configured crew dispatch | `jq`, plus compatible `quota-axi` when a rule or the default is a profile array. |
 | Browser work | `chrome-devtools-axi` and a compatible browser when that feature is used. |
 | Visual boards | Compatible `lavish-axi`; plain-text work may continue without it. |
 
 These checks select prerequisites rather than installing them or changing a project's delivery policy.
 A tool needed by a later, newly selected workflow must be installed before using that workflow; its absence during an unrelated local task does not authorize bypassing its guards.
 `workflow_delivery_tools` and the tool detection in [`bin/fm-bootstrap.sh`](../bin/fm-bootstrap.sh) own exact selection and diagnostics.
-That script owns the AXI-family floor policy and the `gh-axi` and `lavish-axi` floors; [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh) retains native queue compatibility aliases, and [`bin/fm-quota-axi-lib.sh`](../bin/fm-quota-axi-lib.sh) owns its tool's floor.
+That script owns the AXI-family floor policy and the `lavish-axi` floor; [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh) retains native queue compatibility aliases, and [`bin/fm-quota-axi-lib.sh`](../bin/fm-quota-axi-lib.sh) owns its tool's floor.
 
 **Backend requirements**
 
@@ -1341,7 +1341,6 @@ A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the
 Compatibility checks apply when the corresponding workflow above is selected.
 
 - A missing native queue or Python runtime reports `MISSING: native queue`; automatic lifecycle mutation stays refused, while a manual-backend home keeps its backlog hand-edited.
-- An absent or incompatible `gh-axi` reports `MISSING: gh-axi (install: npm install -g gh-axi && gh-axi setup hooks)`.
 - An absent or board-incompatible `lavish-axi` reports `PRESENTATION_UNAVAILABLE` with the 0.1.77 compatibility floor, install command, and explicit text fallback; compatible versions below 0.1.80 retain legacy board replies and report an upgrade recommendation for synchronous acceptance, while [`bootstrap-diagnostics`](../.agents/skills/bootstrap-diagnostics/SKILL.md) owns diagnostic handling.
 - An absent or too-old `quota-axi` reports `MISSING: quota-axi (install: npm install -g quota-axi)`; firstmate cannot resolve a profile array without a compatible binary.
 

@@ -25,15 +25,16 @@
 #          "treehouse get --lease" support.
 #          no-mistakes is also MISSING when its installed version is older than
 #          1.46.0 (structured pipeline attestation floor; see CONTRIBUTING.md).
-#          The AXI-family floor policy is owned beside GH_AXI_MIN and
-#          LAVISH_AXI_MIN below; the per-tool owners point there. An installed
+#          The AXI-family floor policy is owned beside LAVISH_AXI_MIN
+#          below; the per-tool owners point there. An installed
 #          essential build below its floor reports MISSING like no-mistakes.
 #          Missing or incompatible lavish-axi reports PRESENTATION_UNAVAILABLE;
 #          a compatible older build keeps legacy boards and reports a BOOTSTRAP_INFO
 #          upgrade recommendation for synchronous reply acceptance.
 #          workflow_delivery_tools below owns conditional delivery prerequisites.
-#          The shipped queue and Python are required by automatic backlog work; quota-axi
-#          and jq are required when crew-dispatch.json is configured.
+#          The shipped queue and Python are required by automatic backlog work; jq
+#          is required when crew-dispatch.json is configured, and quota-axi when
+#          a rule or the default there is a profile array.
 #          Browser tooling is checked when browser work is selected, not here.
 #          Native queue availability is silent unless verbose facts are requested.
 #          quota-axi is required for the agent-owned dispatch-profile array
@@ -264,8 +265,7 @@ install_cmd() {
     cmux) echo "brew install --cask cmux  # or see https://cmux.com" ;;
     treehouse) echo "curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh" ;;
     no-mistakes) echo "curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh" ;;
-    gh-axi|chrome-devtools-axi|lavish-axi) echo "npm install -g $1 && $1 setup hooks" ;;
-    quota-axi) echo "npm install -g $1" ;;
+    chrome-devtools-axi|lavish-axi|quota-axi) echo "npm install -g $1" ;;
     *) return 1 ;;
   esac
 }
@@ -296,7 +296,7 @@ missing_tool_diagnostic() {
 # Local-only needs neither GitHub nor no-mistakes; direct-PR needs GitHub;
 # no-mistakes and conditional/unknown modes need both. Missing registry input
 # retains both. Manual backlog skips the native queue requirement. Configured routing needs
-# jq and quota-axi. Browser work checks its own feature-specific dependency.
+# jq, plus quota-axi when a rule or the default is a profile array. Browser work checks its own feature-specific dependency.
 # Missing/unsafe/unknown input stays conservative. No live project is mutated.
 workflow_delivery_tools() {
   local names name posture mode kind meta need_github=0 need_validation=0
@@ -330,14 +330,18 @@ workflow_delivery_tools() {
       *) need_github=1; need_validation=1 ;;
     esac
   done
-  [ "$need_github" = 0 ] || printf '%s\n' 'gh gh-axi'
+  [ "$need_github" = 0 ] || printf '%s\n' gh
   [ "$need_validation" = 0 ] || printf '%s\n' no-mistakes
   return 0
 }
 COMMON_TOOLS="node git $(workflow_delivery_tools | tr '\n' ' ')"
 if ! fm_backlog_backend_manual "$CONFIG"; then COMMON_TOOLS="$COMMON_TOOLS python3"; fi
 if [ -e "$CONFIG/crew-dispatch.json" ] || [ -L "$CONFIG/crew-dispatch.json" ]; then
-  COMMON_TOOLS="$COMMON_TOOLS jq quota-axi"
+  COMMON_TOOLS="$COMMON_TOOLS jq"
+  if command -v jq >/dev/null 2>&1 \
+    && jq -e '[.default?, (.rules // [])[]?.use?] | any(type == "array")' "$CONFIG/crew-dispatch.json" >/dev/null 2>&1; then
+    COMMON_TOOLS="$COMMON_TOOLS quota-axi"
+  fi
 fi
 BACKEND=$(fm_backend_name)
 BACKEND_VALID=1
@@ -352,7 +356,6 @@ NO_MISTAKES_MIN=1.46.0
 # newest axi tools. It is NOT the minimum feature-introduced version. These floors
 # are expected to drift upward as new versions ship. Never lower a floor to the
 # earliest release that happens to satisfy some depended-on behavior.
-GH_AXI_MIN=0.1.29
 LAVISH_AXI_MIN=0.1.80
 LAVISH_AXI_BOARD_MIN=0.1.77
 
@@ -778,9 +781,6 @@ detect_local_tools() {
   fi
   if fm_backend_list_contains "$COMMON_TOOLS" no-mistakes && command -v no-mistakes >/dev/null 2>&1 && ! tool_version_at_least no-mistakes "$NO_MISTAKES_MIN"; then
     echo "MISSING: no-mistakes (install: $(install_cmd no-mistakes))"
-  fi
-  if fm_backend_list_contains "$COMMON_TOOLS" gh-axi && command -v gh-axi >/dev/null 2>&1 && ! tool_version_at_least gh-axi "$GH_AXI_MIN"; then
-    echo "MISSING: gh-axi (install: $(install_cmd gh-axi))"
   fi
   if ! tool_version_at_least lavish-axi "$LAVISH_AXI_BOARD_MIN"; then
     echo "PRESENTATION_UNAVAILABLE: lavish-axi (requires >=$LAVISH_AXI_BOARD_MIN; install: $(install_cmd lavish-axi)) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish"
