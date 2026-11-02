@@ -200,10 +200,9 @@
 #   With no harness arg, a crewmate/scout spawn resolves the CREW harness only when
 #   config/crew-dispatch.json is absent. When that file exists, crewmate/scout
 #   spawns require an explicit harness so firstmate cannot silently skip dispatch
-#   profile consultation. While that file exists, a fresh ship or scout spawn on
-#   an adapter whose quota is positively known exhausted launches the next
-#   configured profile instead, or defers with exit 75 when none has quota left
-#   (bin/fm-quota-failover.sh pick owns the evidence and order). A --secondmate spawn is exempt and resolves the SECONDMATE
+#   profile consultation. Fresh explicit-adapter launches also pass through
+#   bin/fm-quota-failover.sh pick; its header owns quota substitution and deferral.
+#   A --secondmate spawn is exempt from explicit-harness consultation and resolves the SECONDMATE
 #   harness (config/secondmate-harness -> config/crew-harness -> own), so the
 #   secondmate-vs-crewmate split is DURABLE across every respawn (recovery,
 #   /updatefirstmate, restart). A bare adapter name (claude|codex|opencode|pi|pi-signed|grok|kimi|cursor|gemini|muse|rovo|omp|agy|devin)
@@ -1791,12 +1790,9 @@ else
 fi
 [ -z "$HARNESS_ARG" ] || ARG3=$HARNESS_ARG
 
-# Quota failover (bin/fm-quota-failover.sh owns the evidence and candidate
-# order): a fresh ship or scout spawn on an adapter whose quota is positively
-# known exhausted launches the next configured dispatch profile instead, or
-# defers with exit 75 like a full project when none has quota left. A relaunch
-# already carries its caller's deliberate choice, and a raw launch command has
-# no profile to move.
+# bin/fm-quota-failover.sh owns quota substitution and deferral. A relaunch
+# already carries its caller's deliberate choice; a raw launch command has no
+# profile to move.
 if [ "$RELAUNCH" = 0 ] && [ -f "$CONFIG/crew-dispatch.json" ]; then
   case "$ARG3" in
   '' | *' '*) ;;

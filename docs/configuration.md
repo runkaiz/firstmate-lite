@@ -1110,8 +1110,7 @@ This section is the single owner of the canonical schema and its per-field seman
 
 **Fields applied only by typed resolution**
 
-Rule `approval`, `min_confidence`, and `floor`, and profile `provider` and `floor` are optional declarations that only [typed dispatch resolution](#typed-dispatch-resolution-env-typesafe_api_key) applies in code; without that opt-in they are inert, and firstmate's own intake reads them as ordinary hints.
-The one exception is profile `provider`, which quota failover below also reads with or without the key.
+Rule `approval`, `min_confidence`, and `floor`, and profile `floor` are optional declarations that only [typed dispatch resolution](#typed-dispatch-resolution-env-typesafe_api_key) applies in code; without that opt-in they are inert, and firstmate's own intake reads them as ordinary hints.
 The resolver supplies the fixed neutral Choice option `No listed rule applies to this task.` for work that matches no listed rule.
 
 - `approval` accepts only `"captain"` and means a task the rule matches is never dispatched from the tool's answer alone.
@@ -1130,7 +1129,8 @@ Set it high when a wrong pick is costly and low when the rule is a safe runner-u
 **Provider identifiers and mappings**
 
 A profile `provider` optionally names the quota-axi provider family whose rows apply to that profile; when present, profile and rule-floor provider IDs must match the strict whole-string pattern `^[a-z0-9]+(-[a-z0-9]+)*\z`.
-Bootstrap validates resolver-only `approval`, `min_confidence`, `floor`, and present `provider` values only while typed resolution is active; without the key those inert fields and the pre-existing verified-harness baseline preserve bootstrap behavior.
+Typed resolution and quota failover both read profile `provider`; failover needs no typed-resolution key.
+Bootstrap validates `approval`, `min_confidence`, `floor`, and present `provider` values only while typed resolution is active; without the key it retains the pre-existing verified-harness baseline.
 
 Typed resolution additively recognizes `gemini` because AGENTS.md section 4 verifies it for crewmate and scout dispatch.
 
@@ -1139,7 +1139,7 @@ Typed resolution additively recognizes `gemini` because AGENTS.md section 4 veri
 | `claude`, `codex`, `grok`, `kimi`, `cursor`, `agy`, `muse` | The resolver has an authoritative single-provider mapping. |
 | Every other verified harness | Must declare `provider` explicitly; this includes multi-provider `pi`, `pi-signed`, `omp`, and `opencode`, and unmapped `gemini`, `rovo`, and `devin`; omission is an actionable configuration error before any request. |
 
-This single-provider table is separate from the frozen legacy mapping used by `fm-quota-choose.sh`, so additions cannot alter no-key routing.
+This single-provider table is separate from the frozen legacy mapping used by `fm-quota-choose.sh`.
 
 **Profile quota floors**
 
@@ -1161,15 +1161,13 @@ See [`docs/examples/crew-dispatch.json`](examples/crew-dispatch.json) for a star
 
 **Quota failover**
 
-While the file exists, a worker never knowingly launches on a runtime whose quota is exhausted, and a worker stopped by a quota or usage limit moves once to an eligible alternative; this needs no typed-resolution key.
-`bin/fm-quota-failover.sh`'s header owns the evidence, candidate order, failure patterns, and exit codes.
+While the file exists, fresh ship and scout spawns with an explicit adapter check for known quota exhaustion without a typed-resolution key; raw launch commands bypass this check.
+An exhausted profile can switch only within its unique matching rule or default array; otherwise the spawn defers and the work stays queued.
+[`bin/fm-quota-failover.sh`](../bin/fm-quota-failover.sh)'s header owns exact profile matching, evidence and account scope, candidate order, failure patterns, and exit codes.
 
-- A fresh ship or scout spawn whose adapter is positively known exhausted - by a recent recorded quota failure or a quota-axi runway reported exhausted - launches the next eligible profile in its unique matching rule or default array instead and prints one `quota:` line naming both.
-- Matching requires the exact harness and model; a profile occurring in multiple entries, in a single-profile entry, or in no entry has no configured alternative.
-- When no eligible alternative exists or has quota left, the spawn prints one `deferred:` line and exits 75, so the work stays queued like a spawn refused by project capacity.
-- When a worker's terminal shows a genuine quota or usage-limit failure, `fm-quota-failover.sh relaunch <task-id>` records it and replaces the worker once through `bin/fm-control.sh relaunch` on the next eligible profile, in the same local copy with a progress note; a second failure for the same task is reported rather than retried.
-- Missing or unreadable quota data, a bare 429, and transient rate-limit or overload messages never move a worker.
-- Account pins and no-mistakes validation-agent settings are never changed: the relaunch still applies `config/claude-account` and `config/pi-account` before it stops anything.
+For a worker stopped by a quota or usage limit, firstmate invokes failover through the [stuck-crewmate recovery procedure](../.agents/skills/stuck-crewmate-recovery/SKILL.md#live-endpoint-escalation).
+Recovery permits one relaunch attempt, preserving task identity, source, and pipeline custody through `bin/fm-control.sh`; account pins and validation-agent settings remain unchanged.
+The failover header owns the guard lifecycle and pre-stop account checks.
 
 **Validation and diagnostics**
 

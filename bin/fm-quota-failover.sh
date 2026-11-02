@@ -23,17 +23,21 @@
 #           when it sees such a failure that this script did not detect itself.
 # relaunch  For a ship or scout whose terminal shows a genuine quota or usage
 #           limit failure, record it, choose the next configured candidate as
-#           pick does, and replace the worker ONCE through
+#           pick does, and attempt to replace the worker ONCE through
 #           bin/fm-control.sh <task-id> relaunch with a progress note, in the
 #           same local copy. Exits 3 without changing anything when no quota
 #           failure is visible, 75 when no eligible alternative has quota left,
-#           and refuses a second switch for the same task, so it never loops.
+#           and refuses a second attempt for the same task, so it never loops.
+#           state/<task-id>.quota-failover is written before calling fm-control
+#           and retained even if relaunch fails; guarded task teardown removes
+#           it with the task's other retired state, allowing later ID reuse.
 #
 # "Positively known exhausted" means either an unexpired record in
 # state/quota-failures, or one bounded `quota-axi --json` read whose applicable
 # runway for the candidate's provider is exhausted_now or a known zero
 # (quota_effective in bin/fm-quota-axi-lib.sh). A missing, failing, or silent
-# quota-axi is uncertainty, never exhaustion, so it never moves a launch.
+# quota-axi is uncertainty, never exhaustion; an exact recorded failure can
+# still move a launch without live evidence.
 # Profiles with a configured worker account pin ignore ambient quota-axi
 # evidence and use only exact-scope recorded failures.
 #
@@ -42,8 +46,10 @@
 # harness has unknown quota identity. Candidates come only from the one rule
 # use array (or default array) containing the exact requested harness and model.
 # Multiple matching entries, single-profile entries, and unlisted profiles have
-# no configured alternative. Other efforts of the same harness/model are not
-# alternatives. Exhaustion without an eligible alternative exits 75.
+# no configured alternative. Scan that array from the beginning, choosing the
+# first alternative not known exhausted, including one with unknown quota.
+# Other efforts of the same harness/model are not alternatives. Exhaustion
+# without an eligible alternative exits 75.
 #
 # state/quota-failures contains JSON lines: {scope: {harness, model, account},
 # until: <epoch>, why: <text>}. Scope equality is exact, including empty models.
