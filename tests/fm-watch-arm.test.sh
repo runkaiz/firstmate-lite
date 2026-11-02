@@ -1422,6 +1422,30 @@ test_watcher_exits_when_its_state_directory_is_removed() {
   pass "watch-arm: a watcher exits when its state directory is removed"
 }
 
+# Deterministic form of the race behind that case's CI flake: the state
+# directory vanishes after the top-of-cycle check but before the cycle's wake
+# queue lock, whose wait used to spin forever. A copied bin whose per-cycle
+# usage refresh deletes the state directory opens exactly that window.
+test_watcher_exits_when_state_is_removed_before_the_queue_lock() {
+  local dir state out pid
+  dir=$(make_case state-removed-before-queue-lock)
+  state="$dir/state"
+  out="$dir/watch.out"
+  mkdir -p "$dir/home/data"
+  cp -R "$ROOT/bin" "$dir/bin"
+  # shellcheck disable=SC2016 # The variable expands when the copied helper runs.
+  printf '#!/usr/bin/env bash\nrm -rf -- "${FM_STATE_OVERRIDE:?}"\n' > "$dir/bin/fm-usage-refresh.sh"
+  FM_HOME="$dir/home" FM_STATE_OVERRIDE="$state" FM_POLL=1 FM_SIGNAL_GRACE=0 \
+    FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$dir/bin/fm-watch.sh" > "$out" 2>&1 &
+  pid=$!
+  wait_for_pid_gone "$pid" 300 \
+    || { kill -TERM "$pid" 2>/dev/null; fail "watcher pid $pid hung waiting on a lock in its deleted state directory"; }
+  wait "$pid" 2>/dev/null || true
+  grep -qF 'watcher: exiting - state directory no longer exists' "$out" \
+    || fail "watcher did not log the state-gone exit reason: $(cat "$out")"
+  pass "watch-arm: a state directory removed before the queue lock still ends the watcher"
+}
+
 # The same for a deleted home whose state directory still exists elsewhere: the
 # lock is released through the ordinary cleanup so nothing stale is left behind.
 test_watcher_exits_when_its_home_is_removed() {
@@ -1713,6 +1737,7 @@ test_attached_arm_reports_the_delivered_wake_after_drain
 test_arm_refuses_an_unusable_launch_confirm_window
 test_arm_refuses_a_disposable_validation_checkout
 test_watcher_exits_when_its_state_directory_is_removed
+test_watcher_exits_when_state_is_removed_before_the_queue_lock
 test_watcher_exits_when_its_home_is_removed
 test_reaper_stops_a_tracked_watcher
 test_attached_arm_still_fails_on_a_wake_it_did_not_deliver

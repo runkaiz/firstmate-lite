@@ -2490,7 +2490,7 @@ while :; do
   # Select specialized delivery and generic recovery from the same snapshot.
   # An append publishes downtime before its queue row; observing those across
   # separate locks can announce recovery and then repeat the row on a successor.
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
+  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || continue
   procevent_surface_queued
   away_entry_surface_queued
   resurface_after_downtime

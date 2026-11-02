@@ -279,7 +279,7 @@ An ordinary presentation drain bounds both its initial queue-lock acquire and it
 | Initial queue lock | One PID-naming advisory, and the whole drain is skipped before any claim or mutation. |
 | Status-presentation lock | One such advisory after raw wake presentation, and status annotations, sections, and cursors are left retriable on the next drain. |
 
-Acknowledgement invocations and every other mutation-critical queue-lock acquire retain blocking semantics, so acknowledgement atomicity is unchanged.
+Acknowledgement invocations and every other mutation-critical queue-lock acquire still block on contention, but fail without entering the protected operation when the lock's parent directory is gone, preserving acknowledgement atomicity.
 
 ### Guard counts for branch-held rows
 
@@ -459,7 +459,7 @@ They also prove that a legacy or handoff-phase watcher marker from an absent rep
 - The manual-restart generation churn that makes a confirmation for the churned generation report a mismatch, which an arm check without a reopen leaves in place.
 - A take-over that stays quiet after a confirmed TERM, still surfaces queued work and self-exit downtime, and attaches without stopping a cycle the named arm does not own.
 - The disposable-checkout arm refusal.
-- The home-gone and state-gone watcher exits.
+- The home-gone and state-gone watcher exits, including state removal between the cycle's teardown check and queue-lock acquisition.
 - The test reaper that stops a watcher armed for a temporary home.
 
 `tests/fm-watch-recovery-loop.test.sh` covers:
