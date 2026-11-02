@@ -1,0 +1,3 @@
+ok: pinned chrome-devtools-mcp /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js and Chrome /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browsers/chrome/linux-156.0.8078.80/chrome-linux64/chrome verified
+not ok - live pinned browser MCP guard failed: FAIL navigate did not select the page: Protocol error (Target.setDiscoverTargets): Target closed
+Cause: : expected exit 0, got 1

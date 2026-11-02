@@ -1,0 +1,11 @@
+Performing one time database migration, may take a few minutes...
+sqlite-migration:done
+Database migration complete.
+[0m
+┌  MCP Servers
+│
+●  ✓ browser [90mconnected
+│      [90m/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp
+│
+└  1 server(s)
+

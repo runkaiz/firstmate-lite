@@ -1,0 +1,6 @@
+chrome-devtools-mcp exposes content of the browser instance to the MCP clients allowing them to inspect,
+debug, and modify any data in the browser or DevTools.
+Avoid sharing sensitive or personal information that you do not want to share with MCP clients.
+{"result":{"protocolVersion":"2025-06-18","capabilities":{"logging":{},"tools":{"listChanged":true}},"serverInfo":{"name":"chrome_devtools","title":"Chrome DevTools MCP server","version":"1.12.0"}},"jsonrpc":"2.0","id":1}
+[chrome-devtools-mcp] The connecting client did not negotiate the MCP roots capability. Tools that read or write local files will be restricted to the OS temp directory. To restore the previous unrestricted behavior, start the server with --allow-unrestricted-paths.
+{"result":{"content":[{"type":"text","text":"Successfully navigated to data:text/html,<title>probe</title>.\n## Pages\n1: probe (data:text/html,<title>probe</title>) [selected]"}]},"jsonrpc":"2.0","id":2}

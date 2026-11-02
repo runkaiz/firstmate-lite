@@ -1,0 +1,60 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab
+
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.gm-sock new-session -d -s fm-lab-gemini -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation sleep 600
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-spawn.sh gemini-valid /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/project --mode local-only --yolo off --harness gemini --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-valid/launch-brief.md records no ship branch; defaulting to legacy branch fm/gemini-valid
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-valid/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD b2a8e58)
+HEAD is now at b2a8e58 initial
+native allocation task=gemini-valid source_ref=refs/heads/main base=b2a8e58c0cbf5ab38eec5ad4c03dac3ea30169fa worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-valid/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned gemini-valid harness=gemini kind=ship mode=local-only yolo=off window=fm-lab-gemini:fm-gemini-valid worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-valid/worktree
+
+{"scenario": "valid", "notice": "Browser tools (gemini): No browser tool is supplied by this launch on this runtime. If the session exposes no browser MCP tools, report that limitation; do not install or fetch a browser tool.", "mcpServers": {}, "hooks": ["BeforeAgent", "AfterAgent", "SessionEnd"]}
+Security Warning: Skipping system settings file '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state/gemini-valid.gemini-settings.json': Parent directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is insecure: Directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is not owned by root (uid 0). Current uid: 1000. To fix this, run: sudo chown root:root "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state"
+No MCP servers configured.
+
+PASS actual fm-spawn Gemini valid pins: no browser wiring and honest emitted notice
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-spawn.sh gemini-invalid /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/project --mode local-only --yolo off --harness gemini --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 5s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-invalid/launch-brief.md records no ship branch; defaulting to legacy branch fm/gemini-invalid
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-invalid/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD b2a8e58)
+HEAD is now at b2a8e58 initial
+native allocation task=gemini-invalid source_ref=refs/heads/main base=b2a8e58c0cbf5ab38eec5ad4c03dac3ea30169fa worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-invalid/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned gemini-invalid harness=gemini kind=ship mode=local-only yolo=off window=fm-lab-gemini:fm-gemini-invalid worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-invalid/worktree
+
+{"scenario": "invalid", "notice": "Browser tools (gemini): No browser tool is supplied by this launch on this runtime. If the session exposes no browser MCP tools, report that limitation; do not install or fetch a browser tool.", "mcpServers": {}, "hooks": ["BeforeAgent", "AfterAgent", "SessionEnd"]}
+Security Warning: Skipping system settings file '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state/gemini-invalid.gemini-settings.json': Parent directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is insecure: Directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is not owned by root (uid 0). Current uid: 1000. To fix this, run: sudo chown root:root "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state"
+No MCP servers configured.
+
+PASS actual fm-spawn Gemini invalid pins: no browser wiring and honest emitted notice
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-spawn.sh gemini-absent /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/project --mode local-only --yolo off --harness gemini --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab
+WARNING: watcher still down (same stale episode; last beat: 8s ago, grace 300s) - full banner already printed this episode.
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-absent/launch-brief.md records no ship branch; defaulting to legacy branch fm/gemini-absent
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/data/gemini-absent/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+Preparing worktree (detached HEAD b2a8e58)
+HEAD is now at b2a8e58 initial
+native allocation task=gemini-absent source_ref=refs/heads/main base=b2a8e58c0cbf5ab38eec5ad4c03dac3ea30169fa worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-absent/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned gemini-absent harness=gemini kind=ship mode=local-only yolo=off window=fm-lab-gemini:fm-gemini-absent worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-copies/gemini-absent/worktree
+
+{"scenario": "absent", "notice": "Browser tools (gemini): No browser tool is supplied by this launch on this runtime. If the session exposes no browser MCP tools, report that limitation; do not install or fetch a browser tool.", "mcpServers": {}, "hooks": ["BeforeAgent", "AfterAgent", "SessionEnd"]}
+Security Warning: Skipping system settings file '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state/gemini-absent.gemini-settings.json': Parent directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is insecure: Directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state' is not owned by root (uid 0). Current uid: 1000. To fix this, run: sudo chown root:root "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-lab/state"
+No MCP servers configured.
+
+PASS actual fm-spawn Gemini absent pins: no browser wiring and honest emitted notice
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.gm-sock kill-server
+

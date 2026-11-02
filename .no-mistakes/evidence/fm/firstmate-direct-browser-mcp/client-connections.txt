@@ -1,0 +1,30 @@
+Claude SDK control mcp_status: [{"name": "browser", "status": "connected", "serverInfo": {"name": "chrome_devtools", "title": "Chrome DevTools MCP server", "version": "1.12.0"}, "config": {"type": "stdio", "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh", "args": ["/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp"]}, "transport": "stdio", "scope": "dynamic", "source": "dynamic", "tools": [{"name": "click", "annotations": {}}, {"name": "close_page", "annotations": {}}, {"name": "drag", "annotations": {}}, {"name": "emulate", "annotations": {}}, {"name": "evaluate_script", "annotations": {}}, {"name": "fill", "annotations": {}}, {"name": "fill_form", "annotations": {}}, {"name": "get_console_message", "annotations": {"readOnly": true}}, {"name": "get_css_styles", "annotations": {"readOnly": true}}, {"name": "get_network_request", "annotations": {}}, {"name": "handle_dialog", "annotations": {}}, {"name": "hover", "annotations": {}}, {"name": "lighthouse_audit", "annotations": {}}, {"name": "list_console_messages", "annotations": {"readOnly": true}}, {"name": "list_network_requests", "annotations": {"readOnly": true}}, {"name": "list_pages", "annotations": {"readOnly": true}}, {"name": "navigate_page", "annotations": {}}, {"name": "new_page", "annotations": {}}, {"name": "performance_analyze_insight", "annotations": {"readOnly": true}}, {"name": "performance_start_trace", "annotations": {}}, {"name": "performance_stop_trace", "annotations": {}}, {"name": "press_key", "annotations": {}}, {"name": "resize_page", "annotations": {}}, {"name": "screencast_start", "annotations": {}}, {"name": "screencast_stop", "annotations": {}}, {"name": "select_page", "annotations": {"readOnly": true}}, {"name": "take_heapsnapshot", "annotations": {}}, {"name": "take_screenshot", "annotations": {}}, {"name": "take_snapshot", "annotations": {}}, {"name": "type_text", "annotations": {}}, {"name": "upload_file", "annotations": {}}, {"name": "wait_for", "annotations": {"readOnly": true}}]}]
+
+Codex app-server mcpServerStatus/list: {"name": "browser", "toolsError": null, "authStatus": "unsupported"} tools=fill_form,fill,evaluate_script,get_network_request,get_console_message,navigate_page,performance_stop_trace,click,close_page,get_css_styles,screencast_stop,take_heapsnapshot,lighthouse_audit,type_text,press_key,performance_start_trace,handle_dialog,screencast_start,wait_for,select_page,take_snapshot,take_screenshot,drag,list_pages,emulate,hover,upload_file,new_page,resize_page,performance_analyze_insight,list_network_requests,list_console_messages
+
+OpenCode mcp list:
+[0m
+┌  MCP Servers
+│
+●  ✓ browser [90mconnected
+│      [90m/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp
+│
+└  1 server(s)
+
+
+
+Gemini 0.58.0 with launch trust setting:
+Configured MCP servers:
+
+✓ browser: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp (stdio) - Connected
+
+
+Gemini 0.66.0 with launch trust setting:
+Security Warning: Skipping system settings file '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/gemini-settings.json': Parent directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation' is insecure: Directory '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation' is not owned by root (uid 0). Current uid: 1000. To fix this, run: sudo chown root:root "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation"
+No MCP servers configured.
+
+
+Gemini 0.66.0 counterfactual: identical pins in isolated user settings:
+Configured MCP servers:
+
+✓ browser: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp (stdio) - Connected

@@ -1,0 +1,10 @@
+ok - claude ship launch and relaunch attach the pinned browser server
+ok - claude scout launch and relaunch attach the pinned browser server
+ok - codex ship launch and relaunch attach the pinned browser server
+ok - codex scout launch and relaunch attach the pinned browser server
+ok - opencode ship launch and relaunch attach the pinned browser server
+ok - opencode scout launch and relaunch attach the pinned browser server
+ok - gemini ship launch and relaunch attach the pinned browser server
+ok - gemini scout launch and relaunch attach the pinned browser server
+ok - every supported runtime refuses invalid pins before provisioning ships and scouts
+ok - absent pins and unsupported runtimes disclose that no browser tool is supplied

@@ -1,0 +1,2 @@
+ok: pinned chrome-devtools-mcp /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js and Chrome /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browsers/chrome/linux-153.0.8010.12/chrome-linux64/chrome verified
+ok - pinned browser MCP serves selected-page tools, readable errors, a recognizable title, and exits with its browser on stdin close (title=chrome-devtools-mcp processes=8)

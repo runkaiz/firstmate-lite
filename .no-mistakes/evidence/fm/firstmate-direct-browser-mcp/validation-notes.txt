@@ -1,0 +1,37 @@
+Test phase only; no source edits, linters, broad suite, push, PR, or pipeline control.
+
+Dependencies were installed under .browser-validation and removed after testing.
+Browser: chrome-devtools-mcp 1.12.0, Chrome for Testing 153.0.8010.12.
+Initial browser checks with TMPDIR inside the long gate path failed with Target closed.
+Removing that test-only TMPDIR override fixed the setup; the stock live guard and
+all manual browser scenarios then passed. Chrome ephemeral profiles were cleaned.
+
+Targeted baseline commands:
+TMPDIR=<workspace>/.browser-validation/tmp bash tests/fm-browser-mcp.test.sh
+TMPDIR=<workspace>/.browser-validation/tmp CODEX_HOME=<isolated-home> FM_BROWSER_MCP_CODEX_BIN=$(command -v codex) bash tests/fm-spawn-dispatch-profile.test.sh --browser-mcp
+FM_BROWSER_MCP_LIVE=1 FM_BROWSER_MCP_CONFIG=<workspace>/.browser-validation/browser-mcp bash tests/fm-browser-mcp-live-e2e.test.sh
+All passed. Spawn tests use capture processes, not actual interactive workers.
+
+Real client probes used isolated home/config directories without model requests:
+Claude SDK control initialize + mcp_status with --mcp-config/--strict-mcp-config.
+Codex app-server initialize + mcpServerStatus/list with per-launch -c override.
+OpenCode mcp list with OPENCODE_CONFIG_CONTENT.
+Gemini mcp list with GEMINI_CLI_SYSTEM_SETTINGS_PATH and GEMINI_CLI_TRUST_WORKSPACE=true.
+Claude, Codex, OpenCode, and Gemini 0.58.0 connected. Gemini 0.66.0 rejected the
+user-owned system-settings file and reported no MCP servers configured.
+Counterfactual: the same JSON in a disposable user settings file connected on
+0.66.0, isolating the failure to the system-settings carrier, not the pins or trust.
+No production credentials or operator configuration were used or modified.
+
+The saved scenarios.mjs driver exercised a disposable localhost page through the
+real launcher: navigate, snapshot, fill, click, screenshot, evaluation, tab selection,
+invalid page/error recovery, independent concurrent storage, stdin/SIGTERM/SIGKILL cleanup.
+The saved teardown scripts used fm-lab-home.sh, a private tmux socket, a disposable
+local repository, and real browser processes. Teardown killed the owned MCP,
+refused while an unrelated process remained, preserved the other browser, then
+removed the task copy once the unrelated process exited.
+
+Result: no-go for the newly advertised Gemini path on 0.66.0. The implementation
+must either provide a supported per-launch carrier or reject/document incompatible
+versions before telling workers that browser tools are configured. Do not chown
+operator directories or change global settings to work around this test failure.

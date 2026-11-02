@@ -1,0 +1,9 @@
+Validated target 86e7bcd4e82d9fe92e3eb102e918b056d10b620b in the assigned test phase.
+Targeted baseline: fm-browser-mcp.test.sh and fm-spawn-dispatch-profile.test.sh --browser-mcp passed. Spawn capture tests are supporting evidence, not live harness execution.
+Real MCP and Chrome passed form interaction (screenshot inspected), selected-tab routing, readable tool errors, invalid-page recovery, independent concurrent storage, and stdin/SIGTERM/SIGKILL cleanup. The existing live-e2e guard also passed.
+Real Codex 0.165.0 app-server discovered browser tools; Claude 2.1.316 control protocol connected; OpenCode 1.2.15 mcp list connected. These probes used disposable configuration without model requests or operator credentials.
+Real fm-spawn launched Gemini 0.66.0 through a private 120x40 tmux lab with valid, invalid, and absent browser pins. Generated launch briefs explicitly disclosed no browser tool; generated settings contained no browser MCP; Gemini mcp list reported no servers. No model-response behavior or credentialed Gemini turn was claimed.
+Real fm-teardown stopped the task-owned MCP, preserved a separate browser, refused removal with an unrelated process present, then successfully removed the copy once that process exited. Its driver logged both successful assertions; the enclosing shell returned 143 during final private-tmux cleanup after the assertions completed.
+Real launcher rejected changed MCP and Chrome hashes, duplicate/unknown keys, and a relative path before serving MCP.
+No source edits, linters, full-suite runs, pipeline operations, pushes, or PR actions. Disposable installs, homes, repositories, copies, and sockets were removed. A process scan found no processes whose cwd remained in the disposable setup before removal.
+Verdict: go.

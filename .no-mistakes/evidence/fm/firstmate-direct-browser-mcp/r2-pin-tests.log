@@ -1,0 +1,4 @@
+ok - a complete, matching pin set verifies
+ok - launch execs the pinned entry with an isolated headless browser, selected-page routing and telemetry off
+ok - without node= the launcher uses node from PATH and never npx
+ok - drifted, malformed, incomplete or unreadable pins refuse with a readable line before anything starts

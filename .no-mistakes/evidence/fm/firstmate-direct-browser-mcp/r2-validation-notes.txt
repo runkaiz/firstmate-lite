@@ -1,0 +1,15 @@
+Validated commit 5be7e2587fcb308b6fd0e9d388392d576300333b in the assigned test phase.
+No source changes, linters, full-suite runs, pipeline controls, pushes or PR actions.
+The previously selected Gemini fix is absent from this checkout.
+
+Targeted baseline: fm-browser-mcp.test.sh and fm-spawn-dispatch-profile.test.sh --browser-mcp passed. Spawn checks use capture fixtures; they are supporting tests, not live worker launches.
+Live: fm-browser-mcp-live-e2e.test.sh passed with chrome-devtools-mcp 1.12.0 and Chrome for Testing 153.0.8010.12 installed only in the disposable workspace.
+Manual real MCP calls passed form interaction, screenshot, selected-tab routing, readable errors, invalid-page recovery, independent concurrent storage, and stdin/SIGTERM/SIGKILL cleanup.
+Real Codex 0.165.0 app-server discovered browser tools. Claude 2.1.316 control protocol reported connected. OpenCode 1.2.15 mcp list reported connected. These client probes used isolated settings and no model requests.
+Gemini 0.66.0 mcp list with GEMINI_CLI_TRUST_WORKSPACE=true rejected the same per-task system-settings carrier used by fm-spawn and reported No MCP servers configured. This is a reproduced product integration failure, not missing login. The recorded decision requires a proven per-launch route or no Gemini attachment with honest instructions and runtime documentation.
+Real fm-teardown with a disposable lab home/private tmux socket stopped the owned MCP, preserved a foreign browser, refused removal while an unrelated process remained, and succeeded once that process exited.
+Malformed paths/keys and MCP/Chrome hash mismatches refused through the real launcher.
+
+New evidence uses r2-* filenames. Screenshot r2-browser-form.png was visually inspected.
+All disposable dependencies, lab state, fixture repository, task copies and socket were removed; no setup processes remained and git status was clean.
+Verdict: no-go solely for the still-unfixed Gemini integration.

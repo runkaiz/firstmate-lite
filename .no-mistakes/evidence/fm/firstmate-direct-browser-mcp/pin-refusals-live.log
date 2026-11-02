@@ -1,0 +1,9 @@
+mcp-drift: exit=1, stdout empty
+fm-browser-mcp: mcp /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js has SHA-256 e8b0290a8fe9a1edc31d595ccc870df926bfaaafe19fb14cd4d8d47bf6194979, not the pinned mcp_sha256 0000000000000000000000000000000000000000000000000000000000000000; re-pin deliberately after verifying the update
+
+chrome-drift: exit=1, stdout empty
+fm-browser-mcp: chrome /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browsers/chrome/linux-153.0.8010.12/chrome-linux64/chrome has SHA-256 8c599d43aec53f2460a31ae2f4af6bd863f8258b34ff519564bc5d4726bfaa1e, not the pinned chrome_sha256 0000000000000000000000000000000000000000000000000000000000000000; re-pin deliberately after verifying the update
+
+unknown-key: exit=1, stdout empty
+fm-browser-mcp: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/bad-unknown-key: unknown key port (accepted: mcp, mcp_sha256, chrome, chrome_sha256, node)
+
