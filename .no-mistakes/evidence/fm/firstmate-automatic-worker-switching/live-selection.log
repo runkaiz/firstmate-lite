@@ -1,0 +1,73 @@
+$ fm-quota-failover.sh pick --harness codex --model model-a
+codex|model-a|
+exit=0
+
+$ fm-quota-failover.sh record --harness codex --model model-a --why disposable lab reported exhaustion
+exit=0
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+pi|provider/model-b|
+quota: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)); using pi provider/model-b instead
+exit=0
+
+$ fm-quota-failover.sh pick --harness codex --model model-other
+codex|model-other|
+exit=0
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+codex|model-a|
+exit=0
+
+$ fm-quota-failover.sh record --harness pi --model provider/model-b
+exit=0
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
+exit=75
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
+exit=75
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
+exit=75
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
+exit=75
+
+$ fm-quota-failover.sh pick --harness codex --model model-a
+deferred: codex model-a is exhausted (recorded quota failure for codex model-a until 1793617129 (disposable lab reported exhaustion)) and no configured alternative exists or has quota left, so the work stays queued
+exit=75
+
+$ fm-quota-failover.sh record --harness codex --model expired --until 1
+exit=0
+
+$ fm-quota-failover.sh pick --harness codex --model expired
+codex|expired|
+exit=0
+
+$ fm-quota-failover.sh record --harness claude --model scoped
+exit=0
+
+$ fm-quota-failover.sh pick --harness claude --model scoped
+codex|healthy|
+quota: claude scoped is exhausted (recorded quota failure for claude scoped until 1793617129 (recorded by firstmate)); using codex healthy instead
+exit=0
+
+$ fm-quota-failover.sh pick --harness claude --model scoped
+claude|scoped|
+exit=0
+
+$ fm-quota-failover.sh relaunch once
+error: task 'once' already switched runtime once after a quota failure (completed prior switch); not retrying, so firstmate decides the next step
+exit=1
+
+Persisted scope records:
+{"scope":{"harness":"codex","model":"model-a","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.codex"},"until":1793617129,"why":"disposable lab reported exhaustion"}
+{"scope":{"harness":"pi","model":"provider/model-b","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.pi/agent"},"until":1793617129,"why":"recorded by firstmate"}
+{"scope":{"harness":"codex","model":"expired","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/.codex"},"until":1,"why":"recorded by firstmate"}
+{"scope":{"harness":"claude","model":"scoped","account":"/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DC5VNVA0R6QVNCBPEMJX18/.qa/pick/account-a"},"until":1793617129,"why":"recorded by firstmate"}
+
+All public CLI assertions passed. No quota-axi executable was supplied; unavailable evidence stayed unknown. No lifecycle command or external account was stubbed.
