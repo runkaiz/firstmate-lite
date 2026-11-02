@@ -1547,7 +1547,7 @@ SH
 }
 
 write_browser_mcp_pins() {  # <home> [chrome-sha-override]
-  local home=$1 pins="$1/pins" sum
+  local home=$1 pins="$1/pins"
   mkdir -p "$pins"
   printf '// fixture entry\n' > "$pins/chrome-devtools-mcp.js"
   printf '#!/bin/sh\n' > "$pins/chrome"
