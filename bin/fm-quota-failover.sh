@@ -14,11 +14,11 @@
 #           quota is positively known exhausted; then the next configured
 #           candidate that is not known exhausted comes back instead, with one
 #           `quota:` line on stderr naming both and the evidence. When every
-#           configured candidate is known exhausted it prints one `deferred:`
+#           eligible candidate is known exhausted, or none exists, it prints a `deferred:`
 #           line on stderr and exits 75, so the work stays queued.
 #           bin/fm-spawn.sh runs this for every fresh ship or scout spawn with
 #           an explicit adapter while config/crew-dispatch.json exists.
-# record    Remember that a profile's provider hit a genuine quota or usage
+# record    Remember that a profile's exact runtime/account/model hit a quota or usage
 #           limit, until <epoch> (default: now + 5 hours). Firstmate may call it
 #           when it sees such a failure that this script did not detect itself.
 # relaunch  For a ship or scout whose terminal shows a genuine quota or usage
@@ -26,7 +26,7 @@
 #           pick does, and replace the worker ONCE through
 #           bin/fm-control.sh <task-id> relaunch with a progress note, in the
 #           same local copy. Exits 3 without changing anything when no quota
-#           failure is visible, 75 when no configured candidate has quota left,
+#           failure is visible, 75 when no eligible alternative has quota left,
 #           and refuses a second switch for the same task, so it never loops.
 #
 # "Positively known exhausted" means either an unexpired record in
@@ -35,11 +35,21 @@
 # (quota_effective in bin/fm-quota-axi-lib.sh). A missing, failing, or silent
 # quota-axi is uncertainty, never exhaustion, so it never moves a launch.
 #
-# A candidate's provider is its profile's declared `provider`, else the primary
-# family from fm_quota_provider_for_harness, else `harness:<name>`. Candidates,
-# in order: every rule `use` set containing the requested profile (same
-# harness, and the same model when both name one), then `default`, without
-# duplicates and without the requested profile itself.
+# A candidate's provider is its exact profile's unambiguous declared `provider`,
+# else fm_quota_single_provider_for_harness; an unresolved multi-provider
+# harness has unknown quota identity. Candidates come only from the one rule
+# use array (or default array) containing the exact requested harness and model.
+# Multiple matching entries, single-profile entries, and unlisted profiles have
+# no configured alternative. Other efforts of the same harness/model are not
+# alternatives. Exhaustion without an eligible alternative exits 75.
+#
+# state/quota-failures contains JSON lines: {scope: {harness, model, account},
+# until: <epoch>, why: <text>}. Scope equality is exact, including empty models.
+# Account is the declared worker pin or known ambient credential root; Pi's
+# provider/account lane remains part of the full model. Relaunch uses the task's
+# recorded pin for the failed worker, and current pins for alternatives.
+# Legacy provider-only records are ignored. Each choice reads quota-axi once
+# before evaluating live account/model evidence and matching failure records.
 #
 # A quota failure is genuine only when one of the last 12 non-blank terminal
 # lines carries a usage-limit or quota-exhaustion message: "usage limit
@@ -68,8 +78,8 @@ case "${1:-}" in -h|--help|help) usage; exit 0 ;; esac
 . "$SCRIPT_DIR/fm-backend.sh"
 # shellcheck source=bin/fm-quota-axi-lib.sh
 . "$SCRIPT_DIR/fm-quota-axi-lib.sh"
-# shellcheck source=bin/fm-timeout-lib.sh
-. "$SCRIPT_DIR/fm-timeout-lib.sh"
+# shellcheck source=bin/fm-worker-account-lib.sh
+. "$SCRIPT_DIR/fm-worker-account-lib.sh"
 
 FAILURE_TTL=18000
 QUOTA_AXI_TIMEOUT=15
@@ -81,11 +91,10 @@ FAILURES="$STATE/quota-failures"
 DISPATCH="$CONFIG/crew-dispatch.json"
 NOW=$(date +%s)
 QUOTA_JSON=
-QUOTA_READ=0
 
-profile_provider() {  # <harness> <model> <declared-provider>
-  [ -z "$3" ] || { printf '%s\n' "$3"; return; }
-  fm_quota_provider_for_harness "$1" "$2" 2>/dev/null || printf 'harness:%s\n' "$1"
+profile_provider() {  # <harness> <declared-provider>
+  [ -z "$2" ] || { printf '%s\n' "$2"; return; }
+  fm_quota_single_provider_for_harness "$1" 2>/dev/null || true
 }
 
 # The requested profile's declared provider, when the dispatch file names one.
@@ -93,80 +102,97 @@ declared_provider() {  # <harness> <model>
   [ -f "$DISPATCH" ] || return 0
   jq -r --arg h "$1" --arg m "$2" '
     [(.rules // [])[].use, .default | select(. != null) | if type == "array" then .[] else . end
-     | select(.harness == $h and ((.model // "") == $m or $m == "" or (.model // "") == ""))
-     | .provider // empty] | first // empty' "$DISPATCH" 2>/dev/null || true
+     | select(.harness == $h and (.model // "") == $m)
+     | .provider // ""] | unique | if length == 1 then .[0] else empty end' "$DISPATCH" 2>/dev/null || true
 }
 
 quota_snapshot() {
-  [ "$QUOTA_READ" = 1 ] && return 0
-  QUOTA_READ=1
   command -v quota-axi >/dev/null 2>&1 || return 0
   QUOTA_JSON=$(fm_run_timed "$QUOTA_AXI_TIMEOUT" quota-axi --json 2>/dev/null </dev/null) || QUOTA_JSON=
   printf '%s\n' "$QUOTA_JSON" | fm_quota_json_valid || QUOTA_JSON=
 }
 
-# Prints the evidence and succeeds only when the profile is known exhausted.
-exhausted_evidence() {  # <harness> <model> <provider>
-  local key until why scope_model effective
-  if [ -f "$FAILURES" ]; then
-    while IFS=$'\t' read -r key until why; do
-      [ "$key" = "$3" ] || continue
-      case "$until" in ''|*[!0-9]*) continue ;; esac
-      [ "$until" -gt "$NOW" ] || continue
-      printf 'recorded quota failure for %s until %s (%s)\n' "$3" "$(date -u -d "@$until" +%Y-%m-%dT%H:%MZ 2>/dev/null || date -u -r "$until" +%Y-%m-%dT%H:%MZ 2>/dev/null || printf '%s' "$until")" "${why:-no detail}"
-      return 0
-    done < "$FAILURES"
+profile_scope() {
+  local account=${3:-} selection
+  if [ "$#" -lt 3 ]; then
+    selection=$(fm_worker_account_resolve "$1" "$CONFIG") || return 1
+    account=${selection%%$'\t'*}
   fi
-  case "$3" in harness:*) return 1 ;; esac
-  quota_snapshot
-  [ -n "$QUOTA_JSON" ] || return 1
-  scope_model=${2##*/}
-  effective=$(printf '%s\n' "$QUOTA_JSON" | jq -r --arg h "$1" --arg m "$2" --arg sm "$scope_model" --arg p "$3" \
-    "$FM_QUOTA_ROW_JQ"'quota_effective(.; $p; $sm; quota_lane($h; $m)) |
-      if (.runway.status // "") == "exhausted_now" or (.status == "known" and .effectivePercentRemaining == 0)
-      then "quota-axi reports \($p) \(.scope // "quota") exhausted" else empty end' 2>/dev/null) || effective=
+  case "$1" in
+    claude) account=${account:-${CLAUDE_CONFIG_DIR:-ordinary}} ;;
+    pi|pi-signed)
+      if [ "$account" = ordinary ]; then account="$HOME/.pi/agent"; fi
+      account=${account:-${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}}
+      ;;
+    codex) account=${CODEX_HOME:-$HOME/.codex} ;;
+  esac
+  jq -cn --arg h "$1" --arg m "$2" --arg a "$account" '{harness:$h, model:$m, account:$a}'
+}
+
+# Prints the evidence and succeeds only when the profile is known exhausted.
+exhausted_evidence() {
+  local scope_model effective=
+  if [ -n "$3" ] && [ -n "$QUOTA_JSON" ]; then
+    scope_model=${2##*/}
+    effective=$(printf '%s\n' "$QUOTA_JSON" | jq -r --arg h "$1" --arg m "$2" --arg sm "$scope_model" --arg p "$3" \
+      "$FM_QUOTA_ROW_JQ"'quota_effective(.; $p; $sm; quota_lane($h; $m)) |
+        if (.runway.status // "") == "exhausted_now" or (.status == "known" and .effectivePercentRemaining == 0)
+        then "quota-axi reports \($p) \(.scope // "quota") exhausted" else empty end' 2>/dev/null) || effective=
+  fi
+  if [ -z "$effective" ] && [ -f "$FAILURES" ]; then
+    effective=$(jq -Rr --argjson scope "$4" --argjson now "$NOW" '
+      fromjson? | select(.scope == $scope and (.until | type) == "number" and .until > $now) |
+      "recorded quota failure for \(.scope.harness) \(.scope.model) until \(.until) (\(.why))"
+    ' "$FAILURES" 2>/dev/null) || effective=
+  fi
   [ -n "$effective" ] || return 1
   printf '%s\n' "$effective"
 }
 
 # Ordered "<harness>|<model>|<effort>|<provider>" lines, excluding the request.
-candidates() {  # <harness> <model> <effort>
+candidates() {  # <harness> <model>
   [ -f "$DISPATCH" ] || return 0
-  jq -r --arg h "$1" --arg m "$2" --arg e "$3" '
+  jq -r --arg h "$1" --arg m "$2" '
     def profiles: if . == null then [] elif type == "array" then . else [.] end;
-    def matches: .harness == $h and ((.model // "") == $m or $m == "" or (.model // "") == "");
-    ([(.rules // [])[] | .use | profiles | select(any(.[]; matches)) | .[]] + (.default | profiles))
+    def matches: .harness == $h and (.model // "") == $m;
+    [(.rules // [])[].use, .default | profiles | select(any(.[]; matches))]
+    | if length == 1 then .[0] else [] end
     | map({harness, model: (.model // ""), effort: (.effort // ""), provider: (.provider // "")})
     | reduce .[] as $c ([]; if any(.[]; .harness == $c.harness and .model == $c.model and .effort == $c.effort) then . else . + [$c] end)
-    | map(select((.harness == $h and .model == $m and .effort == $e) | not))
+    | map(select((.harness == $h and .model == $m) | not))
     | .[] | [.harness, .model, .effort, .provider] | join("|")' "$DISPATCH" 2>/dev/null \
     || die "config/crew-dispatch.json cannot be read as dispatch profiles; fix it rather than switching around it" 2
 }
 
 # Sets CHOSEN to the profile to launch; returns 75 when nothing has quota.
 choose() {  # <harness> <model> <effort>
-  local provider evidence h m e p list
-  provider=$(profile_provider "$1" "$2" "$(declared_provider "$1" "$2")")
+  local provider evidence h m e p list scope alternative_scope
+  scope=${4:-}
+  [ -n "$scope" ] || scope=$(profile_scope "$1" "$2") || return 1
+  quota_snapshot
+  provider=$(profile_provider "$1" "$(declared_provider "$1" "$2")")
   CHOSEN="$1|$2|$3"
-  evidence=$(exhausted_evidence "$1" "$2" "$provider") || return 0
-  list=$(candidates "$1" "$2" "$3") || exit $?
+  evidence=$(exhausted_evidence "$1" "$2" "$provider" "$scope") || return 0
+  list=$(candidates "$1" "$2") || exit $?
   while IFS='|' read -r h m e p; do
     [ -n "$h" ] || continue
-    p=$(profile_provider "$h" "$m" "$p")
-    exhausted_evidence "$h" "$m" "$p" >/dev/null && continue
+    p=$(profile_provider "$h" "$p")
+    alternative_scope=$(profile_scope "$h" "$m") || return 1
+    exhausted_evidence "$h" "$m" "$p" "$alternative_scope" >/dev/null && continue
     CHOSEN="$h|$m|$e"
     printf 'quota: %s %s is exhausted (%s); using %s %s instead\n' "$1" "${2:-default}" "$evidence" "$h" "${m:-default}" >&2
     return 0
   done <<< "$list"
-  printf 'deferred: %s %s is exhausted (%s) and no other configured dispatch profile has quota left, so the work stays queued\n' "$1" "${2:-default}" "$evidence" >&2
+  printf 'deferred: %s %s is exhausted (%s) and no configured alternative exists or has quota left, so the work stays queued\n' "$1" "${2:-default}" "$evidence" >&2
   return 75
 }
 
 record_failure() {  # <harness> <model> <until> <why>
-  local provider why=${4//$'\t'/ }
-  provider=$(profile_provider "$1" "$2" "$(declared_provider "$1" "$2")")
+  local scope=${5:-}
+  [ -n "$scope" ] || scope=$(profile_scope "$1" "$2") || return 1
   mkdir -p "$STATE"
-  printf '%s\t%s\t%s\n' "$provider" "$3" "${why//$'\n'/ }" >> "$FAILURES" \
+  jq -cn --argjson scope "$scope" --argjson until "$3" --arg why "$4" \
+    '{scope:$scope, until:$until, why:$why}' >> "$FAILURES" \
     || die "cannot record the quota failure in $FAILURES"
 }
 
@@ -191,7 +217,7 @@ parse_profile_flags() {
 }
 
 relaunch_task() {  # <task-id>
-  local id=$1 meta marker kind harness model effort pane line h m e note rc
+  local id=$1 meta marker kind harness model effort pane line h m e note rc scope
   case "$id" in ''|*/*|.*) die "relaunch needs an exact task id" 2 ;; esac
   meta="$STATE/$id.meta"
   [ -f "$meta" ] || die "no task record for '$id' in this home"
@@ -202,6 +228,8 @@ relaunch_task() {  # <task-id>
   harness=$(fm_meta_get "$meta" harness)
   model=$(fm_meta_get "$meta" model)
   effort=$(fm_meta_get "$meta" effort)
+  [ "$model" != default ] || model=
+  [ "$effort" != default ] || effort=
   [ -n "$harness" ] || die "task '$id' records no harness"
   pane=$(FM_HOME="$FM_HOME" "$SCRIPT_DIR/fm-peek.sh" "$id" 60 2>/dev/null) \
     || die "cannot read task '$id''s terminal to confirm a quota failure"
@@ -210,8 +238,9 @@ relaunch_task() {  # <task-id>
     echo "no quota failure is visible in task '$id''s terminal; nothing changed"
     exit 3
   fi
-  record_failure "$harness" "$model" "$((NOW + FAILURE_TTL))" "task $id: $line"
-  choose "$harness" "$model" "$effort" || exit $?
+  scope=$(profile_scope "$harness" "$model" "$(fm_meta_get "$meta" account)") || exit 1
+  record_failure "$harness" "$model" "$((NOW + FAILURE_TTL))" "task $id: $line" "$scope" || exit $?
+  choose "$harness" "$model" "$effort" "$scope" || exit $?
   IFS='|' read -r h m e <<< "$CHOSEN"
   [ "$h|$m|$e" != "$harness|$model|$effort" ] \
     || die "the quota failure was recorded but task '$id''s own profile still reads as available; refusing to relaunch onto the same runtime"

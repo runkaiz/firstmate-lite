@@ -548,8 +548,8 @@ test_exhausted_profile_spawns_next_configured_candidate() {
   id=profile-quota-switch-z15
   rec=$(make_spawn_case profile-quota-switch claude "$id")
   read_case_record "$rec"
-  enable_dispatch_profile "$HOME_DIR"
-  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok --why "usage limit reached" \
+  printf '%s\n' '{"default":[{"harness":"grok","model":"grok-4","effort":"high"},{"harness":"codex","model":"gpt-5","effort":"medium"}]}' > "$HOME_DIR/config/crew-dispatch.json"
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok --model grok-4 --why "usage limit reached" \
     || fail "recording the quota failure should succeed"
 
   out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
@@ -567,9 +567,9 @@ test_spawn_defers_when_every_candidate_is_exhausted() {
   id=profile-quota-defer-z16
   rec=$(make_spawn_case profile-quota-defer claude "$id")
   read_case_record "$rec"
-  enable_dispatch_profile "$HOME_DIR"
-  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok >/dev/null
-  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness codex >/dev/null
+  printf '%s\n' '{"default":[{"harness":"grok","model":"grok-4","effort":"high"},{"harness":"codex","model":"gpt-5","effort":"medium"}]}' > "$HOME_DIR/config/crew-dispatch.json"
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok --model grok-4 >/dev/null
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness codex --model gpt-5 >/dev/null
 
   out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
     "$id" "$PROJ_DIR" --harness grok --model grok-4 --effort high)

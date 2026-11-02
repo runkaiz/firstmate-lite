@@ -1161,12 +1161,13 @@ See [`docs/examples/crew-dispatch.json`](examples/crew-dispatch.json) for a star
 
 **Quota failover**
 
-While the file exists, a worker never knowingly launches on a runtime whose quota is exhausted, and a worker stopped by a quota or usage limit moves once to the next configured profile; this needs no typed-resolution key.
+While the file exists, a worker never knowingly launches on a runtime whose quota is exhausted, and a worker stopped by a quota or usage limit moves once to an eligible alternative; this needs no typed-resolution key.
 `bin/fm-quota-failover.sh`'s header owns the evidence, candidate order, failure patterns, and exit codes.
 
-- A fresh ship or scout spawn whose adapter is positively known exhausted - by a recent recorded quota failure or a quota-axi runway reported exhausted - launches the next configured profile instead and prints one `quota:` line naming both.
-- When no configured profile has quota left, the spawn prints one `deferred:` line and exits 75, so the work stays queued like a spawn refused by project capacity.
-- When a worker's terminal shows a genuine quota or usage-limit failure, `fm-quota-failover.sh relaunch <task-id>` records it and replaces the worker once through `bin/fm-control.sh relaunch` on the next configured profile, in the same local copy with a progress note; a second failure for the same task is reported rather than retried.
+- A fresh ship or scout spawn whose adapter is positively known exhausted - by a recent recorded quota failure or a quota-axi runway reported exhausted - launches the next eligible profile in its unique matching rule or default array instead and prints one `quota:` line naming both.
+- Matching requires the exact harness and model; a profile occurring in multiple entries, in a single-profile entry, or in no entry has no configured alternative.
+- When no eligible alternative exists or has quota left, the spawn prints one `deferred:` line and exits 75, so the work stays queued like a spawn refused by project capacity.
+- When a worker's terminal shows a genuine quota or usage-limit failure, `fm-quota-failover.sh relaunch <task-id>` records it and replaces the worker once through `bin/fm-control.sh relaunch` on the next eligible profile, in the same local copy with a progress note; a second failure for the same task is reported rather than retried.
 - Missing or unreadable quota data, a bare 429, and transient rate-limit or overload messages never move a worker.
 - Account pins and no-mistakes validation-agent settings are never changed: the relaunch still applies `config/claude-account` and `config/pi-account` before it stops anything.
 

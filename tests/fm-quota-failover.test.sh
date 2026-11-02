@@ -18,6 +18,7 @@ cp -R "$ROOT/bin" "$COPY/bin"
 
 cat > "$FAKEBIN/quota-axi" <<'SH'
 #!/usr/bin/env bash
+[ -z "${FM_TEST_QUOTA_CALLS:-}" ] || printf 'call\n' >> "$FM_TEST_QUOTA_CALLS"
 [ -n "${FM_TEST_QUOTA_JSON:-}" ] || exit 1
 cat "$FM_TEST_QUOTA_JSON"
 SH
@@ -81,8 +82,9 @@ test_quota_axi_exhaustion_moves_to_next_candidate() {
   local home out status
   home=$(new_home axi)
   quota_fixture "$home/quota.json" codex exhausted_now 0
-  out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6 --effort medium)
+  out=$(FM_TEST_QUOTA_CALLS="$home/calls" FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6 --effort medium)
   status=$?
+  assert_equals "call" "$(cat "$home/calls")" "requested profile and alternatives must share one snapshot"
   expect_code 0 "$status" "pick past an exhausted provider"
   assert_contains "$out" "quota: codex gpt-6 is exhausted (quota-axi reports codex all_models exhausted); using pi opencode-go/kimi instead" \
     "the switch must name both profiles and the evidence"
@@ -91,18 +93,20 @@ test_quota_axi_exhaustion_moves_to_next_candidate() {
 }
 
 test_recorded_failure_is_honored_until_it_expires() {
-  local home out
+  local home out status
   home=$(new_home recorded)
   failover "$home" record --harness pi --model opencode-go/kimi --why "Go usage limit exceeded" >/dev/null \
     || fail "record should succeed"
-  assert_grep "opencode-go" "$home/state/quota-failures" "the declared provider must key the record"
+  jq -e '.scope.harness == "pi" and .scope.model == "opencode-go/kimi" and (.scope.account | length > 0)' \
+    "$home/state/quota-failures" >/dev/null || fail "persisted failure must carry the exact scope"
   quota_fixture "$home/quota.json" codex exhausted_now 0
   out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6 --effort medium)
-  assert_contains "$out" "claude|claude-opus-5-5|high" "a recorded failure must skip that candidate"
+  status=$?
+  expect_code 75 "$status" "recorded failure must exclude the only eligible alternative"
   out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness pi --model opencode-go/kimi)
-  assert_contains "$out" "recorded quota failure for opencode-go" "the record itself must move the launch"
+  assert_contains "$out" "recorded quota failure for pi opencode-go/kimi" "the record itself must move the launch"
   assert_contains "$out" "codex|gpt-6|medium" "the first other rule candidate must be chosen"
-  printf 'claude\t1\told\n' >> "$home/state/quota-failures"
+  failover "$home" record --harness claude --model claude-opus-5-5 --until 1 >/dev/null
   out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness claude --model claude-opus-5-5 --effort high)
   assert_equals "claude|claude-opus-5-5|high" "$out" "an expired record must not move the launch"
   pass "a recorded quota failure moves launches until it expires"
@@ -111,7 +115,6 @@ test_recorded_failure_is_honored_until_it_expires() {
 test_every_candidate_exhausted_defers() {
   local home out status
   home=$(new_home defer)
-  failover "$home" record --harness claude >/dev/null
   failover "$home" record --harness pi --model opencode-go/kimi >/dev/null
   quota_fixture "$home/quota.json" codex exhausted_now 0
   out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6 --effort medium)
@@ -121,13 +124,116 @@ test_every_candidate_exhausted_defers() {
   pass "with every configured candidate exhausted the launch defers with exit 75"
 }
 
-test_unlisted_profile_falls_back_to_default() {
+test_only_unambiguous_matching_arrays_supply_alternatives() {
+  local home out status config
+  home=$(new_home matching)
+  failover "$home" record --harness codex --model gpt-6 >/dev/null
+  for config in \
+    '{"rules":[],"default":[{"harness":"claude"}]}' \
+    '{"rules":[{"use":{"harness":"codex","model":"gpt-6"}}],"default":[{"harness":"claude"}]}' \
+    '{"rules":[{"use":[{"harness":"codex"},{"harness":"claude"}]}]}' \
+    '{"rules":[{"use":[{"harness":"codex","model":"gpt-6"},{"harness":"claude"}]},{"use":[{"harness":"codex","model":"gpt-6"},{"harness":"grok"}]}]}' \
+    '{"rules":[{"use":[{"harness":"codex","model":"gpt-6"},{"harness":"claude"}]}],"default":[{"harness":"codex","model":"gpt-6"},{"harness":"grok"}]}' \
+    '{"default":[{"harness":"codex","model":"gpt-6","effort":"high"},{"harness":"codex","model":"gpt-6","effort":"low"}]}'; do
+    printf '%s\n' "$config" > "$home/config/crew-dispatch.json"
+    out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness codex --model gpt-6)
+    status=$?
+    expect_code 75 "$status" "no unique eligible alternative: $config"
+    assert_contains "$out" "no configured alternative exists" "deferral must explain the missing alternative"
+  done
+  printf '%s\n' '{"default":[{"harness":"codex","model":"gpt-6"},{"harness":"claude"}]}' > "$home/config/crew-dispatch.json"
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness codex --model gpt-6)
+  expect_code 0 "$?" "a uniquely matching default array"
+  assert_contains "$out" "claude||" "the matching default must provide its own alternative"
+  failover "$home" record --harness codex >/dev/null
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness codex)
+  expect_code 75 "$?" "an omitted requested model must not match a named model"
+  pass "only an exact, unique matching entry supplies alternatives"
+}
+
+test_failure_scope_is_exact() {
+  local home out model harness account
+  home=$(new_home scopes)
+  printf '%s\n' '{"default":[{"harness":"pi","model":"openai-codex-work/gpt-6","provider":"codex"},{"harness":"codex","model":"gpt-6"}]}' > "$home/config/crew-dispatch.json"
+  failover "$home" record --harness pi --model openai-codex-work/gpt-6 >/dev/null
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness pi --model openai-codex-work/gpt-6)
+  expect_code 0 "$?" "Pi exhaustion must leave native Codex eligible"
+  assert_contains "$out" "codex|gpt-6|" "a recorded Pi failure must not block native Codex"
+  for model in openai-codex-personal/gpt-6 openai-codex-work/gpt-7 ''; do
+    out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness pi --model "$model")
+    assert_equals "pi|$model|" "$out" "a narrower record must not block another lane/model or an omitted model"
+  done
+  for harness in pi pi-signed claude codex; do
+    for account in a b; do mkdir -p "$home/$account"; done
+    out=$(PI_CODING_AGENT_DIR="$home/a" CLAUDE_CONFIG_DIR="$home/a" CODEX_HOME="$home/a" \
+      failover "$home" record --harness "$harness" --model scoped)
+    expect_code 0 "$?" "record with ambient credential source"
+    out=$(PI_CODING_AGENT_DIR="$home/b" CLAUDE_CONFIG_DIR="$home/b" CODEX_HOME="$home/b" FM_TEST_QUOTA_JSON='' \
+      failover "$home" pick --harness "$harness" --model scoped)
+    assert_equals "$harness|scoped|" "$out" "ambient credential roots must not share failures"
+  done
+  for harness in claude pi pi-signed; do
+    case "$harness" in claude) account=claude-account ;; *) account=pi-account ;; esac
+    printf '%s\n' "$home/a" > "$home/config/$account"
+    [ "$harness" = claude ] || printf 'openai-codex-work\n' >> "$home/config/$account"
+    failover "$home" record --harness "$harness" --model openai-codex-work/gpt-6 >/dev/null
+    printf '%s\n' "$home/b" > "$home/config/$account"
+    [ "$harness" = claude ] || printf 'openai-codex-work\n' >> "$home/config/$account"
+    out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness "$harness" --model openai-codex-work/gpt-6)
+    assert_equals "$harness|openai-codex-work/gpt-6|" "$out" "different account pins must not share failures"
+  done
+  printf 'codex\t9999999999\tlegacy\n' >> "$home/state/quota-failures"
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness codex --model gpt-6)
+  assert_equals "codex|gpt-6|" "$out" "provider-only legacy records must not block a launch"
+  pass "failure records isolate runtimes, account sources, and exact models"
+}
+
+test_unknown_providers_ignore_live_quota() {
+  local home out harness
+  home=$(new_home unknown-provider)
+  quota_fixture "$home/quota.json" codex exhausted_now 0
+  for harness in opencode pi pi-signed omp; do
+    printf '{"default":[{"harness":"%s","model":"custom"},{"harness":"claude"}]}\n' "$harness" > "$home/config/crew-dispatch.json"
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model custom)
+    assert_equals "$harness|custom|" "$out" "undeclared multi-provider identity must stay unknown"
+    failover "$home" record --harness "$harness" --model custom >/dev/null
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model custom)
+    assert_contains "$out" "claude||" "an exact recorded failure still applies without a provider declaration"
+    printf '{"default":[{"harness":"codex","model":"gpt-6"},{"harness":"%s","model":"other"}]}\n' "$harness" > "$home/config/crew-dispatch.json"
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6)
+    assert_contains "$out" "$harness|other|" "an undeclared alternative must not inherit another provider's exhaustion"
+  done
+  for harness in opencode pi pi-signed omp; do
+    printf '{"default":[{"harness":"%s","model":"specific","provider":"codex"},{"harness":"claude"}]}\n' "$harness" > "$home/config/crew-dispatch.json"
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness")
+    assert_equals "$harness||" "$out" "missing models must not inherit a named profile's provider"
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model specific)
+    assert_contains "$out" "claude||" "exact declared providers must still use live evidence"
+    printf '{"default":[{"harness":"%s","provider":"codex"},{"harness":"claude"}]}\n' "$harness" > "$home/config/crew-dispatch.json"
+    out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model specific)
+    assert_equals "$harness|specific|" "$out" "named models must not inherit an unqualified profile's provider"
+  done
+  pass "multi-provider profiles require exact provider declarations for live evidence"
+}
+
+test_account_scoped_live_evidence_survives_unrelated_records() {
   local home out
-  home=$(new_home unlisted)
-  failover "$home" record --harness grok >/dev/null
-  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness grok --model grok-4)
-  assert_contains "$out" "claude|claude-opus-5-5|high" "a profile in no rule must fall back to the default set"
-  pass "a profile named by no rule falls back to the default profiles"
+  home=$(new_home lanes)
+  printf '%s\n' '{"default":[{"harness":"codex","model":"gpt-6"},{"harness":"pi","model":"openai-codex-work/gpt-6","provider":"codex"}]}' > "$home/config/crew-dispatch.json"
+  quota_fixture "$home/base.json" codex exhausted_now 0
+  jq '.schemaVersion=6 | .providers[0].accountKey="openai-codex-work" |
+    .providers += [(.providers[0] | .accountKey="codex-home" |
+      .quotaSemantics.effectiveAvailability[0].effectivePercentRemaining=50 |
+      .quotaSemantics.effectiveAvailability[0].runway.status="through_reset")]' "$home/base.json" > "$home/quota.json"
+  failover "$home" record --harness pi --model openai-codex-work/other >/dev/null
+  out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6)
+  assert_equals "codex|gpt-6|" "$out" "a healthy native Codex account must stay available"
+  out=$(FM_TEST_QUOTA_CALLS="$home/calls" FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness pi --model openai-codex-work/gpt-6)
+  expect_code 0 "$?" "account-scoped exhaustion must switch to the healthy account"
+  assert_contains "$out" "quota-axi reports codex all_models exhausted" "unmatched records must not hide live account evidence"
+  assert_contains "$out" "codex|gpt-6|" "the healthy account must remain eligible"
+  assert_equals "call" "$(cat "$home/calls")" "account checks must share one snapshot"
+  pass "live evidence binds to the account and remains consulted with unrelated records"
 }
 
 test_relaunch_switches_once_on_a_genuine_quota_failure() {
@@ -154,6 +260,27 @@ test_relaunch_switches_once_on_a_genuine_quota_failure() {
   assert_contains "$out" "already switched runtime once" "the second switch must be refused"
   [ "$(grep -c '^relaunch$' "$home/control.log")" = 1 ] || fail "fm-control must be called exactly once"
   pass "a genuine quota failure switches the worker once and never loops"
+}
+
+test_relaunch_uses_recorded_account_and_default_model() {
+  local home out
+  home=$(new_home relaunch-account)
+  mkdir -p "$home/old" "$home/new"
+  printf '%s\n' "$home/new" > "$home/config/claude-account"
+  printf '%s\n' '{"default":[{"harness":"claude"},{"harness":"codex"}]}' > "$home/config/crew-dispatch.json"
+  write_task "$home" task-pin claude default default
+  printf 'account=%s\n' "$home/old" >> "$home/state/task-pin.meta"
+  printf '%s\n' "You've hit your usage limit." > "$home/pane.txt"
+  out=$(FM_TEST_PANE="$home/pane.txt" FM_TEST_QUOTA_JSON='' relaunch "$home" task-pin)
+  expect_code 0 "$?" "relaunch must match the default model and stopped worker's scope: $out"
+  jq -e --arg account "$home/old" '.scope.account == $account and .scope.model == ""' \
+    "$home/state/quota-failures" >/dev/null || fail "failure must retain the stopped worker's account and normalized model"
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness claude --model default)
+  assert_equals "claude||" "$out" "the old worker's failure must not block the new account pin"
+  printf '%s\n' "$home/old" > "$home/config/claude-account"
+  out=$(FM_TEST_QUOTA_JSON='' failover "$home" pick --harness claude)
+  assert_contains "$out" "codex||" "the same old account must still match its recorded failure"
+  pass "relaunch records the stopped account and normalizes default metadata"
 }
 
 test_relaunch_ignores_transient_and_old_messages() {
@@ -203,8 +330,12 @@ test_available_profile_is_kept
 test_quota_axi_exhaustion_moves_to_next_candidate
 test_recorded_failure_is_honored_until_it_expires
 test_every_candidate_exhausted_defers
-test_unlisted_profile_falls_back_to_default
+test_only_unambiguous_matching_arrays_supply_alternatives
+test_failure_scope_is_exact
+test_unknown_providers_ignore_live_quota
+test_account_scoped_live_evidence_survives_unrelated_records
 test_relaunch_switches_once_on_a_genuine_quota_failure
+test_relaunch_uses_recorded_account_and_default_model
 test_relaunch_ignores_transient_and_old_messages
 test_relaunch_without_quota_left_changes_nothing
 test_home_is_required
