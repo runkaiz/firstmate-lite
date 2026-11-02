@@ -932,7 +932,7 @@ The address selects the existing shared server; it does not authorize starting o
 ## Browser MCP pin (config/browser-mcp)
 
 The optional local, gitignored `config/browser-mcp` pins this machine's worker browser tooling: a dedicated chrome-devtools-mcp install and a Chrome for Testing executable, each by absolute path and SHA-256.
-When the file exists, `fm-spawn.sh` verifies the pins and attaches [`bin/fm-browser-mcp.sh`](../bin/fm-browser-mcp.sh) to each new Claude Code worker and relaunch as the `browser` MCP server.
+When the file exists, `fm-spawn.sh` verifies the pins and attaches [`bin/fm-browser-mcp.sh`](../bin/fm-browser-mcp.sh) to each supported worker launch and relaunch (runtime table below) as the `browser` MCP server.
 A pin that does not verify refuses the launch before the worker starts, naming the drifted file and both hashes.
 Without the file, workers get no browser server, and their instructions tell them to report that rather than install or fetch a browser tool.
 The launcher never runs `npx` or downloads anything, so the browser stack changes only when the pins are deliberately updated.
@@ -957,7 +957,17 @@ The launcher's header owns the file format, server flags, and lifetime contract.
 | Runtime | With `config/browser-mcp` |
 | --- | --- |
 | `claude` | Attached on every template launch and relaunch. |
-| Every other runtime, and a raw launch command | Not attached and not checked; such a worker has no browser tools unless its own MCP configuration runs `bin/fm-browser-mcp.sh <home>/config/browser-mcp`. |
+| `codex` | Attached through a per-launch `-c` override of `mcp_servers.browser`, including on relaunch. |
+| `opencode` | Attached through the existing `OPENCODE_CONFIG_CONTENT`, preserving permission and model-effort settings. |
+| `gemini` | Attached through the existing per-task `GEMINI_CLI_SYSTEM_SETTINGS_PATH` file, preserving lifecycle hooks. |
+| `pi`, `pi-signed` | Not attached: the verified launch CLI has no per-launch MCP server configuration option. Pi 1.4.0 supports user/project MCP files, but Firstmate does not rewrite those files or replace its account directory to inject a server. |
+| `grok`, `kimi`, `cursor`, `omp`, `muse`, `rovo`, `agy`, `devin` | Not attached: no per-launch browser MCP configuration route is verified for these adapters. Existing MCP support in a runtime does not establish that launch override capability. |
+| Raw launch command | Not attached or checked; the command owner supplies its MCP configuration. |
+
+Unsupported runtimes and launches without pins receive an explicit notice in the generated launch instructions that this launch supplies no browser tool.
+An independently configured session can still expose browser tools; otherwise workers report the limitation without installing tools.
+The same launch construction covers ships, scouts, relaunches, and each backend; existing supervisor sessions require their own MCP registration.
+[Runtime verification](verification/runtime-backends.md#pinned-browser-mcp-server) records capability evidence and live-check limits.
 
 ## Home brief include (config/brief-include.md)
 

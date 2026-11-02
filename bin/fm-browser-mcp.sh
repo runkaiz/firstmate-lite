@@ -28,7 +28,7 @@
 # closes, even if the server is killed. bin/fm-teardown.sh's
 # stop_owned_browser_mcp is the backstop for a server left in a task copy.
 #
-# bin/fm-spawn.sh attaches this server to Claude Code workers when the home has
+# bin/fm-spawn.sh attaches this server to supported workers when the home has
 # config/browser-mcp; docs/configuration.md "Browser MCP pin" owns setup and
 # per-harness support.
 set -eu

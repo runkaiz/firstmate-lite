@@ -49,7 +49,16 @@ A direct protocol probe of the same pins also confirmed that the browser exits w
 Claude Code 2.1.316 attached the launcher through `--mcp-config '{"mcpServers":{"browser":{"args":["<home>/config/browser-mcp"],"command":"<root>/bin/fm-browser-mcp.sh"}}}'` in a `claude -p` run from a scratch directory.
 The run navigated to a data URL, evaluated its title, and wrote a screenshot into that directory, replying `TITLE=FM claude probe SHOT=yes`.
 No process with that directory as its cwd remained after the run.
-Other runtimes were not exercised because `fm-spawn.sh` attaches the server to Claude Code launches only.
+The Claude run above is the live browser proof; it does not establish live browser behavior for other runtimes.
+The spawn regression entry point is `bash tests/fm-spawn-dispatch-profile.test.sh --browser-mcp`: it executes generated launches against argument-capture processes and checks the resulting server configuration, retained permissions/effort/hooks, missing-pin behavior, invalid-pin refusals, and worker availability instructions.
+Set `FM_BROWSER_MCP_CODEX_BIN="$(command -v codex)"` on that command to additionally consume the generated overrides with the installed `codex mcp get browser --json`, without starting a model session.
+On 2026-11-01, installed `codex --version` reported `codex-cli 0.165.0`; its `--help` and `mcp get --help` expose per-launch TOML overrides.
+The focused regression with `FM_BROWSER_MCP_CODEX_BIN="$(command -v codex)"` exited 0 on that date, including Codex consuming the generated override and returning the enabled stdio server with the exact launcher and pin-file argument.
+Installed `pi --version` reported `1.4.0`; `pi --help` and `pi mcp --help` expose user/project MCP files and no per-launch MCP server override, so Pi and Pi-signed remain explicitly unattached.
+OpenCode's [inline configuration](https://opencode.ai/docs/config/) and [local server schema](https://opencode.ai/docs/mcp-servers/) establish its per-launch configuration shape.
+Gemini's [MCP settings](https://geminicli.com/docs/tools/mcp-server/) use the existing per-task system-settings carrier verified by its adapter.
+OpenCode and Gemini executables were absent from PATH on that date, so their generated launch contracts have portable coverage but no live CLI or browser verification here.
+Other adapter references do not establish a per-launch MCP override; the runtime table in [configuration.md](../configuration.md#browser-mcp-pin-configbrowser-mcp) records those limits.
 
 ## Native Git task copies
 
