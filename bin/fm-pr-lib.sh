@@ -860,56 +860,8 @@ FIELDS
   FM_PR_RECORD_MERGED=$merged
 }
 
-fm_pr_github_read_record_with_gh_axi() {  # <owner> <repo> <number>
-  local owner=$1 repo=$2 number=$3 output state
-  FM_PR_RECORD_STATE=
-  FM_PR_RECORD_MERGED=
-  if ! output=$(gh-axi pr view "$number" --repo "$owner/$repo" 2>/dev/null); then
-    return 1
-  fi
-  if ! state=$(printf '%s\n' "$output" | awk '
-    $1 == "state:" { count++; value=$2 }
-    END { if (count == 1 && value != "") print value; else exit 1 }
-  '); then
-    return 1
-  fi
-  case "$state" in
-    MERGED|merged)
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_STATE=MERGED
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_MERGED=true
-      ;;
-    OPEN|open)
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_STATE=OPEN
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_MERGED=false
-      ;;
-    CLOSED|closed)
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_STATE=CLOSED
-      # Consumed by bin/fm-crew-state.sh passed_pr_detail.
-      # shellcheck disable=SC2034
-      FM_PR_RECORD_MERGED=false
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
-
 fm_pr_github_read_record() {  # <owner> <repo> <number>
-  if command -v gh >/dev/null 2>&1 && fm_pr_github_read_record_with_gh "$@"; then
-    return 0
-  fi
-  command -v gh-axi >/dev/null 2>&1 || return 1
-  fm_pr_github_read_record_with_gh_axi "$@"
+  command -v gh >/dev/null 2>&1 && fm_pr_github_read_record_with_gh "$@"
 }
 
 

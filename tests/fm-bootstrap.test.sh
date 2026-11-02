@@ -5,14 +5,14 @@
 # BOOTSTRAP_INFO fact, or completed bootstrap no-action fact and is silent when
 # all is well. firstmate consumes the exact 'MISSING: treehouse (install: ...)',
 # 'MISSING: tasks-axi (install: ...)', 'MISSING: quota-axi (install: ...)',
-# 'MISSING: gh-axi (install: ...)', 'PRESENTATION_UNAVAILABLE: lavish-axi ...', and
+# 'PRESENTATION_UNAVAILABLE: lavish-axi ...', and
 # 'BOOTSTRAP_INFO: ...' lines, so those contracts are pinned verbatim. The cases
 # are table-driven over the inputs that vary: whether `treehouse get --help`
 # advertises --lease, which (if any) tasks-axi version is on PATH, whether
 # tasks-axi update advertises --archive-body, whether its mv help advertises
 # multi-ID moves, whether quota-axi is on PATH,
 # whether the local backend config opts out of tasks-axi backlog mutations,
-# which no-mistakes version is on PATH, which gh-axi version is on PATH, and
+# which no-mistakes version is on PATH, and
 # which lavish-axi version is on PATH.
 # Dedicated fleet-sync cases pin the computed bootstrap timeout, explicit
 # override, blank-env defaulting, partial-output relay, and pre-launch timeout
@@ -45,15 +45,6 @@ make_fake_toolchain() {
   fakebin=$(fm_fakebin "$dir")
   fm_fake_exit0 "$fakebin" tmux node chrome-devtools-axi
   fm_fake_version_tool "$fakebin" lavish-axi FM_FAKE_LAVISH_AXI_VERSION 0.1.80
-  cat > "$fakebin/gh-axi" <<'SH'
-#!/usr/bin/env bash
-if [ "${1:-}" = --version ]; then
-  printf '%s\n' "${FM_FAKE_GH_AXI_VERSION:-0.1.29}"
-  exit 0
-fi
-exit 0
-SH
-  chmod +x "$fakebin/gh-axi"
   cat > "$fakebin/gh" <<'SH'
 #!/usr/bin/env bash
 if [ "${1:-}" = auth ] && [ "${2:-}" = status ]; then
@@ -324,7 +315,7 @@ test_bootstrap_requires_only_selected_workflow_tools() {
   printf '%s\n' manual > "$home/config/backlog-backend"
   printf '%s\n' '- local [local-only] - fixture' > "$home/data/projects.md"
   fakebin=$(make_fake_toolchain "$dir")
-  for tool in gh gh-axi no-mistakes quota-axi tasks-axi chrome-devtools-axi; do
+  for tool in gh no-mistakes quota-axi tasks-axi chrome-devtools-axi; do
     cat > "$fakebin/$tool" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$0 $*" >> "$FM_UNUSED_TOOL_LOG"
@@ -346,7 +337,7 @@ SH
   printf '%s\n' '- remote [direct-PR] - fixture' >> "$home/data/projects.md"
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" 'MISSING: gh-axi' "direct-PR must require GitHub tooling"
+  assert_contains "$out" 'NEEDS_GH_AUTH' "direct-PR must require GitHub tooling"
   assert_contains "$out" 'NEEDS_GH_AUTH' "direct-PR must retain authentication checks"
   assert_not_contains "$out" 'MISSING: no-mistakes' "direct-PR must not require validation daemon"
 
@@ -359,7 +350,11 @@ SH
   printf '%s\n' '{"rules":[],"default":{"harness":"codex"}}' > "$home/config/crew-dispatch.json"
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" 'MISSING: quota-axi' "configured routing must retain quota compatibility checks"
+  assert_not_contains "$out" 'MISSING: quota-axi' "single-profile routing must not require quota-axi"
+  printf '%s\n' '{"rules":[{"when":"x","use":[{"harness":"codex"},{"harness":"claude"}],"why":"y"}],"default":{"harness":"codex"}}' > "$home/config/crew-dispatch.json"
+  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
+  assert_contains "$out" 'MISSING: quota-axi' "profile-array routing must retain quota compatibility checks"
   rm "$home/config/backlog-backend"
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
@@ -398,40 +393,9 @@ ROWS
   pass "bootstrap enforces no-mistakes minimum version"
 }
 
-test_gh_axi_min_version() {
-  local label version mode case_dir fakebin out missing n
-  missing='MISSING: gh-axi (install: npm install -g gh-axi && gh-axi setup hooks)'
-  n=0
-  while IFS='^' read -r label version mode; do
-    [ -n "$label" ] || continue
-    n=$((n + 1))
-    case_dir="$TMP_ROOT/gh-axi-$n"
-    mkdir -p "$case_dir/home/config"
-    printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-    fakebin=$(make_fake_toolchain "$case_dir")
-    out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-      FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_FAKE_GH_AXI_VERSION="$version" "$ROOT/bin/fm-bootstrap.sh")
-    case "$mode" in
-      empty)
-        [ -z "$out" ] || fail "$label: expected silence, got: $out" ;;
-      missing)
-        [ "$out" = "$missing" ] || fail "$label: expected '$missing', got: $out" ;;
-    esac
-  done <<'ROWS'
-minimum gh-axi version is accepted^0.1.29^empty
-newer gh-axi patch is accepted^0.1.30^empty
-newer gh-axi minor is accepted^0.2.0^empty
-newer gh-axi major is accepted^1.0.0^empty
-older gh-axi patch reports an upgrade^0.1.19^missing
-much older gh-axi minor reports an upgrade^0.0.9^missing
-unparseable gh-axi version reports an upgrade^gh-axi development build^missing
-ROWS
-  pass "bootstrap enforces gh-axi minimum version"
-}
-
 test_lavish_axi_min_version() {
   local label version mode case_dir fakebin out unavailable upgrade n
-  unavailable='PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi && lavish-axi setup hooks) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish'
+  unavailable='PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish'
   upgrade='BOOTSTRAP_INFO: lavish-axi >=0.1.80 enables confirmed board replies; this older compatible version retains the legacy reply path, but upgrade to prevent handing back a board before its reply is accepted'
   n=0
   while IFS='^' read -r label version mode; do
@@ -529,7 +493,7 @@ test_quota_axi_min_version() {
     case_dir="$TMP_ROOT/quota-axi-$n"
     mkdir -p "$case_dir/home/config"
     printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-    printf '%s\n' '{"rules":[],"default":{"harness":"codex"}}' > "$case_dir/home/config/crew-dispatch.json"
+    printf '%s\n' '{"rules":[],"default":[{"harness":"codex"},{"harness":"claude"}]}' > "$case_dir/home/config/crew-dispatch.json"
     fakebin=$(make_fake_toolchain "$case_dir")
     out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
       FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_FAKE_QUOTA_AXI_VERSION="$version" "$ROOT/bin/fm-bootstrap.sh")
@@ -1267,7 +1231,6 @@ ROWS
 test_bootstrap_reporting
 test_bootstrap_requires_only_selected_workflow_tools
 test_no_mistakes_min_version
-test_gh_axi_min_version
 test_lavish_axi_min_version
 test_tasks_axi_min_version
 test_quota_axi_min_version

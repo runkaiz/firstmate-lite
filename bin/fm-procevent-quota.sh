@@ -128,7 +128,7 @@ quota_json() {
     fi
     fm_quota_axi_version_compatible "$output" || return 3
     rc=0
-    output=$(fm_run_timed "$timeout" quota-axi --json 2>/dev/null </dev/null) || rc=$?
+    output=$(fm_run_timed "$timeout" quota-axi --json --no-credential-refresh 2>/dev/null </dev/null) || rc=$?
     if [ "$rc" -ne 0 ]; then
       if fm_timed_out "$rc"; then
         return 1
@@ -140,7 +140,7 @@ quota_json() {
     output=$(quota-axi --version 2>/dev/null </dev/null) || rc=$?
     [ "$rc" -eq 0 ] || return 4
     fm_quota_axi_version_compatible "$output" || return 3
-    output=$(quota-axi --json 2>/dev/null </dev/null) || return 4
+    output=$(quota-axi --json --no-credential-refresh 2>/dev/null </dev/null) || return 4
   fi
   printf '%s\n' "$output"
 }
