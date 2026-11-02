@@ -1260,9 +1260,13 @@ fm_lock_try_acquire() {
   return "$rc"
 }
 
+# Returns 1 once the lock's parent directory is gone (a torn-down state or
+# config directory): no acquirer can ever create the lock there again, so
+# spinning would strand the caller forever. Callers must handle that failure.
 fm_lock_acquire_wait() {
   local lockdir=$1
   while ! fm_lock_try_acquire "$lockdir"; do
+    case "$lockdir" in */*) [ -d "${lockdir%/*}/" ] || return 1 ;; esac
     sleep 0.1
   done
 }
@@ -2136,7 +2140,7 @@ fm_wake_clean_field() {
 
 fm_wake_append() {
   local status=0
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
+  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || return 1
   fm_wake_append_locked "$@" || status=$?
   fm_lock_release "$FM_WAKE_QUEUE_LOCK"
   return "$status"
@@ -2196,7 +2200,7 @@ fm_wake_queued_keys() {
     signal|stale|check|heartbeat) ;;
     *) printf 'fm_wake_queued_keys: invalid wake kind: %s\n' "$kind" >&2; return 2 ;;
   esac
-  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
+  fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || return 1
   fm_wake_queued_keys_locked "$kind"
   fm_lock_release "$FM_WAKE_QUEUE_LOCK"
 }

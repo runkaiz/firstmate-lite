@@ -915,7 +915,7 @@ main() {
   . "$SCRIPT_DIR/fm-pr-lib.sh"
 
   mkdir -p "$STATE" || return 1
-  fm_lock_acquire_wait "$LOCK"
+  fm_lock_acquire_wait "$LOCK" || return 1
   trap 'fm_lock_release "$LOCK"' EXIT
   # A completed return is a no-op, not a new epoch-zero history window.
   # Keep unrelated wakes and outcomes owned by their ordinary delivery path.

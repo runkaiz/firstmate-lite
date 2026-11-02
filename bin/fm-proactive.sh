@@ -47,7 +47,7 @@ write_preference() {
   # Reuse the portable lock owner; loading it only on writes keeps status pure.
   # shellcheck source=bin/fm-wake-lib.sh
   . "$SCRIPT_DIR/fm-wake-lib.sh"
-  fm_lock_acquire_wait "$CONFIG/.proactive.lock"
+  fm_lock_acquire_wait "$CONFIG/.proactive.lock" || return 1
   trap 'fm_lock_release "$CONFIG/.proactive.lock"' EXIT
   if [ "$1" = toggle ]; then
     MODE=off INVALID=0
