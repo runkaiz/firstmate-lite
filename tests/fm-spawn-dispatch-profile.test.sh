@@ -1587,6 +1587,193 @@ SH
   pass "absent Lavish configuration preserves the destination environment"
 }
 
+write_browser_mcp_pins() {  # <home> [chrome-sha-override]
+  local home=$1 pins="$1/pins"
+  mkdir -p "$pins"
+  printf '// fixture entry\n' > "$pins/chrome-devtools-mcp.js"
+  printf '#!/bin/sh\n' > "$pins/chrome"
+  chmod +x "$pins/chrome"
+  sum() { if command -v sha256sum >/dev/null 2>&1; then sha256sum -- "$1" | cut -d' ' -f1; else shasum -a 256 -- "$1" | cut -d' ' -f1; fi; }
+  printf '%s\n' "mcp=$pins/chrome-devtools-mcp.js" "mcp_sha256=$(sum "$pins/chrome-devtools-mcp.js")" \
+    "chrome=$pins/chrome" "chrome_sha256=${2:-$(sum "$pins/chrome")}" > "$home/config/browser-mcp"
+}
+
+assert_browser_mcp_launch() {
+  local harness=$1 id=$2 expected=$3 launch out
+  cat > "$FAKEBIN_DIR/$harness" <<'SH'
+#!/usr/bin/env bash
+python3 - "$@" <<'PYTHON'
+import json, os, sys
+with open(os.environ['FM_BROWSER_CAPTURE'], 'w') as f:
+    json.dump({'argv': sys.argv[1:], 'opencode': os.environ.get('OPENCODE_CONFIG_CONTENT'),
+               'gemini': os.environ.get('GEMINI_CLI_SYSTEM_SETTINGS_PATH')}, f)
+PYTHON
+SH
+  chmod +x "$FAKEBIN_DIR/$harness"
+  launch=$(cat "$LAUNCH_LOG")
+  FM_BROWSER_CAPTURE="$CASE_DIR/browser-capture.json" PATH="$FAKEBIN_DIR:$PATH" \
+    bash -c "$launch" || fail "$harness generated launch did not execute"
+  out=$(python3 - "$CASE_DIR/browser-capture.json" "$harness" "$ROOT/bin/fm-browser-mcp.sh" \
+    "$(cd "$HOME_DIR/config" && pwd -P)/browser-mcp" "$expected" <<'PYTHON'
+import json, os, subprocess, sys, tomllib
+from pathlib import Path
+capture, harness, command, config, expected = sys.argv[1:]
+data = json.loads(Path(capture).read_text())
+args = data['argv']
+server = None
+if harness == 'claude':
+    if '--mcp-config' in args:
+        server = json.loads(args[args.index('--mcp-config') + 1])['mcpServers']['browser']
+    assert '--settings' in args
+elif harness == 'codex':
+    overrides = [args[i+1] for i, v in enumerate(args) if v == '-c']
+    browser = [v for v in overrides if v.startswith('mcp_servers.browser=')]
+    assert len(browser) <= 1
+    if browser:
+        server = tomllib.loads(browser[0])['mcp_servers']['browser']
+        assert server.pop('enabled') is True
+        if os.environ.get('FM_BROWSER_MCP_CODEX_BIN'):
+            result = subprocess.run([os.environ['FM_BROWSER_MCP_CODEX_BIN'], '-c', browser[0],
+                                     'mcp', 'get', 'browser', '--json'], capture_output=True, text=True)
+            assert result.returncode == 0, result.stderr
+            actual = json.loads(result.stdout)
+            assert actual['enabled'] is True
+            assert actual['transport']['command'] == command
+            assert actual['transport']['args'] == [config]
+    assert 'service_tier="default"' in overrides
+elif harness == 'opencode':
+    settings = json.loads(data['opencode'])
+    assert settings['permission'] == {'*': 'allow'}
+    assert settings['agent']['build']['variant'] == 'high'
+    if 'mcp' in settings:
+        entry = settings['mcp']['browser']
+        assert entry['type'] == 'local' and entry['enabled'] is True
+        server = {'command': entry['command'][0], 'args': entry['command'][1:]}
+elif harness == 'gemini':
+    settings = json.loads(Path(data['gemini']).read_text())
+    assert set(settings['hooks']) == {'BeforeAgent', 'AfterAgent', 'SessionEnd'}
+    server = settings.get('mcpServers', {}).get('browser')
+if expected == 'attached':
+    assert server == {'command': command, 'args': [config]}, server
+else:
+    assert server is None, server
+PYTHON
+  ) || fail "$harness MCP launch contract failed: $out"
+  if [ "$expected" = attached ]; then
+    assert_contains "$(cat "$HOME_DIR/data/$id/launch-brief.md")" 'This launch configures the pinned browser MCP server.' \
+      'generated worker instructions must describe configured browser tools'
+  else
+    assert_contains "$(cat "$HOME_DIR/data/$id/launch-brief.md")" 'No browser tool is supplied by this launch on this runtime.' \
+      'generated worker instructions must disclose missing browser tools'
+  fi
+}
+
+test_browser_mcp_attaches_to_supported_launches() {
+  local harness kind rec id out profile_args target
+  for harness in claude codex opencode; do
+    for kind in ship scout; do
+      id="browser-$harness-$kind"
+      rec=$(make_spawn_case "$id" "$harness" "$id")
+      read_case_record "$rec"
+      mv "$HOME_DIR/config" "$HOME_DIR/pinned config's"
+      ln -s "pinned config's" "$HOME_DIR/config"
+      write_browser_mcp_pins "$HOME_DIR"
+      profile_args=()
+      [ "$harness" != opencode ] || profile_args=(--model openai/gpt-5 --effort high)
+      if [ "$kind" = scout ]; then
+        out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout "${profile_args[@]}")
+      else
+        out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" "${profile_args[@]}")
+      fi
+      expect_code 0 "$?" "$harness $kind spawn failed: $out"
+      assert_browser_mcp_launch "$harness" "$id" attached
+      mv "$FAKEBIN_DIR/tmux" "$FAKEBIN_DIR/tmux-original"
+      cat > "$FAKEBIN_DIR/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$*" in *'#{pane_current_command}'*) printf 'bash\n'; exit 0 ;; esac
+exec "$(dirname "$0")/tmux-original" "$@"
+SH
+      chmod +x "$FAKEBIN_DIR/tmux"
+      target=$(sed -n 's/^window=//p' "$HOME_DIR/state/$id.meta")
+      out=$(FM_FAKE_DUPLICATE_WINDOW="${target#*:}" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" --relaunch "${profile_args[@]}")
+      expect_code 0 "$?" "$harness $kind relaunch failed: $out"
+      assert_browser_mcp_launch "$harness" "$id" attached
+      write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+      if out=$(FM_FAKE_DUPLICATE_WINDOW="${target#*:}" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" --relaunch "${profile_args[@]}"); then
+        fail "$harness $kind relaunch accepted a drifted pin"
+      fi
+      assert_contains "$out" 'not the pinned chrome_sha256' 'relaunch must recheck the pins'
+      [ ! -s "$LAUNCH_LOG" ] || fail 'invalid pins still launched a replacement'
+      pass "$harness $kind launch and relaunch attach the pinned browser server"
+    done
+  done
+}
+
+test_browser_mcp_bad_pin_refuses_supported_launches() {
+  local harness kind rec id out
+  for harness in claude codex opencode; do
+    for kind in ship scout; do
+      id="browser-bad-$harness-$kind"
+      rec=$(make_spawn_case "$id" "$harness" "$id")
+      read_case_record "$rec"
+      write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+      if [ "$kind" = scout ]; then
+        if out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout); then
+          fail "a drifted browser pin should refuse $harness $kind"
+        fi
+      else
+        if out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR"); then
+          fail "a drifted browser pin should refuse $harness $kind"
+        fi
+      fi
+      assert_contains "$out" 'not the pinned chrome_sha256' 'refusal must name the drifted pin'
+      [ ! -s "$LAUNCH_LOG" ] || fail 'a drifted browser pin still launched the worker'
+      [ ! -f "$HOME_DIR/state/$id.meta" ] || fail 'a drifted browser pin provisioned a worker'
+    done
+  done
+  pass 'every supported runtime refuses invalid pins before provisioning ships and scouts'
+}
+
+test_browser_mcp_gemini_remains_unattached() {
+  local kind pin rec id out
+  for kind in ship scout; do
+    for pin in valid invalid; do
+      id="browser-gemini-$kind-$pin"
+      rec=$(make_spawn_case "$id" gemini "$id")
+      read_case_record "$rec"
+      if [ "$pin" = valid ]; then
+        write_browser_mcp_pins "$HOME_DIR"
+      else
+        write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+      fi
+      if [ "$kind" = scout ]; then
+        out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout)
+      else
+        out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+      fi
+      expect_code 0 "$?" "Gemini $kind with $pin browser pins failed: $out"
+      assert_browser_mcp_launch gemini "$id" absent
+    done
+  done
+  pass 'Gemini ships and scouts remain unattached regardless of browser pins'
+}
+
+test_browser_mcp_absent_and_unsupported_launches() {
+  local harness rec id out profile_args
+  for harness in claude codex opencode gemini pi pi-signed; do
+    id="browser-none-$harness"
+    rec=$(make_spawn_case "$id" "$harness" "$id")
+    read_case_record "$rec"
+    case "$harness" in pi*) write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000 ;; esac
+    profile_args=()
+    [ "$harness" != opencode ] || profile_args=(--model openai/gpt-5 --effort high)
+    out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" "${profile_args[@]}")
+    expect_code 0 "$?" "$harness spawn without a supported browser configuration failed: $out"
+    assert_browser_mcp_launch "$harness" "$id" absent
+  done
+  pass 'absent pins and unsupported runtimes disclose that no browser tool is supplied'
+}
+
 test_claude_omits_config_dir_prefix_when_unset() {
   local rec id out status launch
   id=profile-claude-nocfgdir-z18
@@ -1834,9 +2021,6 @@ test_launch_environment_inaccessible_config_refuses() {
 
 
 
-test_launch_environment_allowlist
-test_launch_environment_invalid_config_refuses
-test_launch_environment_inaccessible_config_refuses
 test_worker_launch_delivers_role_scope() {
   local rec id out launch kind prompt envelope encoded brief_kind brief content first_line role_line task_line inbox
   for brief_kind in heading legacy scaffold; do
@@ -2094,8 +2278,20 @@ test_non_claude_harness_ignores_claude_permission_mode() {
   pass "config/claude-permission-mode changes claude launches only"
 }
 
+if [ "${1:-}" = --browser-mcp ]; then
+  test_browser_mcp_gemini_remains_unattached
+  test_browser_mcp_attaches_to_supported_launches
+  test_browser_mcp_bad_pin_refuses_supported_launches
+  test_browser_mcp_absent_and_unsupported_launches
+  exit 0
+fi
+
+test_launch_environment_allowlist
+test_launch_environment_invalid_config_refuses
+test_launch_environment_inaccessible_config_refuses
 test_launch_preserves_inherited_git_config
 test_worker_launch_delivers_role_scope
+
 test_launch_profile_reports_controls_without_inventing_effective_values
 test_no_profile_keeps_claude_profile_defaults
 test_claude_launch_brief_publishes_record_doorbell
@@ -2148,6 +2344,10 @@ test_batch_forwards_shared_profile_flags
 test_claude_forwards_firstmate_config_dir_when_set
 test_lavish_server_address_is_exported_to_worker_launch
 test_lavish_absent_config_preserves_destination_ambient
+test_browser_mcp_attaches_to_supported_launches
+test_browser_mcp_bad_pin_refuses_supported_launches
+test_browser_mcp_absent_and_unsupported_launches
+test_browser_mcp_gemini_remains_unattached
 test_claude_omits_config_dir_prefix_when_unset
 test_claude_permission_mode_bypass_matches_absent_launch
 test_claude_permission_mode_auto_swaps_only_the_permission_flag

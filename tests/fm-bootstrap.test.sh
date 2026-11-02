@@ -43,7 +43,7 @@ unset TMUX TMUX_PANE HERDR_ENV HERDR_PANE_ID HERDR_SESSION HERDR_SOCKET_PATH \
 make_fake_toolchain() {
   local dir=$1 fakebin
   fakebin=$(fm_fakebin "$dir")
-  fm_fake_exit0 "$fakebin" tmux node chrome-devtools-axi
+  fm_fake_exit0 "$fakebin" tmux node
   fm_fake_version_tool "$fakebin" lavish-axi FM_FAKE_LAVISH_AXI_VERSION 0.1.80
   cat > "$fakebin/gh" <<'SH'
 #!/usr/bin/env bash
@@ -315,7 +315,7 @@ test_bootstrap_requires_only_selected_workflow_tools() {
   printf '%s\n' manual > "$home/config/backlog-backend"
   printf '%s\n' '- local [local-only] - fixture' > "$home/data/projects.md"
   fakebin=$(make_fake_toolchain "$dir")
-  for tool in gh no-mistakes quota-axi tasks-axi chrome-devtools-axi; do
+  for tool in gh no-mistakes quota-axi tasks-axi; do
     cat > "$fakebin/$tool" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$0 $*" >> "$FM_UNUSED_TOOL_LOG"

@@ -265,7 +265,7 @@ install_cmd() {
     cmux) echo "brew install --cask cmux  # or see https://cmux.com" ;;
     treehouse) echo "curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh" ;;
     no-mistakes) echo "curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh" ;;
-    chrome-devtools-axi|lavish-axi|quota-axi) echo "npm install -g $1" ;;
+    lavish-axi|quota-axi) echo "npm install -g $1" ;;
     *) return 1 ;;
   esac
 }

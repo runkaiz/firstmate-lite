@@ -763,8 +763,6 @@ id=weave-leftovers
 allocate "$id" || fail 'weave fixture allocation failed'
 WT=$FM_GIT_WORKTREE_PATH
 KEEP="$HOME_DIR/data/$id/preserved-artifacts"
-USER_HOME="$CASE/user-home"
-mkdir -p "$USER_HOME/.chrome-devtools-axi/sessions/weave-task"
 fakebin=$(fm_fakebin "$CASE/fake")
 cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
@@ -774,27 +772,13 @@ cat > "$fakebin/no-mistakes" <<'SH'
 #!/usr/bin/env bash
 exit 0
 SH
-# The fixture tool mirrors the real stop: it resolves the session record from
-# CHROME_DEVTOOLS_AXI_SESSION under $HOME and terminates the pid it names.
-cat > "$fakebin/chrome-devtools-axi" <<'SH'
-#!/usr/bin/env bash
-[ "$1" = stop ] || exit 2
-session=${CHROME_DEVTOOLS_AXI_SESSION:-default}
-printf 'stop session=%s cwd=%s\n' "$session" "$PWD" >> "${FM_TEST_BRIDGE_LOG:?}"
-if [ "$session" = default ]; then record=$HOME/.chrome-devtools-axi/bridge.pid
-else record=$HOME/.chrome-devtools-axi/sessions/$session/bridge.pid; fi
-pid=$(sed -n 's/.*"pid":\([0-9]*\).*/\1/p' "$record")
-[ -n "$pid" ] && kill "$pid"
-SH
-chmod +x "$fakebin/tmux" "$fakebin/no-mistakes" "$fakebin/chrome-devtools-axi"
-BRIDGE_LOG="$CASE/bridge.log"
-: > "$BRIDGE_LOG"
+chmod +x "$fakebin/tmux" "$fakebin/no-mistakes"
 fm_write_meta "$HOME_DIR/state/$id.meta" \
   "window=native-fixture:fm-$id" "endpoint_task_id=$id" 'backend=tmux' \
   "worktree=$WT" "project=$PROJ" 'kind=ship' 'mode=local-only' \
   'spawn_gen=s1792922400.123.456' 'allocator=git'
 run_weave_teardown() {
-  env PATH="$fakebin:$PATH" HOME="$USER_HOME" FM_TEST_BRIDGE_LOG="$BRIDGE_LOG" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+  env PATH="$fakebin:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
     FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
     FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
     bash "$ROOT/bin/fm-teardown.sh" "$id" "$@"
@@ -848,33 +832,29 @@ start_in_copy() { # <argv0> - a process whose cwd is the copy
   LAST_PID=$!
 }
 stop_weave_pids() { kill "${weave_pids[@]}" 2>/dev/null || true; wait 2>/dev/null || true; weave_pids=(); }
-start_in_copy /opt/axi/bin/chrome-devtools-axi-bridge
-bridge=$LAST_PID
-printf '{"pid":%s,"port":9999}' "$((bridge + 100000))" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
-if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail 'an unproven bridge was treated as task-owned'; fi
-assert_contains "$out" 'not proven task-owned' 'unproven bridge refused for the wrong reason'
-kill -0 "$bridge" 2>/dev/null || fail 'teardown stopped a bridge not proven owned by the task'
-[ ! -s "$BRIDGE_LOG" ] || fail "unproven bridge reached the tool's stop: $(cat "$BRIDGE_LOG")"
-weave_intact || fail 'unproven bridge refusal moved content'
-printf '{"pid":%s,"port":9999}' "$bridge" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
+# The pinned server titles itself chrome-devtools-mcp; one running outside the
+# copy belongs to someone else and must survive.
+(cd "$CASE" && exec -a chrome-devtools-mcp sleep 300) &
+foreign=$!
+start_in_copy chrome-devtools-mcp
+server=$LAST_PID
 start_in_copy unrelated-helper
-if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail 'a non-bridge copy process was ignored'; fi
-assert_contains "$out" "copy processes remain after stopping its chrome-devtools-axi bridge: $LAST_PID" 'mixed processes refused without naming the remaining pid'
-if kill -0 "$bridge" 2>/dev/null; then fail 'teardown left the proven bridge running'; fi
+if out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1); then fail "a non-browser copy process was ignored: $out"; fi
+assert_contains "$out" "stopping task-owned browser MCP server process(es) $server" 'the in-copy browser MCP server was not stopped'
+assert_contains "$out" "copy processes remain after stopping its browser MCP server: $LAST_PID" 'mixed processes refused without naming the remaining pid'
+if kill -0 "$server" 2>/dev/null; then fail 'teardown left the in-copy browser MCP server running'; fi
 kill -0 "$LAST_PID" 2>/dev/null || fail 'teardown stopped the unrelated copy process'
-assert_contains "$(cat "$BRIDGE_LOG")" "stop session=weave-task cwd=$WT" "mixed processes did not stop the proven bridge through the tool"
+kill -0 "$foreign" 2>/dev/null || fail 'teardown stopped a browser MCP server outside the copy'
 weave_intact || fail 'mixed process refusal moved content'
-kill "$LAST_PID"; wait "$LAST_PID" 2>/dev/null || true
-start_in_copy /opt/axi/bin/chrome-devtools-axi-bridge
-bridge=$LAST_PID
-printf '{"pid":%s,"port":9999}' "$bridge" > "$USER_HOME/.chrome-devtools-axi/sessions/weave-task/bridge.pid"
+kill "$LAST_PID" "$foreign"; wait "$LAST_PID" "$foreign" 2>/dev/null || true
+start_in_copy /opt/pins/chrome-devtools-mcp/build/src/telemetry/watchdog
+start_in_copy chrome-devtools-mcp
 out=$(run_weave_teardown "${all_weave_names[@]}" 2>&1)
 rc=$?
 stop_weave_pids
-expect_code 0 "$rc" "owned bridge and directory preservation did not complete teardown: $out"
-assert_contains "$(cat "$BRIDGE_LOG")" "stop session=weave-task cwd=$WT" "the tool's own stop did not run from the copy with the owning session"
+expect_code 0 "$rc" "owned browser MCP processes and directory preservation did not complete teardown: $out"
 assert_contains "$out" "'web' holds tracked content; naming its leftover roots instead" 'directory expansion was not reported'
-[ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'owned-bridge teardown left the copy or task record'
+[ ! -e "$WT" ] && [ ! -e "$HOME_DIR/state/$id.meta" ] || fail 'owned browser MCP teardown left the copy or task record'
 for f in web/node_modules/pkg/lib/x.js web/next-env.d.ts web/.next/cache/y web/out/index.html .cache/jdk/a \
   build/out.bin scripts/__pycache__/run.pyc; do
   [ "$(cat "$KEEP/files/$f")" = "generated $f" ] || fail "preserved artifact $f lost content"
@@ -882,7 +862,7 @@ done
 [ ! -e "$KEEP/files/web/package.json" ] && [ ! -e "$KEEP/files/scripts/run.py" ] || fail 'tracked files were moved with leftovers'
 [ "$(cut -f3 "$KEEP/receipt" | LC_ALL=C sort | tr '\n' ' ')" = '.cache build scripts/__pycache__ web/.next web/next-env.d.ts web/node_modules web/out ' ] \
   || fail "receipt does not record each expanded root once: $(cat "$KEEP/receipt")"
-pass 'native teardown expands a named tracked directory to its leftover roots and stops only a task-owned browser bridge'
+pass 'native teardown expands a named tracked directory to its leftover roots and stops only a task-owned browser MCP server'
 
 fm_live_gate default-on FM_NATIVE_TMUX_LIVE_E2E tmux pgrep lsof
 

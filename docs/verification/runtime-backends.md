@@ -35,6 +35,31 @@ Missing-check and revalidation cases exercise no-mistakes' response contract wit
 The measured zero dispatches apply only to the exercised unchanged-CI wait path, excluding pipeline agents, initial handoff, actionable returns and unrelated fleet activity.
 Unacknowledged actionable captures retain the existing bounded re-announcement semantics rather than an exactly-once delivery claim.
 
+## Pinned browser MCP server
+
+Verified on 2026-11-01 on Linux with Node 22.23.2, chrome-devtools-mcp 1.12.0 (entry SHA-256 `e8b0290a8fe9a1edc31d595ccc870df926bfaaafe19fb14cd4d8d47bf6194979`) and Chrome for Testing 153.0.8010.12.
+`bin/fm-teardown.sh`'s `stop_owned_browser_mcp` recognizes the server by the title chrome-devtools-mcp sets for itself, so this guarantee is vendor-dependent.
+Refresh with `FM_BROWSER_MCP_CONFIG=<home>/config/browser-mcp bash tests/fm-browser-mcp-live-e2e.test.sh`, which spends no model tokens:
+
+```text
+ok - pinned browser MCP serves selected-page tools, readable errors, a recognizable title, and exits with its browser on stdin close (title=chrome-devtools-mcp processes=8)
+```
+
+A direct protocol probe of the same pins also confirmed that the browser exits within four seconds after the server receives SIGTERM, SIGHUP or SIGKILL, because the browser's pipe closes.
+Claude Code 2.1.316 attached the launcher through `--mcp-config '{"mcpServers":{"browser":{"args":["<home>/config/browser-mcp"],"command":"<root>/bin/fm-browser-mcp.sh"}}}'` in a `claude -p` run from a scratch directory.
+The run navigated to a data URL, evaluated its title, and wrote a screenshot into that directory, replying `TITLE=FM claude probe SHOT=yes`.
+No process with that directory as its cwd remained after the run.
+The Claude run above is the live browser proof; it does not establish live browser behavior for other runtimes.
+The spawn regression entry point is `bash tests/fm-spawn-dispatch-profile.test.sh --browser-mcp`: it executes generated launches against argument-capture processes and checks the resulting server configuration, retained permissions/effort/hooks, missing-pin behavior, invalid-pin refusals, and worker availability instructions.
+Set `FM_BROWSER_MCP_CODEX_BIN="$(command -v codex)"` on that command to additionally consume the generated overrides with the installed `codex mcp get browser --json`, without starting a model session.
+On 2026-11-01, installed `codex --version` reported `codex-cli 0.165.0`; its `--help` and `mcp get --help` expose per-launch TOML overrides.
+The focused regression with `FM_BROWSER_MCP_CODEX_BIN="$(command -v codex)"` exited 0 on that date, including Codex consuming the generated override and returning the enabled stdio server with the exact launcher and pin-file argument.
+Installed `pi --version` reported `1.4.0`; `pi --help` and `pi mcp --help` expose user/project MCP files and no per-launch MCP server override, so Pi and Pi-signed remain explicitly unattached.
+OpenCode's [inline configuration](https://opencode.ai/docs/config/) and [local server schema](https://opencode.ai/docs/mcp-servers/) establish its per-launch configuration shape.
+OpenCode's generated launch contract has portable coverage; its executable was absent from PATH for the verification above.
+Gemini remains unattached; the [runtime table](../configuration.md#browser-mcp-pin-configbrowser-mcp) records the system-settings carrier limitation, and the spawn regression checks that generated Gemini launches omit the browser server and disclose its absence.
+Other adapter references do not establish a per-launch MCP override; the runtime table in [configuration.md](../configuration.md#browser-mcp-pin-configbrowser-mcp) records those limits.
+
 ## Native Git task copies
 
 Verified on 2026-10-26 UTC with Herdr 0.9.5 and Git 2.56.0 in isolated local-file fixtures.
