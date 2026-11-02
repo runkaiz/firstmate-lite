@@ -236,6 +236,55 @@ test_account_scoped_live_evidence_survives_unrelated_records() {
   pass "live evidence binds to the account and remains consulted with unrelated records"
 }
 
+test_pinned_profiles_ignore_ambient_quota() {
+  local home out harness model pin_file schema
+  for harness in claude pi pi-signed; do
+    case "$harness" in
+      claude) pin_file=claude-account; model=claude-opus-5-5 ;;
+      *) pin_file=pi-account; model=anthropic/claude-opus-5-5 ;;
+    esac
+    for schema in 5 6; do
+      home=$(new_home "pinned-$harness-$schema")
+      mkdir -p "$home/account-b" "$home/account-c"
+      printf '{"default":[{"harness":"codex","model":"gpt-6"},{"harness":"%s","model":"%s","provider":"claude"}]}\n' \
+        "$harness" "$model" > "$home/config/crew-dispatch.json"
+      quota_fixture "$home/base.json" claude exhausted_now 0
+      jq --argjson schema "$schema" '.schemaVersion=$schema |
+        if $schema == 6 then .providers[0].accountKey="default" else . end' \
+        "$home/base.json" > "$home/quota.json"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model "$model")
+      expect_code 0 "$?" "unpinned $harness with schema $schema"
+      assert_contains "$out" "quota-axi reports claude all_models exhausted" "unpinned live evidence must still apply"
+      assert_contains "$out" "codex|gpt-6|" "an exhausted unpinned profile must switch"
+
+      printf '%s\n' "$home/account-b" > "$home/config/$pin_file"
+      [ "$harness" = claude ] || printf 'anthropic\n' >> "$home/config/$pin_file"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model "$model")
+      expect_code 0 "$?" "pinned $harness with schema $schema"
+      assert_equals "$harness|$model|" "$out" "ambient exhaustion must not move a pinned profile"
+
+      failover "$home" record --harness codex --model gpt-6 >/dev/null || fail "record requested failure"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6)
+      expect_code 0 "$?" "pinned $harness alternative with schema $schema"
+      assert_contains "$out" "$harness|$model|" "ambient exhaustion must not exclude a pinned alternative"
+
+      failover "$home" record --harness "$harness" --model "$model" >/dev/null || fail "record pinned failure"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model "$model")
+      expect_code 75 "$?" "exact pinned failure with no available alternative"
+      assert_contains "$out" "recorded quota failure for $harness $model" "pinned failures must still apply at their exact scope"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness codex --model gpt-6)
+      expect_code 75 "$?" "recorded pinned failures must also exclude alternatives"
+
+      printf '%s\n' "$home/account-c" > "$home/config/$pin_file"
+      [ "$harness" = claude ] || printf 'anthropic\n' >> "$home/config/$pin_file"
+      out=$(FM_TEST_QUOTA_JSON="$home/quota.json" failover "$home" pick --harness "$harness" --model "$model")
+      expect_code 0 "$?" "different pinned account with schema $schema"
+      assert_equals "$harness|$model|" "$out" "neither ambient nor differently scoped exhaustion may block another pin"
+    done
+  done
+  pass "pinned profiles ignore ambient quota while exact recorded failures remain effective"
+}
+
 test_relaunch_switches_once_on_a_genuine_quota_failure() {
   local home out status
   home=$(new_home relaunch)
@@ -334,6 +383,7 @@ test_only_unambiguous_matching_arrays_supply_alternatives
 test_failure_scope_is_exact
 test_unknown_providers_ignore_live_quota
 test_account_scoped_live_evidence_survives_unrelated_records
+test_pinned_profiles_ignore_ambient_quota
 test_relaunch_switches_once_on_a_genuine_quota_failure
 test_relaunch_uses_recorded_account_and_default_model
 test_relaunch_ignores_transient_and_old_messages

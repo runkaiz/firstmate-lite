@@ -34,6 +34,8 @@
 # runway for the candidate's provider is exhausted_now or a known zero
 # (quota_effective in bin/fm-quota-axi-lib.sh). A missing, failing, or silent
 # quota-axi is uncertainty, never exhaustion, so it never moves a launch.
+# Profiles with a configured worker account pin ignore ambient quota-axi
+# evidence and use only exact-scope recorded failures.
 #
 # A candidate's provider is its exact profile's unambiguous declared `provider`,
 # else fm_quota_single_provider_for_harness; an unresolved multi-provider
@@ -131,8 +133,10 @@ profile_scope() {
 
 # Prints the evidence and succeeds only when the profile is known exhausted.
 exhausted_evidence() {
-  local scope_model effective=
-  if [ -n "$3" ] && [ -n "$QUOTA_JSON" ]; then
+  local scope_model effective='' pin_file
+  pin_file=$(fm_worker_account_file "$1") || pin_file=
+  if [ -n "$3" ] && [ -n "$QUOTA_JSON" ] &&
+    { [ -z "$pin_file" ] || [ ! -e "$CONFIG/$pin_file" ]; }; then
     scope_model=${2##*/}
     effective=$(printf '%s\n' "$QUOTA_JSON" | jq -r --arg h "$1" --arg m "$2" --arg sm "$scope_model" --arg p "$3" \
       "$FM_QUOTA_ROW_JQ"'quota_effective(.; $p; $sm; quota_lane($h; $m)) |
