@@ -83,6 +83,7 @@ Uncertainty and ineligibility are different findings:
 - No model-level window, no matching auth source, an unmeasurable or `unknown` scope, or a surface quota-axi does not model at all is disclosed uncertainty.
   Keep the candidate eligible, state the unknown, and prefer known viable evidence when otherwise comparable.
 - An expired credential is a short-lived session token the owning vendor renews on next use, not a sign-out.
+  Firstmate's quota reads do not refresh credentials, so an expired session can leave quota unavailable; treat that missing quota as disclosed uncertainty.
 - Only concrete contradictory evidence blocks: an authoritative catalog proving the model unsupported, or proof that the credential the candidate actually selects is unusable.
 - Reserve login wording for that proven-unusable case, and name the harness, model, surface, and evidence.
 
