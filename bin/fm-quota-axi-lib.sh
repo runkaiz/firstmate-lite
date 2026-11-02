@@ -28,6 +28,13 @@ FM_QUOTA_PROVIDER_ID_RE='^[a-z0-9]+(-[a-z0-9]+)*\z'
 #   quota_row($snapshot; $provider; $lane)
 #                                  the one provider row the candidate binds to,
 #                                  or null; schema 5 ignores $lane.
+#   quota_effective($snapshot; $provider; $model; $lane)
+#                                  the most constraining applicable runway for
+#                                  the candidate: provider-wide scopes plus the
+#                                  exact model: or product: scope for $model;
+#                                  an exhausted_now runway first, then a known
+#                                  zero, else the lowest known percentage, or
+#                                  {status: "unknown"} when nothing applies.
 # shellcheck disable=SC2016,SC2034  # jq program text, not shell expansion; read by the sourcing consumers
 FM_QUOTA_ROW_JQ='
   def quota_lane($harness; $model):
@@ -41,6 +48,27 @@ FM_QUOTA_ROW_JQ='
       (([$rows[] | select(.accountKey == $lane)] | first) //
        ([$rows[] | select(.accountKey == "default")] | first) // null)
     else ($rows | first) // null
+    end;
+  def quota_effective($snapshot; $provider; $model; $lane):
+    (($model // "") | sub("^model:"; "")) as $model_token |
+    quota_row($snapshot; $provider; $lane) as $p |
+    if ($p // null) == null then {status: "unknown"}
+    else ($p.quotaSemantics.effectiveAvailability // []) |
+    map(select(.scope as $scope |
+      $scope == "all_models" or $scope == "all_products" or
+      ($model_token != "" and $model_token != "default" and
+       (($scope | startswith("model:")) or ($scope | startswith("product:"))) and
+       ($model_token == ($scope | sub("^(model|product):"; ""))))
+    )) as $applicable |
+    ($applicable | map(select(.status == "known"))) as $known |
+    if ($applicable | length) == 0 then {status: "unknown"}
+    elif any($applicable[]; (.runway.status // "") == "exhausted_now") then
+      ($applicable | map(select((.runway.status // "") == "exhausted_now")) | first)
+    elif ($known | length) == 0 then {status: "unknown"}
+    elif any($known[]; .effectivePercentRemaining == 0) then
+      ($known | map(select(.effectivePercentRemaining == 0)) | first)
+    else ($known | min_by(.effectivePercentRemaining))
+    end
     end;
 '
 

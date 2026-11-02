@@ -694,6 +694,7 @@ test_published_unmerged_branch_refuses_cleanup() {
   for mode in no-mistakes local-only; do
     case_dir=$(make_case "published-unmerged-$mode")
     write_meta "$case_dir" "$mode" ship
+    : > "$case_dir/state/task-x1.quota-failover"
     wt_commit_file "$case_dir" pending.txt 'unfinished delivery'
     add_fork_with_pushed_branch "$case_dir"
     before=$(git -C "$case_dir/wt" rev-parse HEAD)
@@ -701,6 +702,7 @@ test_published_unmerged_branch_refuses_cleanup() {
     run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
     [ "$rc" -ne 0 ] || fail "$mode: a pushed but unlanded branch was cleaned up"
     assert_present "$case_dir/state/task-x1.meta" "$mode: refusal removed the task record"
+    assert_present "$case_dir/state/task-x1.quota-failover" "$mode: refusal removed the quota failover guard"
     [ "$(git -C "$case_dir/wt" rev-parse HEAD)" = "$before" ] || fail "$mode: refusal changed the worktree"
     assert_present "$case_dir/wt/pending.txt" "$mode: refusal removed pending work"
   done
@@ -3332,16 +3334,20 @@ test_teardown_retires_task_watcher_markers_and_orphan_journal() {
   seed_watcher_markers "$case_dir" task-x1
   seed_watcher_markers "$case_dir" task-y2
   seed_watcher_markers "$case_dir" task-x1_extra
+  for marker in task-x1 task-y2 task-x1_extra; do
+    : > "$case_dir/state/$marker.quota-failover"
+  done
   printf '%s\n' 'version=1' 'task_id=task-y2' 'projection_id=ZyXwVuTsRqPoNmLkJiHgFe' \
     > "$case_dir/state/task-y2.herdr-presentation"
 
   FM_FAKE_HERDR_LOG="$log" FM_FAKE_HERDR_CLOSED="$closed" FM_FAKE_HERDR_RESTORED="$restored" \
     run_teardown "$case_dir" --force > "$case_dir/stdout" 2> "$case_dir/stderr" \
     || fail "retire-watcher-markers: teardown failed: $(cat "$case_dir/stderr")"
-  for marker in .seen-task-x1_status .seen-task-x1_turn-ended .hb-surfaced-task-x1 task-x1.herdr-presentation; do
+  for marker in .seen-task-x1_status .seen-task-x1_turn-ended .hb-surfaced-task-x1 task-x1.herdr-presentation task-x1.quota-failover; do
     assert_absent "$case_dir/state/$marker" "teardown left the torn-down task's $marker behind"
   done
   for marker in .seen-task-y2_status .seen-task-y2_turn-ended .hb-surfaced-task-y2 task-y2.herdr-presentation \
+    task-y2.quota-failover task-x1_extra.quota-failover \
     .seen-task-x1_extra_status .seen-task-x1_extra_turn-ended .hb-surfaced-task-x1_extra; do
     assert_present "$case_dir/state/$marker" "teardown removed another task's $marker"
   done
