@@ -1,0 +1,37 @@
+chrome-devtools-mcp exposes content of the browser instance to the MCP clients allowing them to inspect,
+debug, and modify any data in the browser or DevTools.
+Avoid sharing sensitive or personal information that you do not want to share with MCP clients.
+[chrome-devtools-mcp] The connecting client did not negotiate the MCP roots capability. Tools that read or write local files will be restricted to the OS temp directory. To restore the previous unrestricted behavior, start the server with --allow-unrestricted-paths.
+Browser server 1978197 cwd=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/copies/browser-cleanup/worktree: {'result': {'content': [{'type': 'text', 'text': 'Successfully navigated to data:text/html,<title>Cleanup proof</title>.\n## Pages\n1: Cleanup proof (data:text/html,<title>Cleanup proof</title>) [selected]'}]}, 'jsonrpc': '2.0', 'id': 2}
+chrome-devtools-mcp exposes content of the browser instance to the MCP clients allowing them to inspect,
+debug, and modify any data in the browser or DevTools.
+Avoid sharing sensitive or personal information that you do not want to share with MCP clients.
+[chrome-devtools-mcp] The connecting client did not negotiate the MCP roots capability. Tools that read or write local files will be restricted to the OS temp directory. To restore the previous unrestricted behavior, start the server with --allow-unrestricted-paths.
+Browser server 1978415 cwd=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/worker-b: {'result': {'content': [{'type': 'text', 'text': 'Successfully navigated to data:text/html,<title>Cleanup proof</title>.\n## Pages\n1: Cleanup proof (data:text/html,<title>Cleanup proof</title>) [selected]'}]}, 'jsonrpc': '2.0', 'id': 2}
+TEARDOWN exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/lab
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: stopping task-owned browser MCP server process(es) 1978197 for browser-cleanup
+teardown: copy processes remain after stopping its browser MCP server: 1978626
+REFUSED: native copy still has processes; preserving it
+
+PASS refuses remaining unrelated process; owned browser stopped; foreign browser survives
+chrome-devtools-mcp exposes content of the browser instance to the MCP clients allowing them to inspect,
+debug, and modify any data in the browser or DevTools.
+Avoid sharing sensitive or personal information that you do not want to share with MCP clients.
+[chrome-devtools-mcp] The connecting client did not negotiate the MCP roots capability. Tools that read or write local files will be restricted to the OS temp directory. To restore the previous unrestricted behavior, start the server with --allow-unrestricted-paths.
+Browser server 1988432 cwd=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/copies/browser-cleanup/worktree: {'result': {'content': [{'type': 'text', 'text': 'Successfully navigated to data:text/html,<title>Cleanup proof</title>.\n## Pages\n1: Cleanup proof (data:text/html,<title>Cleanup proof</title>) [selected]'}]}, 'jsonrpc': '2.0', 'id': 2}
+TEARDOWN exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/lab
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: stopping task-owned browser MCP server process(es) 1988432 for browser-cleanup
+teardown browser-cleanup complete (window fm-lab-browser:fm-browser-cleanup, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/copies/browser-cleanup/worktree)
+Backlog: browser-cleanup just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/lab/data/backlog.md - move browser-cleanup to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+
+PASS cleanup removes the task copy and server while foreign browser remains usable

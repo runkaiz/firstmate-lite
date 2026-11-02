@@ -1,0 +1,60 @@
+import {spawn, execFileSync} from 'node:child_process';
+import fs from 'node:fs';
+import http from 'node:http';
+import assert from 'node:assert/strict';
+const root='/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK';
+const evidence='/home/runkai/.no-mistakes/evidence/01M6DETVKKZ59NZBMVZXJ557KK';
+const text=r=>(r.result?.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n');
+const log=(s)=>{console.log(s);fs.appendFileSync(evidence+'/r4-scenarios.log',s+'\n');};
+fs.writeFileSync(evidence+'/r4-scenarios.log','Real fm-browser-mcp.sh + chrome-devtools-mcp 1.12.0 + Chrome for Testing 153.0.8010.12\n');
+const page=`<!doctype html><title>Browser validation</title><style>body{font:20px system-ui;margin:60px;background:#eff5fa;color:#123}input,button{font:inherit;padding:12px}output{display:block;margin-top:30px}</style><h1>Pinned browser validation</h1><label>Name <input id="name"></label> <button onclick="document.querySelector('output').textContent='Hello '+document.querySelector('input').value">Submit</button><output>Ready</output>`;
+const web=http.createServer((req,res)=>{res.setHeader('Content-Type','text/html');res.end(page);});
+await new Promise(r=>web.listen(0,'127.0.0.1',r));
+const url=`http://127.0.0.1:${web.address().port}/`;
+const clients=[];
+async function client(name){
+  const cwd=root+'/.browser-validation/'+name;fs.mkdirSync(cwd,{recursive:true});
+  const err=fs.openSync(evidence+'/r4-'+name+'-stderr.log','w');
+  const env={...process.env};delete env.TMPDIR;
+  const p=spawn(root+'/bin/fm-browser-mcp.sh',[root+'/.browser-validation/browser-mcp'],{cwd,env,stdio:['pipe','pipe',err]});
+  let buf='',id=0;const waiting=new Map();
+  const send=m=>p.stdin.write(JSON.stringify({jsonrpc:'2.0',...m})+'\n');
+  p.stdout.on('data',d=>{buf+=d;let i;while((i=buf.indexOf('\n'))>=0){const l=buf.slice(0,i);buf=buf.slice(i+1);const m=JSON.parse(l);if(m.method==='roots/list')send({id:m.id,result:{roots:[{uri:'file://'+root,name:'workspace'},{uri:'file://'+evidence,name:'evidence'}]}});else if(waiting.has(m.id)){waiting.get(m.id)(m);waiting.delete(m.id);}}});
+  const rpc=(method,params)=>new Promise((resolve,reject)=>{const n=++id;const timer=setTimeout(()=>reject(Error(method+' timed out')),20000);waiting.set(n,m=>{clearTimeout(timer);resolve(m)});send({id:n,method,params});});
+  const call=async(name,args={})=>{const r=await rpc('tools/call',{name,arguments:args});log(JSON.stringify({client:nameOfClient,tool:name,args,response:r.result??r.error}));return r;};
+  const nameOfClient=name;
+  const c={p,cwd,call,rpc};clients.push(c);
+  await rpc('initialize',{protocolVersion:'2025-06-18',capabilities:{roots:{listChanged:false}},clientInfo:{name:'firstmate-live-validation',version:'1'}});send({method:'notifications/initialized'});
+  return c;
+}
+const processes=c=>fs.readdirSync('/proc').filter(x=>/^\d+$/.test(x)).filter(x=>{try{return fs.realpathSync('/proc/'+x+'/cwd')===fs.realpathSync(c.cwd)}catch{return false}});
+async function stop(c,signal){const before=processes(c);if(signal)c.p.kill(signal);else c.p.stdin.end();for(let i=0;i<80&&processes(c).length;i++)await new Promise(r=>setTimeout(r,100));assert.equal(processes(c).length,0);log(`PASS ${signal||'stdin close'} removes server and browser: ${before.join(',')}`);}
+try {
+ const a=await client('worker-a'), b=await client('worker-b');
+ assert.ok(!(await a.call('navigate_page',{url})).result.isError);
+ let snap=text(await a.call('take_snapshot'));
+ const input=snap.match(/uid=(\S+) textbox/)[1], button=snap.match(/uid=(\S+) button "Submit"/)[1];
+ assert.ok(!(await a.call('fill',{uid:input,value:'Firstmate'})).result.isError);
+ assert.ok(!(await a.call('click',{uid:button})).result.isError);
+ assert.match(text(await a.call('evaluate_script',{function:'() => document.querySelector("output").textContent'})),/Hello Firstmate/);
+ await a.call('take_screenshot',{filePath:evidence+'/r4-browser-form.png',fullPage:true});assert.ok(fs.statSync(evidence+'/r4-browser-form.png').size>1000);
+ await a.call('evaluate_script',{function:'() => {localStorage.setItem("worker", "A");return true}'});
+ await b.call('navigate_page',{url});
+ assert.match(text(await b.call('evaluate_script',{function:'() => localStorage.getItem("worker")'})),/null/);
+ log('PASS concurrent workers do not share local storage or profiles');
+ const pages=text(await a.call('list_pages'));const first=Number(pages.match(/(\d+): Browser validation/)[1]);
+ await a.call('new_page',{url:'data:text/html,<title>Second tab</title><h1>Second</h1>'});
+ assert.match(text(await a.call('evaluate_script',{function:'() => document.title'})),/Second tab/);
+ await a.call('select_page',{pageId:first});
+ assert.match(text(await a.call('evaluate_script',{function:'() => document.title'})),/Browser validation/);
+ const bad=await a.call('select_page',{pageId:999999});assert.equal(bad.result.isError,true);
+ const thrown=await a.call('evaluate_script',{function:'() => {throw new Error("readable validation error")}'});assert.equal(thrown.result.isError,true);assert.match(text(thrown),/readable validation error/);
+ assert.match(text(await a.call('evaluate_script',{function:'() => document.title'})),/Browser validation/);
+ log('PASS selected-page routing, invalid-page refusal, readable error and recovery');
+ await stop(a);
+ assert.match(text(await b.call('evaluate_script',{function:'() => document.title'})),/Browser validation/);
+ log('PASS ending worker A leaves worker B browser usable');
+ await stop(b,'SIGTERM');
+ const c=await client('worker-kill');await c.call('navigate_page',{url});await stop(c,'SIGKILL');
+ log('PASS all live browser scenarios');
+} finally {for(const c of clients){if(c.p.exitCode===null)c.p.kill('SIGTERM');}web.close();}

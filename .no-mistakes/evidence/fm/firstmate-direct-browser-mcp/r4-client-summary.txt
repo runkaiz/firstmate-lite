@@ -1,0 +1,21 @@
+codex: codex-cli 0.165.0
+claude: 2.1.316 (Claude Code)
+opencode: 1.2.15
+gemini: 0.66.0
+chrome: Google Chrome for Testing 153.0.8010.12
+{"client": "claude", "status": [{"name": "browser", "status": "pending", "config": {"type": "stdio", "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh", "args": ["/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp"]}, "transport": "stdio", "scope": "dynamic", "source": "dynamic"}]}
+{"client": "claude", "status": [{"name": "browser", "status": "pending", "config": {"type": "stdio", "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh", "args": ["/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp"]}, "transport": "stdio", "scope": "dynamic", "source": "dynamic"}]}
+{"client": "claude", "status": [{"name": "browser", "status": "connected", "serverInfo": {"name": "chrome_devtools", "title": "Chrome DevTools MCP server", "version": "1.12.0"}, "config": {"type": "stdio", "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh", "args": ["/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp"]}, "transport": "stdio", "scope": "dynamic", "source": "dynamic", "tools": [{"name": "click", "annotations": {}}, {"name": "close_page", "annotations": {}}, {"name": "drag", "annotations": {}}, {"name": "emulate", "annotations": {}}, {"name": "evaluate_script", "annotations": {}}, {"name": "fill", "annotations": {}}, {"name": "fill_form", "annotations": {}}, {"name": "get_console_message", "annotations": {"readOnly": true}}, {"name": "get_css_styles", "annotations": {"readOnly": true}}, {"name": "get_network_request", "annotations": {}}, {"name": "handle_dialog", "annotations": {}}, {"name": "hover", "annotations": {}}, {"name": "lighthouse_audit", "annotations": {}}, {"name": "list_console_messages", "annotations": {"readOnly": true}}, {"name": "list_network_requests", "annotations": {"readOnly": true}}, {"name": "list_pages", "annotations": {"readOnly": true}}, {"name": "navigate_page", "annotations": {}}, {"name": "new_page", "annotations": {}}, {"name": "performance_analyze_insight", "annotations": {"readOnly": true}}, {"name": "performance_start_trace", "annotations": {}}, {"name": "performance_stop_trace", "annotations": {}}, {"name": "press_key", "annotations": {}}, {"name": "resize_page", "annotations": {}}, {"name": "screencast_start", "annotations": {}}, {"name": "screencast_stop", "annotations": {}}, {"name": "select_page", "annotations": {"readOnly": true}}, {"name": "take_heapsnapshot", "annotations": {}}, {"name": "take_screenshot", "annotations": {}}, {"name": "take_snapshot", "annotations": {}}, {"name": "type_text", "annotations": {}}, {"name": "upload_file", "annotations": {}}, {"name": "wait_for", "annotations": {"readOnly": true}}]}]}
+{"client": "codex", "server": "browser", "version": "1.12.0", "tools": ["get_network_request", "take_snapshot", "performance_stop_trace", "upload_file", "wait_for", "fill_form", "get_console_message", "drag", "fill", "emulate", "screencast_stop", "close_page", "performance_analyze_insight", "get_css_styles", "click", "resize_page", "list_network_requests", "screencast_start", "performance_start_trace", "lighthouse_audit", "list_console_messages", "new_page", "select_page", "take_screenshot", "type_text", "list_pages", "take_heapsnapshot", "navigate_page", "hover", "handle_dialog", "evaluate_script", "press_key"], "toolsError": null}
+Performing one time database migration, may take a few minutes...
+sqlite-migration:done
+Database migration complete.
+[0m
+┌  MCP Servers
+│
+●  ✓ browser [90mconnected
+│      [90m/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/bin/fm-browser-mcp.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DETVKKZ59NZBMVZXJ557KK/.browser-validation/browser-mcp
+│
+└  1 server(s)
+
+

@@ -1,0 +1,11 @@
+Validated 10259e5c3056389cd1e32dbe7f25fdb14f610d03 in the assigned test phase.
+Targeted baseline: tests/fm-browser-mcp.test.sh and tests/fm-spawn-dispatch-profile.test.sh --browser-mcp passed. Spawn capture fixtures cover ships, scouts, relaunches, invalid pins and absent/unsupported configuration; these baseline checks are not live worker evidence.
+Live: tests/fm-browser-mcp-live-e2e.test.sh passed against workspace-local chrome-devtools-mcp 1.12.0 and Chrome for Testing 153.0.8010.12.
+Real MCP calls exercised form input/submission, selected-page navigation, invalid page errors, recovery, independent concurrent browser storage, and stdin/SIGTERM/SIGKILL cleanup. Screenshot r4-browser-form.png was captured and visually inspected.
+Real Claude 2.1.316, Codex 0.165.0 and OpenCode 1.2.15 clients connected using isolated per-launch configuration. These protocol/CLI probes did not request model inference.
+Real fm-spawn Gemini launches used a disposable lab home and private 120x40 tmux session with valid, invalid and absent browser pins. Emitted instructions disclosed no browser tool, generated settings had no browser entry, and real Gemini 0.66.0 mcp list reported no MCP servers configured. No user-scope Gemini settings were written.
+Real fm-teardown stopped the owned MCP, preserved a foreign browser, refused removal while an unrelated process remained, then succeeded after that process ended.
+Real launcher --check verified valid pins and rejected both hash mismatches, duplicate and unknown keys, and relative paths.
+All new evidence uses r4-* filenames. All disposable dependencies, lab homes, project copies, sockets and generated data were removed. Read-only hook-directory permissions required local chmod before removal. No fixture processes remained and git status was clean.
+No source changes, linters, broad suite, pipeline controls, push, PR or CI actions.
+Verdict: go.
