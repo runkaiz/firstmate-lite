@@ -338,8 +338,8 @@ COMMON_TOOLS="node git $(workflow_delivery_tools | tr '\n' ' ')"
 if ! fm_backlog_backend_manual "$CONFIG"; then COMMON_TOOLS="$COMMON_TOOLS python3"; fi
 if [ -e "$CONFIG/crew-dispatch.json" ] || [ -L "$CONFIG/crew-dispatch.json" ]; then
   COMMON_TOOLS="$COMMON_TOOLS jq"
-  if ! command -v jq >/dev/null 2>&1 \
-    || jq -e '[.default?, (.rules // [])[]?.use?] | any(type == "array")' "$CONFIG/crew-dispatch.json" >/dev/null 2>&1; then
+  if command -v jq >/dev/null 2>&1 \
+    && jq -e '[.default?, (.rules // [])[]?.use?] | any(type == "array")' "$CONFIG/crew-dispatch.json" >/dev/null 2>&1; then
     COMMON_TOOLS="$COMMON_TOOLS quota-axi"
   fi
 fi

@@ -309,7 +309,7 @@ ROWS
 }
 
 test_bootstrap_requires_only_selected_workflow_tools() {
-  local dir home fakebin out tool
+  local dir home fakebin out tool bash_env
   dir="$TMP_ROOT/selected-workflow"; home="$dir/home"
   mkdir -p "$home/config" "$home/data" "$home/state"
   printf '%s\n' manual > "$home/config/backlog-backend"
@@ -351,6 +351,23 @@ SH
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
   assert_not_contains "$out" 'MISSING: quota-axi' "single-profile routing must not require quota-axi"
+  bash_env="$dir/no-jq.bash"
+  cat > "$bash_env" <<'SH'
+command() {
+  if [ "${1:-}" = -v ] && [ "${2:-}" = jq ]; then
+    return 1
+  fi
+  builtin command "$@"
+}
+jq() {
+  return 127
+}
+SH
+  out=$(PATH="$fakebin:$BASE_PATH" BASH_ENV="$bash_env" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
+  assert_contains "$out" 'MISSING: jq' "configured routing must report missing jq"
+  assert_not_contains "$out" 'MISSING: quota-axi' "missing jq must not imply a quota-axi requirement"
+  assert_no_grep 'quota-axi' "$dir/calls" "single-profile startup must not probe quota-axi without jq"
   printf '%s\n' '{"rules":[{"when":"x","use":[{"harness":"codex"},{"harness":"claude"}],"why":"y"}],"default":{"harness":"codex"}}' > "$home/config/crew-dispatch.json"
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_BOOTSTRAP_DETECT_ONLY=1 FM_FAKE_TREEHOUSE_LEASE_HELP=1 FM_UNUSED_TOOL_LOG="$dir/calls" "$ROOT/bin/fm-bootstrap.sh")
