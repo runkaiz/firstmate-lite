@@ -1,0 +1,20 @@
+$ quota-axi auth --json --no-credential-refresh --provider claude --full
+{
+  "generatedAt": "2026-11-02T05:53:07.792Z",
+  "schemaVersion": 1,
+  "auth": [
+    {
+      "provider": "claude",
+      "sources": [
+        {
+          "source": "oauth-file",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.claude/.credentials.json",
+          "status": "expired"
+        }
+      ]
+    }
+  ]
+}
+
+exit=0
+Synthetic expired credential file byte-for-byte unchanged: True

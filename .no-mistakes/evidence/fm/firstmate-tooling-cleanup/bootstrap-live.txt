@@ -1,0 +1,49 @@
+$ FM_HOME=<disposable> FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bin/fm-bootstrap.sh
+Configuration: no routing
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0
+
+$ FM_HOME=<disposable> FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bin/fm-bootstrap.sh
+Configuration: single default
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0
+
+$ FM_HOME=<disposable> FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bin/fm-bootstrap.sh
+Configuration: single rule
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0
+
+$ FM_HOME=<disposable> FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bin/fm-bootstrap.sh
+Configuration: array default
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: quota-axi (install: npm install -g quota-axi)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0
+
+$ FM_HOME=<disposable> FM_BOOTSTRAP_DETECT_ONLY=1 FM_BOOTSTRAP_NETWORK=skip bin/fm-bootstrap.sh
+Configuration: array rule
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: quota-axi (install: npm install -g quota-axi)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0
+
+$ bin/fm-bootstrap.sh (single default; jq absent)
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: jq (install: brew install jq  # or the platform's package manager)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+MISSING: jq (install: brew install jq  # or the platform's package manager)
+exit=0
+
+$ bin/fm-bootstrap.sh (real gh present; gh-axi absent)
+MISSING: treehouse (install: curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+exit=0

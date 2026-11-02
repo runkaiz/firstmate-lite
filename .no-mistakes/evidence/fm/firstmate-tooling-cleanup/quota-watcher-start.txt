@@ -1,0 +1,16 @@
+$ bin/fm-procevent-quota.sh arm --interval 1 --provider claude
+registered: quota-claude (quota)
+armed: quota-claude
+provider: claude
+threshold: 10%
+interval: 1s
+exit=0
+$ bin/fm-procevent.sh start quota-claude
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/bin/fm-procevent.sh: line 1496: seq: command not found
+error: cannot start the runner's owner guard: quota-claude
+exit=1
+$ bin/fm-procevent.sh start quota-claude (real seq added to isolated PATH)
+retired: quota-claude (adapter classified the captured result terminal)
+captured: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/state/procevent-inbox/quota-claude.1.result
+not-autohandled: quota-claude (left for the handler; still unacknowledged)
+exit=0

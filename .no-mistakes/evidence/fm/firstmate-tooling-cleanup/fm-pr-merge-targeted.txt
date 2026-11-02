@@ -1,0 +1,10 @@
+Selected: test_github_merged_outcome_is_verified, test_github_open_unqueued_outcome_refuses, test_github_unreadable_outcome_keeps_pr_bookkeeping, test_github_unreadable_outcome_refusal_quotes_the_forge_output, test_github_without_gh_refuses_before_recording, test_github_mergeable_unknown_retries_then_succeeds, test_github_mergeable_unknown_exhausts_bound_and_reports_pending
+ok - fm-pr-merge verifies a genuinely merged GitHub pull request
+ok - fm-pr-merge refuses a GitHub merge call that leaves the PR open and unqueued
+ok - fm-pr-merge keeps PR bookkeeping when it cannot read a successful merge call's outcome
+ok - fm-pr-merge quotes the forge output when it cannot read the outcome either
+ok - fm-pr-merge refuses a GitHub merge when gh is missing, before recording
+ok - fm-pr-merge retries a bounded number of times when mergeable is UNKNOWN and merges once it resolves
+ok - fm-pr-merge reports mergeability still pending after its bounded UNKNOWN retry is spent
+
+exit=0

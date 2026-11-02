@@ -1,0 +1,21 @@
+$ bin/fm-procevent-quota.sh arm --interval 1 --provider claude
+registered: quota-claude (quota)
+armed: quota-claude
+provider: claude
+threshold: 10%
+interval: 1s
+exit=0
+
+$ bin/fm-procevent.sh list
+SOURCE                       ADAPTER      OWNER      PENDING
+quota-claude                 quota        none       0
+exit=0
+
+$ bin/fm-procevent.sh list
+SOURCE                       ADAPTER      OWNER      PENDING
+quota-claude                 quota        none       0
+exit=0
+
+$ bin/fm-procevent-quota.sh retire --provider claude
+retired: quota-claude
+exit=0

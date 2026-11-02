@@ -1,0 +1,12 @@
+quota: quota-claude
+status: error
+detail: 3 consecutive read failures; last quota-axi read failed
+condition_polls: 3
+
+$ bin/fm-procevent.sh handled quota-claude 1
+handled: quota-claude 1
+
+$ bin/fm-procevent.sh list
+no sources registered
+
+Synthetic expired credential remains byte-for-byte unchanged after background polling and all documented operator reads.

@@ -1,0 +1,45 @@
+$ bin/fm-pr-merge.sh tooling-test https://github.com/example/disposable-fixture/pull/1
+gh absent
+error: merging a GitHub pull request requires gh on PATH
+exit=1
+Task metadata unchanged; no merge poll created.
+
+$ bin/fm-pr-merge.sh tooling-test https://github.com/example/disposable-fixture/pull/1
+real gh; isolated empty authentication configuration
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+error: named head cannot be verified: worktree missing
+exit=1
+Task metadata unchanged; no merge poll created.
+
+$ fm_pr_github_read_record example disposable-fixture 1 (real gh, isolated unauthenticated home)
+read_exit=1 state= merged=
+
+$ bin/fm-pr-merge.sh tooling-test https://github.com/example/disposable-fixture/pull/1
+Real gh; disposable git worktree with reachable head; isolated empty authentication configuration
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/bin/fm-pr-lib.sh: line 482: cmp: command not found
+error: could not prepare PR poll
+exit=1
+Metadata unchanged; no merge poll: True
+
+$ bin/fm-pr-merge.sh tooling-test https://github.com/example/disposable-fixture/pull/1 (real cmp added to isolated PATH)
+armed: state/tooling-test.check.sh
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+error: could not read the GitHub pull request state before merging
+exit=1
+Persisted task metadata:
+kind=ship
+mode=direct-PR
+worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/repo
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/repo
+pr=https://github.com/example/disposable-fixture/pull/1
+Poll exists: True

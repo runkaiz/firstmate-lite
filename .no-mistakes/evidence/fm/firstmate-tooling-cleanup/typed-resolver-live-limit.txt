@@ -1,0 +1,4 @@
+$ bin/fm-dispatch-resolve.sh <disposable-brief>
+dispatch-resolve: off (TYPESAFE_API_KEY absent from the environment and /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.env)
+exit=0
+No TYPESAFE_API_KEY provided to this isolated home. The typed service call was not driven live.

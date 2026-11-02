@@ -1,0 +1,312 @@
+$ quota-axi --no-credential-refresh
+bin: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/bin/quota-axi
+description: Report local agent-provider quota windows for routing-aware agents
+generatedAt: "2026-11-02T05:56:42.793Z"
+quota[0]:
+exhaustion[0]:
+attention[2]{provider,scope,kind,detail,remedy}:
+  claude,all,unavailable,Claude access token expired (auth expired_refreshable),none
+  codex,all,auth_required,Codex sign-in required,none
+help[2]:
+  16 providers not set up are omitted; run `quota-axi --full` to list them
+  Run `quota-axi --full` for windows, pace, reserve, and account evidence
+
+exit=1; disposable credential unchanged
+
+$ quota-axi --json --no-credential-refresh
+{
+  "schemaVersion": 5,
+  "claude": [
+    {
+      "provider": "claude",
+      "windows": [],
+      "state": {
+        "status": "unavailable",
+        "stale": false,
+        "error": "Claude access token expired",
+        "authStatus": "expired_refreshable"
+      },
+      "quotaSemantics": {
+        "status": "unknown",
+        "effectiveAvailability": []
+      },
+      "accountKeys": [
+        "default"
+      ]
+    }
+  ],
+  "otherProviderCount": 17
+}
+exit=1; disposable credential unchanged
+
+$ quota-axi auth --json --no-credential-refresh
+{
+  "generatedAt": "2026-11-02T05:56:43.116Z",
+  "schemaVersion": 1,
+  "auth": [
+    {
+      "provider": "claude",
+      "sources": [
+        {
+          "source": "oauth-file",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.claude/.credentials.json",
+          "status": "expired"
+        }
+      ]
+    },
+    {
+      "provider": "codex",
+      "sources": [
+        {
+          "source": "auth-json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.codex/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "pi:openai-codex",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "cli-rpc",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "cursor",
+      "sources": [
+        {
+          "source": "state-vscdb",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.config/Cursor/User/globalStorage/state.vscdb",
+          "status": "missing"
+        },
+        {
+          "source": "cli-authfile",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.config/cursor/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "copilot",
+      "sources": [
+        {
+          "source": "apps-json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.config/github-copilot/apps.json",
+          "status": "missing"
+        },
+        {
+          "source": "copilot-cli:keychain",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.copilot/config.json",
+          "status": "missing"
+        },
+        {
+          "source": "gh:hosts.yml",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.config/gh/hosts.yml",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "grok",
+      "sources": [
+        {
+          "source": "auth-json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.grok/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "pi:xai",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "kimi",
+      "sources": [
+        {
+          "source": "pi:kimi-coding",
+          "status": "missing"
+        },
+        {
+          "source": "kimi-code-cli",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "zai",
+      "sources": [
+        {
+          "source": "pi:zai",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "opencode:auth.json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.local/share/opencode/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "agy",
+      "sources": [
+        {
+          "source": "loopback",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "alibaba",
+      "sources": [
+        {
+          "source": "bl-cli",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "opencode-go",
+      "sources": [
+        {
+          "source": "opencode:auth.json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.local/share/opencode/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "commandcode",
+      "sources": [
+        {
+          "source": "pi:commandcode",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "env:COMMAND_CODE_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "env:COMMANDCODE_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "commandcode-cli",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.commandcode/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "omp:commandcode",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.omp/agent/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "minimax",
+      "sources": [
+        {
+          "source": "env:MINIMAX_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "pi:minimax",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "minimax:config.json",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.mmx/config.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "mimo",
+      "sources": [
+        {
+          "source": "env:MIMO_API_KEY",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "deepseek",
+      "sources": [
+        {
+          "source": "env:DEEPSEEK_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "pi:deepseek",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "openrouter",
+      "sources": [
+        {
+          "source": "env:OPENROUTER_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "pi:openrouter",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.pi/agent/auth.json",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "elevenlabs",
+      "sources": [
+        {
+          "source": "env:ELEVENLABS_API_KEY",
+          "path": "ELEVENLABS_API_KEY",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "devin",
+      "sources": [
+        {
+          "source": "env:WINDSURF_API_KEY",
+          "path": "WINDSURF_API_KEY",
+          "status": "missing"
+        },
+        {
+          "source": "file:credentials.toml",
+          "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/home/.local/share/devin/credentials.toml",
+          "status": "missing"
+        }
+      ]
+    },
+    {
+      "provider": "muse",
+      "sources": [
+        {
+          "source": "muse:auth.json",
+          "path": "~/.config/muse/auth.json",
+          "status": "missing"
+        },
+        {
+          "source": "cli-keychain",
+          "path": "Keychain ai.meta.dev.credentials",
+          "status": "missing"
+        },
+        {
+          "source": "env:META_API_KEY",
+          "path": "META_API_KEY",
+          "status": "missing"
+        }
+      ]
+    }
+  ]
+}
+exit=0; disposable credential unchanged

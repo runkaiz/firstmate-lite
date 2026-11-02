@@ -1,0 +1,40 @@
+$ quota-axi --json --no-credential-refresh --provider claude --full
+{
+  "generatedAt": "2026-11-02T05:53:07.723Z",
+  "schemaVersion": 5,
+  "providers": [
+    {
+      "provider": "claude",
+      "label": "Claude",
+      "source": "unavailable",
+      "windows": [],
+      "state": {
+        "status": "unavailable",
+        "stale": false,
+        "error": "Claude access token expired",
+        "sourcesTried": [
+          "oauth-file"
+        ],
+        "authStatus": "expired_refreshable"
+      },
+      "attempts": [
+        {
+          "source": "oauth-file",
+          "status": "failed",
+          "error": "Claude access token expired"
+        }
+      ],
+      "quotaSemantics": {
+        "status": "unknown",
+        "description": "No quota windows are available, so no effective remaining percentage can be computed.",
+        "effectiveAvailability": []
+      },
+      "accountKeys": [
+        "default"
+      ]
+    }
+  ]
+}
+
+exit=1
+Synthetic expired credential file byte-for-byte unchanged: True

@@ -1,0 +1,21 @@
+$ quota-axi --no-credential-refresh --provider claude --full
+bin: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6DCEQQ3AT1MB6K85Y189FRN/.live-tooling/bin/quota-axi
+description: Report local agent-provider quota windows for routing-aware agents
+generatedAt: "2026-11-02T05:53:07.534Z"
+quota[0]:
+exhaustion[0]:
+attention[1]{provider,scope,kind,detail,remedy}:
+  claude,all,unavailable,Claude access token expired (auth expired_refreshable),none
+providers[1]{provider,plan,source,status,authStatus,relationships,refreshedAt}:
+  claude,unknown,unavailable,unavailable,expired_refreshable,unknown,none
+windows[0]:
+scopeAudit[0]:
+accounts[1]{provider,email,organization,accountId,identityStatus}:
+  claude,hidden,none,none,unknown
+attempts[1]{provider,source,status,error}:
+  claude,oauth-file,failed,Claude access token expired
+help[1]:
+  Run `quota-axi --full` for windows, pace, reserve, and account evidence
+
+exit=1
+Synthetic expired credential file byte-for-byte unchanged: True

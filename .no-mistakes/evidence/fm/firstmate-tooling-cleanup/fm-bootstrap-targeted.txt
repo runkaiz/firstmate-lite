@@ -1,0 +1,6 @@
+Selected: test_bootstrap_requires_only_selected_workflow_tools, test_quota_axi_min_version, test_lavish_axi_min_version
+ok - bootstrap follows local, remote, in-flight, routing and backlog workflow requirements
+ok - bootstrap enforces quota-axi minimum version
+ok - bootstrap preserves legacy Lavish boards while recommending synchronous reply support
+
+exit=0
