@@ -8,7 +8,7 @@ Start with the directory layout, then use the setting reference for the behavior
 | What you want to configure | Start here |
 | --- | --- |
 | Firstmate's code, private files, or project location | [FM_HOME](#fm_home) and [operational home layout](#operational-home-layout-and-state) |
-| Task windows and worker tools | [Runtime backend](#runtime-backend-configbackend--fm_backend) and [harness support](#harness-support) |
+| Task windows and worker tools | [Runtime backend](#runtime-backend-configbackend--fm_backend), [harness support](#harness-support), and the [browser MCP pin](#browser-mcp-pin-configbrowser-mcp) |
 | Worker permissions, accounts, or environment | [Claude permission mode](#claude-permission-mode-configclaude-permission-mode), [worker account pin](#worker-account-pin-configclaude-account-configpi-account), [worker tool exclusions](#worker-tool-exclusions-configcrew-exclude-tools), [worker launch environment](#worker-launch-environment-configlaunch-env-allowlist), and its [Orca environment source](#orca-environment-source-configlaunch-env-tmux-session) |
 | Backlog, preferences, and memory | [Backlog backend](#backlog-backend-taskstoml--configbacklog-backend), [captain preferences](#captain-preferences-datacaptainmd--datacaptain-sharedmd), [external memory tiers](#external-memory-tiers-memory-layering-section), and [startup memory budget](#startup-memory-budget-configstartup-memory-budget) |
 | Supervision and presentation | [Pi supervision branch](#pi-supervision-branch), [supervision host](#supervision-host-configsupervision-host), and [Calm preference](#calm-preference-configcalm) |
@@ -401,7 +401,7 @@ Startup reports orphan native reservations through the existing bootstrap diagno
 [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
-It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser-helper shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_bridges` ownership checks.
+It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
 Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them, and `bin/fm-teardown.sh --preserve-untracked` moves inspected generated leftovers into the task's data directory rather than deleting them.
 Teardown summarizes leftover roots and offers a preservation command; its header and referenced helpers own the full-list location, directory expansion and custody mechanics.
 Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
@@ -929,6 +929,36 @@ When the file is absent, worker launches do not add a board address and retain t
 Malformed or unreadable values refuse the launch before the worker starts.
 The address selects the existing shared server; it does not authorize starting or stopping the server, and the Lavish startup crash remains a vendor-tool concern.
 
+## Browser MCP pin (config/browser-mcp)
+
+The optional local, gitignored `config/browser-mcp` pins this machine's worker browser tooling: a dedicated chrome-devtools-mcp install and a Chrome for Testing executable, each by absolute path and SHA-256.
+When the file exists, `fm-spawn.sh` verifies the pins and attaches [`bin/fm-browser-mcp.sh`](../bin/fm-browser-mcp.sh) to each new Claude Code worker and relaunch as the `browser` MCP server.
+A pin that does not verify refuses the launch before the worker starts, naming the drifted file and both hashes.
+Without the file, workers get no browser server, and their instructions tell them to report that rather than install or fetch a browser tool.
+The launcher never runs `npx` or downloads anything, so the browser stack changes only when the pins are deliberately updated.
+
+Set the pins once per machine, using a version-named install directory so the path itself records the pinned version:
+
+```sh
+npm install --prefix ~/.local/share/chrome-devtools-mcp-1.12.0 chrome-devtools-mcp@1.12.0
+mcp=~/.local/share/chrome-devtools-mcp-1.12.0/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js
+chrome=/path/to/chrome-for-testing/chrome
+printf '%s\n' "mcp=$mcp" "mcp_sha256=$(sha256sum "$mcp" | cut -d' ' -f1)" \
+  "chrome=$chrome" "chrome_sha256=$(sha256sum "$chrome" | cut -d' ' -f1)" > config/browser-mcp
+bin/fm-browser-mcp.sh --check config/browser-mcp
+```
+
+To update, install the new version beside the old one, re-pin both values, and run the same check.
+Each server starts its own isolated headless Chrome over a pipe with a throwaway profile, so concurrent workers never share a browser, profile, or debugging port.
+Page tools act on the selected page without a page id, and failures come back as MCP tool errors carrying the browser's message.
+The browser closes when the worker's session ends; teardown stops a server still running in a task copy.
+The launcher's header owns the file format, server flags, and lifetime contract.
+
+| Runtime | With `config/browser-mcp` |
+| --- | --- |
+| `claude` | Attached on every template launch and relaunch. |
+| Every other runtime, and a raw launch command | Not attached and not checked; such a worker has no browser tools unless its own MCP configuration runs `bin/fm-browser-mcp.sh <home>/config/browser-mcp`. |
+
 ## Home brief include (config/brief-include.md)
 
 The optional local, gitignored `config/brief-include.md` adds standing worker instructions to every ship and scout brief.
@@ -1302,7 +1332,7 @@ Bootstrap selects delivery prerequisites from the project registry and recorded 
 | Missing, unreadable or unknown delivery input | Conservative GitHub and no-mistakes prerequisites. |
 | Automatic backlog backend | Shipped native queue and Python 3.9+; no external tasks-axi executable. |
 | Configured crew dispatch | `jq`, plus compatible `quota-axi` when a rule or the default is a profile array. |
-| Browser work | `chrome-devtools-axi` and a compatible browser when that feature is used. |
+| Browser work | Node.js plus the pinned chrome-devtools-mcp install and Chrome for Testing named by the [browser MCP pin](#browser-mcp-pin-configbrowser-mcp) when that feature is used. |
 | Visual boards | Compatible `lavish-axi`; plain-text work may continue without it. |
 
 These checks select prerequisites rather than installing them or changing a project's delivery policy.

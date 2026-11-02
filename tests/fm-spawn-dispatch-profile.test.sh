@@ -1546,6 +1546,63 @@ SH
   pass "absent Lavish configuration preserves the destination environment"
 }
 
+# config/browser-mcp: bin/fm-browser-mcp.sh owns the pin contract; spawn
+# attaches it to claude template launches and refuses a pin that does not verify.
+write_browser_mcp_pins() {  # <home> [chrome-sha-override]
+  local home=$1 pins="$1/pins" sum
+  mkdir -p "$pins"
+  printf '// fixture entry\n' > "$pins/chrome-devtools-mcp.js"
+  printf '#!/bin/sh\n' > "$pins/chrome"
+  chmod +x "$pins/chrome"
+  sum() { if command -v sha256sum >/dev/null 2>&1; then sha256sum -- "$1" | cut -d' ' -f1; else shasum -a 256 -- "$1" | cut -d' ' -f1; fi; }
+  printf '%s\n' "mcp=$pins/chrome-devtools-mcp.js" "mcp_sha256=$(sum "$pins/chrome-devtools-mcp.js")" \
+    "chrome=$pins/chrome" "chrome_sha256=${2:-$(sum "$pins/chrome")}" > "$home/config/browser-mcp"
+}
+
+test_browser_mcp_attaches_to_claude_launch() {
+  local rec id out status launch config_real
+  id=profile-browser-mcp-z18
+  rec=$(make_spawn_case profile-browser-mcp claude "$id")
+  read_case_record "$rec"
+  write_browser_mcp_pins "$HOME_DIR"
+  config_real=$(cd "$HOME_DIR/config" && pwd -P)
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+  status=$?
+  expect_code 0 "$status" "verified browser pins should allow the claude spawn: $out"
+  launch=$(cat "$LAUNCH_LOG")
+  assert_contains "$launch" "$(claude_worker_add_dirs "$HOME_DIR" "$id")--mcp-config '{\"mcpServers\":{\"browser\":{\"args\":[\"$config_real/browser-mcp\"],\"command\":\"$ROOT/bin/fm-browser-mcp.sh\"}}}' --settings '$HOME_DIR/state/$id.claude-settings.json'" \
+    "claude launch did not attach the pinned browser MCP server"
+  pass "verified browser pins attach the pinned browser MCP server to a claude worker"
+}
+
+test_browser_mcp_bad_pin_refuses_claude_launch() {
+  local rec id out status
+  id=profile-browser-mcp-bad-z18
+  rec=$(make_spawn_case profile-browser-mcp-bad claude "$id")
+  read_case_record "$rec"
+  write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+  status=$?
+  [ "$status" -ne 0 ] || fail "a drifted browser pin should refuse the claude spawn"
+  assert_contains "$out" "not the pinned chrome_sha256" "refusal did not name the drifted pin"
+  assert_contains "$out" "config/browser-mcp did not verify" "refusal did not name the configuration file"
+  [ ! -s "$LAUNCH_LOG" ] || fail "a drifted browser pin still launched the worker: $(cat "$LAUNCH_LOG")"
+  pass "a drifted browser pin refuses the claude spawn before launch"
+}
+
+test_browser_mcp_is_claude_only() {
+  local rec id out status
+  id=profile-browser-mcp-codex-z18
+  rec=$(make_spawn_case profile-browser-mcp-codex codex "$id")
+  read_case_record "$rec"
+  write_browser_mcp_pins "$HOME_DIR" 0000000000000000000000000000000000000000000000000000000000000000
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR")
+  status=$?
+  expect_code 0 "$status" "browser pins must not affect a codex spawn: $out"
+  assert_not_contains "$(cat "$LAUNCH_LOG")" "fm-browser-mcp" "a codex launch received browser MCP wiring"
+  pass "browser pins are attached only to claude workers"
+}
+
 test_claude_omits_config_dir_prefix_when_unset() {
   local rec id out status launch
   id=profile-claude-nocfgdir-z18
@@ -2105,6 +2162,9 @@ test_batch_forwards_shared_profile_flags
 test_claude_forwards_firstmate_config_dir_when_set
 test_lavish_server_address_is_exported_to_worker_launch
 test_lavish_absent_config_preserves_destination_ambient
+test_browser_mcp_attaches_to_claude_launch
+test_browser_mcp_bad_pin_refuses_claude_launch
+test_browser_mcp_is_claude_only
 test_claude_omits_config_dir_prefix_when_unset
 test_claude_permission_mode_bypass_matches_absent_launch
 test_claude_permission_mode_auto_swaps_only_the_permission_flag

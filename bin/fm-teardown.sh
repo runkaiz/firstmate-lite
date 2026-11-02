@@ -19,8 +19,8 @@
 # (native_leftover_next_action); a named directory holding tracked content
 # stands for the leftover roots beneath it.
 # Only the recorded idle endpoint is closed; remaining copy processes refuse
-# removal rather than being reaped, except a task-owned chrome-devtools-axi
-# bridge (stop_owned_browser_bridges). Git removal uses no force and keeps branch
+# removal rather than being reaped, except a task-owned browser MCP server
+# (stop_owned_browser_mcp). Git removal uses no force and keeps branch
 # refs. An interrupted removal with an absent, unregistered copy retires only
 # its matching reservation. Pooled tasks are never migrated or removed by this.
 # Tear down a finished task: return the treehouse worktree, release the Orca
@@ -1874,79 +1874,42 @@ $dir_pids"
   TASK_PIDS=$(printf '%s\n' "$pids" | grep -E '^[0-9]+$' | sort -un || true)
 }
 
-# A chrome-devtools-axi bridge left running in a native copy is stopped through
-# the tool's own `stop` when each bridge is proven owned: command names
-# chrome-devtools-axi-bridge, cwd under the copy, and exactly one of this user's
-# session records names that pid. Remaining copy processes refuse removal
-# after a bounded wait; nothing here signals a process directly.
-browser_bridge_pidfile_pid() {  # <pid-file>
-  perl -MJSON::PP -0777 -ne '
-    my $d = eval { JSON::PP::decode_json($_) };
-    print $d->{pid} if ref $d eq "HASH" && defined $d->{pid} && $d->{pid} =~ /\A[0-9]+\z/;
-  ' -- "$1" 2>/dev/null
-}
-
-browser_bridge_session_for_pid() {  # <state-dir> <pid> -> session name, or fail
-  local state_dir=$1 pid=$2 pidfile session match=
-  for pidfile in "$state_dir/bridge.pid" "$state_dir"/sessions/*/bridge.pid; do
-    [ -f "$pidfile" ] && [ ! -L "$pidfile" ] || continue
-    [ "$(browser_bridge_pidfile_pid "$pidfile")" = "$pid" ] || continue
-    if [ "$pidfile" = "$state_dir/bridge.pid" ]; then
-      session=default
-    else
-      session=${pidfile%/bridge.pid}
-      session=${session##*/}
-      printf '%s' "$session" | LC_ALL=C grep -Eq '^[A-Za-z0-9._-]{1,64}$' || return 1
-      case "$session" in default|*[!.]*) ;; *) return 1 ;; esac
-    fi
-    [ -z "$match" ] || return 1
-    match=$session
-  done
-  [ -n "$match" ] || return 1
-  printf '%s\n' "$match"
-}
-
-stop_owned_browser_bridges() {  # <copy>; uses and refreshes TASK_PIDS
-  local copy=$1 state_dir pid cmd bridge session waited=0
-  local -a bridges=() sessions=()
+# A browser MCP server (bin/fm-browser-mcp.sh) left running in a native copy is
+# task-owned because its cwd is under this task's own copy, which no other task
+# shares. It is recognized by the title chrome-devtools-mcp sets for itself or by
+# its package path in the command, and receives TERM only after an identity
+# recheck; the Chrome it launched over a pipe exits with it. Any other copy
+# process, or one still alive after a ten-second wait, refuses removal.
+stop_owned_browser_mcp() {  # <copy>; uses and refreshes TASK_PIDS
+  local copy=$1 pid cmd identity i deadline
+  local -a servers=() identities=()
   [ -n "$TASK_PIDS" ] || return 0
   while IFS= read -r pid; do
     [ -n "$pid" ] || continue
     cmd=$(ps -p "$pid" -o command= 2>/dev/null) || continue
-    case "$cmd" in *chrome-devtools-axi-bridge*) bridges+=("$pid") ;; esac
+    case "$cmd" in
+      chrome-devtools-mcp|'chrome-devtools-mcp '*|*/chrome-devtools-mcp/*)
+        identity=$(task_process_identity "$pid") || continue
+        servers+=("$pid")
+        identities+=("$identity")
+        ;;
+    esac
   done <<< "$TASK_PIDS"
-  [ "${#bridges[@]}" -gt 0 ] || return 1
-  command -v chrome-devtools-axi >/dev/null 2>&1 || {
-    echo "teardown: chrome-devtools-axi bridge ${bridges[*]} runs in the copy but the tool is not on PATH to stop it; stopping nothing" >&2
-    return 1
-  }
-  state_dir=${HOME:+$HOME/.chrome-devtools-axi}
-  for bridge in "${bridges[@]}"; do
-    if [ -z "$state_dir" ] || ! session=$(browser_bridge_session_for_pid "$state_dir" "$bridge"); then
-      echo "teardown: chrome-devtools-axi bridge $bridge runs in the copy but no single session record of this user names it; not proven task-owned, stopping nothing" >&2
-      return 1
-    fi
-    sessions+=("$session")
-  done
-  for i in "${!bridges[@]}"; do
-    bridge=${bridges[$i]} session=${sessions[$i]}
-    # Re-prove right before the stop, which acts on whatever pid the record names.
-    [ "$(browser_bridge_session_for_pid "$state_dir" "$bridge" 2>/dev/null)" = "$session" ] || return 1
-    echo "teardown: stopping task-owned chrome-devtools-axi bridge $bridge (session $session) for $ID" >&2
-    if [ "$session" = default ]; then
-      (cd "$copy" && env -u CHROME_DEVTOOLS_AXI_SESSION -u CHROME_DEVTOOLS_AXI_PORT chrome-devtools-axi stop) >/dev/null 2>&1 || true
-    else
-      (cd "$copy" && env -u CHROME_DEVTOOLS_AXI_PORT CHROME_DEVTOOLS_AXI_SESSION="$session" chrome-devtools-axi stop) >/dev/null 2>&1 || true
+  [ "${#servers[@]}" -gt 0 ] || return 1
+  echo "teardown: stopping task-owned browser MCP server process(es) ${servers[*]} for $ID" >&2
+  for i in "${!servers[@]}"; do
+    if task_process_identity_matches "${servers[$i]}" "${identities[$i]}"; then
+      kill -TERM "${servers[$i]}" 2>/dev/null || true
     fi
   done
+  deadline=$((SECONDS + 10))
   while :; do
     task_pids_under_roots "$copy" || return 1
     [ -n "$TASK_PIDS" ] || return 0
-    [ "$waited" -lt 20 ] || break
+    [ "$SECONDS" -lt "$deadline" ] || break
     sleep 0.25
-    waited=$((waited + 1))
   done
-  echo "teardown: copy processes remain after stopping its chrome-devtools-axi bridge: $(printf '%s' "$TASK_PIDS" | tr '\n' ' ')" >&2
+  echo "teardown: copy processes remain after stopping its browser MCP server: $(printf '%s' "$TASK_PIDS" | tr '\n' ' ')" >&2
   return 1
 }
 
@@ -2679,7 +2642,7 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
       "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
     teardown_close_endpoint
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free; nothing preserved' >&2; exit 1; }
-    stop_owned_browser_bridges "$WT" || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
+    stop_owned_browser_mcp "$WT" || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
     fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}" || {
       echo "REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes" >&2
       [ "${FM_GIT_WORKTREE_UNCOVERED:-0}" = 0 ] || native_leftover_next_action "$WT"
@@ -2925,7 +2888,7 @@ fi
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ -d "$WT" ]; then
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free' >&2; exit 1; }
-    stop_owned_browser_bridges "$WT" || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
+    stop_owned_browser_mcp "$WT" || { echo 'REFUSED: native copy still has processes; preserving it' >&2; exit 1; }
   fi
   fm_git_worktree_remove "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1

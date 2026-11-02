@@ -242,6 +242,9 @@ test_forge_selection_renders_correct_cli() {
   assert_grep 'When clearing scratch folders, use a guarded explicit path such as `rm -rf -- "${DIR:?}/sub"`, never `cd` then `rm -rf` with a relative glob.' "$brief" \
     "a ship brief must carry the guarded scratch-cleanup rule"
   # shellcheck disable=SC2016 # Backticks are literal generated brief text.
+  assert_grep 'Use this session'"'"'s `browser` MCP tools for browser operations; if the session has none, report that instead of installing or fetching a browser tool.' "$brief" \
+    "a ship brief must route browser work to the pinned browser MCP server"
+  # shellcheck disable=SC2016 # Backticks are literal generated brief text.
   assert_grep 'open a PR with `gh`' "$brief" \
     "a direct-PR brief with no --forge must still tell the worker to open the PR with gh"
   grep -qx "Delivery contract: mode=direct-PR" "$brief" \
