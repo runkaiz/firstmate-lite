@@ -50,7 +50,11 @@ if [ "${1:-}" = --list-models ]; then
 fi
 exit 0
 SH
-  chmod +x "$fakebin/timeout" "$fakebin/cursor-agent"
+  cat > "$fakebin/quota-axi" <<'SH'
+#!/usr/bin/env bash
+exit 1
+SH
+  chmod +x "$fakebin/timeout" "$fakebin/cursor-agent" "$fakebin/quota-axi"
   make_spawn_pi_probe "$fakebin" pi
   make_spawn_pi_probe "$fakebin" pi-signed
   printf '%s\n' "$fakebin"
@@ -537,6 +541,43 @@ test_active_dispatch_profile_allows_positional_harness() {
   assert_contains "$out" "spawned $id harness=codex" "spawn did not report positional codex harness"
   assert_meta_profile "$HOME_DIR/state/$id.meta" codex gpt-5 high
   pass "active crew-dispatch profile allows the legacy positional harness form"
+}
+
+test_exhausted_profile_spawns_next_configured_candidate() {
+  local rec id out status
+  id=profile-quota-switch-z15
+  rec=$(make_spawn_case profile-quota-switch claude "$id")
+  read_case_record "$rec"
+  enable_dispatch_profile "$HOME_DIR"
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok --why "usage limit reached" \
+    || fail "recording the quota failure should succeed"
+
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
+    "$id" "$PROJ_DIR" --harness grok --model grok-4 --effort high)
+  status=$?
+  expect_code 0 "$status" "spawn on an exhausted profile should launch the next candidate: $out"
+  assert_contains "$out" "quota: grok grok-4 is exhausted" "spawn did not explain the switch"
+  assert_contains "$out" "spawned $id harness=codex" "spawn did not launch the next configured candidate"
+  assert_meta_profile "$HOME_DIR/state/$id.meta" codex gpt-5 medium
+  pass "a spawn on a known-exhausted profile launches the next configured candidate"
+}
+
+test_spawn_defers_when_every_candidate_is_exhausted() {
+  local rec id out status
+  id=profile-quota-defer-z16
+  rec=$(make_spawn_case profile-quota-defer claude "$id")
+  read_case_record "$rec"
+  enable_dispatch_profile "$HOME_DIR"
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness grok >/dev/null
+  FM_HOME="$HOME_DIR" "$ROOT/bin/fm-quota-failover.sh" record --harness codex >/dev/null
+
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
+    "$id" "$PROJ_DIR" --harness grok --model grok-4 --effort high)
+  status=$?
+  expect_code 75 "$status" "spawn with no quota left anywhere should defer"
+  assert_contains "$out" "deferred: grok grok-4 is exhausted" "the deferral did not say why"
+  assert_absent "$HOME_DIR/state/$id.meta" "a deferred spawn must leave no task record"
+  pass "a spawn with every configured candidate exhausted defers with exit 75"
 }
 
 # Replacing inherited config rather than appending the hooks entry loses the
@@ -2068,6 +2109,8 @@ test_active_dispatch_profile_requires_explicit_harness_for_ship
 test_active_dispatch_profile_requires_explicit_harness_for_scout
 test_active_dispatch_profile_allows_explicit_harness
 test_active_dispatch_profile_allows_positional_harness
+test_exhausted_profile_spawns_next_configured_candidate
+test_spawn_defers_when_every_candidate_is_exhausted
 test_active_dispatch_profile_allows_raw_launch_command
 test_chained_raw_launch_strips_ai_trailer_in_every_step
 test_claude_threads_model_and_effort

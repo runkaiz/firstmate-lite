@@ -428,7 +428,7 @@ family_for_basename() {
     fm-pending-reply.test.sh|fm-pi-branch-extension.test.sh|\
     fm-procevent-quota.test.sh|fm-procevent-when.test.sh|fm-procevent.test.sh|\
     fm-live-gate.test.sh|\
-    fm-project-origin.test.sh|fm-quota-choose.test.sh|\
+    fm-project-origin.test.sh|fm-quota-choose.test.sh|fm-quota-failover.test.sh|\
     fm-remote-entrypoint.test.sh|fm-remote-secondmate-parent-binding.test.sh|\
     fm-send-remote-delivery.test.sh|fm-spawn-pool-base-freshen.test.sh|\
     fm-test-fixture-cleanup.test.sh|fm-test-fixtures.test.sh|\
@@ -804,6 +804,7 @@ tests/fm-procevent.test.sh 292297
 tests/fm-project-origin.test.sh 123
 tests/fm-quota-array-dispatch-live-e2e.test.sh 50
 tests/fm-quota-choose.test.sh 2860
+tests/fm-quota-failover.test.sh 361
 tests/fm-remote-backlog-handoff.test.sh 82063
 tests/fm-remote-doctor.test.sh 14460
 tests/fm-remote-entrypoint.test.sh 134
@@ -1518,6 +1519,10 @@ families_for_changed_path() {
       printf '%s\n' "__script__:fm-procevent-quota.test.sh"
       printf '%s\n' "__script__:fm-quota-choose.test.sh"
       printf '%s\n' "__script__:fm-dispatch-resolve.test.sh"
+      printf '%s\n' "__script__:fm-quota-failover.test.sh"
+      ;;
+    bin/fm-quota-failover.sh)
+      printf '%s\n' "__script__:fm-quota-failover.test.sh"
       ;;
     bin/fm-procevent-quota.sh)
       printf '%s\n' "__script__:fm-procevent-quota.test.sh"
