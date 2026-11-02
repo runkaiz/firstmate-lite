@@ -21,7 +21,7 @@
 # nonzero when the environment would lead to an unsafe dispatch.
 #
 # The helper is the canonical worker-side selection used after the agent has
-# already run `quota-axi` for its model selection. It never replaces the agent's
+# already run `quota-axi --no-credential-refresh` for its model selection. It never replaces the agent's
 # reasoning-class or runway-feasibility gates; it only answers which ordered
 # candidate remains eligible under the captured quota evidence.
 #

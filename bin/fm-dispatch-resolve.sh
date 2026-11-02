@@ -23,7 +23,7 @@
 #   rule's declared `min_confidence` on that rule's probability, falling to the
 #   most probable other option that clears its own floor), the rule's declared
 #   `approval` and `floor`, each profile's declared `provider` and `floor`, the
-#   quota rows from ONE quota-axi --json snapshot (schema 5 or 6; each
+#   quota rows from ONE quota-axi --json --no-credential-refresh snapshot (schema 5 or 6; each
 #   candidate binds to one row through quota_row in
 #   bin/fm-quota-axi-lib.sh, so a Pi lane such as openai-codex-work/...
 #   reads its own account's row and an expanded provider with no row for the
@@ -344,7 +344,7 @@ jq -e --slurpfile rules "$RULES" '
        (.usage.output_tokens | type) == "number"))' \
   "$RESP_FILE" >/dev/null 2>&1 || emit_error "response is not a rule Choice answer"
 
-# ---- quota evidence: one quota-axi --json snapshot -----------------------------
+# ---- quota evidence: one quota-axi --json --no-credential-refresh snapshot -----
 command -v quota-axi >/dev/null 2>&1 || emit_error "quota-axi not installed"
 quota-axi --json --no-credential-refresh > "$QUOTA" 2>/dev/null || emit_error "quota-axi --json failed"
 fm_quota_json_valid < "$QUOTA" || emit_error "quota-axi --json returned an invalid snapshot"
