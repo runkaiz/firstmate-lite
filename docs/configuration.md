@@ -931,11 +931,12 @@ The address selects the existing shared server; it does not authorize starting o
 
 ## Browser MCP pin (config/browser-mcp)
 
-The optional local, gitignored `config/browser-mcp` pins this machine's worker browser tooling: a dedicated chrome-devtools-mcp install and a Chrome for Testing executable, each by absolute path and SHA-256.
+The optional local, gitignored `config/browser-mcp` pins this machine's worker browser tooling by the absolute paths and SHA-256 hashes of the chrome-devtools-mcp entry file and Chrome for Testing executable.
 When the file exists, `fm-spawn.sh` verifies the pins and attaches [`bin/fm-browser-mcp.sh`](../bin/fm-browser-mcp.sh) to each supported worker launch and relaunch (runtime table below) as the `browser` MCP server.
-A pin that does not verify refuses the launch before the worker starts, naming the drifted file and both hashes.
-Without the file, workers get no browser server, and their instructions tell them to report that rather than install or fetch a browser tool.
-The launcher never runs `npx` or downloads anything, so the browser stack changes only when the pins are deliberately updated.
+Invalid pins refuse supported template launches before the worker starts; a hash mismatch names the drifted file and both hashes.
+Without the file, Firstmate supplies no browser server, and worker instructions disclose that limitation.
+The launcher never runs `npx` or downloads anything.
+The hashes cover those two files, not the complete install or its dependencies, so keep the dedicated version-pinned installation unchanged between deliberate updates.
 
 Set the pins once per machine, using a version-named install directory so the path itself records the pinned version:
 
@@ -948,11 +949,10 @@ printf '%s\n' "mcp=$mcp" "mcp_sha256=$(sha256sum "$mcp" | cut -d' ' -f1)" \
 bin/fm-browser-mcp.sh --check config/browser-mcp
 ```
 
+On systems without `sha256sum`, use `shasum -a 256` in both hash commands; the launcher accepts either tool.
+If the operational home is separate from the code checkout, write the file under that home's `config/` directory and pass its path to the launcher in the code checkout.
 To update, install the new version beside the old one, re-pin both values, and run the same check.
-Each server starts its own isolated headless Chrome over a pipe with a throwaway profile, so concurrent workers never share a browser, profile, or debugging port.
-Page tools act on the selected page without a page id, and failures come back as MCP tool errors carrying the browser's message.
-The browser closes when the worker's session ends; teardown stops a server still running in a task copy.
-The launcher's header owns the file format, server flags, and lifetime contract.
+The [launcher's header](../bin/fm-browser-mcp.sh) owns the file format, browser isolation, selected-page routing, error behavior, server flags, and lifetime contract.
 
 | Runtime | With `config/browser-mcp` |
 | --- | --- |
