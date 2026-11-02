@@ -1260,9 +1260,9 @@ fm_lock_try_acquire() {
   return "$rc"
 }
 
-# Returns 1 once the lock's parent directory is gone (a torn-down state or
-# config directory): no acquirer can ever create the lock there again, so
-# spinning would strand the caller forever. Callers must handle that failure.
+# Returns 1 when the lock's parent directory is absent (for example, after
+# state or config teardown): acquisition cannot succeed while it is absent.
+# Callers must handle that failure before entering the critical section.
 fm_lock_acquire_wait() {
   local lockdir=$1
   while ! fm_lock_try_acquire "$lockdir"; do
