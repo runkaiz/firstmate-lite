@@ -12,8 +12,8 @@
 # recovery. Every captured result ends this wait; no merge monitor is added.
 # Readiness is only a no-mistakes drive outcome, checked against the current
 # forge head. Missing required checks remain no-mistakes' responsibility.
-# After NO_CHECK_HOLDS pending holds (at least 10 minutes) of a CI-only run whose
-# PR has zero registered checks, poll queues one `check` wake carrying the PR URL
+# After NO_CHECK_HOLDS pending holds (roughly 10 minutes) of a CI-only run whose
+# PR has zero registered checks, poll queues one `check` wake per CI round carrying the PR URL
 # and keeps holding, so checks that register later still return here. That wake
 # reports an absence only; zero checks are never green and it authorizes nothing.
 # Results are evidence for the original worker to reattach, never authority to
@@ -65,9 +65,8 @@ ci_only() {
       exit bad || !n
     }'
 }
-# GitHub registers checks within seconds of a PR event, so 10 minutes separates a
-# repository with nothing to run from a slow start. The hold before handoff adds
-# at most one drive wait (default 8 minutes), so the captain hears within 20.
+# Allow roughly 10 minutes of pending CI holds before checking for absent checks.
+# Each pipeline-owned repair starts a fresh notification window.
 NO_CHECK_HOLDS=20
 HOLDS=0
 NO_CHECK_DONE=0

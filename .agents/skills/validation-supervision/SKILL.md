@@ -48,4 +48,4 @@ Offer two ways out, and take either only on the captain's word:
 
 A PR that predates its CI workflow gets no checks from the workflow landing on the default branch.
 To recover it, retire the wait, then steer the original worker to abort the run through no-mistakes axi, confirm it stopped, settle branch ownership as above, rebase onto the default branch, and re-run once.
-Firstmate never closes or reopens a PR to re-trigger CI: it changes a PR a run is monitoring, and it did not start checks when tried.
+Firstmate never closes or reopens a PR to re-trigger CI while a run monitors it; use the recovery procedure above.
