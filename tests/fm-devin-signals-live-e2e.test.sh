@@ -78,13 +78,13 @@ TARGET="firstmate:fm-$ID"
 capture() { "$REAL_TMUX" -S "$SOCKET" capture-pane -p -e -t "$TARGET"; }
 screen_text() { "$REAL_TMUX" -S "$SOCKET" capture-pane -p -t "$TARGET"; }
 wait_file() {
-  local path=$1 i
-  for i in $(seq 1 480); do [ -s "$path" ] && return 0; sleep 0.5; done
+  local path=$1 _
+  for _ in $(seq 1 480); do [ -s "$path" ] && return 0; sleep 0.5; done
   fail "timed out waiting for ${path##*/}"
 }
 wait_idle() {
-  local i
-  for i in $(seq 1 240); do
+  local _
+  for _ in $(seq 1 240); do
     [ "$(fm_busy_classify tmux "$TARGET" devin "$ID" "$H/state")" = 'idle devin-hook' ] && return 0
     sleep 0.5
   done
