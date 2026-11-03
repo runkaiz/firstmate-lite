@@ -1056,7 +1056,7 @@ test_failed_launch_recovery_does_not_start_backlog_items() {
   done
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
     FM_DATA_OVERRIDE="$home/missing-data" FM_BOOTSTRAP_NETWORK=skip \
-    FM_QUEUE_TEST_CLI= FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    FM_QUEUE_TEST_CLI='' FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
     || fail "failed-launch recovery incorrectly required backlog access: $out"
 
   printf '%s\n' '# Backlog' '' '## In flight' '' '## Queued' '' '## Done' > "$home/data/backlog.md"
@@ -1068,7 +1068,7 @@ test_failed_launch_recovery_does_not_start_backlog_items() {
     --kind ship --file "$home/data/backlog.md" >/dev/null || fail "could not seed ordinary item"
   fm_write_meta "$home/state/ordinary-ship.meta" 'kind=ship'
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
-    FM_BOOTSTRAP_NETWORK=skip FM_QUEUE_TEST_CLI= FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    FM_BOOTSTRAP_NETWORK=skip FM_QUEUE_TEST_CLI='' FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
     || fail "mixed worker recovery failed: $out"
   for kind in ship scout; do
     row=$("$ROOT/bin/fm-queue.py" show "recovery-$kind" --file "$home/data/backlog.md")
