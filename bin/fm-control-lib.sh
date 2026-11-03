@@ -273,25 +273,20 @@ fm_control_relaunch_resume_flag() {  # <harness> <registered-agent>
 }
 
 # Which named keys a backend adapter can deliver. Every session provider
-# normalizes Enter, Ctrl+C, and the Ctrl+U composer clear; Orca's terminal API
-# exposes only an interrupt and an Enter, so it can deliver neither Escape nor
-# Ctrl+U (bin/backends/orca.sh's fm_backend_orca_send_key).
+# normalizes Escape, Enter, Ctrl+C, and the Ctrl+U composer clear.
 fm_control_backend_supports_key() {  # <backend> <key>
   local backend=${1-} key=${2-}
   case "$backend" in
-    tmux|herdr|zellij|cmux)
+    tmux|herdr)
       case "$key" in Escape|Enter|C-c|C-u) return 0 ;; esac
-      ;;
-    orca)
-      case "$key" in Enter|C-c) return 0 ;; esac
       ;;
   esac
   return 1
 }
 
-# Whether <backend> has a recovery-grade agent-state classifier. Only tmux and
-# herdr implement fm_backend_agent_state; zellij, orca, and cmux report
-# `unverified`, so no reading of theirs can prove an agent stopped. The control
+# Whether <backend> has a recovery-grade agent-state classifier. tmux and
+# herdr implement fm_backend_agent_state; any other backend reports
+# `unverified`, so no reading of its can prove an agent stopped. The control
 # plane refuses a stop-proving verb there instead of reporting an unprovable
 # transition as success.
 fm_control_backend_state_verified() {  # <backend>

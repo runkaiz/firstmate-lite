@@ -31,7 +31,8 @@ On a Linux machine you need:
 
 - A supported coding agent, logged in to its own account; the walkthrough below uses Claude Code.
 - `git`, Node.js, and Python 3.9+ for the built-in backlog.
-- `tmux` (the terminal multiplexer where workers get their own windows) and `treehouse` (hands out isolated copies of your project).
+- [Herdr](https://herdr.dev) (the terminal workspace where workers get their own tabs), `jq`, and `treehouse` (hands out isolated copies of your project).
+  `tmux` works as a simpler fallback when Herdr is not installed.
 - For the default GitHub workflow: the `gh` CLI, logged in with `gh auth login`, and `no-mistakes` (the review-and-ship pipeline).
 
 You do not have to get this list perfect.
@@ -50,12 +51,14 @@ By default, your own records (backlog, notes, project clones, settings) live in 
 
 ### 3. Launch your first mate
 
-Start a tmux session so you can watch the workers appear as windows, then start your agent:
+Start Herdr so you can watch the workers appear as tabs, then start your agent in its pane:
 
 ```sh
-tmux new -s firstmate
+herdr
 claude
 ```
+
+Without Herdr, use tmux instead: run `tmux new -s firstmate`, then `claude`; workers appear as tmux windows.
 
 Other supported agents launch the same way from this folder:
 
@@ -125,8 +128,8 @@ If something breaks, tell the first mate what you saw - diagnosing its own setup
 
 - [docs/configuration.md](docs/configuration.md) - every setting, file, and supported agent.
 - [docs/architecture.md](docs/architecture.md) - how the crew, supervision, and isolated copies fit together.
-- [docs/tmux-backend.md](docs/tmux-backend.md) - watching and steering workers in tmux.
-- Other terminal backends: [Herdr](docs/herdr-backend.md), [Zellij](docs/zellij-backend.md), [Orca](docs/orca-backend.md), [cmux](docs/cmux-backend.md) (the last three are experimental).
+- [docs/herdr-backend.md](docs/herdr-backend.md) - watching and steering workers in Herdr, the default backend.
+- [docs/tmux-backend.md](docs/tmux-backend.md) - the tmux fallback.
 - [docs/wedge-alarm.md](docs/wedge-alarm.md) - an alert for when an away-mode notification gets stuck.
 - [docs/scripts.md](docs/scripts.md) - the `bin/` toolbelt.
 - [AGENTS.md](AGENTS.md) - the first mate's full job description.

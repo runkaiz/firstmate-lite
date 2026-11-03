@@ -61,10 +61,7 @@
 # Race safety: bin/fm-spawn.sh evaluates admission while holding the shared
 # project lock and keeps holding it until the new task record is published, so
 # two concurrent spawns for one project can never both publish from the same
-# count. A spawn on an uncapped project can still publish a holder for a capped
-# same-origin clone, so every backend takes that lock whenever the declaration
-# caps any project; Orca, which otherwise never takes it, is included. Freeing a
-# place needs no lock, because removing a record or adding pr= only ever lowers
+# count. Freeing a place needs no lock, because removing a record or adding pr= only ever lowers
 # the count.
 #
 # Requires bin/fm-wake-lib.sh (root home, local homes, project lock path),
@@ -92,14 +89,12 @@ fm_project_capacity_config_dir() {  # <spawning-home> <spawning-config-dir>
 
 # Read the declared capacity for one project.
 # Sets FM_PROJECT_CAPACITY_FILE to the declaration path, FM_PROJECT_CAPACITY
-# to the project's capacity, or to empty when the project declares none, and
-# FM_PROJECT_CAPACITY_ANY to 1 when the declaration caps any project at all.
+# to the project's capacity, or to empty when the project declares none.
 # Returns 1 with FM_PROJECT_CAPACITY_ERROR when the declaration is unreadable.
 fm_project_capacity_lookup() {  # <config-dir> <project-name>
   local name=$2 line lineno=0 pname pcap seen='|'
   FM_PROJECT_CAPACITY_FILE="$1/project-capacity"
   FM_PROJECT_CAPACITY=
-  FM_PROJECT_CAPACITY_ANY=
   FM_PROJECT_CAPACITY_ERROR=
   if [ ! -e "$FM_PROJECT_CAPACITY_FILE" ] && [ ! -L "$FM_PROJECT_CAPACITY_FILE" ]; then
     return 0
@@ -156,7 +151,6 @@ fm_project_capacity_lookup() {  # <config-dir> <project-name>
     seen="$seen$pname|"
     [ "$pname" != "$name" ] || FM_PROJECT_CAPACITY=$pcap
   done < "$FM_PROJECT_CAPACITY_FILE"
-  [ "$seen" = '|' ] || FM_PROJECT_CAPACITY_ANY=1
   return 0
 }
 

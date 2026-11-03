@@ -27,16 +27,14 @@ set -u
 
 BASE_PATH=${FM_TEST_BASE_PATH:-/usr/bin:/bin:/usr/sbin:/sbin}
 TMP_ROOT=$(fm_test_tmproot fm-bootstrap-tests)
-export FM_BACKEND_CMUX_BUNDLE_BIN="$TMP_ROOT/no-bundled-cmux"
 
 # Hermetic runtime-backend detection. These cases pin the backend per-home via
 # config/backend; the dev shell's ambient runtime markers ($TMUX inside tmux,
-# HERDR_ENV inside herdr, CMUX_* inside a cmux terminal) must not leak into
-# fm_backend_name and flip a default-backend case onto a non-tmux backend. Unset
+# HERDR_ENV inside herdr) must not leak into fm_backend_name and flip a
+# default-backend case onto a non-tmux backend. Unset
 # them once so the suite resolves the tmux reference backend unless a case says
 # otherwise - the same hermeticity discipline as pinning PATH via BASE_PATH.
-unset TMUX TMUX_PANE HERDR_ENV HERDR_PANE_ID HERDR_SESSION HERDR_SOCKET_PATH \
-  CMUX_WORKSPACE_ID CMUX_SURFACE_ID CMUX_SOCKET_PATH CMUX_TAB_ID CMUX_PANEL_ID 2>/dev/null || true
+unset TMUX TMUX_PANE HERDR_ENV HERDR_PANE_ID HERDR_SESSION HERDR_SOCKET_PATH 2>/dev/null || true
 
 # A fake toolchain where every required tool is present and gh is authenticated.
 # treehouse's `get --help` advertises --lease only when FM_FAKE_TREEHOUSE_LEASE_HELP=1.
@@ -558,34 +556,10 @@ SH
   pass "bootstrap requires git with an install instruction"
 }
 
-test_orca_backend_gates_orca_tool_only_when_selected() {
-  local case_dir fakebin out missing_orca
-  missing_orca="MISSING: orca (install: brew install orca  # or the platform's package manager)"
-
-  case_dir="$TMP_ROOT/orca-backend-selected"
-  mkdir -p "$case_dir/home/config"
-  printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-  printf '%s\n' orca > "$case_dir/home/config/backend"
-  fakebin=$(make_fake_toolchain "$case_dir")
-  out=$(PATH="$fakebin:$(fm_test_base_path_sans "$BASE_PATH" orca)" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
-  [ "$out" = "$missing_orca" ] || fail "backend=orca should require only the Orca-specific missing tool, got: $out"
-
-  case_dir="$TMP_ROOT/orca-backend-not-selected"
-  mkdir -p "$case_dir/home/config"
-  printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-  fakebin=$(make_fake_toolchain "$case_dir")
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
-  assert_not_contains "$out" "MISSING: orca" "bootstrap should not require orca unless backend=orca is selected"
-  pass "bootstrap: backend=orca gates the Orca CLI without requiring it on the default backend"
-}
-
 # Build a fake toolchain with tmux REMOVED and the named backend session CLI(s)
 # plus jq added, so a backend that must NOT require tmux can be proven silent
 # with tmux absent. Echoes the fakebin dir. The removed tmux is what makes these
-# cases catch the old "everything but orca demands tmux" bug: with the buggy
-# TOOLS list a herdr/zellij/cmux home would report MISSING: tmux here.
+# cases catch a herdr home wrongly reporting MISSING: tmux.
 make_fake_toolchain_no_tmux() {  # <case-dir> <extra-cli...>
   local dir=$1 fakebin
   shift
@@ -597,7 +571,7 @@ make_fake_toolchain_no_tmux() {  # <case-dir> <extra-cli...>
 
 test_session_provider_backends_do_not_require_tmux() {
   local backend cli case_dir fakebin out
-  # herdr/zellij/cmux are session providers only: they require their own CLI, jq,
+  # herdr is a session provider only: it requires its own CLI, jq,
   # and treehouse, never tmux. With all genuine deps present and tmux absent,
   # bootstrap must be silent.
   while IFS='^' read -r backend cli; do
@@ -612,8 +586,6 @@ test_session_provider_backends_do_not_require_tmux() {
     [ -z "$out" ] || fail "backend=$backend with tmux absent but its own deps present should be silent, got: $out"
   done <<'ROWS'
 herdr^herdr
-zellij^zellij
-cmux^cmux
 ROWS
   pass "bootstrap: session-provider backends require their own CLI + jq + treehouse, never tmux"
 }
@@ -645,8 +617,6 @@ test_session_provider_backends_gate_own_cli_not_tmux() {
     assert_not_contains "$out" "MISSING: tmux" "backend=$backend must not demand tmux when its own CLI is missing"
   done <<'ROWS'
 herdr^herdr
-zellij^zellij
-cmux^cmux
 ROWS
   pass "bootstrap: a session-provider backend gates its own CLI, never a false tmux requirement"
 }
@@ -661,21 +631,6 @@ test_herdr_install_requires_manual_action() {
   pass "bootstrap: Herdr manual-install guidance is never executed as a shell command"
 }
 
-test_cmux_bundled_cli_satisfies_dependency() {
-  local case_dir fakebin bundle out
-  case_dir="$TMP_ROOT/cmux-bundled-cli"
-  mkdir -p "$case_dir/home/config" "$case_dir/bundle"
-  printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-  printf '%s\n' cmux > "$case_dir/home/config/backend"
-  fakebin=$(make_fake_toolchain_no_tmux "$case_dir")
-  fm_fake_exit0 "$case_dir/bundle" cmux
-  bundle="$case_dir/bundle/cmux"
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    FM_BACKEND_CMUX_BUNDLE_BIN="$bundle" FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
-  [ -z "$out" ] || fail "a usable bundled cmux CLI should satisfy bootstrap without a PATH shim, got: $out"
-  pass "bootstrap: the bundled cmux CLI satisfies the active backend dependency"
-}
-
 test_unknown_backend_reports_invalid_configuration() {
   local case_dir fakebin out
   case_dir="$TMP_ROOT/unknown-backend"
@@ -685,15 +640,31 @@ test_unknown_backend_reports_invalid_configuration() {
   fakebin=$(make_fake_toolchain "$case_dir")
   out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
     FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
-  assert_contains "$out" "BACKEND_INVALID: bogus (known: tmux herdr zellij orca cmux)" \
+  assert_contains "$out" "BACKEND_INVALID: bogus (known: tmux herdr)" \
     "bootstrap should report an unknown resolved backend"
   assert_not_contains "$out" "MISSING: tmux" "an unknown backend should not silently fall back to tmux dependencies"
   pass "bootstrap: unknown resolved backends fail closed with an actionable diagnostic"
 }
 
+test_removed_backend_reports_switch_instruction() {
+  local backend case_dir fakebin out
+  for backend in zellij cmux orca; do
+    case_dir="$TMP_ROOT/removed-backend-$backend"
+    mkdir -p "$case_dir/home/config"
+    printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
+    printf '%s\n' "$backend" > "$case_dir/home/config/backend"
+    fakebin=$(make_fake_toolchain "$case_dir")
+    out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
+      FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh")
+    assert_contains "$out" "BACKEND_INVALID: $backend (removed; switch config/backend or FM_BACKEND to herdr or tmux)" \
+      "bootstrap should tell a $backend home to switch to herdr or tmux"
+  done
+  pass "bootstrap: a home configured for a removed backend is told to switch to herdr or tmux"
+}
+
 test_json_backends_require_jq_not_tmux() {
   local backend case_dir fakebin bash_env out
-  # herdr/zellij/cmux parse their backend's JSON output, so jq is a genuine dep.
+  # herdr parses its backend's JSON output, so jq is a genuine dep.
   # jq lives in a system BASE_PATH dir on many hosts, so force it missing with a
   # command()/jq() override (the same technique the git-required case uses) to keep
   # the assertion host-independent.
@@ -725,31 +696,14 @@ SH
     assert_not_contains "$out" "MISSING: tmux" "backend=$backend must not demand tmux when jq is missing"
   done <<'ROWS'
 herdr
-zellij
-cmux
 ROWS
   pass "bootstrap: JSON-emitting backends require jq (their genuine dep), never tmux"
 }
 
 test_treehouse_lease_check_follows_resolved_backend() {
   local case_dir fakebin out
-  # A treehouse that lacks durable --lease support is only a problem for a backend
-  # that actually uses treehouse. Orca owns its own worktrees, so an old treehouse
-  # must NOT trip MISSING: treehouse under backend=orca...
-  case_dir="$TMP_ROOT/orca-old-treehouse"
-  mkdir -p "$case_dir/home/config"
-  printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
-  printf '%s\n' orca > "$case_dir/home/config/backend"
-  fakebin=$(make_fake_toolchain "$case_dir")
-  rm -f "$fakebin/tmux"
-  fm_fake_exit0 "$fakebin" orca
-  # FM_FAKE_TREEHOUSE_LEASE_HELP unset: the fake treehouse advertises NO --lease.
-  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$case_dir/home" \
-    "$ROOT/bin/fm-bootstrap.sh")
-  [ -z "$out" ] || fail "backend=orca must not require treehouse (even lease-less) or tmux, got: $out"
-
-  # ...but the same lease-less treehouse IS a problem for a session-provider
-  # backend that relies on treehouse for worktrees.
+  # A treehouse that lacks durable --lease support is a problem for a backend
+  # that relies on treehouse for worktrees.
   case_dir="$TMP_ROOT/herdr-old-treehouse"
   mkdir -p "$case_dir/home/config"
   printf '%s\n' manual > "$case_dir/home/config/backlog-backend"
@@ -1089,6 +1043,43 @@ SH
   pass "bootstrap ignores external compatibility verdicts without running that tool"
 }
 
+test_failed_launch_recovery_does_not_start_backlog_items() {
+  local case_dir home fakebin kind out row
+  case_dir="$TMP_ROOT/failed-launch-recovery"
+  home="$case_dir/home"
+  mkdir -p "$home/config" "$home/data" "$home/state"
+  printf '%s\n' tmux > "$home/config/backend"
+  fm_test_tasks_toml "$home/.tasks.toml"
+  fakebin=$(make_fake_toolchain "$case_dir")
+  for kind in ship scout; do
+    fm_write_meta "$home/state/recovery-$kind.meta" "kind=$kind" 'cleanup_recovery=orca'
+  done
+  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_DATA_OVERRIDE="$home/missing-data" FM_BOOTSTRAP_NETWORK=skip \
+    FM_QUEUE_TEST_CLI='' FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    || fail "failed-launch recovery incorrectly required backlog access: $out"
+
+  printf '%s\n' '# Backlog' '' '## In flight' '' '## Queued' '' '## Done' > "$home/data/backlog.md"
+  for kind in ship scout; do
+    "$ROOT/bin/fm-queue.py" add "recovery-$kind" "failed $kind launch" \
+      --kind "$kind" --file "$home/data/backlog.md" >/dev/null || fail "could not seed recovery item"
+  done
+  "$ROOT/bin/fm-queue.py" add ordinary-ship 'launched worker' \
+    --kind ship --file "$home/data/backlog.md" >/dev/null || fail "could not seed ordinary item"
+  fm_write_meta "$home/state/ordinary-ship.meta" 'kind=ship'
+  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_BOOTSTRAP_NETWORK=skip FM_QUEUE_TEST_CLI='' FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    || fail "mixed worker recovery failed: $out"
+  for kind in ship scout; do
+    row=$("$ROOT/bin/fm-queue.py" show "recovery-$kind" --file "$home/data/backlog.md")
+    assert_contains "$row" 'state: queued' "failed $kind launch was advanced to In flight"
+    assert_present "$home/state/recovery-$kind.meta" "recovery record was removed"
+  done
+  row=$("$ROOT/bin/fm-queue.py" show ordinary-ship --file "$home/data/backlog.md")
+  assert_contains "$row" 'state: in_flight' 'ordinary worker was not reconciled'
+  pass "bootstrap excludes failed-launch recovery from backlog gating and reconciliation"
+}
+
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info() {
   local case_dir fakebin out expect
   case_dir="$TMP_ROOT/dispatch-active"
@@ -1252,12 +1243,11 @@ test_lavish_axi_min_version
 test_tasks_axi_min_version
 test_quota_axi_min_version
 test_git_is_required_with_supported_install_instruction
-test_orca_backend_gates_orca_tool_only_when_selected
 test_session_provider_backends_do_not_require_tmux
 test_session_provider_backends_gate_own_cli_not_tmux
 test_herdr_install_requires_manual_action
-test_cmux_bundled_cli_satisfies_dependency
 test_unknown_backend_reports_invalid_configuration
+test_removed_backend_reports_switch_instruction
 test_json_backends_require_jq_not_tmux
 test_treehouse_lease_check_follows_resolved_backend
 test_fleet_sync_timeout_scales_with_origin_backed_project_count
@@ -1271,5 +1261,6 @@ test_network_phase_partitions_the_run
 test_network_sweeps_recheck_lock_ownership
 test_network_phases_record_per_step_elapsed_times
 test_native_queue_ignores_external_compatibility_verdicts
+test_failed_launch_recovery_does_not_start_backlog_items
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info
 test_crew_dispatch_validation

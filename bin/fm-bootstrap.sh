@@ -8,7 +8,9 @@
 #          Lines: "MISSING: <tool> (install: <command>)",
 #                 "PRESENTATION_UNAVAILABLE: lavish-axi (requires >=<floor>; install: <command>) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish",
 #                 "MISSING_MANUAL: <tool> (instructions: <url>)", "NEEDS_GH_AUTH",
-#                 "BACKEND_INVALID: <name> (known: <names>)",
+#                 "BACKEND_INVALID: <name> (known: <names>)" or, for a removed
+#                 backend, "BACKEND_INVALID: <name> (removed; switch config/backend
+#                 or FM_BACKEND to herdr or tmux)",
 #                 "STARTUP_MEMORY_BUDGET: invalid config/startup-memory-budget - <reason>",
 #                 "CREW_DISPATCH: invalid config/crew-dispatch.json - <reason>",
 #                 "FLEET_SYNC: <repo>: skipped|recovered|STUCK: <detail>",
@@ -261,8 +263,7 @@ fleet_sync() {
 
 install_cmd() {
   case "$1" in
-    tmux|node|git|gh|curl|jq|orca|zellij) echo "brew install $1  # or the platform's package manager" ;;
-    cmux) echo "brew install --cask cmux  # or see https://cmux.com" ;;
+    tmux|node|git|gh|curl|jq) echo "brew install $1  # or the platform's package manager" ;;
     treehouse) echo "curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | sh" ;;
     no-mistakes) echo "curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh" ;;
     lavish-axi|quota-axi) echo "npm install -g $1" ;;
@@ -289,8 +290,8 @@ missing_tool_diagnostic() {
 
 # Required-tool detection follows the RESOLVED backend, not a one-size default:
 # a universal toolchain every home needs plus the backend-specific delta owned by
-# fm_backend_required_tools (bin/fm-backend.sh). So a herdr/zellij/cmux home is
-# never told tmux is missing, and only orca drops treehouse. A backend value with
+# fm_backend_required_tools (bin/fm-backend.sh). So a herdr home is never told
+# tmux is missing. A backend value with
 # no verified dependency set is reported before the universal checks continue.
 # The registry and recorded task modes select delivery dependencies.
 # Local-only needs neither GitHub nor no-mistakes; direct-PR needs GitHub;
@@ -763,7 +764,11 @@ fi
 # leaves this machine, so it stays on the session-start critical path.
 detect_local_tools() {
   if [ "$BACKEND_VALID" -eq 0 ]; then
-    echo "BACKEND_INVALID: $BACKEND (known: $FM_BACKEND_KNOWN)"
+    if fm_backend_list_contains "$FM_BACKEND_REMOVED" "$BACKEND"; then
+      echo "BACKEND_INVALID: $BACKEND (removed; switch config/backend or FM_BACKEND to herdr or tmux)"
+    else
+      echo "BACKEND_INVALID: $BACKEND (known: $FM_BACKEND_KNOWN)"
+    fi
   fi
   for t in $BACKEND_TOOLS; do
     fm_backend_required_tool_available "$BACKEND" "$t" \
@@ -773,8 +778,7 @@ detect_local_tools() {
     command -v "$t" >/dev/null || missing_tool_diagnostic "$t"
   done
   # The treehouse lease-support upgrade check is only relevant when the resolved
-  # backend actually requires treehouse (every backend except orca, which owns its
-  # own worktrees); an orca home must not be told to upgrade a provider it never uses.
+  # backend actually requires treehouse.
   if fm_backend_list_contains "$TOOLS" treehouse \
     && command -v treehouse >/dev/null 2>&1 && ! treehouse_supports_lease; then
     echo "MISSING: treehouse (install: $(install_cmd treehouse))"

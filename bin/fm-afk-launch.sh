@@ -105,8 +105,7 @@
 #                              only on a home that runs the host; exit 2 with one
 #                              line naming a live away record on that home.
 #
-# Supported backends: herdr, tmux. Others (zellij, orca, cmux) have no verified
-# non-visible-launch primitive here yet and refuse loudly.
+# Supported backends: herdr, tmux.
 #
 # Test seam: FM_AFK_LAUNCH_ENTRY overrides the command run in the created
 # terminal (default bin/fm-afk-start.sh), so a topology test can run a harmless

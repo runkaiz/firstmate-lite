@@ -30,7 +30,7 @@ Herdr provides the terminal session; [task allocator configuration](configuratio
 
 ## Setup
 
-Pick Herdr when you want native busy, idle, and blocked state and accept the [active limits](#active-limits) below.
+Herdr is Firstmate's default and recommended backend: it gives native busy, idle, and blocked state, within the [active limits](#active-limits) below.
 
 Prerequisites:
 
@@ -44,16 +44,10 @@ Firstmate invokes its CLI as a separate process.
 
 ### Selecting Herdr
 
-Select Herdr in any of these ways:
-
-- Local `config/backend` containing `herdr`.
-- `FM_BACKEND=herdr` for one launch.
-- An explicit request to Firstmate.
-
-
-Herdr is also auto-detected when the primary runs natively under `HERDR_ENV=1` and is not inside tmux.
+With nothing configured, Firstmate selects Herdr whenever the `herdr` CLI is installed, unless the primary itself runs inside tmux.
+Start Herdr with `herdr` and launch the primary agent in its pane to watch tasks appear beside it.
 A tmux pane nested inside Herdr resolves to tmux because the innermost multiplexer wins.
-An auto-detected Herdr spawn stays silent, matching the verified tmux default path.
+[`configuration.md`](configuration.md#backend-selection-order) owns the full selection order, including `config/backend` and `FM_BACKEND`.
 
 ### Spawn preflight and CI
 
@@ -767,8 +761,7 @@ There is still one watcher process; the event reader is a bounded child of that 
 
 ## Away-mode supervisor support
 
-The away daemon supports tmux and Herdr supervisor panes only.
-It refuses Zellij, Orca, and cmux as supervisor backends rather than applying the wrong transport.
+The away daemon supports tmux and Herdr supervisor panes only, and refuses any other supervisor backend rather than applying the wrong transport.
 For Herdr, target existence, native state, capture, composer state, and verified submit all route through the shared backend dispatcher and the explicit named-session CLI owner.
 The pane-independent max-defer alert is configured in [`wedge-alarm.md`](wedge-alarm.md).
 

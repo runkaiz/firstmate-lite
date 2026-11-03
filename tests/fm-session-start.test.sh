@@ -493,7 +493,7 @@ SH
 # fm_backend_target_exists uses for a herdr endpoint liveness read. An
 # optional second pane id answers with exit 4, the shape backend probes
 # produce for a gone surface without normalising to 1 (jq -e on empty input,
-# orca's ok:false, a missing tmux binary). No version/server-start calls: a
+# a missing tmux binary). No version/server-start calls: a
 # liveness check must never auto-start a server (fm-backend.sh's contract).
 make_fake_herdr() {
   local fakebin=$1 live=$2 odd=${3:-}

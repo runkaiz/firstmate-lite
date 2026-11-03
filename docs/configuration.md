@@ -9,7 +9,7 @@ Start with the directory layout, then use the setting reference for the behavior
 | --- | --- |
 | Firstmate's code, private files, or project location | [FM_HOME](#fm_home) and [operational home layout](#operational-home-layout-and-state) |
 | Task windows and worker tools | [Runtime backend](#runtime-backend-configbackend--fm_backend), [harness support](#harness-support), and the [browser MCP pin](#browser-mcp-pin-configbrowser-mcp) |
-| Worker permissions, accounts, or environment | [Claude permission mode](#claude-permission-mode-configclaude-permission-mode), [worker account pin](#worker-account-pin-configclaude-account-configpi-account), [worker tool exclusions](#worker-tool-exclusions-configcrew-exclude-tools), [worker launch environment](#worker-launch-environment-configlaunch-env-allowlist), and its [Orca environment source](#orca-environment-source-configlaunch-env-tmux-session) |
+| Worker permissions, accounts, or environment | [Claude permission mode](#claude-permission-mode-configclaude-permission-mode), [worker account pin](#worker-account-pin-configclaude-account-configpi-account), [worker tool exclusions](#worker-tool-exclusions-configcrew-exclude-tools), and [worker launch environment](#worker-launch-environment-configlaunch-env-allowlist) |
 | Backlog, preferences, and memory | [Backlog backend](#backlog-backend-taskstoml--configbacklog-backend), [captain preferences](#captain-preferences-datacaptainmd--datacaptain-sharedmd), [external memory tiers](#external-memory-tiers-memory-layering-section), and [startup memory budget](#startup-memory-budget-configstartup-memory-budget) |
 | Supervision and presentation | [Pi supervision branch](#pi-supervision-branch), [supervision host](#supervision-host-configsupervision-host), and [Calm preference](#calm-preference-configcalm) |
 | Remote command routes | [Remote command routes](#remote-commands-configremote-routes) |
@@ -62,8 +62,6 @@ Other transient consumers retain their existing shell-relative behavior.
 | Backend | Effect of the operational home |
 | --- | --- |
 | herdr | `FM_HOME` determines the adapter's workspace label. |
-| zellij | `FM_HOME` determines the readable home prefix in visible tab titles, but does not split containers; use `FM_ZELLIJ_SESSION` for a separate session; the full home label also includes a short hash of the resolved `FM_ROOT` path. |
-| cmux | `FM_HOME` determines the default config path and readable home prefix in workspace titles; `FM_CONFIG_OVERRIDE` overrides where `config/cmux-socket-password` is read; the full home label also includes a short hash of the resolved `FM_ROOT` path; there is no per-home container split. |
 
 ## Operational home layout and state
 
@@ -383,11 +381,10 @@ Neither a configuration compatibility check nor merging this code authorizes rew
 
 ## Task worktree allocator (config/worktree-allocator)
 
-The default remains Treehouse for new task copies; Orca continues to own its own copies.
+The default remains Treehouse for new task copies.
 Set `config/worktree-allocator` to `git` only after reviewing a native candidate and approving activation for that home.
-The native allocator currently supports tmux and Herdr, whose endpoint ownership checks are verified.
+The native allocator supports tmux and Herdr, whose endpoint ownership checks are verified.
 Native reservation recovery and cleanup require `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
-Other runtime backends remain available through their existing allocators.
 
 Native allocation also requires `config/git-worktree-root`, containing one absolute directory path outside the project, its primary checkout and the active Firstmate home.
 Its parent must already exist; the root must be owned by the current user and not writable by group or others.
@@ -410,15 +407,12 @@ Use the existing guarded entry points and the [runtime verification record](veri
 
 For spawn-capable adapters, the runtime session-provider backend controls where task windows/endpoints are created, captured, sent to, watched, and killed.
 
-| Runtime backend | Verification status | Reference |
+| Runtime backend | Role | Reference |
 | --- | --- | --- |
-| `tmux` | Verified reference backend | [`docs/tmux-backend.md`](tmux-backend.md) |
-| `herdr` | Has its own required CI lane | [`docs/herdr-backend.md`](herdr-backend.md) |
-| `zellij` | Experimental; no dedicated real-backend CI lane | [`docs/zellij-backend.md`](zellij-backend.md) |
-| `orca` | Experimental; no dedicated real-backend CI lane | [`docs/orca-backend.md`](orca-backend.md) |
-| `cmux` | Experimental; no dedicated real-backend CI lane | [`docs/cmux-backend.md`](cmux-backend.md) |
+| `herdr` | Default and recommended; has its own required CI lane | [`docs/herdr-backend.md`](herdr-backend.md) |
+| `tmux` | Simple fallback; verified reference backend | [`docs/tmux-backend.md`](tmux-backend.md) |
 
-Worktree providers are selected separately as described in [Task worktree allocator](#task-worktree-allocator-configworktree-allocator); Orca provides both the task worktree and terminal endpoint.
+Worktree providers are selected separately as described in [Task worktree allocator](#task-worktree-allocator-configworktree-allocator).
 
 ### Backend selection order
 
@@ -428,19 +422,16 @@ New spawns choose the backend in this order:
    A later task cannot inherit that authority by analogy.
 2. `FM_BACKEND`.
 3. The first non-empty line of local, gitignored `config/backend`.
-4. Runtime auto-detection from `$TMUX`, `HERDR_ENV=1`, or cmux runtime signals.
-5. Default `tmux`.
+4. The multiplexer Firstmate itself runs inside, innermost first: `$TMUX` selects tmux, otherwise `HERDR_ENV=1` selects Herdr, so a tmux pane nested inside Herdr stays on tmux.
+5. Herdr, when the `herdr` CLI is installed.
+6. tmux.
 
-If more than one runtime marker is present, detection resolves innermost-first: `$TMUX` is checked before `HERDR_ENV=1`, which is checked before cmux's primary `CMUX_WORKSPACE_ID` marker and its documented fallback signals - tmux or herdr started from inside a cmux terminal is the innermost, currently-executing layer, while cmux itself (a terminal application, not a nestable multiplexer) is always checked last.
-See [`docs/cmux-backend.md`](cmux-backend.md#runtime-detection) for why cmux can be selected when `CMUX_WORKSPACE_ID` is absent.
-
-Auto-detected Herdr stays silent like tmux, while auto-detected cmux prints a stderr notice naming `config/backend` and `--backend tmux` because cmux remains experimental.
-Zellij and Orca are never auto-detected; select them by putting the name in a local `config/backend` file, by exporting `FM_BACKEND=<name>`, or by telling the first mate in chat.
+Every step is silent; select a backend by putting its name in a local `config/backend` file, by exporting `FM_BACKEND=<name>`, or by telling the first mate in chat.
 
 ### Accepted backends
 
-Any value other than `tmux`, `herdr`, `zellij`, `orca`, or `cmux` is rejected until another adapter is implemented and verified.
-`fm-spawn.sh` accepts `tmux`, `herdr`, `zellij`, `orca`, and `cmux` for ship and scout tasks.
+`fm-spawn.sh` accepts `herdr` and `tmux`; any other value is rejected.
+The Zellij, Orca, and cmux backends were removed; a home still configured for one gets a message to switch to `herdr` or `tmux`, and a task record left on one is preserved and refused rather than cleaned up, so close its endpoint by hand before removing the record.
 
 `codex-app` is not an accepted runtime backend yet; [`docs/codex-app-backend.md`](codex-app-backend.md) owns the Codex App boundary.
 
@@ -453,26 +444,17 @@ The compatibility helper `fm_backend_agent_alive` continues to collapse those de
 
 ### Dependency and socket checks
 
-- A herdr spawn additionally version-gates against the installed `herdr` binary's protocol and requires `jq`, refusing loudly on an incompatible or missing installation.
+A herdr spawn additionally version-gates against the installed `herdr` binary's protocol and requires `jq`, refusing loudly on an incompatible or missing installation.
 
-- A zellij spawn additionally version-gates against the installed `zellij` binary's version and requires `jq`, refusing loudly when either is missing or the version is older than 0.44.
-
-- A cmux spawn additionally version-gates against the installed `cmux` binary's version, requires `jq`, and requires the control socket to be reachable and accessible (see [`docs/cmux-backend.md`](cmux-backend.md) "Setup" for the one-time socket-access configuration this needs; Automation mode is the recommended socket control mode, with Password mode supported via `config/cmux-socket-password`), refusing loudly and non-retryably on a `cmuxOnly`/unauthenticated socket.
-
-A backend spawn refusal from a missing dependency, version gate, or unauthenticated socket is terminal for that selected backend; firstmate surfaces it as a blocker instead of silently retrying another backend.
+A backend spawn refusal from a missing dependency or version gate is terminal for that selected backend; firstmate surfaces it as a blocker instead of silently retrying another backend.
 
 ### Task metadata
 
-Task meta records `backend=` only for a non-default backend; an absent `backend=` means `tmux`, preserving existing default-path meta files.
+Task meta records `backend=` only for a non-tmux backend; an absent `backend=` means `tmux`, preserving existing tmux meta files.
 
 - Every new task records `endpoint_task_id=` as the cleanup binding between the metadata filename and its opaque runtime endpoint.
 
 - A herdr task additionally records `herdr_session=`, `herdr_workspace_id=`, `herdr_tab_id=`, and `herdr_pane_id=`.
-
-- A zellij task additionally records `zellij_session=`, `zellij_tab_id=`, and `zellij_pane_id=`.
-- An Orca task additionally records `orca_worktree_id=` and `terminal=`, with `window=fm-<id>` kept as the shared firstmate alias.
-
-- A cmux task additionally records `cmux_workspace_id=` and `cmux_surface_id=`.
 
 ### Task selectors
 
@@ -480,7 +462,7 @@ Task selectors for `fm-peek.sh`, `fm-send.sh`, and `fm-crew-state.sh` resolve ce
 A selector containing `:` is passed through as an explicit backend endpoint escape hatch.
 
 Otherwise an exact task id matching `state/<id>.meta` wins before the legacy `fm-<id>` label fallback, so task ids that themselves start with `fm-` route to their own metadata instead of being stripped.
-A metadata-routed selector returns the recorded backend target (`terminal=` for Orca, otherwise `window=`), and matching explicit targets can still recover the recorded backend when metadata contains the same endpoint.
+A metadata-routed selector returns the recorded `window=` target, and matching explicit targets can still recover the recorded backend when metadata contains the same endpoint.
 
 Only metadata-routed task selectors carry recorded harness context; explicit endpoint escape hatches do not.
 These rules are the single owner of the task-selector vocabulary.
@@ -503,20 +485,6 @@ The local `config/herdr-presentation-spaces` file instead opts a home out of, or
 For normal herdr operations, `HERDR_SESSION` selects the named session, but destructive test cleanup must not rely on `HERDR_SESSION` alone.
 Use the explicit guarded cleanup path described in [`docs/herdr-backend.md`](herdr-backend.md) instead of `herdr server stop`.
 
-### Zellij sessions
-
-For normal zellij operations, `FM_ZELLIJ_SESSION` selects the named session and defaults to `firstmate`.
-Zellij has no per-home workspace split: tasks share that one session, and visible tab titles are scoped by the active `FM_HOME` readable label plus a short hash of the resolved `FM_ROOT` path as `fm-<home-label>-<id>`.
-
-Use the guarded cleanup path described in [`docs/zellij-backend.md`](zellij-backend.md) instead of `kill-all-sessions` or `delete-all-sessions`.
-
-### cmux workspaces
-
-cmux has no session layer at all - one workspace per task, in whatever cmux window is open - and its socket password (when configured) is read from local, gitignored `config/cmux-socket-password` under the effective config directory, never committed.
-The caller-facing label remains `fm-<id>`, but the actual cmux workspace title is scoped by the active `FM_HOME` readable label plus a short hash of the resolved `FM_ROOT` path as `fm-<home-label>-<id>`.
-
-Test cleanup must use the guarded path in [`docs/cmux-backend.md`](cmux-backend.md#current-operation-and-safety), never enumerate-and-close every workspace.
-
 ## Away-mode supervisor backend (FM_SUPERVISOR_BACKEND / FM_SUPERVISOR_TARGET)
 
 The `/afk` sub-supervisor injects escalation digests into firstmate's own pane independently of where new task endpoints are spawned.
@@ -528,7 +496,7 @@ Without overrides, backend detection uses `$TMUX_PANE` first, then `HERDR_ENV=1`
 That keeps a tmux pane nested inside herdr on the tmux transport, matching the runtime backend's innermost-first rule.
 Target detection uses `FM_SUPERVISOR_TARGET`, then `$TMUX_PANE`, then `"${HERDR_SESSION:-default}:${HERDR_PANE_ID}"` under herdr, then the legacy `firstmate:0` tmux fallback with a warning.
 
-Selecting any other supervisor backend, including `zellij`, `orca`, or `cmux`, refuses at daemon startup instead of trying tmux injection primitives against a non-tmux pane.
+Selecting any other supervisor backend refuses at daemon startup instead of trying tmux injection primitives against a non-tmux pane.
 
 ## Away-mode wedge alarm channels (config/wedge-alarm)
 
@@ -744,11 +712,10 @@ claude, codex, opencode, pi, pi-signed, grok, kimi, cursor, and omp have crewmat
 
 ### Harness restrictions and credentials
 
-`fm-spawn.sh` refuses kimi on cmux and Orca at preflight, because answering Kimi's folder-trust dialog needs a verified viewport-only capture those backends lack; [its adapter reference](../.agents/skills/harness-adapters/references/harness/kimi.md#readiness-gated-start) owns the trust-dialog handling.
+Answering Kimi's folder-trust dialog needs a verified viewport-only capture, which tmux and Herdr both provide; [its adapter reference](../.agents/skills/harness-adapters/references/harness/kimi.md#readiness-gated-start) owns the trust-dialog handling.
 A cursor primary runs the tracked project-scope `.cursor/hooks.json` in its own home and must be launched with `--trust`, or no project hook loads; [`docs/supervision-protocols/cursor.md`](supervision-protocols/cursor.md) owns its supervision protocol.
 
-Cursor typed-submit confirmation is verified on tmux and Herdr only.
-On Zellij, cmux, and Orca a typed-plane Cursor send (a harness-native invocation or an explicit backend target; ordinary text steers ride the durable inbox and exit 0 at enqueue) lands, but `fm-send` reports delivery unconfirmed and exits non-zero because their shared submit core does not consult the busy footer; [runtime backend verification](verification/runtime-backends.md#cursor-agent-cli) owns the evidence and transcript-state boundary.
+Cursor typed-submit confirmation is verified on tmux and Herdr; [runtime backend verification](verification/runtime-backends.md#cursor-agent-cli) owns the evidence and transcript-state boundary.
 
 muse is verified for crewmate and scout launches ONLY, and `fm-spawn.sh` refuses it for a secondmate, because muse ships no usable hook surface for a primary session's turn-end supervision; [`docs/verification/muse.md`](verification/muse.md) owns that evidence.
 muse also needs a worker-reachable credential before spawning, and the portable fleet path is the `<config>/muse/auth.json` credential stored by `muse login`, because a caller-only `META_API_KEY` does not cross a long-lived backend daemon.
@@ -1014,25 +981,8 @@ Firstmate retains basic home, executable search, terminal, locale, temporary-dir
 Other ambient names must be listed explicitly, including custom credential-store locations, proxy settings, and certificate overrides when required by the selected tools.
 The command shell and worker may still create their own variables.
 
-Unless the Orca environment source below is configured, allowed values come from the destination pane at execution time; they are neither copied from the invoking Firstmate process nor written into the launch command.
+Allowed values come from the destination pane at execution time; they are neither copied from the invoking Firstmate process nor written into the launch command.
 Listing a name does not provision it in a daemon's environment or transfer credentials to another machine.
-
-On the Orca backend the destination is an Orca terminal whose environment comes from the Orca app and your shell startup files, not from Firstmate or its tmux session.
-Allowlisted names there resolve to whatever that terminal has, often your personal credentials or nothing, so a spawn with a nonempty allowlist prints a warning unless the Orca environment source below is configured.
-
-### Orca environment source (config/launch-env-tmux-session)
-
-An Orca home can opt in to taking allowlisted values from one named tmux session instead of the Orca terminal.
-Create the local, gitignored `config/launch-env-tmux-session` containing that session's name, and keep the session running for subsequent Orca spawns.
-The source requires `config/launch-env-allowlist` and reads only its names from the session's local environment (`tmux set-environment -t <session>`), so tmux's automatic values such as `SSH_AUTH_SOCK` are never forwarded unless listed.
-A listed name missing from the session, an unreadable session, or a malformed selector stops the spawn before Orca creates the worktree or terminal; a name removed with `tmux set-environment -r` stays deliberately unset.
-Source mode also sets `GIT_CONFIG_NOSYSTEM=1`, so a system Git credential helper cannot answer with personal credentials.
-Values travel only in the owner-only staged launch file, never terminal input, and the pane deletes that file before the worker starts.
-If the pane has not run the launch command and deleted the file within 30 seconds, or the spawn is interrupted before then, Firstmate removes the file unless the pane already did, leaves the Orca terminal open, and reports the spawn as failed rather than leaving credentials on disk.
-The source applies to fresh Orca spawns; `--relaunch` is refused on Orca because it has no recovery-grade agent-state classifier.
-The selector is not inherited into secondmate homes, and other backends ignore it.
-[`fm-spawn.sh --help`](../bin/fm-spawn.sh) owns the snapshot and launch-file mechanics.
-Project and harness sandbox settings still own filesystem access to personal credential stores.
 
 ### Authentication requirements
 
@@ -1056,7 +1006,7 @@ Raw launch commands run under noninteractive POSIX `sh` with this option and mus
 The filter runs at the worker command boundary, after the terminal daemon and pane shell have started; it does not scrub either of those processes.
 This is not a sandbox: it cannot revoke same-user access to credential files, prevent tools or later shells from loading credentials again, or isolate processes from the same user's other processes.
 
-Regression coverage executes emitted launch commands with synthetic nonsecret values in [`tests/fm-spawn-dispatch-profile.test.sh`](../tests/fm-spawn-dispatch-profile.test.sh), and the Orca environment source in [`tests/fm-spawn-orca-worktree.test.sh`](../tests/fm-spawn-orca-worktree.test.sh).
+Regression coverage executes emitted launch commands with synthetic nonsecret values in [`tests/fm-spawn-dispatch-profile.test.sh`](../tests/fm-spawn-dispatch-profile.test.sh).
 
 ### Compact adviser setting
 
@@ -1362,25 +1312,19 @@ That script owns the AXI-family floor policy and the `lavish-axi` floor; [`bin/f
 
 **Backend requirements**
 
-The per-backend delta is required only for the backend resolved from `FM_BACKEND`, then `config/backend`, then runtime auto-detection, then default `tmux`, so a home is never told to install a tool an inactive backend or feature would need.
+The per-backend delta is required only for the backend resolved by [Backend selection order](#backend-selection-order), so a home is never told to install a tool an inactive backend or feature would need.
 `fm_backend_required_tools` in `bin/fm-backend.sh` owns the backend additions:
 
 | Resolved backend | Additional tools |
 | --- | --- |
-| `tmux` | `tmux`, `treehouse` |
 | `herdr` | `herdr`, `jq`, `treehouse` |
-| `zellij` | `zellij`, `jq`, `treehouse` |
-| `orca` | `orca` |
-| `cmux` | `cmux`, `jq`, `treehouse` |
+| `tmux` | `tmux`, `treehouse` |
 
-The JSON-emitting adapters (`herdr`, `zellij`, `cmux`) need `jq` because their spawn and liveness paths parse backend JSON.
+Herdr needs `jq` because its spawn and liveness paths parse backend JSON.
 These backend prerequisite checks still require `treehouse` even when [native task allocation](#task-worktree-allocator-configworktree-allocator) is selected.
 
-Backend tool availability uses the adapter's own executable resolver, so bootstrap and spawn agree on supported non-`PATH` locations such as cmux's bundled CLI.
-An unknown resolved backend emits `BACKEND_INVALID` and blocks dispatch instead of silently dropping its dependency delta or falling back to tmux.
-
-Orca provides both the task worktree and terminal endpoint (see "Runtime backend" above), so `backend=orca` requires only `orca` on top of the universal toolchain and skips both `treehouse` and every other backend's session CLI.
-A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the `treehouse` durable-lease upgrade check follows the backend prerequisites above.
+An unknown or removed resolved backend emits `BACKEND_INVALID` and blocks dispatch instead of silently dropping its dependency delta or falling back to tmux.
+A herdr home is therefore never told `tmux` is missing, and the `treehouse` durable-lease upgrade check follows the backend prerequisites above.
 
 **Feature-specific requirements**
 
@@ -2000,21 +1944,19 @@ Runtime tuning via environment variables (defaults shown):
 
 ```sh
 FM_HOME=                 # optional operational home for most scripts, unset means this repo root; fm-send requires it explicitly
-FM_ROOT_OVERRIDE=        # override firstmate repo root, tangle-guard target, and zellij/cmux home-title hash; also legacy whole-root override when FM_HOME is unset
+FM_ROOT_OVERRIDE=        # override firstmate repo root and tangle-guard target; also legacy whole-root override when FM_HOME is unset
 FM_STATE_OVERRIDE=       # alternate state dir, mainly for tests
 FM_DATA_OVERRIDE=        # alternate data dir, mainly for tests
 FM_PROJECTS_OVERRIDE=    # alternate projects dir, mainly for tests
 FM_CONFIG_OVERRIDE=      # alternate config dir, mainly for tests
 FM_PROC_ROOT_OVERRIDE=   # alternate /proc root for Linux process-identity reads in fm-wake-lib.sh and fm-teardown.sh, mainly for tests
-FM_BACKEND=             # optional runtime backend override for new spawns; tmux/herdr/zellij/orca/cmux support ship/scout spawns, codex-app is not accepted
+FM_BACKEND=             # optional runtime backend override for new spawns: herdr or tmux
 FM_TRACE_CONTEXT=       # optional trace-context override; see "Trace context propagation"
 FM_TASK_ID=             # internal task-worker marker fm-spawn.sh exports into ship and scout panes, never set by hand; bin/fm-test-run.sh refuses to execute in the repository primary checkout while it is set
 FM_TASK_INBOX=          # internal: absolute path of the task's steering inbox (state/<id>.inbox) that fm-spawn.sh exports into every ship and scout launch, never set by hand; the steering doorbell names "$FM_TASK_INBOX"
 HERDR_SESSION=default  # herdr-only: named session for normal backend ops; not enough for destructive cleanup (docs/herdr-backend.md)
 FM_BACKEND_HERDR_SUBMIT_POLLS=6  # herdr-only: agent-state samples spread across each Enter attempt's budget when confirming a submit (docs/herdr-backend.md "Current transport behavior")
 FM_BACKEND_HERDR_SUBMIT_MIN_SLEEP=0.6  # herdr-only: minimum per-Enter confirmation budget before polling agent-state after an idle baseline
-FM_ZELLIJ_SESSION=firstmate  # zellij-only: named session for normal backend ops and test isolation (docs/zellij-backend.md)
-CMUX_SOCKET_PASSWORD=   # cmux-only: socket password fallback when config/cmux-socket-password is absent (docs/cmux-backend.md)
 FM_SESSION_START_STATUS_TAIL=5   # state/*.status lines printed per task in the session-start digest; each line is capped by bin/fm-line-cap-lib.sh
 FM_SESSION_START_QUEUED_LIMIT=20   # plain queued backlog rows in the session-start digest; in-flight, held, and blocked rows are never bounded and done rows are never listed
 FM_SESSION_START_ENDPOINT_TIMEOUT=10   # seconds bounding each per-task endpoint liveness read in the session-start digest (bin/fm-session-start.sh); nonpositive or invalid values fall back to 10; a read that hits the bound or dies becomes that task's own `endpoint: error` line and the digest continues
@@ -2101,9 +2043,9 @@ FM_FLEET_SYNC_PACKED_REFS_LOCK_RETRY_WAIT_SECS=1 # seconds fm-fleet-sync.sh wait
 FM_FLEET_SYNC_PACKED_REFS_LOCK_AGE_SECS=30       # min mtime age before fm-fleet-sync.sh treats a leftover packed-refs.lock as provably stale
 FM_BUSY_REGEX=          # optional override for rendered delivery guards and Grok's isolated task-state fallback; converted worker state ignores it
 FM_COMPOSER_IDLE_RE=    # optional fleet-wide idle-placeholder regex override (bin/fm-composer-lib.sh); a match alone does not prove emptiness because shape-specific position and ANSI de-emphasis safety gates still apply
-FM_COMPOSER_CAPTURE_LINES=20   # fleet-wide bound for tail-capture composer reads; it no longer bounds the adapter composer state/content reads on tmux or herdr, which supply their bounded visible pane instead, while the cmux, orca, and Zellij adapters use this small window so stale scrollback banners stay out of the candidate set; it still bounds the shared inbox composer read (bin/fm-task-inbox-lib.sh) on every backend, and on herdr it also floors how many Ctrl+U presses a refused leftover may take
+FM_COMPOSER_CAPTURE_LINES=20   # fleet-wide bound for tail-capture composer reads; it no longer bounds the adapter composer state/content reads on tmux or herdr, which supply their bounded visible pane instead; it still bounds the shared inbox composer read (bin/fm-task-inbox-lib.sh) on every backend, and on herdr it also floors how many Ctrl+U presses a refused leftover may take
 FM_COMPOSER_PI_MAX_LINES=8     # fleet-wide: maximum rows admitted between Pi's identity-corroborated separator pair; taller or ambiguous candidates stay unknown
-FM_COMPOSER_GHOST_LUMA_MAX=128   # fleet-wide: max perceived luminance (0.299R+0.587G+0.114B, 0-255) for a TRUECOLOR foreground to count as de-emphasised ghost/placeholder text and be stripped; dim/faint (SGR 2) is stripped regardless. Assumes a dark terminal theme (bin/fm-composer-lib.sh's fm_composer_strip_ghost, used by styled tmux, herdr, and Zellij reads)
+FM_COMPOSER_GHOST_LUMA_MAX=128   # fleet-wide: max perceived luminance (0.299R+0.587G+0.114B, 0-255) for a TRUECOLOR foreground to count as de-emphasised ghost/placeholder text and be stripped; dim/faint (SGR 2) is stripped regardless. Assumes a dark terminal theme (bin/fm-composer-lib.sh's fm_composer_strip_ghost, used by styled tmux and herdr reads)
 GROK_HOME=              # optional Grok config home for firstmate's global grok turn-end hook; defaults to ~/.grok
 FM_SEND_RETRIES=3       # fm-send typed-plane Enter-retry attempts after typing the line once; agy typed targets use a longer per-harness default owned by bin/fm-send.sh
 FM_SEND_SLEEP=0.4       # seconds between fm-send typed-plane submit checks

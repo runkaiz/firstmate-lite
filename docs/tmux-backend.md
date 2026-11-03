@@ -1,6 +1,6 @@
 # tmux runtime backend
 
-tmux is Firstmate's reference runtime backend for ordinary isolated workers.
+tmux is Firstmate's simple fallback runtime backend and its verified reference adapter; [Herdr](herdr-backend.md) is the default and recommended backend.
 [`configuration.md`](configuration.md#runtime-backend-configbackend--fm_backend) owns shared backend selection and metadata semantics.
 
 ## Setup
@@ -8,7 +8,7 @@ tmux is Firstmate's reference runtime backend for ordinary isolated workers.
 Install tmux with `brew install tmux` or your platform package manager.
 The universal harness and toolchain requirements are in [`configuration.md`](configuration.md#toolchain).
 
-tmux is the hard default when no explicit setting or runtime auto-detection selects another backend.
+tmux is selected when the primary runs inside tmux or when Herdr is not installed; [`configuration.md`](configuration.md#backend-selection-order) owns the full selection order.
 Select it explicitly with local `config/backend` containing `tmux`, with `FM_BACKEND=tmux` for one launch, or by asking Firstmate to use tmux.
 Explicit tmux selection via `config/backend` or `--backend tmux` overrides runtime auto-detection.
 
