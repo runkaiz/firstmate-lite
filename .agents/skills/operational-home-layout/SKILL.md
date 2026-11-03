@@ -26,7 +26,7 @@ config/claude-account config/pi-account  optional per-home worker account pin fo
 config/crew-dispatch.json  optional crewmate dispatch profiles; LOCAL, gitignored; firstmate-maintained but human-editable natural-language rules that choose a per-task harness/model/effort profile (section 4)
 config/project-capacity  optional per-machine count of workers each named project admits at once, read from the root home by every local home; LOCAL, gitignored; see docs/configuration.md "Project capacity"
 config/backlog-backend  backlog mode override; LOCAL, gitignored; see docs/configuration.md "Backlog backend"
-config/backend  runtime session-provider backend override for new tasks: herdr or tmux; LOCAL, gitignored; absent = the innermost multiplexer firstmate runs inside, then herdr when installed, then tmux (docs/configuration.md "Backend selection order"); codex-app is not accepted; see docs/codex-app-backend.md in secondmate-provisioning
+config/backend  runtime session-provider backend override for new tasks; LOCAL, gitignored; see docs/configuration.md "Runtime backend" for selection and supported values
 config/worktree-allocator config/git-worktree-root  optional native task-copy opt-in and root; LOCAL, gitignored, not inherited; see docs/configuration.md "Task worktree allocator"
 config/calm     Calm presentation preference shared by the Pi extension and the Claude Code mod; LOCAL, gitignored, and not inherited; see docs/configuration.md "Calm preference"
 config/keep-ai-trailers  optional presence flag to keep AI co-author trailers in this home's fleet commits; LOCAL, gitignored; see docs/configuration.md "Commit attribution"

@@ -961,7 +961,7 @@ An earlier untrusted-worktree run left Claude, Grok, and Muse unverified because
 FM_COMPOSER_MATRIX_LIVE=1 tests/fm-composer-matrix-live-e2e.test.sh
 ```
 
-Observed output:
+Observed harness and blank-row output (excerpt):
 
 ```text
 ok - claude (2.1.227 (Claude Code)): real idle composer classifies empty
@@ -972,8 +972,6 @@ ok - grok (grok 1.0.0 (3cd0d0cbcebe)): real idle composer classifies empty
 # harness absent, not verified here: kimi
 ok - muse (Muse Code 0.1.0 (0.1.0-R708.1)): real idle composer classifies empty
 ok - strict posture live: a blank shell row classifies unknown and injection defers
-ok - zellij (zellij 0.44.0): unrelated pane change never confirms delivery (verdict: unknown)
-ok - live composer-matrix guard verified 8 live surface(s)
 ```
 
 All six installed harnesses' real idle composers reached a proven `empty` (Claude auto-updated to 2.1.227 between the audit and this rerun, so the shipped classifier is proven against the newer release as well), including Pi through the tmux foreground-process identity probe, Grok through the titled-bottom-border tolerance, and OpenCode through the left-bar shape; Codex and OpenCode first parked on vendor update-available modals that the strict classifier correctly refused until the guard's single non-submitting Escape dismissed them.

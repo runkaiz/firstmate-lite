@@ -78,7 +78,7 @@ Coordinate any workflow rollback with its required-check names so a retired chec
   Everything personal to one captain's fleet (`.env`, `data/`, `state/`, `config/`, `projects/`, `.no-mistakes/`) is gitignored; never commit it.
   The root `.tasks.toml` retains compatible native Markdown queue paths for `data/backlog.md`; the shipped queue replaces the external tasks-axi runtime dependency, with activation and compatibility owned by [`docs/configuration.md`](docs/configuration.md) ("Backlog backend").
   A local `config/backlog-backend=manual` opt-out forces firstmate's routine backlog updates to hand-editing and stays gitignored; atomic multi-ID transfers use the native queue's `mv` interface.
-  A local `config/backend` file explicitly overrides runtime auto-detection for new task endpoints and stays gitignored; spawn-supported values are `herdr` (the default, with its own required CI lane) and `tmux` (the fallback), while `codex-app` is documented only in `docs/codex-app-backend.md`.
+  A local `config/backend` file stays gitignored; [Runtime backend](docs/configuration.md#runtime-backend-configbackend--fm_backend) owns selection and supported values.
   It does not make `data/` tracked.
 - Shell helpers in `bin/` are plain bash.
   Each starts with a usage header comment; keep it accurate when you change behavior.
