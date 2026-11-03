@@ -1,0 +1,9 @@
+Config override; read-only session discovery
+$ bin/fm-herdr-lab.sh run fm-lab-gate-boundary session list --json
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/runkai/.config/herdr","socket_path":"/home/runkai/.config/herdr/herdr.sock"}]}
+exit=0
+
+Fully isolated XDG storage; mandatory prepare
+$ bin/fm-herdr-lab.sh prepare fm-lab-gate-boundary
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+exit=1

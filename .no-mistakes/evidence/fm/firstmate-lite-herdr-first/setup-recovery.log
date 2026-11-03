@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown liveworker complete (window primary:fm-liveworker, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree)
+Backlog: liveworker just finished (this home keeps no markdown backlog at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/data/backlog.md). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/data/backlog.md - move liveworker to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.

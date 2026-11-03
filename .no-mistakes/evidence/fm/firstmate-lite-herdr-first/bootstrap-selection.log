@@ -1,0 +1,31 @@
+Unconfigured installed Herdr requires jq, without demanding tmux
+$ /bin/bash bin/fm-bootstrap.sh
+MISSING: jq (install: brew install jq  # or the platform's package manager)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: no-mistakes (install: curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+[exit 0]
+
+Unconfigured installation without Herdr requires tmux, without demanding jq
+$ /bin/bash bin/fm-bootstrap.sh
+MISSING: tmux (install: brew install tmux  # or the platform's package manager)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: no-mistakes (install: curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+[exit 0]
+
+Explicit tmux configuration wins over installed Herdr
+$ /bin/bash bin/fm-bootstrap.sh
+MISSING: tmux (install: brew install tmux  # or the platform's package manager)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: no-mistakes (install: curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+[exit 0]
+
+Explicit Herdr environment wins over tmux configuration
+$ /bin/bash bin/fm-bootstrap.sh
+MISSING: jq (install: brew install jq  # or the platform's package manager)
+MISSING: gh (install: brew install gh  # or the platform's package manager)
+MISSING: no-mistakes (install: curl -fsSL https://raw.githubusercontent.com/kunchenguid/no-mistakes/main/docs/install.sh | sh)
+PRESENTATION_UNAVAILABLE: lavish-axi (requires >=0.1.77; install: npm install -g lavish-axi) - nonvisual work may proceed with plain-text decisions and reports; install or upgrade before using Lavish
+[exit 0]

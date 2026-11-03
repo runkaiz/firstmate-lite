@@ -1,0 +1,151 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+herdr[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+tmux[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+tmux[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+herdr[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project -c 'user.name=Live Test' -c user.email=live@example.invalid commit -qm initial
+[exit 0]
+$ bin/fm-brief.sh liveworker project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/data/liveworker/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ bin/fm-spawn.sh liveworker /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project 'sh -c '"'"'echo should-not-launch'"'"'' --mode local-only --yolo off --backend zellij
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+error: the 'zellij' runtime backend was removed from Firstmate; switch to herdr (recommended) or tmux in config/backend or FM_BACKEND
+[exit 1]
+$ bin/fm-bootstrap.sh
+BACKEND_INVALID: zellij (removed; switch config/backend or FM_BACKEND to herdr or tmux)
+[exit 0]
+$ bin/fm-spawn.sh liveworker /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project 'sh -c '"'"'echo should-not-launch'"'"'' --mode local-only --yolo off --backend cmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+error: the 'cmux' runtime backend was removed from Firstmate; switch to herdr (recommended) or tmux in config/backend or FM_BACKEND
+[exit 1]
+$ bin/fm-bootstrap.sh
+BACKEND_INVALID: cmux (removed; switch config/backend or FM_BACKEND to herdr or tmux)
+[exit 0]
+$ bin/fm-spawn.sh liveworker /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project 'sh -c '"'"'echo should-not-launch'"'"'' --mode local-only --yolo off --backend orca
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+error: the 'orca' runtime backend was removed from Firstmate; switch to herdr (recommended) or tmux in config/backend or FM_BACKEND
+[exit 1]
+$ bin/fm-bootstrap.sh
+BACKEND_INVALID: orca (removed; switch config/backend or FM_BACKEND to herdr or tmux)
+[exit 0]
+$ bin/fm-herdr-lab.sh prepare fm-lab-gate-2195961
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+[exit 1]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.t new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC 'bash --noprofile --norc'
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.t display-message -p -t primary '#{socket_path},#{pid},0'
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.t,2196860,0
+[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+tmux[exit 0]
+$ bash -c '. bin/fm-backend.sh; fm_backend_name'
+tmux[exit 0]
+$ bin/fm-spawn.sh liveworker /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project 'sh -c '"'"'printf "live-worker-%s\n" ready'"'"'' --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+Preparing worktree (detached HEAD 39ee6d5)
+HEAD is now at 39ee6d5 initial
+native allocation task=liveworker source_ref=refs/heads/main base=39ee6d52dd5130c32bc3a7bff3ad83f7a11b3dd0 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned liveworker harness=sh kind=ship mode=local-only yolo=off window=primary:fm-liveworker worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree
+[exit 0]
+PERSISTED METADATA
+window=primary:fm-liveworker
+endpoint_task_id=liveworker
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project
+harness=sh
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/liveworker
+tasktmp=/tmp/fm-liveworker
+model=default
+effort=default
+launch_model_control=unverified
+launch_effort_control=unverified
+launch_service_control=unverified
+effective_profile=unverified
+spawn_gen=s1793704012.2196883.9463
+
+$ bin/fm-peek.sh liveworker 100
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/work
+tree'
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/project$ cd -- '/var/home/run
+kai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/livewor
+ker/worktree$ export GOTMPDIR=/tmp/fm-liveworker/gotmp
+export COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/livewor
+ker/worktree$ export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=liveworker
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/livewor
+ker/worktree$ export FM_TASK_ID=liveworker
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/livewor
+ker/worktree$ . '/tmp/fm-liveworker+c81324966cac56fa045e62c8fffe49f35cb7423b4bf922edb57ba313dd3bd468/launch.s1793704012.
+2196883.9463.sh'
+live-worker-ready
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/livewor
+ker/worktree$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ bin/fm-send.sh liveworker 'Please retain this disposable live-check instruction.'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell not typed because the agent in primary:fm-liveworker has exited; the steer is durably recorded at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/state/liveworker.inbox/001.msg for recovery (stuck-crewmate-recovery), and the watcher will not re-ring a dead pane
+[exit 0]
+DURABLE INBOX 001.msg
+schema=fm-task-inbox.v1
+at=2026-11-03T11:06:53Z
+--
+Please retain this disposable live-check instruction.
+$ bin/fm-teardown.sh liveworker
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown liveworker complete (window primary:fm-liveworker, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/copies/liveworker/worktree)
+Backlog: liveworker just finished (this home keeps no markdown backlog at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/data/backlog.md). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/home/data/backlog.md - move liveworker to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.t list-windows -t primary -F '#{window_name}'
+bash
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.t kill-server
+[exit 0]

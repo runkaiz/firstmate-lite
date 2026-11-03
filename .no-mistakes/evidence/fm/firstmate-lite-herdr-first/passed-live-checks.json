@@ -1,0 +1,6 @@
+[
+  "Installed Herdr is the default; absent Herdr falls back to tmux; config and environment overrides win",
+  "Removed Zellij, cmux, and Orca selections fail before worker allocation and bootstrap gives a migration instruction",
+  "Running on a private tmux server selects tmux even when Herdr is installed or an outer Herdr marker is inherited",
+  "A tmux fallback worker spawns, executes, exposes captured output, accepts durable steering, and tears down its endpoint and copy"
+]

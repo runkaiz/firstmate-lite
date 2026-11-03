@@ -1,0 +1,148 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery
+[exit 0]
+$ bin/fm-bootstrap.sh
+[exit 0]
+$ bin/fm-queue.py add recovery-ship 'failed ship launch' --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+ok: add recovery-ship
+task:
+  id: recovery-ship
+  title: failed ship launch
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ bin/fm-queue.py add recovery-scout 'failed scout launch' --kind scout --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+ok: add recovery-scout
+task:
+  id: recovery-scout
+  title: failed scout launch
+  state: queued
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ bin/fm-queue.py add ordinary-ship 'successfully launched worker' --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+ok: add ordinary-ship
+task:
+  id: ordinary-ship
+  title: successfully launched worker
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ bin/fm-bootstrap.sh
+BOOTSTRAP_INFO: marked ordinary-ship in flight to match the worker this home already owns
+[exit 0]
+$ bin/fm-queue.py show recovery-ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+task:
+  id: recovery-ship
+  title: failed ship launch
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ bin/fm-queue.py show recovery-scout --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+task:
+  id: recovery-scout
+  title: failed scout launch
+  state: queued
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ bin/fm-queue.py show ordinary-ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6GGMMMF21GAXJG1J6XGCMTC/.gate-live/recovery/data/backlog.md
+task:
+  id: ordinary-ship
+  title: successfully launched worker
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-03
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+PERSISTED BACKLOG CONTRACT
+# Backlog
+
+## In flight
+
+- [ ] ordinary-ship - successfully launched worker (kind: ship) (since 2026-11-03)
+## Queued
+
+- [ ] recovery-ship - failed ship launch (kind: ship) (since 2026-11-03)
+- [ ] recovery-scout - failed scout launch (kind: scout) (since 2026-11-03)
+## Done
