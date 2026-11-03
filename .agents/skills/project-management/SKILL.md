@@ -2,7 +2,7 @@
 name: project-management
 description: >-
   Agent-only procedure for Firstmate project management.
-  Use before adding, creating, removing, or initializing a project.
+  Use before adding, creating, removing, or initializing a project, or switching one to a no-mistakes mode.
   Cloning or registering a project is add intake and uses the same trigger.
   Owns project add, create, clone, remove, initialization, registry, delivery-mode, autonomy, and outward-consent decisions.
 user-invocable: false
@@ -12,7 +12,7 @@ metadata:
 
 # project-management
 
-Use this procedure before adding, creating, removing, or initializing a project.
+Use this procedure before adding, creating, removing, or initializing a project, or switching one to a no-mistakes mode.
 Cloning or registering a project is add intake and uses the same trigger.
 This skill is the single owner of Firstmate's project-management procedure.
 Persistent supervisor homes are unsupported; preserve any legacy homes and their private history.
@@ -73,7 +73,7 @@ The captain's request to create that local project authorizes this local initial
 
 ## Initialize
 
-Run no-mistakes initialization only for `no-mistakes` and `no-mistakes-prod-only` projects:
+Run no-mistakes initialization only for `no-mistakes` and `no-mistakes-prod-only` projects, including when an existing project switches to either mode:
 
 ```sh
 (cd projects/<name> && no-mistakes init && no-mistakes doctor)
@@ -82,6 +82,12 @@ Run no-mistakes initialization only for `no-mistakes` and `no-mistakes-prod-only
 Initialization configures the local gate and does not vendor a no-mistakes skill into the project.
 Do not create a commit merely because initialization ran.
 If doctor reports an environment, authentication, or daemon problem, resolve that blocker before dispatching work and never restart the shared daemon from a project operation.
+
+Then run `bin/fm-project-mode.sh --ci-workflows <name>`, because the pipeline's last step waits for checks and a repository with none stalls there.
+On `none`, tell the captain the repository has no GitHub Actions workflows, that no-mistakes PRs will wait on checks that never register unless another CI system reports them, and offer `no-mistakes ci-workflow`, which emits a matching workflow.
+On `unknown`, say the check could not finish.
+Neither result blocks the add or the switch.
+Install a workflow only on the captain's word, as an ordinary ship task.
 
 ## Remove
 

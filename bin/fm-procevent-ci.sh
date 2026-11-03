@@ -12,6 +12,10 @@
 # recovery. Every captured result ends this wait; no merge monitor is added.
 # Readiness is only a no-mistakes drive outcome, checked against the current
 # forge head. Missing required checks remain no-mistakes' responsibility.
+# After NO_CHECK_HOLDS pending holds (at least 10 minutes) of a CI-only run whose
+# PR has zero registered checks, poll queues one `check` wake carrying the PR URL
+# and keeps holding, so checks that register later still return here. That wake
+# reports an absence only; zero checks are never green and it authorizes nothing.
 # Results are evidence for the original worker to reattach, never authority to
 # mark a run passed, merge, edit pipeline-owned code or answer an approval.
 set -eu
@@ -60,6 +64,32 @@ ci_only() {
       for (i=1; i<=n; i++) if (seen[required[i]] != 1) bad=1
       exit bad || !n
     }'
+}
+# GitHub registers checks within seconds of a PR event, so 10 minutes separates a
+# repository with nothing to run from a slow start. The hold before handoff adds
+# at most one drive wait (default 8 minutes), so the captain hears within 20.
+NO_CHECK_HOLDS=20
+HOLDS=0
+NO_CHECK_DONE=0
+surface_no_checks() {
+  local count
+  count=$(fm_nm_bounded "$WT" 15 gh pr view "$PR" --json statusCheckRollup --jq '.statusCheckRollup | length') || return 1
+  case "$count" in
+    ''|*[!0-9]*) return 1 ;;
+    0) fm_wake_append check "ci-no-checks:$RUN" \
+         "check: no-mistakes CI wait has zero registered checks after 10 minutes - task=$TASK pr=$PR; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision" || return 1 ;;
+  esac
+}
+pending_hold() {
+  if ! ci_only; then
+    # A pipeline-owned repair restarts CI, and with it this bound.
+    HOLDS=0
+  elif [ "$NO_CHECK_DONE" -eq 0 ]; then
+    HOLDS=$((HOLDS+1))
+    # An unreadable forge or queue retries on the next hold rather than guessing.
+    if [ "$HOLDS" -ge "$NO_CHECK_HOLDS" ] && surface_no_checks; then NO_CHECK_DONE=1; fi
+  fi
+  sleep 30
 }
 result() {
   printf 'ci_wait: %s\ntask: %s\nrun_id: %s\npr: %s\n' "$1" "$TASK" "$RUN" "$PR"
@@ -128,7 +158,7 @@ case "${1:-}" in
         && [ "$(fm_nm_strip_quotes "$(fm_nm_field "$DRIVE" error)")" = 'wait of 1s elapsed while driving the run' ] \
         && ! printf '%s\n' "$DRIVE" | grep -Eq '^[[:space:]]*(gate|outcome):'; then
         if ! fm_nm_run_is_executing "$SNAPSHOT"; then result action "$SNAPSHOT"; break; fi
-        sleep 30
+        pending_hold
         continue
       fi
       if printf '%s\n' "$DRIVE" | grep -Eq '^[[:space:]]*(gate|outcome|error):'; then
@@ -162,8 +192,8 @@ case "${1:-}" in
       # A pipeline-owned rebase or repair may return to Review. Keep holding
       # its same run without waking a worker merely to observe active work.
       if ! fm_nm_run_is_executing "$SNAPSHOT"; then result action "$SNAPSHOT"; break; fi
-      # No model, status event, or wake is emitted for an elapsed pending hold.
-      sleep 30
+      # An elapsed pending hold emits no model, status event, or routine wake.
+      pending_hold
     done
     ;;
   classify)

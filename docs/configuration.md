@@ -1305,6 +1305,9 @@ Bootstrap selects delivery prerequisites from the project registry and recorded 
 | Browser work | Node.js plus the pinned chrome-devtools-mcp install and Chrome for Testing named by the [browser MCP pin](#browser-mcp-pin-configbrowser-mcp) when that feature is used. |
 | Visual boards | Compatible `lavish-axi`; plain-text work may continue without it. |
 
+No-mistakes delivery also needs CI that reports on the repository's PRs, because its last step waits for checks, for up to its 168-hour default.
+The first mate checks for GitHub Actions workflows when a project is added or switched to a no-mistakes mode and offers `no-mistakes ci-workflow` when there are none; the [validation-supervision skill](../.agents/skills/validation-supervision/SKILL.md) owns recovering a PR that predates its workflow.
+
 These checks select prerequisites rather than installing them or changing a project's delivery policy.
 A tool needed by a later, newly selected workflow must be installed before using that workflow; its absence during an unrelated local task does not authorize bypassing its guards.
 `workflow_delivery_tools` and the tool detection in [`bin/fm-bootstrap.sh`](../bin/fm-bootstrap.sh) own exact selection and diagnostics.
@@ -1550,6 +1553,7 @@ A long-polling external process is registered as a *source* through its adapter,
 
 No-mistakes workers can delegate a CI-only wait to the existing process-event runner regardless of proactive mode or `config/wait-no-turns`; no additional monitoring service or setting is needed.
 After a confirmed handoff, unchanged pending CI consumes no worker or routine supervision-review turns; a drive response requiring action or a monitoring error returns through firstmate to the original worker.
+If the PR still has zero registered checks 10 minutes after the handoff, the first mate tells you with the PR link while the wait continues; zero checks never count as green.
 [`bin/fm-procevent-ci.sh`](../bin/fm-procevent-ci.sh) owns eligibility, listener confirmation, run and head binding, and exclusive monitoring; [`validation-supervision`](../.agents/skills/validation-supervision/SKILL.md) owns handling the captured result.
 The [verification record](verification/runtime-backends.md#ci-only-worker-waits) states the tested scope and live-evidence limits.
 

@@ -39,3 +39,45 @@ for directory in "$TMP_ROOT/absent" "$DATA"; do
   [ "$out" = off ] || fail "absent project or registry implicitly enabled history retention"
 done
 pass "history retention requires an explicit registered annotation"
+
+# --ci-workflows reads the clone's origin; the fake forge applies the script's real filter.
+FAKEBIN=$(fm_fakebin "$TMP_ROOT/fake")
+cat > "$FAKEBIN/gh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$2" >> "$GH_CALLS"
+[ -f "$WORKFLOWS" ] || exit 1
+exec jq -r "$4" "$WORKFLOWS"
+SH
+chmod +x "$FAKEBIN/gh"
+export GH_CALLS="$TMP_ROOT/gh-calls" WORKFLOWS="$TMP_ROOT/workflows.json"
+PROJECTS="$TMP_ROOT/projects"
+git init -q "$PROJECTS/app"
+git -C "$PROJECTS/app" remote add origin git@github.com:acme/app.git
+ci_query() { PATH="$FAKEBIN:$PATH" FM_DATA_OVERRIDE="$DATA" FM_PROJECTS_OVERRIDE="$PROJECTS" "$PROJECT_MODE" --ci-workflows "$1"; }
+for row in \
+  'none|{"workflows":[]}' \
+  'none|{"workflows":[{"state":"active","path":"dynamic/dependabot/dependabot-updates"}]}' \
+  'none|{"workflows":[{"state":"disabled_manually","path":".github/workflows/ci.yml"}]}' \
+  'present|{"workflows":[{"state":"active","path":".github/workflows/ci.yml"}]}'; do
+  printf '%s\n' "${row#*|}" > "$WORKFLOWS"
+  out=$(ci_query app)
+  [ "$out" = "${row%%|*}" ] || fail "workflow check for ${row#*|}: got $out"
+done
+pass "workflow check counts only active repository workflows"
+assert_contains "$(cat "$GH_CALLS")" 'repos/acme/app/actions/workflows' "workflow check must read the origin's repository"
+for origin in https://github.com/acme/app.git https://github.com/acme/app ssh://git@github.com/acme/app.git; do
+  git -C "$PROJECTS/app" remote set-url origin "$origin"
+  : > "$GH_CALLS"
+  [ "$(ci_query app)" = present ] || fail "workflow check rejected $origin"
+  [ "$(cat "$GH_CALLS")" = repos/acme/app/actions/workflows ] || fail "wrong repository for $origin"
+done
+pass "workflow check accepts every GitHub origin form"
+rm -f "$WORKFLOWS"
+[ "$(ci_query app)" = unknown ] || fail "a failed forge read must not read as no workflows"
+printf '%s\n' '{"workflows":[]}' > "$WORKFLOWS"
+git -C "$PROJECTS/app" remote set-url origin https://gitlab.com/acme/app.git
+: > "$GH_CALLS"
+[ "$(ci_query app)" = unknown ] || fail "a non-GitHub origin must not read as no workflows"
+[ ! -s "$GH_CALLS" ] || fail "a non-GitHub origin must not reach GitHub"
+[ "$(ci_query absent)" = unknown ] || fail "a missing clone must not read as no workflows"
+pass "workflow check reports unknown rather than none when it has no answer"
