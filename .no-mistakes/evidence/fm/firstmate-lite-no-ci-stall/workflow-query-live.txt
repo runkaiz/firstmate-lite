@@ -1,0 +1,60 @@
+Real bin/fm-project-mode.sh + installed gh; disposable TLS GitHub API on loopback.
+No production GitHub data, credentials, or configuration used.
+
+Repository without CI
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: []
+stdout: none
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Active repository workflow
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: [{"state": "active", "path": ".github/workflows/ci.yml"}]
+stdout: present
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Release-only workflow remains present, per accepted scope
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: [{"state": "active", "path": ".github/workflows/release.yml"}]
+stdout: present
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Dynamic Dependabot does not masquerade as repository CI
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: [{"state": "active", "path": "dynamic/dependabot/dependabot-updates"}]
+stdout: none
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Disabled workflow does not masquerade as active CI
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: [{"state": "disabled_manually", "path": ".github/workflows/ci.yml"}]
+stdout: none
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Unavailable forge is unknown rather than no CI
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: HTTP 503
+stdout: unknown
+exit: 0
+HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+
+Missing clone is unknown and makes no request
+$ bin/fm-project-mode.sh --ci-workflows missing
+API input: []
+stdout: unknown
+exit: 0
+HTTP requests: []
+
+Unsupported forge is unknown and makes no request
+$ bin/fm-project-mode.sh --ci-workflows app
+API input: []
+stdout: unknown
+exit: 0
+HTTP requests: []
+
+All live workflow-query scenarios passed.

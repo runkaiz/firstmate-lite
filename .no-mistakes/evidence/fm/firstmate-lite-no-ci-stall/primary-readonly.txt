@@ -1,0 +1,50 @@
+Real Claude primary on private fm-lab tmux socket, 120x40 grid.
+Read-only print-mode fallback after interactive workspace trust blocked launch.
+Input: actual wake captured from controlled CI-monitor test; not a live pipeline.
+Prompt:
+Read-only disposable primary evaluation. Read .agents/skills/validation-supervision/SKILL.md, then handle the following incoming check wake and give the captain-facing response. Use only Read; do not run startup, shell, tools with side effects, pipeline commands, project initialization, or external actions. Do not ask permission to read. This is a lab with an example PR, and your output is the only requested action. Incoming wake: 1793747587	1	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+
+CLI transcript:
+Captain, this PR has had no CI checks register after 10 minutes of waiting: https://github.com/example/repo/pull/1
+
+No checks is not a pass, so nothing has confirmed this PR is good. I won't merge it under any standing merge setting, an
+d validation will keep waiting in case checks appear.
+
+**Options:**
+1. **Add CI (recommended):** I'd ship a CI workflow for the project as its own task. Adding it won't trigger checks on t
+his PR, so the original worker would then stop the current validation, rebase the PR onto the default branch and re-run
+validation once.
+2. **Land without checks:** If you're comfortable merging this PR unverified by CI, tell me explicitly to merge PR #1. I
+'d stop the wait and merge it through the guarded path.
+
+Which would you like: add CI, or merge PR #1 without checks?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pane is dead (status 0, Tue Nov  3 15:14:22 2026)
+
+Pane state: 1

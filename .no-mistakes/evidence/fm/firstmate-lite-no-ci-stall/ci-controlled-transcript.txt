@@ -1,0 +1,118 @@
+Controlled integration evidence: real CI monitor and wake queue, fixture daemon/forge, accelerated clock. This is NOT a live no-mistakes pipeline.
+
+Observation: check 'zero checks surface at ten minutes of holds' test "$(line_count "$queue")" = 1
+controlled daemon scenario=pending initial_checks=0
+accelerated hold clock: 750
+real product durable wake queue:
+1793747587	1	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Observation: check 'checks disappearing after a positive read surface once' test "$(line_count "$queue")" = 1
+controlled daemon scenario=checks-disappear initial_checks=2
+accelerated hold clock: 750
+real product durable wake queue:
+1793747589	2	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Observation: check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+controlled daemon scenario=late-revalidate initial_checks=2
+accelerated hold clock: 1410
+real product durable wake queue:
+1793747591	3	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Observation: check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+controlled daemon scenario=late-revalidate initial_checks=0
+accelerated hold clock: 1410
+real product durable wake queue:
+1793747592	4	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+1793747593	5	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Observation: check 'unreadable forge does not count as zero checks' test ! -s "$queue"
+controlled daemon scenario=pending initial_checks=unreadable
+accelerated hold clock: 750
+real product durable wake queue:
+(empty)
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Observation: check 'runner-hosted wait surfaces zero checks' grep -q "ci-no-checks:RUN1.*pr=$PR" "$queue"
+controlled daemon scenario=hold initial_checks=0
+accelerated hold clock: 600
+real product durable wake queue:
+1793747597	7	check	ci-no-checks:RUN1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=task pr=https://github.com/example/repo/pull/1; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+real product poll output:
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: 5e8f5dd2f8894e5e37514b42adba7cf3a62f93af
+  pr: https://github.com/example/repo/pull/1
+gate: ci
+findings[1]{id,severity,file,line,action,description}:
+  c1,error,file,1,ask-user,CI failed; approval required

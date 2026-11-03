@@ -1,0 +1,7 @@
+ok - GitHub/local delivery keeps mode, merge authority and default forge
+ok - removed forge bindings refuse without silently changing delivery
+ok - absent registry preserves default forge
+ok - history retention requires an explicit registered annotation
+ok - workflow check counts only active repository workflows
+ok - workflow check accepts every GitHub origin form
+ok - workflow check reports unknown rather than none when it has no answer

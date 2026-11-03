@@ -1,0 +1,101 @@
+Real Claude print-mode primary + real bin/fm-project-mode.sh + installed gh.
+Disposable loopback TLS API, private fm-lab socket, 120x40 pane; post-initialization step only.
+
+New project without workflows
+Prompt: Read-only disposable primary evaluation: New project without workflows. The project registration, no-mistakes initialization, and doctor have ALREADY completed; do only the remaining workflow preflight and captain response from .agents/skills/project-management/SKILL.md. Read that skill, execute bin/fm-project-mode.sh --ci-workflows app, and tell the captain the result in plain language. FM_HOME and the forge endpoint already target the isolated lab. Do not run startup, initialize or control any pipeline, install a workflow, change any files, dispatch any work, or take an external action. Read and this one read-only shell query are the only authorized tools/actions. End after your captain-facing response.
+API workflows: []
+Actual HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+CLI transcript:
+Captain, the `app` project has no GitHub Actions workflows. This doesn't block the project, and it's still added, but PR
+s that go through the no-mistakes validation will wait at the end for checks that never appear, unless another CI system
+ reports them to GitHub.
+
+`no-mistakes ci-workflow` can generate a matching workflow for the repository. I haven't installed anything, and would o
+nly do so on your word, as a normal piece of work that ends in its own PR.
+
+Would you like me to add the workflow to `app`? I recommend it, unless another CI system already reports checks on this
+repository's PRs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pane is dead (status 0, Tue Nov  3 15:15:43 2026)
+
+Pane state: 1
+
+
+Existing project switched to pipeline mode with release-only workflow
+Prompt: Read-only disposable primary evaluation: Existing project switched to pipeline mode with release-only workflow. The project registration, no-mistakes initialization, and doctor have ALREADY completed; do only the remaining workflow preflight and captain response from .agents/skills/project-management/SKILL.md. Read that skill, execute bin/fm-project-mode.sh --ci-workflows app, and tell the captain the result in plain language. FM_HOME and the forge endpoint already target the isolated lab. Do not run startup, initialize or control any pipeline, install a workflow, change any files, dispatch any work, or take an external action. Read and this one read-only shell query are the only authorized tools/actions. End after your captain-facing response.
+API workflows: [{"state": "active", "path": ".github/workflows/release.yml"}]
+Actual HTTP requests: ["/api/v3/repos/disposable/workflow-lab/actions/workflows"]
+CLI transcript:
+Captain, the `app` project's switch to pipeline mode stands, and the workflow check didn't block it. The check found Git
+Hub Actions workflows in the repository, but it only confirms they exist, not what triggers them.
+
+Those workflows must run on pull requests for the pipeline to finish. If `app`'s workflow really is release-only, as des
+cribed for this switch, it won't report checks on PRs, so pipeline PRs will stall waiting for them. You'll be told if no
+ checks appear.
+
+I installed and changed nothing. Adding a workflow that runs on PRs would be an ordinary task for a worker, so that's yo
+ur call. I recommend adding one before relying on the pipeline for `app`, unless another CI system already reports check
+s on its PRs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pane is dead (status 0, Tue Nov  3 15:15:53 2026)
+
+Pane state: 1
