@@ -1043,6 +1043,43 @@ SH
   pass "bootstrap ignores external compatibility verdicts without running that tool"
 }
 
+test_failed_launch_recovery_does_not_start_backlog_items() {
+  local case_dir home fakebin kind out row
+  case_dir="$TMP_ROOT/failed-launch-recovery"
+  home="$case_dir/home"
+  mkdir -p "$home/config" "$home/data" "$home/state"
+  printf '%s\n' tmux > "$home/config/backend"
+  fm_test_tasks_toml "$home/.tasks.toml"
+  fakebin=$(make_fake_toolchain "$case_dir")
+  for kind in ship scout; do
+    fm_write_meta "$home/state/recovery-$kind.meta" "kind=$kind" 'cleanup_recovery=orca'
+  done
+  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_DATA_OVERRIDE="$home/missing-data" FM_BOOTSTRAP_NETWORK=skip \
+    FM_QUEUE_TEST_CLI= FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    || fail "failed-launch recovery incorrectly required backlog access: $out"
+
+  printf '%s\n' '# Backlog' '' '## In flight' '' '## Queued' '' '## Done' > "$home/data/backlog.md"
+  for kind in ship scout; do
+    "$ROOT/bin/fm-queue.py" add "recovery-$kind" "failed $kind launch" \
+      --kind "$kind" --file "$home/data/backlog.md" >/dev/null || fail "could not seed recovery item"
+  done
+  "$ROOT/bin/fm-queue.py" add ordinary-ship 'launched worker' \
+    --kind ship --file "$home/data/backlog.md" >/dev/null || fail "could not seed ordinary item"
+  fm_write_meta "$home/state/ordinary-ship.meta" 'kind=ship'
+  out=$(PATH="$fakebin:$BASE_PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$home" \
+    FM_BOOTSTRAP_NETWORK=skip FM_QUEUE_TEST_CLI= FM_FAKE_TREEHOUSE_LEASE_HELP=1 "$ROOT/bin/fm-bootstrap.sh" 2>&1) \
+    || fail "mixed worker recovery failed: $out"
+  for kind in ship scout; do
+    row=$("$ROOT/bin/fm-queue.py" show "recovery-$kind" --file "$home/data/backlog.md")
+    assert_contains "$row" 'state: queued' "failed $kind launch was advanced to In flight"
+    assert_present "$home/state/recovery-$kind.meta" "recovery record was removed"
+  done
+  row=$("$ROOT/bin/fm-queue.py" show ordinary-ship --file "$home/data/backlog.md")
+  assert_contains "$row" 'state: in_flight' 'ordinary worker was not reconciled'
+  pass "bootstrap excludes failed-launch recovery from backlog gating and reconciliation"
+}
+
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info() {
   local case_dir fakebin out expect
   case_dir="$TMP_ROOT/dispatch-active"
@@ -1224,5 +1261,6 @@ test_network_phase_partitions_the_run
 test_network_sweeps_recheck_lock_ownership
 test_network_phases_record_per_step_elapsed_times
 test_native_queue_ignores_external_compatibility_verdicts
+test_failed_launch_recovery_does_not_start_backlog_items
 test_crew_dispatch_active_rules_are_verbose_bootstrap_info
 test_crew_dispatch_validation

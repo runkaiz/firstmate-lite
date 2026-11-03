@@ -643,7 +643,8 @@ backlog_record_reconcile() {
       fm_lock_release "$meta_lock"
       return 2
     fi
-    if [ "$(fm_meta_get "$meta" kind)" != secondmate ]; then
+    if [ "$(fm_meta_get "$meta" kind)" != secondmate ] \
+       && [ "$(fm_meta_get "$meta" cleanup_recovery)" != orca ]; then
       row=
       if fm_backlog_row_probe "$DATA" "$id"; then
         row=$FM_BACKLOG_ROW_STATE
@@ -731,7 +732,8 @@ if [ "${FM_BOOTSTRAP_DETECT_ONLY:-0}" != 1 ] && local_phase; then
           echo "error: bootstrap refused unsafe worker record ($FM_BACKLOG_TRANSITION_ERROR)" >&2
           exit 1
         fi
-        if [ "$(fm_meta_get "$BOOTSTRAP_BACKLOG_META" kind)" != secondmate ]; then
+        if [ "$(fm_meta_get "$BOOTSTRAP_BACKLOG_META" kind)" != secondmate ] \
+           && [ "$(fm_meta_get "$BOOTSTRAP_BACKLOG_META" cleanup_recovery)" != orca ]; then
           BOOTSTRAP_BACKLOG_GATE_KIND=ship
           break
         fi
