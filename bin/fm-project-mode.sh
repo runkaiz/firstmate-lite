@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Resolve registered delivery mode, merge authority and branch prefix.
-# Usage: fm-project-mode.sh [--raw|--forge|--branch-prefix|--retained-history] <project-name>
+# Usage: fm-project-mode.sh [--raw|--forge|--branch-prefix|--retained-history|--ci-workflows] <project-name>
 # Default output is <no-mistakes|direct-PR|local-only> <on|off>.
 # no-mistakes-prod-only remains a registry policy: --raw returns that policy;
 # normal output resolves conservatively to no-mistakes.
@@ -12,8 +12,11 @@
 # --retained-history prints on for retained-history inside the registry entry's
 # bracketed annotations (for example [no-mistakes retained-history]),
 # otherwise off. It does not change delivery mode, merge authority or refs.
+# --ci-workflows asks GitHub whether the clone's origin has an active repository
+# workflow, ignoring GitHub's dynamic ones (such as Dependabot), and prints present,
+# none, or unknown when the origin or the read gives no answer. Only this query
+# uses the network, and it reads the clone rather than the registry.
 # Registry input is the active home data/projects.md; no configuration is written.
-# Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history] <project-name>
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,8 +33,24 @@ case "${1:-}" in
   --branch-prefix) BRANCH_PREFIX_QUERY=1; shift ;;
   --forge) WANT_FORGE=1; shift ;;
   --retained-history) RETAINED_HISTORY_QUERY=1; shift ;;
+  --ci-workflows)
+    NAME=${2:?usage: fm-project-mode.sh --ci-workflows <project-name>}
+    ORIGIN=$(git -C "${FM_PROJECTS_OVERRIDE:-$FM_HOME/projects}/$NAME" remote get-url origin 2>/dev/null) || ORIGIN=
+    SLUG=$(printf '%s\n' "$ORIGIN" | sed -nE 's#^(https://|ssh://git@|git@)github\.com[:/]([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)$#\2#p')
+    SLUG=${SLUG%.git}
+    COUNT=
+    # shellcheck disable=SC2016 # The startswith argument is jq, not shell.
+    [ -z "$SLUG" ] || COUNT=$(gh api "repos/$SLUG/actions/workflows" \
+      --jq '[.workflows[] | select(.state == "active" and (.path | startswith(".github/workflows/")))] | length' 2>/dev/null) || COUNT=
+    case "$COUNT" in
+      0) echo none ;;
+      ''|*[!0-9]*) echo unknown ;;
+      *) echo present ;;
+    esac
+    exit 0
+    ;;
 esac
-NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history] <project-name>}
+NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--retained-history|--ci-workflows] <project-name>}
 
 if [ ! -f "$REG" ]; then
   echo "warn: no registry at $REG; defaulting $NAME to no-mistakes off" >&2

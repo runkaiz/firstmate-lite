@@ -9,6 +9,7 @@ metadata:
 # Validation supervision
 
 For a no-mistakes ship, follow the generated handoff owned by `bin/fm-dod-lib.sh`; when it calls for firstmate invocation after the implementation commit, use the same worker and the harness invocation owned by `harness-adapters`.
+A worker's first `done:` on a no-mistakes ship outside proactive mode is that designed handoff, not a skipped pipeline; never report it as one.
 The task worker that starts a no-mistakes run owns pipeline decisions through the next gate or outcome; `bin/fm-procevent-ci.sh` owns the supported CI-only drive-wait delegation and its exact commands.
 Firstmate never invokes `no-mistakes axi respond` for a crew-owned run.
 `bin/fm-dod-lib.sh` owns the worker-side `--intent` contract.
@@ -37,3 +38,14 @@ If that worker already reported CI-ready done, acknowledge and retire the captur
 Otherwise send the original worker the captured result path once, telling it to read the response and reattach or handle its gate through no-mistakes, then acknowledge the process-event sequence after the durable steer succeeds.
 A replay must reconcile the task's steering inbox before sending the same captured source/sequence again.
 Do not answer a gate, run a parallel CI or merge poll, or turn unchanged registered CI waits into routine status-review turns.
+
+A `no-mistakes CI wait has zero registered checks` wake means the run has been waiting on a PR with nothing reporting, and the wait stays registered in case checks appear.
+Tell the captain now with the PR's URL, because zero checks are not green and no merge posture lands this PR on its own.
+Offer two ways out, and take either only on the captain's word:
+
+- Add CI: ship `no-mistakes ci-workflow` as its own task, then recover this PR as below.
+- Land without checks: on an explicit merge instruction naming this PR, retire the wait with `bin/fm-procevent.sh retire <source-id>` (`bin/fm-procevent.sh list` names it), then use the guarded merge.
+
+A PR that predates its CI workflow gets no checks from the workflow landing on the default branch.
+To recover it, retire the wait, then steer the original worker to abort the run through no-mistakes axi, confirm it stopped, settle branch ownership as above, rebase onto the default branch, and re-run once.
+Firstmate never closes or reopens a PR to re-trigger CI while a run monitors it; use the recovery procedure above.

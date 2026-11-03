@@ -39,6 +39,7 @@ if [ "$*" = 'axi status' ]; then
     other-run) run=RUN2 ;;
     other-branch) branch=fm/other ;;
     revalidate) if [ "$count" -gt 0 ] && [ "$count" -lt 3 ]; then review=running; ci=pending; fi ;;
+    late-revalidate) if [ "$count" -ge 23 ] && [ "$count" -le 24 ]; then review=running; ci=pending; fi ;;
     repairing) state=fixing ;;
     missing-required) : ;;
     changed-head|post-return-rebase) if [ "$count" -gt 0 ]; then CI_TEST_HEAD=1111111111111111111111111111111111111111; fi ;;
@@ -87,6 +88,16 @@ cat > "$LAB/fakebin/gh" <<'SH'
 #!/usr/bin/env bash
 set -eu
 printf '%s\n' "$*" >> "$CI_TEST_LAB/forge-calls"
+if [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json statusCheckRollup --jq .statusCheckRollup | length' ]; then
+  [ -n "${CI_CHECKS:-}" ] || exit 1
+  read -r count < "$CI_TEST_LAB/drives"
+  case "$CI_SCENARIO" in
+    checks-disappear) if [ "$count" -gt 20 ]; then CI_CHECKS=0; fi ;;
+    late-revalidate) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
+  esac
+  printf '%s\n' "$CI_CHECKS"
+  exit 0
+fi
 [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json url,headRefOid --jq [.url,.headRefOid] | @tsv' ] || exit 99
 head=$CI_TEST_HEAD
 case "$CI_SCENARIO" in stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;; esac
@@ -149,6 +160,46 @@ for scenario in gate failed error near-elapsed stale-green skips revalidate othe
   esac
 done
 
+# Bounded zero-check surfacing: one wake with the PR URL at the bound, while only
+# the pipeline's own later return can still supply a result.
+queue=$FM_STATE_OVERRIDE/.wake-queue
+rollup_calls() { touch "$LAB/forge-calls"; grep -c statusCheckRollup "$LAB/forge-calls" || true; }
+reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=20 CI_CHECKS=0
+out=$(poll)
+check 'zero checks stay quiet before the bound' test ! -s "$queue"
+check 'no forge read before the bound' test "$(rollup_calls)" = 0
+reset_counts; export CI_AFTER=26
+out=$(poll)
+check 'zero checks surface at ten minutes of holds' test "$(line_count "$queue")" = 1
+check 'bound is at least ten minutes on the hold clock' test "$(cat "$LAB/clock")" -ge 600
+check 'wake carries the PR URL' grep -q "ci-no-checks:RUN1.*pr=$PR" "$queue"
+check 'wake says zero checks are not green' grep -q 'zero checks are not green' "$queue"
+check 'zero checks are read once then the wait keeps holding' test "$(rollup_calls)" = 1
+check 'wait kept driving to the real pipeline outcome' test "$(cat "$LAB/drives")" = 26
+check 'surfacing never reads a merge or writes to the PR' test "$(grep -vc '^pr view ' "$LAB/forge-calls")" = 0
+reset_counts; rm -f "$queue"; export CI_CHECKS=2
+out=$(poll)
+check 'registered checks never surface' test ! -s "$queue"
+check 'registered checks keep zero-check detection active' test "$(rollup_calls)" = 6
+reset_counts; export CI_SCENARIO=checks-disappear
+out=$(poll)
+check 'checks disappearing after a positive read surface once' test "$(line_count "$queue")" = 1
+for initial_checks in 2 0; do
+  reset_counts; rm -f "$queue"; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=$initial_checks
+  out=$(poll)
+  if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
+  check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+done
+reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=
+out=$(poll)
+check 'unreadable forge does not count as zero checks' test ! -s "$queue"
+check 'unreadable forge retries on later holds' test "$(rollup_calls)" -gt 1
+# 21 holds would pass the bound, but the first two are outside CI and restart it.
+reset_counts; export CI_SCENARIO=revalidate CI_AFTER=22 CI_CHECKS=0
+out=$(poll)
+check 'pipeline repair restarts the zero-check bound' test ! -s "$queue"
+check 'no forge read before the restarted bound' test "$(rollup_calls)" = 0
+rm -f "$queue"; unset CI_CHECKS
 # Recovery through the real runner: a persisted registration with no listener
 # is reconciled, pending holds publish nothing, one terminal capture wakes once,
 # and handled + restart cannot wake a completed worker again.
@@ -181,6 +232,16 @@ before=$(wc -l < "$FM_STATE_OVERRIDE/.wake-queue" | tr -d ' ')
 check 'handled action not reannounced after reconcile/restart' test "$(line_count "$FM_STATE_OVERRIDE/.wake-queue")" = "$before"
 check 'terminal wait retires so it cannot wake completed worker again' not_waiting "$FM_STATE_OVERRIDE" task "$ROOT"
 check 'entire exercised monitor path dispatches zero models' test ! -e "$LAB/model-dispatches"
+# The surfaced wake reaches this home's queue through the real runner while the
+# registered wait keeps ownership, and only the pipeline's return ends it.
+reset_counts; rm -f "$LAB/release" "$queue"; export CI_SCENARIO=hold CI_CHECKS=0
+"$ROOT/bin/fm-procevent.sh" register ci ci-run1 -- "$ADAPTER" poll task "$LAB/wt" RUN1 fm/ci "$PR" >/dev/null
+"$ROOT/bin/fm-procevent.sh" ensure-listening ci-run1 >/dev/null
+for ((i=0; i<400; i++)); do [ -s "$queue" ] && break; /bin/sleep .05; done
+check 'runner-hosted wait surfaces zero checks' grep -q "ci-no-checks:RUN1.*pr=$PR" "$queue"
+check 'surfacing keeps the wait registered' fm_procevent_ci_waiting "$FM_STATE_OVERRIDE" task "$ROOT"
+"$ROOT/bin/fm-procevent.sh" retire ci-run1 >/dev/null
+rm -f "$queue"; unset CI_CHECKS
 # Public handoff verifies eligibility and exclusive ownership before parking.
 reset_counts; rm -f "$LAB/release"
 export CI_SCENARIO=repairing
