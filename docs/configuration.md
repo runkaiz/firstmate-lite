@@ -740,7 +740,7 @@ The skill text owns the marker spelling, the tick order, and the reinforcement r
 
 ## Harness support
 
-claude, codex, opencode, pi, pi-signed, grok, kimi, cursor, and omp have crewmate launch adapters; gemini is verified for crewmate and scout launches only, and [README launch guide](../README.md#3-launch-your-first-mate) own the set supported for the primary session.
+claude, codex, opencode, pi, pi-signed, grok, kimi, cursor, and omp have crewmate launch adapters; gemini is verified for crewmate and scout launches only, and the [README launch guide](../README.md#3-launch-your-first-mate) owns the set supported for the primary session.
 
 ### Harness restrictions and credentials
 

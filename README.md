@@ -19,7 +19,7 @@ You talk to exactly one agent, the first mate.
 The first mate sends each job to its own worker (a separate coding agent) in its own isolated copy of the project, keeps an eye on all of them, and only comes back to you with finished work or a real decision.
 No more juggling five terminals and forgetting which one had the failing test.
 
-There is nothing to install or build.
+The distro itself needs no separate install or build step.
 This repository *is* the first mate: a set of instructions, skills, and small scripts that turn the coding agent you already use (Claude Code, Pi, and friends) into a crew boss.
 Open your agent inside this folder and it reads `AGENTS.md` and takes the job.
 
@@ -29,13 +29,14 @@ Open your agent inside this folder and it reads `AGENTS.md` and takes the job.
 
 On a Linux machine you need:
 
-- A supported coding agent, logged in to its own account; [Claude Code](https://docs.claude.com/en/docs/claude-code) is the most exercised path.
-- `git` and Node.js.
+- A supported coding agent, logged in to its own account; the walkthrough below uses Claude Code.
+- `git`, Node.js, and Python 3.9+ for the built-in backlog.
 - `tmux` (the terminal multiplexer where workers get their own windows) and `treehouse` (hands out isolated copies of your project).
-- For GitHub work: the `gh` CLI, logged in with `gh auth login`, and `no-mistakes` (the review-and-ship pipeline the crew uses by default).
+- For the default GitHub workflow: the `gh` CLI, logged in with `gh auth login`, and `no-mistakes` (the review-and-ship pipeline).
 
 You do not have to get this list perfect.
-On its first start the first mate checks what is missing, prints the exact install command for each tool, and asks before installing anything.
+On its first start the first mate checks what is missing, prints install commands or manual instructions, and asks before installing anything.
+Local-only work needs neither GitHub login nor `no-mistakes`; plain PRs need GitHub tooling without the validation pipeline.
 The full list per workflow lives in [the toolchain reference](docs/configuration.md#toolchain).
 
 ### 2. Clone it
@@ -45,7 +46,7 @@ git clone https://github.com/runkaiz/firstmate-lite.git
 cd firstmate-lite
 ```
 
-Your own records (backlog, notes, project clones, settings) are created inside this folder under git-ignored paths, so they never get committed or shared.
+By default, your own records (backlog, notes, project clones, settings) live in this folder's [git-ignored home paths](docs/configuration.md#operational-home-layout-and-state).
 
 ### 3. Launch your first mate
 
@@ -62,10 +63,10 @@ Other supported agents launch the same way from this folder:
 | --- | --- | --- |
 | Claude Code | `claude` | - |
 | Pi | `pi` (or `FM_PI_HARNESS=pi-signed pi-signed` for the signed wrapper) | Approve the project trust prompt once. |
-| Oh My Pi | `omp` | - |
+| Oh My Pi | `omp` | Use `FM_OMP_HARNESS=omp omp` when starting inside a Claude Code pane. |
 | Grok | `grok --trust` | `--trust` loads the project hooks. |
 | Cursor Agent | `cursor-agent --trust` | Run it interactively, not with `-p`. |
-| Codex, OpenCode | `codex`, `opencode` | Supported, with more caveats than the ones above. |
+| Codex, OpenCode | `codex`, `opencode` | See their [supervision limits](docs/turnend-guard.md). |
 
 ### 4. Say hello
 
@@ -85,6 +86,8 @@ A while later:
 
 A few handy commands once you are under way:
 
+Use the slash form below in Claude Code and Grok; in Codex use `$ahoy`, `$afk`, `$stow`, and `$updatefirstmate`.
+
 - `/ahoy` - catch me up: what is in flight, what is waiting on me.
 - `/afk` - I'm stepping away; keep the crew going and brief me when I'm back.
 - `/stow` - save what we learned before I close the session.
@@ -96,21 +99,25 @@ A few handy commands once you are under way:
 - **Parallel work** - each task gets its own worker and its own copy of the project, so several fixes can run at once.
 - **Two kinds of jobs** - a *ship* produces a change (a pull request or a local merge); a *scout* investigates and hands you a written report.
 - **Your delivery style, per project** - pick full review-and-PR, a plain PR, or local-only branches for each project.
-- **Quiet supervision** - a tiny background watcher wakes the first mate only when a worker needs attention, so idle crews cost no tokens.
+- **Quiet supervision** - a tiny background watcher waits without spending model tokens, then wakes the first mate when attention is needed.
 - **Survives restarts** - everything is written to disk, so a new session picks up where the last one left off.
 
 ## How it keeps you safe
 
-- **Nothing merges without your word**, unless you explicitly turn on auto-merge for a project.
-- **Isolated copies** - workers never touch your main checkout; the first mate itself only reads your projects.
-- **No work gets thrown away** - unsaved or unmerged work is never deleted without your explicit say-so.
-- **Your records stay local** - backlog, notes, settings, and project clones live in git-ignored folders on your machine.
+- **You set merge authority** - see the [project delivery rules](docs/architecture.md#delivery-modes-are-explicit-per-task) and optional [proactive mode](docs/configuration.md#proactive-preference-configproactive).
+- **Isolated copies** - workers implement changes in separate worktrees; the first mate's narrow project-write exceptions are defined in [hard rule 1](AGENTS.md#1-identity-and-prime-directives).
+- **No work gets thrown away** - uncommitted or unmerged work is never deleted without your explicit say-so.
+- **Start with your own home** - do not copy another operator's private records or settings into a fresh checkout; see the [home layout](docs/configuration.md#operational-home-layout-and-state).
 - **It cannot publish upstream on its own** - pushing, filing issues, or opening PRs against Firstmate's own repository needs a [maintainer opt-in or your per-task consent](docs/configuration.md#firstmate-role-configfirstmate-role).
 - **It asks before installing tools** and before anything destructive, irreversible, or security-sensitive.
 
 ## Honest limits
 
-Firstmate-lite has been tested on Linux only, and a completely fresh machine install has not been proven end to end yet.
+Current Firstmate-lite evidence covers CPU-only Linux fixtures.
+That does not prove a fresh install, provider login or service-tier behavior, live worker lifecycles, or macOS compatibility.
+Inherited [verification records](docs/verification/runtime-backends.md) apply only to their stated versions and scopes.
+Nested supervision, Relay, alternate forges, and the bundled dashboard are outside this fork's scope.
+The retained [remote command transport](docs/configuration.md#remote-commands-configremote-routes) does not provide standalone remote coding-agent dispatch.
 How well it runs still depends on your agent, your terminal backend, and the tools above; it is lean, not dependency-free.
 If something breaks, tell the first mate what you saw - diagnosing its own setup is part of the job.
 
