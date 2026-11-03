@@ -78,12 +78,14 @@ surface_no_checks() {
     ''|*[!0-9]*) return 1 ;;
     0) fm_wake_append check "ci-no-checks:$RUN" \
          "check: no-mistakes CI wait has zero registered checks after 10 minutes - task=$TASK pr=$PR; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision" || return 1 ;;
+    *) return 1 ;;
   esac
 }
 pending_hold() {
   if ! ci_only; then
     # A pipeline-owned repair restarts CI, and with it this bound.
     HOLDS=0
+    NO_CHECK_DONE=0
   elif [ "$NO_CHECK_DONE" -eq 0 ]; then
     HOLDS=$((HOLDS+1))
     # An unreadable forge or queue retries on the next hold rather than guessing.

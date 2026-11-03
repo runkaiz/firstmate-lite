@@ -85,6 +85,7 @@ If doctor reports an environment, authentication, or daemon problem, resolve tha
 
 Then run `bin/fm-project-mode.sh --ci-workflows <name>`, because the pipeline's last step waits for checks and a repository with none stalls there.
 On `none`, tell the captain the repository has no GitHub Actions workflows, that no-mistakes PRs will wait on checks that never register unless another CI system reports them, and offer `no-mistakes ci-workflow`, which emits a matching workflow.
+On `present`, tell the captain existing workflows must run on pull requests for the pipeline to finish, and they will be told if no checks appear.
 On `unknown`, say the check could not finish.
 Neither result blocks the add or the switch.
 Install a workflow only on the captain's word, as an ordinary ship task.

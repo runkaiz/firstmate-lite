@@ -39,6 +39,7 @@ if [ "$*" = 'axi status' ]; then
     other-run) run=RUN2 ;;
     other-branch) branch=fm/other ;;
     revalidate) if [ "$count" -gt 0 ] && [ "$count" -lt 3 ]; then review=running; ci=pending; fi ;;
+    late-revalidate) if [ "$count" -ge 23 ] && [ "$count" -le 24 ]; then review=running; ci=pending; fi ;;
     repairing) state=fixing ;;
     missing-required) : ;;
     changed-head|post-return-rebase) if [ "$count" -gt 0 ]; then CI_TEST_HEAD=1111111111111111111111111111111111111111; fi ;;
@@ -89,6 +90,11 @@ set -eu
 printf '%s\n' "$*" >> "$CI_TEST_LAB/forge-calls"
 if [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json statusCheckRollup --jq .statusCheckRollup | length' ]; then
   [ -n "${CI_CHECKS:-}" ] || exit 1
+  read -r count < "$CI_TEST_LAB/drives"
+  case "$CI_SCENARIO" in
+    checks-disappear) if [ "$count" -gt 20 ]; then CI_CHECKS=0; fi ;;
+    late-revalidate) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
+  esac
   printf '%s\n' "$CI_CHECKS"
   exit 0
 fi
@@ -174,8 +180,17 @@ check 'surfacing never reads a merge or writes to the PR' test "$(grep -vc '^pr 
 reset_counts; rm -f "$queue"; export CI_CHECKS=2
 out=$(poll)
 check 'registered checks never surface' test ! -s "$queue"
-check 'registered checks end the zero-check read' test "$(rollup_calls)" = 1
-reset_counts; export CI_CHECKS=
+check 'registered checks keep zero-check detection active' test "$(rollup_calls)" = 6
+reset_counts; export CI_SCENARIO=checks-disappear
+out=$(poll)
+check 'checks disappearing after a positive read surface once' test "$(line_count "$queue")" = 1
+for initial_checks in 2 0; do
+  reset_counts; rm -f "$queue"; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=$initial_checks
+  out=$(poll)
+  if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
+  check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+done
+reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=
 out=$(poll)
 check 'unreadable forge does not count as zero checks' test ! -s "$queue"
 check 'unreadable forge retries on later holds' test "$(rollup_calls)" -gt 1
