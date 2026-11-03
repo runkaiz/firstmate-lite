@@ -23,7 +23,7 @@ The shared wake presentation carries the current mode and compact policy referen
 The delivery fixture reported `FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0` and verifies that new proactive no-mistakes briefs omit the intermediate done/invocation exchange, retain the current-mode recheck and explicit holds, and restore the baseline when off.
 Merge fixtures prove ordinary green reviewed PRs can use the proactive path with yolo off, while off/malformed/revoked mode, unresolved/unreadable reviews, red/missing checks, holds, queues, and waivers refuse before the forge merge.
 The mode is re-read under the toggle's lock before that synchronous action.
-No endpoint or backend lifecycle mechanism changed, so tmux, Herdr, zellij, Orca, and cmux use the same instruction path without backend-specific changes.
+No endpoint or backend lifecycle mechanism changed, so tmux and Herdr use the same instruction path without backend-specific changes.
 These are executable-interface and package-contract fixtures, not proof of model obedience, live forge merging, or measured turn/token/latency improvement.
 The policy owner remains the [conditional proactive policy](../../.agents/skills/proactive/policy.md).
 

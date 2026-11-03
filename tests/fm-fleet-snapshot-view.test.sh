@@ -122,6 +122,7 @@ EOF
     "home=$home/secondmate-home" \
     "projects=alpha, beta, gamma, "
   printf 'working: watching delegated scope\n' > "$home/state/secondmate-task.status"
+  # A leftover record from a removed backend still renders as an unknown row.
   fm_write_meta "$home/state/cmux-task.meta" \
     "backend=cmux" \
     "window=workspace:surface" \

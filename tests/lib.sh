@@ -589,9 +589,8 @@ SH
 # fm_fake_blind_ancestry <fakebin>
 # Blind the parent-chain walks: a query of the FIELD-FIRST per-pid form those walks
 # use - `ps -o comm=|args=|ppid= -p <pid>`, the shape in bin/fm-harness.sh,
-# bin/fm-session-lock-lib.sh, bin/fm-sessionstart-nudge.sh and bin/fm-backend.sh's
-# cmux ancestor detection - reports a bash ancestor terminating at pid 1, so ancestry
-# proves nothing and the marker a case sets is the only evidence left. A case that pins
+# bin/fm-session-lock-lib.sh and bin/fm-sessionstart-nudge.sh - reports a bash
+# ancestor terminating at pid 1, so ancestry proves nothing and the marker a case sets is the only evidence left. A case that pins
 # its harness with a marker (CLAUDECODE=1 and friends) needs this, because a structural
 # ancestor of a DIFFERENT harness outranks a marker - without it, the harness the SUITE
 # was launched from decides the verdict.
@@ -916,7 +915,7 @@ assert_present() {
 
 # fm_test_base_path_sans <base_path> <tool...>: returns the path to a single
 # curated directory that resolves every tool <base_path> would have resolved,
-# except the named ones. Some hosts have real system binaries (node, orca,
+# except the named ones. Some hosts have real system binaries (node, git,
 # ...) sitting in BASE_PATH; a fixture that simulates a tool as missing by
 # omitting it from fakebin still falls through to that host binary via
 # BASE_PATH, silently defeating the simulation. Dropping whole directories

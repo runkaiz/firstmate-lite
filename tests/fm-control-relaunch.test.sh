@@ -286,7 +286,7 @@ run_spawn() {  # <case-dir> <args...>
   # without it this suite would write the developer's real ~/.claude.json.
   mkdir -p "$dir/user-home"
   env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SESSION -u HERDR_SOCKET_PATH \
-    -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
+    -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID FM_BACKEND=tmux \
     PATH="$dir/fakebin:$PATH" FM_HOME="$dir/home" FM_FAKE_DIR="$dir/fake" \
     HOME="$dir/user-home" CLAUDE_CONFIG_DIR='' \
     FM_SPAWN_NO_GUARD=1 GROK_HOME="$dir/grokhome" \
