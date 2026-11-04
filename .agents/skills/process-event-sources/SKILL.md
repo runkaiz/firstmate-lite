@@ -96,7 +96,7 @@ A `procevent ci` wake belongs to `validation-supervision`; load it for the CI-on
 `procevent <adapter> <source-id> <sequence>`
 : The named durable result is waiting at `state/procevent-inbox/<source-id>.<sequence>.result`. Read that exact result; separate wakes identify later results independently.
 : **When the adapter owns applying the result, run that adapter before recording the generic acknowledgement below.**
-: A captured result with no durable handled acknowledgement stays eligible for bounded re-announcement on the existing wake queue - across any number of drains and firstmate restarts, not only the crash window right after capture - until it is explicitly acknowledged. Once you have fully handled a result, durably record it:
+: A captured result with no durable handled acknowledgement stays eligible for bounded re-announcement on the existing wake queue - across any number of drains and firstmate restarts, not only the crash window right after capture - until it is explicitly acknowledged. Once you have fully handled a result, durably record it with the command the drain prints as `PROCEVENT_HANDLED_REQUIRED`:
   ```sh
   bin/fm-procevent.sh handled <source-id> <sequence>
   ```

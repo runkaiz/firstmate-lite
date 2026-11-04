@@ -132,6 +132,7 @@ check() { local name=$1; shift; if ! "$@"; then printf 'FAIL: %s\n' "$name" >&2;
 contains() { [[ "$1" == *"$2"* ]]; }
 not_waiting() { ! fm_procevent_ci_waiting "$@"; }
 line_count() { wc -l < "$1" | tr -d ' '; }
+not_grep() { ! grep -q "$1" "$2"; }
 
 out=$(poll)
 check 'four unchanged pending holds consumed in one shell before action' test "$(cat "$LAB/drives")" = 5
@@ -254,6 +255,7 @@ check 'public arm refuses a duplicate PR monitor' test ! -e "$FM_STATE_OVERRIDE/
 rm "$FM_STATE_OVERRIDE/task.check.sh"
 "$ADAPTER" arm task > "$LAB/arm.out"
 check 'public arm confirms durable CI listener' fm_procevent_ci_waiting "$FM_STATE_OVERRIDE" task "$ROOT"
+check 'public arm prints the PR URL for the wait status' grep -Fq "pr=$PR" "$LAB/arm.out"
 if "$ADAPTER" arm task > "$LAB/duplicate.out" 2>&1; then exit 1; fi
 check 'repeated handoff cannot replace existing owner' grep -q "already registered" "$LAB/duplicate.out"
 if "$ROOT/bin/fm-pr-check.sh" task "$PR" > "$LAB/merge.out" 2>&1; then exit 1; fi
@@ -289,13 +291,17 @@ file_mtime() {
   if [ "$(uname)" = Darwin ]; then stat -f %m "$1" 2>/dev/null || true
   else stat -c %Y "$1" 2>/dev/null || true; fi
 }
-last=none; cycles=0
-for ((i=0; i<200; i++)); do
-  current=$(file_mtime "$state/.last-watcher-beat")
-  if [ -n "$current" ] && [ "$current" != "$last" ]; then cycles=$((cycles+1)); last=$current; fi
-  [ "$cycles" -ge 4 ] && break
-  /bin/sleep .05
-done
+beacon_cycles() {
+  local last=none current i
+  cycles=0
+  for ((i=0; i<200; i++)); do
+    current=$(file_mtime "$state/.last-watcher-beat")
+    if [ -n "$current" ] && [ "$current" != "$last" ]; then cycles=$((cycles+1)); last=$current; fi
+    [ "$cycles" -ge 4 ] && break
+    /bin/sleep .05
+  done
+}
+beacon_cycles
 check 'real watcher completes repeated pending cycles' test "$cycles" -ge 4
 check 'unchanged CI produces zero pane-review/heartbeat dispatch events' test ! -s "$state/.wake-queue"
 check 'CI-owned task is never pane-captured for stale review' test ! -e "$case_dir/captures"
@@ -303,6 +309,32 @@ check 'CI-owned task is never pane-captured for stale review' test ! -e "$case_d
 # Losing the durable owner restores the ordinary safety backstop.
 wait_for_exit "$watch_pid" 100 || { kill "$watch_pid" 2>/dev/null || true; exit 1; }
 check 'without CI ownership same idle worker becomes actionable' grep -q 'stale:' "$case_dir/watch.out"
+# Delivery of the zero-check notice, not just its queue row: a real poll queues
+# it and a real handling-successor watcher, which skips generic recovery, wakes
+# firstmate once for that key.
+case_dir=$(make_case ci-no-checks-delivery)
+state="$case_dir/state"
+export FM_STATE_OVERRIDE=$state
+reset_counts; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=0
+out=$(poll)
+unset CI_CHECKS
+successor_watch() {
+  PATH="$case_dir/fakebin:$PATH" FM_WATCH_HANDLING_SUCCESSOR=1 \
+    FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    "$ROOT/bin/fm-watch.sh" > "$1" 2>&1 &
+  watch_pid=$!
+}
+successor_watch "$case_dir/wake.out"
+wait_for_exit "$watch_pid" 100 || { printf 'FAIL: zero-check notice never woke the successor watcher\n' >&2; cat "$case_dir/wake.out" >&2; exit 1; }
+check 'successor watcher emits the zero-check wake' grep -Fq 'check: no-mistakes CI wait has zero registered checks: ci-no-checks:RUN1' "$case_dir/wake.out"
+"$ROOT/bin/fm-wake-drain.sh" > "$case_dir/drain.out" 2> "$case_dir/drain.err" || true
+check 'the drain following the wake presents the PR URL' grep -q "ci-no-checks:RUN1.*pr=$PR" "$case_dir/drain.out"
+check 'a notice with no captured result names no handled command' not_grep PROCEVENT_HANDLED_REQUIRED "$case_dir/drain.err"
+successor_watch "$case_dir/repeat.out"
+beacon_cycles
+check 'a later successor keeps polling on the already-surfaced key' kill -0 "$watch_pid"
+kill "$watch_pid"; wait "$watch_pid" 2>/dev/null || true
+check 'a surfaced key is not delivered twice' not_grep ci-no-checks "$case_dir/repeat.out"
 # Execute the handoff command emitted to a worker, rather than only looking
 # for prose. Both config postures use the same supported command.
 for posture in ordinary wait-no-turns; do
@@ -315,6 +347,7 @@ for posture in ordinary wait-no-turns; do
   # shellcheck disable=SC2016 # Extract the literal backtick-delimited command from the generated interface.
   command=$(sed -n 's/^When only CI remains running.*using `\(.*\)`\.$/\1/p' "$genhome/data/task/brief.md")
   check 'generated handoff command is present in either wait configuration' test -n "$command"
+  check 'generated wait status carries the PR URL' grep -Fq 'CI wait delegated for <the PR URL arming printed>' "$genhome/data/task/brief.md"
   bash -c "$command" > "$genhome/arm.out"
   check 'generated worker command confirms actual listener in either posture' fm_procevent_ci_waiting "$genhome/state" task "$ROOT"
   FM_STATE_OVERRIDE="$genhome/state" "$ROOT/bin/fm-procevent.sh" retire ci-run1 >/dev/null

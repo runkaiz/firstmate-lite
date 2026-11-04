@@ -105,7 +105,10 @@
 #                          (bin/fm-procevent.sh reconcile queues it once per
 #                          failure episode, and a later cycle that finds the
 #                          source owned closes that episode); the queued
-#                          payload names what to check. These three kinds are
+#                          payload names what to check
+#   check: no-mistakes CI wait has zero registered checks: <keys>
+#                          bin/fm-procevent-ci.sh queued a zero-check notice; the
+#                          queued payload carries the PR URL. These four kinds are
 #                          joined with `;` when more than one surfaces in a cycle
 #   check: rejected unauthenticated state checks: <paths>
 #                          unsafe state checks were refused without execution
@@ -1815,11 +1818,11 @@ procevent_surface_after_output() {
 }
 
 procevent_surface_queued() {
-  local key reason captured="" stranded="" unstarted=""
+  local key reason captured="" stranded="" unstarted="" no_checks=""
   PROCEVENT_SURFACED=
   [ -s "$FM_WAKE_QUEUE" ] || return 0
   while IFS= read -r key; do
-    case "$key" in procevent:*) ;; *) continue ;; esac
+    case "$key" in procevent:*|ci-no-checks:*) ;; *) continue ;; esac
     [ -e "$(procevent_surfaced_marker "$key")" ] && continue
     PROCEVENT_SURFACED="$PROCEVENT_SURFACED $key"
     # A stranded source or one whose launch never proved itself is the opposite
@@ -1829,6 +1832,7 @@ procevent_surface_queued() {
     case "$key" in
       procevent:*:stranded:*) stranded="$stranded $key" ;;
       procevent:*:launch-failed:*) unstarted="$unstarted $key" ;;
+      ci-no-checks:*) no_checks="$no_checks $key" ;;
       *) captured="$captured $key" ;;
     esac
   done < <(fm_wake_queued_keys_locked check)
@@ -1844,6 +1848,10 @@ procevent_surface_queued() {
   if [ -n "$unstarted" ]; then
     [ "$reason" = "check:" ] || reason="$reason;"
     reason="$reason process-event source failed to start:$unstarted"
+  fi
+  if [ -n "$no_checks" ]; then
+    [ "$reason" = "check:" ] || reason="$reason;"
+    reason="$reason no-mistakes CI wait has zero registered checks:$no_checks"
   fi
   # shellcheck disable=SC2034 # Consumed by wake() in the separately linted transition owner.
   FM_WAKE_POST_OUTPUT_ACTION=procevent_surface_after_output
