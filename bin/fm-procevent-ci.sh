@@ -14,8 +14,9 @@
 # forge head. Missing required checks remain no-mistakes' responsibility.
 # After NO_CHECK_HOLDS pending holds (roughly 10 minutes) of a CI-only run whose
 # PR has zero registered checks, poll queues one `check` wake per CI round carrying the PR URL
-# and keeps holding, so checks that register later still return here. That wake
-# reports an absence only; zero checks are never green and it authorizes nothing.
+# and keeps holding, so checks that register later still return here.
+# bin/fm-watch.sh delivers that wake once per queue key.
+# It reports an absence only; zero checks are never green and it authorizes nothing.
 # Results are evidence for the original worker to reattach, never authority to
 # mark a run passed, merge, edit pipeline-owned code or answer an approval.
 set -eu
@@ -137,7 +138,7 @@ case "${1:-}" in
       fi
       die 'CI handoff ownership uncertain; stop driving and ask firstmate to reconcile'
     fi
-    printf 'CI wait delegated: %s run=%s; end this turn and wait for firstmate\n' "$SOURCE_ID" "$RUN"
+    printf 'CI wait delegated: %s run=%s pr=%s; end this turn and wait for firstmate\n' "$SOURCE_ID" "$RUN" "$PR"
     ;;
   poll)
     [ "$#" -eq 6 ] || die 'invalid CI poll arguments'

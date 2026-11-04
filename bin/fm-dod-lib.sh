@@ -321,7 +321,7 @@ $drive_block
 
 CI-only exception to the reattachment instructions above (always enabled, independent of proactive mode or wait configuration): after an elapsed drive hold, inspect \`no-mistakes axi status\` once.
 When only CI remains running and every preceding step completed (a skipped rebase is allowed), delegate the next drive return using \`$ci_command\`.
-On confirmed listener success, append one \`paused [at=<epoch>]: CI wait delegated; waiting for the bound no-mistakes gate or outcome\` status and END YOUR TURN.
+On confirmed listener success, append one \`paused [at=<epoch>]: CI wait delegated for <the PR URL arming printed>; waiting for the bound no-mistakes gate or outcome\` status and END YOUR TURN.
 Do not run another drive, forge watch, inbox poll, timer or background monitor while that registration owns the wait.
 The existing runner handles pending holds without model turns and wakes firstmate only for action or a broken monitor.
 If arming refuses before registration or confirms retirement, retain drive ownership and report the refusal.

@@ -6001,6 +6001,8 @@ test_procevent_unacknowledged_result_redrains_until_handled() {
     || fail "the successor could not re-drain the unacknowledged process-event result"
   grep "$(printf '\tcheck\t')" "$replay_out" | grep -F 'procevent lavish delivery-src 1' >/dev/null \
     || fail "the successor drain did not re-print the durable process-event row"
+  grep -F 'PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled delivery-src 1' "$replay_err" >/dev/null \
+    || fail "the drain did not print the exact handled command: $(cat "$replay_err")"
 
   pe_case "$dir" handled delivery-src 1 >/dev/null || fail "could not acknowledge the captured result"
   sequence=$(sed -n 's/^WAKE_ACK_REQUIRED:.*--ack-through \([0-9][0-9]*\) --recovery-generation [A-Za-z0-9._-][A-Za-z0-9._-]*$/\1/p' "$replay_err")
@@ -6073,7 +6075,9 @@ test_procevent_headlines_classify_queue_keys() {
     || fail "a stranded source did not surface under its own headline: $(cat "$out")"
   ! grep -F "result captured" "$out" >/dev/null \
     || fail "a stranded source was headlined as a captured result: $(cat "$out")"
-  FM_STATE_OVERRIDE="$state" "$DRAIN" >/dev/null 2>&1 || fail "stranded headline fixture drain failed"
+  FM_STATE_OVERRIDE="$state" "$DRAIN" >/dev/null 2> "$dir/drain.err" || fail "stranded headline fixture drain failed"
+  ! grep -F PROCEVENT_HANDLED_REQUIRED "$dir/drain.err" >/dev/null \
+    || fail "a stranded source with no captured result was given a handled command"
 
   dir=$(make_case procevent-headline-joined); state="$dir/state"; out="$dir/watch.out"
   append_wake "$state" check "procevent:cap2-src:1" "check: procevent lavish cap2-src 1"

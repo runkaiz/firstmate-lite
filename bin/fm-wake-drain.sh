@@ -9,6 +9,8 @@
 # Successful queued-wake presentations refresh the proactive preference on
 # stderr for MAIN and either branch host, keeping stdout records unchanged.
 #
+# Stderr names the exact `handled` command for each presented captured process-event result.
+#
 # Keep sequence-bound row consumption independent from generation-bound episode
 # retirement; docs/watcher-continuity.md owns the recovery contract.
 # Every scratch file this script mints (.main-eligible-rows.tmp.*,
@@ -1074,6 +1076,12 @@ case "$RECOVERY_MARKER_TOKEN" in
 esac
 fm_lock_release "$FM_WAKE_QUEUE_LOCK"
 DRAIN_LOCK_HELD=false
+# The ack below consumes rows, but only `handled` stops reconcile republishing a
+# captured result. Stranded and launch-failed procevent keys have no result.
+printf '%s\n' "$RAW_ROWS" | awk -F '\t' '$4 ~ /^procevent:[^:]+:[0-9]+$/ {
+  split($4, key, ":")
+  printf "PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled %s %s\n", key[2], key[3]
+}' >&2
 printf 'WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through %s --recovery-generation %s\n' \
   "$ACK_THROUGH" "${RECOVERY_MARKER_TOKEN##*:}" >&2
 
