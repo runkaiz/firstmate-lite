@@ -1,0 +1,64 @@
+$ bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.8ej2tmmg
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.8ej2tmmg
+before: marked lab created; backend is real tmux directed only at an unstarted private socket; no fleet panes exist
+$ bash -c . bin/fm-wake-lib.sh; fm_wake_append check "$1" "$2" _ ci-no-checks:DISPOSABLE1 check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+BASELINE REPRODUCED: a queued zero-check notice does not wake the healthy predecessor watcher
+$ bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.7ydv7x6q
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.7ydv7x6q
+after: marked lab created; backend is real tmux directed only at an unstarted private socket; no fleet panes exist
+$ bash -c . bin/fm-wake-lib.sh; fm_wake_append check "$1" "$2" _ ci-no-checks:DISPOSABLE1 check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+CURRENT: healthy watcher proactively emitted the zero-check headline for the queued key
+$ bin/fm-wake-drain.sh
+1793767444	1	check	ci-no-checks:DISPOSABLE1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 249185.1793767444.u9bBhk
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+notice-rearm-watch.log: watcher remained live with a fresh heartbeat and no repeated check wake for 4s
+$ bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 249185.1793767444.u9bBhk
+$ bash -c . bin/fm-wake-lib.sh; fm_wake_append check "$1" "$2" _ ci-no-checks:DISPOSABLE2 check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+NEW ROUND: a distinct no-check key wakes again; deduplication does not suppress future waits
+$ bin/fm-wake-drain.sh
+1793767449	2	check	ci-no-checks:DISPOSABLE2	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 251904.1793767449.72LqZk
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+$ bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 251904.1793767449.72LqZk
+$ bin/fm-procevent.sh register ci ci-disposable3 -- /usr/bin/cat /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.7ydv7x6q/process-output.txt
+registered: ci-disposable3 (ci)
+$ bin/fm-procevent.sh ensure-listening ci-disposable3
+RUNNER: real registered process output was captured durably and published
+$ bin/fm-procevent.sh classify /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.7ydv7x6q/state/procevent-inbox/ci-disposable3.1.result
+action
+$ bin/fm-wake-drain.sh
+1793767450	3	check	procevent:ci-disposable3:1	check: procevent ci ci-disposable3 1
+PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled ci-disposable3 1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 252945.1793767450.nycM0N
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 252945.1793767450.nycM0N
+$ bin/fm-procevent.sh reconcile
+reconciled: published=1 started=0 stopped=0 uncertain=0 failed=0
+ADVERSARIAL: acknowledging wake rows alone republishes the still-unhandled result
+$ bin/fm-wake-drain.sh
+1793767450	4	check	procevent:ci-disposable3:1	check: procevent ci ci-disposable3 1
+PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled ci-disposable3 1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 254177.1793767450.UPVy7L
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+$ bin/fm-procevent.sh handled ci-disposable3 1
+handled: ci-disposable3 1
+$ bin/fm-procevent.sh handled ci-disposable3 1
+already-handled: ci-disposable3 1
+$ bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 254177.1793767450.UPVy7L
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+handled-result-watch.log: watcher remained live with a fresh heartbeat and no repeated check wake for 4s
+HANDLED: repeated acknowledgement is idempotent; three reconciles and a healthy successor watcher do not reannounce
+$ bin/fm-brief.sh disposable example --mode no-mistakes
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M6JDKDP1VHG82772P0EWRXJC/.test-phase-tmp/fm-lab.7ydv7x6q/data/disposable/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+GENERATED INTERFACE: saved the real worker brief; this does not establish that a live worker writes the requested PR-bearing paused status
+after: disposable lab removed

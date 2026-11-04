@@ -1,0 +1,4 @@
+1793767444	1	check	ci-no-checks:DISPOSABLE1	check: no-mistakes CI wait has zero registered checks after 10 minutes - task=disposable pr=https://github.com/example/disposable/pull/123; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 249185.1793767444.u9bBhk
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.

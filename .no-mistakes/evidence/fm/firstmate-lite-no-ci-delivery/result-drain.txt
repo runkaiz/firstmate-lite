@@ -1,0 +1,5 @@
+1793767450	3	check	procevent:ci-disposable3:1	check: procevent ci ci-disposable3 1
+PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled ci-disposable3 1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 252945.1793767450.nycM0N
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.

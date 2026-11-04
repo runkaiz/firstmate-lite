@@ -1,0 +1,6 @@
+ci_wait: action
+task: disposable
+run_id: DISPOSABLE3
+pr: https://github.com/example/disposable/pull/123
+evidence:
+outcome: checks-passed
