@@ -1787,9 +1787,9 @@ away_entry_surface_queued() {
   wake 'check: away-entry-review'
 }
 
-# Deliver a durably queued process-event result to firstmate. Publication is
-# owned by bin/fm-procevent.sh - by the runner at capture time and by reconcile's
-# re-announcement - so this decides only whether a queued check record has been
+# Deliver queued process-event results and diagnostics to firstmate. Publication
+# belongs to bin/fm-procevent.sh's runner/reconcile and, for zero-check notices,
+# bin/fm-procevent-ci.sh, so this decides only whether a queued check record has been
 # surfaced yet, then reports it through the same actionable exit every other wake
 # uses. Without it a captured result sits on the queue until something else
 # happens to wake firstmate, which is exactly the missed delivery this repairs.

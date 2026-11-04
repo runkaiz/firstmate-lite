@@ -1552,8 +1552,8 @@ A long-polling external process is registered as a *source* through its adapter,
 ### CI-only worker waits
 
 No-mistakes workers can delegate a CI-only wait to the existing process-event runner regardless of proactive mode or `config/wait-no-turns`; no additional monitoring service or setting is needed.
-After a confirmed handoff, unchanged pending CI consumes no worker or routine supervision-review turns; a drive response requiring action or a monitoring error returns through firstmate to the original worker.
-After roughly 10 minutes of pending CI holds, a PR with zero registered checks prompts one notification with its link while the wait continues; zero checks never count as green.
+After a confirmed handoff, the worker records the PR link in its paused status, and unchanged pending CI consumes no worker or routine supervision-review turns; a drive response requiring action or a monitoring error returns through firstmate to the original worker.
+After roughly 10 minutes of pending CI holds, a PR with zero registered checks wakes firstmate through the existing watcher with its link while the wait continues; zero checks never count as green.
 Pipeline repairs restart that notification window, and an unreadable forge response is retried rather than treated as zero checks.
 [`bin/fm-procevent-ci.sh`](../bin/fm-procevent-ci.sh) owns eligibility, listener confirmation, run and head binding, and exclusive monitoring; [`validation-supervision`](../.agents/skills/validation-supervision/SKILL.md) owns handling the captured result.
 The [verification record](verification/runtime-backends.md#ci-only-worker-waits) states the tested scope and live-evidence limits.
