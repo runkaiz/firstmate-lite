@@ -14,8 +14,9 @@
 # holds with deferred=true, which never makes them actionable. Queued rows sort newest filed first, undated rows last.
 # Landings balance a per-home cap and an overall cap; --all-landed expands both.
 # Inventory and away-return warnings remain action-free gates, never workers.
-# Reports, paths, actions, endpoints and live PRs are opt-in; omitted discloses
-# unreadable inputs and bounds. No report files, locks, or queue mutations.
+# Relevant report pointers are included. Extra reports, paths, actions, endpoints,
+# and live PRs are opt-in. omitted discloses unreadable inputs and bounds.
+# No report files, locks, or queue mutations.
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

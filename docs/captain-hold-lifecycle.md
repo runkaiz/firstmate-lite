@@ -368,7 +368,7 @@ The [captain-hold lifecycle policy](../.agents/skills/captain-hold-lifecycle/SKI
 [`bin/fm-landed-lib.sh`](../bin/fm-landed-lib.sh) owns Recently Landed's shared selection and artifact-display compatibility rules.
 The native queue records `local main` as a row artifact; the snapshot also accepts the final body-line form written by the legacy backend.
 A body that carries a captain resolution record is the captain's own prose and is never mined for that note, so a decision worded `local main` does not become a delivery artifact.
-Delivery selection uses the canonical snapshot's structured fields, including the machine-written hold-set timestamp.
+Delivery selection uses the canonical snapshot's structured artifact and hold metadata.
 
 ### Merge-to-cleanup window
 
@@ -452,7 +452,7 @@ The suite does not test the accepted merge-to-cleanup re-hold window or asynchro
 
 ### Cleanup of a captain-held row
 
-- Cleanup of a finished task whose own row is the captain call leaves that call open, queued, held, carrying its deliverable, and visible in Bearings' Captain's Call.
+- Cleanup of a finished task whose own row is the captain call leaves that call open, queued, held, carrying its deliverable, and visible through [Ahoy's hold presentation](#ahoy-placement).
   That cleanup leaves no pending record behind.
   The call survives a `--force` cleanup and closes only when `answer` records the captain's words.
   An ordinary finished task in the same home still closes with its report link.

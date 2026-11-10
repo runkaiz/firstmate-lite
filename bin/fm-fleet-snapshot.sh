@@ -44,9 +44,8 @@
 #     hold_age_days is the hold's age when computable, else null.
 #     Aging is a projection safety net only: the durable deferral remains
 #     re-holding with --until or --when.
-#     Renderers keep every non-live bucket out of the default Captain's Call;
-#     bin/fm-bearings-snapshot.sh owns Ahoy presentation and reveal behavior in the
-#     bounded snapshot.
+#     bin/fm-bearings-snapshot.sh owns the bounded Ahoy projection and reveal
+#     behavior. .agents/skills/ahoy/SKILL.md owns its chat presentation.
 #   tasks[]: one row per task metadata record captured at snapshot start, sorted
 #     by id. A record removed before capture is omitted. If a captured task's
 #     generation changes while observations run, its selected metadata remains
@@ -74,8 +73,8 @@
 #     main-home current-inventory checks shared with secondmate_home_summary_json
 #     (orphan structured in-flight ids with no state/<id>.meta, and unstructured
 #     current backlog rows). Does not invent live tasks; meta remains truth for
-#     workers. Bearings maps failures into omitted[] disclosure (and a Charted
-#     Next gate line) rather than silent empty Underway.
+#     workers. The Ahoy projection maps failures into omitted[] disclosure
+#     and an action-free inventory warning gate.
 #   secondmate_current: {records[],total,shown,truncated} - bounded current summaries
 #     for registered secondmates, selected from validated structured state inside
 #     each home with explicit provenance, freshness, endpoint evidence, and unknown
