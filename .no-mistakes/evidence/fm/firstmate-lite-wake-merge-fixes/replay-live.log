@@ -1,0 +1,102 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home
+[exit 0]
+$ bin/fm-procevent-when.sh arm branch --interval 0.1 --stable 1 --condition /usr/bin/test -d /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home --action /usr/bin/printf %s branch completed
+armed: when-branch
+starts on the watcher's next cycle; or run: bin/fm-procevent.sh reconcile
+reminder: deterministic, safe, reversible actions only; judgment and destructive actions stay on the wake-and-decide path
+[exit 0]
+Runner branch:
+not-autohandled: when-branch (left for the handler; still unacknowledged)
+retired: when-branch (adapter classified the captured result terminal)
+captured: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home/state/procevent-inbox/when-branch.1.result
+
+$ bin/fm-procevent-when.sh arm main --interval 0.1 --stable 1 --condition /usr/bin/test -d /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home --action /usr/bin/printf %s main completed
+armed: when-main
+starts on the watcher's next cycle; or run: bin/fm-procevent.sh reconcile
+reminder: deterministic, safe, reversible actions only; judgment and destructive actions stay on the wake-and-decide path
+[exit 0]
+Runner main:
+not-autohandled: when-main (left for the handler; still unacknowledged)
+retired: when-main (adapter classified the captured result terminal)
+captured: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-replay-guua1gjx/home/state/procevent-inbox/when-main.1.result
+
+Original captures:
+1794341521	1	check	procevent:when-branch:1	check: procevent when when-branch 1
+1794341521	2	check	procevent:when-main:1	check: procevent when when-main 1
+1794341521	3	check	procevent:when-branch:1	check: procevent when when-branch 1
+
+when-branch.1.result
+when: when-branch
+status: fired
+detail: the condition held and the action exited 0
+condition_polls: 1
+action_exit: 0
+output:
+branch completed
+when-main.1.result
+when: when-main
+status: fired
+detail: the condition held and the action exited 0
+condition_polls: 1
+action_exit: 0
+output:
+main completed
+$ bin/fm-wake-drain.sh
+1794341521	3	check	procevent:when-branch:1	check: procevent when when-branch 1
+1794341521	2	check	procevent:when-main:1	check: procevent when when-main 1
+PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled when-branch 1
+PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled when-main 1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 3341234.1794341521.ldo7tj
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 3341234.1794341521.ldo7tj
+[exit 0]
+$ bin/fm-procevent.sh reconcile
+reconciled: published=2 started=0 stopped=0 uncertain=0 failed=0
+[exit 0]
+Replays published BEFORE handling:
+1794341521	4	check	procevent:when-branch:1	check: procevent when when-branch 1
+1794341521	5	check	procevent:when-main:1	check: procevent when when-main 1
+
+$ bin/fm-procevent.sh handled when-branch 1
+handled: when-branch 1
+[exit 0]
+$ bin/fm-procevent.sh handled when-main 1
+handled: when-main 1
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append check "$2" "$3" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T lab-unrelated check: unrelated lab event remains actionable
+[exit 0]
+$ bin/fm-wake-grant.sh activate 3341057 live-replay
+[exit 0]
+$ bin/fm-wake-grant.sh publish live-replay 4 6
+[exit 0]
+$ bin/fm-wake-drain.sh
+1794341522	6	check	lab-unrelated	check: unrelated lab event remains actionable
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 6 --recovery-generation 3343883.1794341521.1tx6VK
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+Queue after branch drain:
+1794341521	5	check	procevent:when-main:1	check: procevent when when-main 1
+1794341522	6	check	lab-unrelated	check: unrelated lab event remains actionable
+
+$ bin/fm-wake-grant.sh deactivate 3341057 live-replay
+[exit 0]
+$ bin/fm-wake-drain.sh
+1794341522	6	check	lab-unrelated	check: unrelated lab event remains actionable
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 6 --recovery-generation 3343883.1794341521.1tx6VK
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+$ bin/fm-procevent.sh handled when-main 1
+already-handled: when-main 1
+[exit 0]
+$ bin/fm-procevent.sh sweep-home
+swept: attempted=0
+[exit 0]
+$ bin/fm-watch-arm.sh --stop
+watcher: none running
+[exit 0]
+Disposable home, project, copies and process claims removed.

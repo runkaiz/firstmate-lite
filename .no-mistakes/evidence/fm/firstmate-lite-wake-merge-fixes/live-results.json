@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Silent empty re-arm, later action, and queued-during-gap recovery",
+    "result": "pass",
+    "live": true,
+    "evidence": "monitoring-live.log",
+    "reason": ""
+  },
+  {
+    "name": "Retain an unlanded branch, reject dirty landing, then fast-forward after cleanup",
+    "result": "pass",
+    "live": true,
+    "evidence": "retained-landing-live.log",
+    "reason": ""
+  },
+  {
+    "name": "Handled replays disappear for main and branch while branch preserves ungranted rows",
+    "result": "pass",
+    "live": true,
+    "evidence": "replay-live.log",
+    "reason": ""
+  }
+]

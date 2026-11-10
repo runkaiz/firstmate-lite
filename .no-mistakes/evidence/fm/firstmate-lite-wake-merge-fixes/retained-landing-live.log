@@ -1,0 +1,75 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.fl.sock -f /dev/null new-session -d -s lab -n main -x 120 -y 40 bash --noprofile --norc
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project commit -qm base --allow-empty
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project rev-parse HEAD
+8e2aac56bbf46a326a06ec33d05d6cd9054d9bcf
+[exit 0]
+$ bash -c . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" retained "$FM_HOME" "$2" "$3" "$4" refs/heads/main && printf "%s\n" "$FM_GIT_WORKTREE_PATH" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies 8e2aac56bbf46a326a06ec33d05d6cd9054d9bcf
+Preparing worktree (detached HEAD 8e2aac5)
+HEAD is now at 8e2aac5 base
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree switch -qc fm/retained
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree add delivered.txt
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree commit -qm delivery
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree rev-parse HEAD
+02e990d476c1a2e644c5e282153c2f724f43d5e4
+[exit 0]
+$ bin/fm-teardown.sh retained
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: task delivery is not proven landed; preserving copy
+[exit 1]
+$ bin/fm-teardown.sh retained --retain-branch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown retained complete (window lab:fm-retained, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/copies/retained/worktree)
+Backlog: retained just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home/data/backlog.md - move retained to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+Retained landing record:
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project
+mode=local-only
+branch=fm/retained
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project rev-parse refs/firstmate/retained-work/retained
+02e990d476c1a2e644c5e282153c2f724f43d5e4
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project rev-parse main
+8e2aac56bbf46a326a06ec33d05d6cd9054d9bcf
+[exit 0]
+$ bin/fm-merge-local.sh retained
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project has a dirty working tree; refusing to merge into it
+[exit 1]
+$ bin/fm-merge-local.sh retained
+merged fm/retained into local main (8e2aac5 -> 02e990d) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/project rev-parse main
+02e990d476c1a2e644c5e282153c2f724f43d5e4
+[exit 0]
+$ bin/fm-merge-local.sh retained
+error: no meta for task retained at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-retained-landing-4a8tiy4b/home/state/retained.meta
+[exit 1]
+$ bin/fm-procevent.sh sweep-home
+swept: attempted=0
+[exit 0]
+$ bin/fm-watch-arm.sh --stop
+watcher: none running
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.fl.sock kill-server
+[exit 0]
+Disposable home, project, copies and process claims removed.

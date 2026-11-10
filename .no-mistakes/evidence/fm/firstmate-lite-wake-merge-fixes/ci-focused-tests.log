@@ -1,0 +1,86 @@
+PASS: four unchanged pending holds consumed in one shell before action
+PASS: controlled clock advances without real CI wait
+PASS: zero worker/supervisor model dispatches during pending holds
+PASS: only pipeline drive supplies green evidence
+PASS: forge verification only at actionable green return
+PASS: approval finding preserved verbatim
+PASS: failure retained rather than hidden by wait
+PASS: error stops safely
+PASS: near-elapsed stops safely
+PASS: new forge head cannot inherit stale green
+PASS: skipped CI remains explicit, never clean green
+PASS: pipeline rebase/revalidation waits without worker observation turns
+PASS: revalidation gate returns to original driver
+PASS: other-run stops safely
+PASS: other-branch stops safely
+PASS: broken stops safely
+PASS: missing required checks remain visible through pipeline gate
+PASS: pipeline head changes cannot inherit a prior forge head green
+PASS: matching new status and forge heads cannot launder an older drive green
+PASS: zero checks stay quiet before the bound
+PASS: no forge read before the bound
+PASS: zero checks surface at ten minutes of holds
+PASS: bound is at least ten minutes on the hold clock
+PASS: wake carries the PR URL
+PASS: wake says zero checks are not green
+PASS: zero checks are read once then the wait keeps holding
+PASS: wait kept driving to the real pipeline outcome
+PASS: surfacing never reads a merge or writes to the PR
+PASS: registered checks never surface
+PASS: registered checks keep zero-check detection active
+PASS: checks disappearing after a positive read surface once
+PASS: late-revalidate allows one zero-check wake per CI round
+PASS: late-revalidate gives each CI round its own notice key
+PASS: late-revalidate keeps driving to the real pipeline outcome
+PASS: late-revalidate allows one zero-check wake per CI round
+PASS: late-revalidate gives each CI round its own notice key
+PASS: late-revalidate keeps driving to the real pipeline outcome
+PASS: late-head-change allows one zero-check wake per CI round
+PASS: late-head-change gives each CI round its own notice key
+PASS: late-head-change keeps driving to the real pipeline outcome
+PASS: late-head-change allows one zero-check wake per CI round
+PASS: late-head-change gives each CI round its own notice key
+PASS: late-head-change keeps driving to the real pipeline outcome
+PASS: a new head waits the full zero-check bound
+PASS: a new head does not query checks before its bound
+PASS: unreadable forge does not count as zero checks
+PASS: unreadable forge retries on later holds
+PASS: pipeline repair restarts the zero-check bound
+PASS: no forge read before the restarted bound
+PASS: durable registration owns wait before listener recovery
+PASS: recovered pending listener emits zero supervisor dispatch events
+PASS: listener recovery dispatches no models
+PASS: action captured durably and queued
+PASS: one actionable transition produces one queued wake
+PASS: capture classified by owning adapter
+PASS: handled action not reannounced after reconcile/restart
+PASS: terminal wait retires so it cannot wake completed worker again
+PASS: entire exercised monitor path dispatches zero models
+PASS: runner-hosted wait surfaces zero checks
+PASS: surfacing keeps the wait registered
+PASS: public arm refuses repair without registering a wait
+PASS: public arm refuses a duplicate PR monitor
+PASS: public arm confirms durable CI listener
+PASS: public arm prints the PR URL for the wait status
+PASS: repeated handoff cannot replace existing owner
+PASS: merge monitor refuses overlapping CI custody
+PASS: unconfirmed handoff retires its registration before driver resumes
+PASS: failed confirmation explicitly returns drive ownership
+PASS: real watcher completes repeated pending cycles
+PASS: unchanged CI produces zero pane-review/heartbeat dispatch events
+PASS: CI-owned task is never pane-captured for stale review
+PASS: without CI ownership same idle worker becomes actionable
+PASS: successor watcher emits the zero-check wake
+PASS: the drain following the wake presents the PR URL
+PASS: a notice with no captured result names no handled command
+PASS: a later successor keeps polling on the already-surfaced key
+PASS: a surfaced key is not delivered twice
+PASS: a restarted listener in a later CI round delivers a fresh zero-check notice
+PASS: the later round does not redeliver the first round
+PASS: generated handoff command is present in either wait configuration
+PASS: generated wait status carries the PR URL
+PASS: generated worker command confirms actual listener in either posture
+PASS: generated handoff command is present in either wait configuration
+PASS: generated wait status carries the PR URL
+PASS: generated worker command confirms actual listener in either posture
+CI wait tests passed

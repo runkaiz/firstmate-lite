@@ -1,0 +1,47 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-monitoring-2rk3vx7a/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T/.test-phase-tmp/fm-lab-monitoring-2rk3vx7a/home
+[exit 0]
+$ bin/fm-watch-arm.sh --stop
+watcher: stopped pid=3304470
+[exit 0]
+Initial stop:
+watcher: started pid=3304470 (beacon fresh)
+watcher: FAILED - watcher cycle exited 143 without an actionable reason
+
+Empty restart stays armed with no queued wake; marker=acked:downtime:3304470.1794341473.R26N5S
+
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append check "$2" "$3" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T lab-action check: an actionable lab event arrived
+[exit 0]
+Action after silent restart:
+watcher: started pid=3305002 (beacon fresh)
+check: rearm-resurface
+
+Durable queue:
+1794341475	1	check	lab-action	check: an actionable lab event arrived
+
+$ bin/fm-wake-drain.sh
+1794341475	1	check	lab-action	check: an actionable lab event arrived
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3306452.1794341475.3tptJN
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+$ bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3306452.1794341475.3tptJN
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append check "$2" "$3" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GCD8YSB63KQGNTDA6EY1T lab-gap-action check: actionable event queued during downtime
+[exit 0]
+Restart with queued work:
+check: rearm-resurface
+
+$ bin/fm-wake-drain.sh
+1794341476	2	check	lab-gap-action	check: actionable event queued during downtime
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3307338.1794341476.on0o4j
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+$ bin/fm-procevent.sh sweep-home
+swept: attempted=0
+[exit 0]
+$ bin/fm-watch-arm.sh --stop
+watcher: none running
+[exit 0]
+Disposable home, project, copies and process claims removed.
