@@ -728,13 +728,12 @@ if [ "$READ_ONLY" -eq 0 ]; then
   [ "$REEMIT" -eq 0 ] || NETWORK_STAGE_LOCKED=0
   "$SCRIPT_DIR/fm-startup-network.sh" start \
     --locked "$NETWORK_STAGE_LOCKED" --harvest-pid $$ >/dev/null 2>&1 || true
-  subsection "LOCAL USAGE"
+  # Refresh the local usage ledger as a side effect; its status is a reporting
+  # surface (/ahoy, docs/usage-ledger.md) with nothing for startup to act on.
   if [ "$REEMIT" -eq 0 ]; then
     FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
-      "$SCRIPT_DIR/fm-usage-refresh.sh" --force || true
+      "$SCRIPT_DIR/fm-usage-refresh.sh" --force >/dev/null 2>&1 || true
   fi
-  FM_HOME="$FM_HOME" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
-    python3 "$SCRIPT_DIR/fm-usage-auto.py" status 2>/dev/null || true
 fi
 
 # --- 2. bootstrap --------------------------------------------------------
@@ -860,26 +859,14 @@ fi
 stage read-once
 section "READ-ONCE CONTRACT"
 cat <<'EOF'
-Everything below is printed in full for this session start: every state/*.meta,
-a compact data/backlog.md listing, a bounded tail of every state/*.status,
-data/projects.md, data/secondmates.md, data/captain.md, data/captain-shared.md,
-and data/learnings.md.
-Do NOT re-read any of them after reading this digest, and do NOT bulk-read
-data/backlog.md or state/*.status: re-reading everything defeats the entire
-point of this command.
-
-Go to a source directly only when:
-  - this digest flagged it ABSENT (then rebuild or create it per AGENTS.md),
-  - its contents looked unparseable or corrupt,
-  - an individual full status log is needed for older wake-event history, or a
-    status line was capped and its tail matters (each task's full log path is
-    printed with its tail),
-  - a full task body is needed (bin/fm-tasks-axi.sh show <id> --full, or data/backlog.md),
-  - the backlog listing disclosed omitted queued items and this turn needs them,
-  - the NETWORK CHECKS section reported its checks still IN PROGRESS and this
-    turn needs their verdict (bin/fm-startup-network.sh report),
-  - or a STARTUP TRUNCATED banner named the stage that would have printed it, in
-    which case that stage's sources were never emitted and must be reconciled.
+Printed below: every state/*.meta, a compact backlog listing,
+a bounded tail of every state/*.status, and the projects, captain,
+shared-captain, and learnings files. Do NOT re-read any of them after reading this digest. Go to a source
+only when it is ABSENT or corrupt, an older or capped status line matters (full
+log paths are printed), a full task body is needed (bin/fm-tasks-axi.sh show
+<id> --full), omitted queued items are needed, an IN PROGRESS network verdict
+is needed (bin/fm-startup-network.sh report), or a
+STARTUP TRUNCATED banner named the stage that would have printed it.
 EOF
 
 # --- 6. fleet-state digest ---------------------------------------------
@@ -983,10 +970,8 @@ fi
 stage network-checks
 section "NETWORK CHECKS"
 if [ "$READ_ONLY" -eq 1 ]; then
-  printf 'skipped (read-only session) - GitHub authentication, project clone refresh,\n'
-  printf 'secondmate liveness and convergence, and pending handoff delivery were not run.\n'
-  printf 'They need the fleet lock, and this session must not spawn, steer, or merge, so it\n'
-  printf 'has no action they would gate. The session holding the lock runs them.\n'
+  printf 'skipped (read-only session) - GitHub authentication and project clone refresh\n'
+  printf 'need the fleet lock; the session holding it runs them.\n'
 else
   "$SCRIPT_DIR/fm-startup-network.sh" harvest --pid $$ 2>&1 || true
 fi
@@ -1009,35 +994,26 @@ section "NEXT STEP"
 if [ "$READ_ONLY" -eq 1 ]; then
   cat <<'EOF'
 This session did not acquire the fleet lock. Stay read-only: do not arm,
-drain, spawn, steer, merge, or repair fleet state from here. Only a session
-with verified fleet-lock ownership may perform mutable follow-up.
-
+drain, spawn, steer, merge, or repair fleet state from here.
 EOF
 elif [ "$AFK_PRESENT" -eq 1 ] && [ "$AFK_MODE" = quiet ]; then
   cat <<'EOF'
 Quiet mode is active. Follow the supervision operating instructions block
-above: load /quiet and ensure the daemon is running, because the daemon owns
-watcher supervision. Ordinary captain chat does not exit it; only an
-explicit /quiet off does.
-
+above: load /quiet and ensure the daemon is running; only an explicit
+/quiet off exits it.
 EOF
 elif [ "$AFK_PRESENT" -eq 1 ]; then
   cat <<'EOF'
 Away mode is active. Follow the supervision operating instructions block above:
-load /afk and ensure the daemon is running, because the daemon owns watcher
-supervision.
-
+load /afk and ensure the daemon is running.
 EOF
 else
 cat <<EOF
-Follow the supervision operating instructions block above for harness '$PRIMARY_HARNESS'.
-This script never starts supervision itself.
-
+Follow the supervision operating instructions block above for harness '$PRIMARY_HARNESS'; this script never starts supervision itself.
 EOF
 fi
 cat <<'EOF'
-The digest above is complete for this session start. The READ-ONCE CONTRACT
-section near the top of it governs what may still be read from disk.
+The digest above is complete for this session start. The READ-ONCE CONTRACT above governs further reads.
 EOF
 
 if [ "$READ_ONLY" -eq 0 ] && [ "$REEMIT" -eq 0 ]; then

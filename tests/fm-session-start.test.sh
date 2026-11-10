@@ -2287,7 +2287,6 @@ EOF
 
   [ "$(cat "$home/data/usage-ledger/status.json")" = "$usage_before" ] \
     || fail '--reemit forced another usage refresh'
-  assert_contains "$reemit" "LOCAL USAGE" 'usage status lacked its own subsection'
   assert_contains "$reemit" "SESSION START (CONTEXT RE-EMIT) - $home" "--reemit did not label itself"
   assert_not_contains "$reemit" "SECONDMATE_LIVENESS" "--reemit repeated a mutating sweep startup already ran"
   assert_contains "$reemit" "done: queued after the re-emit too" "--reemit did not drain the wake queue"
