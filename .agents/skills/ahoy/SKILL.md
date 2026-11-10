@@ -39,8 +39,12 @@ The command saves only one compact checkpoint, never a report archive.
 
 Aim for a ten-second glance, one line per item, with complete task titles and full artifact URLs.
 Omit empty section headings and all empty-state filler, including unheaded "Nothing needs you right now" after completion.
-If none of the four sections has qualifying items, return only the comparison signal and "Captain, all quiet in the local records."
-Replace that all-clear line with a short uncertainty disclosure when required state is unreadable.
+If none of the four sections has qualifying items, stop before the section list below and return only the comparison signal followed by one sentence:
+
+- With complete readable coverage: "Captain, all quiet in the local records."
+- With incomplete or unreadable coverage: "Captain, this update may be incomplete: [unreadable source or coverage gap]."
+
+End the reply there, without an inventory or an offer to investigate.
 Never enumerate empty shipped, moving, next, or needs-you inventories in prose.
 Use these sections in order only when they have qualifying items:
 
@@ -64,7 +68,7 @@ A recorded PR URL alone does not prove merge readiness.
 Put publication or CI uncertainty on the affected work row or in a short unheaded note; it alone creates no captain action.
 Completed scout reports, active validation, and declared external waits never become captain calls merely because they exist.
 If required state is unreadable, say so briefly instead of claiming all clear; leave detailed omissions behind `detail`.
-Include the required captain address naturally once.
+Include the required captain address naturally in the comparison or an existing work or uncertainty line, never an extra empty-state sentence.
 Keep detailed plans, options, evidence, usage accounting, and operational ids out of the glance unless essential to the requested decision.
 
 ## Authority
