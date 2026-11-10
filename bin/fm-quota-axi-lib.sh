@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-# Shared quota-axi compatibility floor for the bootstrap diagnostic, the
-# --json snapshot validator, and the provider-row join dispatch consumers use.
+# Shared quota-axi compatibility floor, JSON snapshot validator, provider-row
+# join, and optional Codex fast-mode budget check.
 # Usage: . bin/fm-quota-axi-lib.sh
 #
 # FM_QUOTA_AXI_MIN follows the axi-family floor policy owned beside the floor
@@ -213,4 +213,44 @@ fm_quota_provider_for_harness() {
     muse)         printf 'meta\n' ;;
     *)            return 1 ;;
   esac
+}
+
+# fm_quota_codex_fast_eligible <model>
+# Read a full quota-axi JSON snapshot on stdin. Fast consumes 2.5x Codex
+# subscription allowance: every applicable scope must have established runway
+# through reset, and every bounding window must cover 2.5 * burnMultiple *
+# timeRemainingPercent with its percentRemaining. Missing, stale, ambiguous,
+# expired, or unmeasurable evidence refuses fast mode, without blocking spawn.
+# Uses the shared schema/account join; never selects or ranks a profile.
+fm_quota_codex_fast_eligible() {
+  local snapshot
+  snapshot=$(cat) || return 1
+  printf '%s\n' "$snapshot" | fm_quota_json_valid || return 1
+  printf '%s\n' "$snapshot" | jq -e --arg model "${1:-}" "$FM_QUOTA_ROW_JQ"'
+    quota_row(.; "codex"; "codex-home") as $p |
+    ($model | sub("^model:"; "")) as $m |
+    [$p.quotaSemantics.effectiveAvailability[]? |
+      select(.scope == "all_models" or .scope == "all_products" or
+        ($m != "" and $m != "default" and
+          (.scope == ("model:" + $m) or .scope == ("product:" + $m))))] as $scopes |
+    $p.state.status == "fresh" and $p.state.stale == false and
+    ($scopes | length) > 0 and
+    all($scopes[];
+      .status == "known" and .effectivePercentRemaining > 0 and
+      .runway.status == "through_reset" and
+      .runway.projectionConfidence == "established" and
+      (.boundedBy | type) == "array" and (.boundedBy | length) > 0 and
+      all(.boundedBy[];
+        . as $id | [$p.windows[]? | select(.id == $id)] as $windows |
+        ($windows | length) == 1 and
+        all($windows[];
+          (.percentRemaining | type) == "number" and
+          .percentRemaining > 0 and .percentRemaining <= 100 and
+          .pace.projectionConfidence == "established" and
+          (.pace.burnMultiple | type) == "number" and .pace.burnMultiple >= 0 and
+          (.pace.timeRemainingPercent | type) == "number" and
+          .pace.timeRemainingPercent > 0 and .pace.timeRemainingPercent <= 100 and
+          ((.resetsAt | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) > now) and
+          .percentRemaining >= (2.5 * .pace.burnMultiple * .pace.timeRemainingPercent))))
+  ' >/dev/null 2>&1
 }

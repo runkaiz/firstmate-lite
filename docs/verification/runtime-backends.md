@@ -8,6 +8,22 @@ This record contains reusable version-scoped evidence for active runtime guarant
 The backend guides own current setup, safety boundaries, and limitations.
 Exact task chronology, branch names, temporary homes, local paths, process ids, thread ids, and delivery transcripts remain in private reports or PR evidence.
 
+## Codex worker fast-mode controls
+
+Verified on 2026-11-10 with codex-cli 0.165.0 on Linux, using the installed CLI without submitting a model request.
+Refresh with `bash bin/fm-test-run.sh tests/fm-codex-hook-layer-live-e2e.test.sh`.
+The guard captures the generated worker launch with measured-quota fixtures, then replays its flags through the real `codex features list` consumer:
+
+```text
+codex-cli 0.165.0 accepts captured fast launch controls with fast_mode enabled
+```
+
+This verifies CLI acceptance and feature activation, not provider access, effective response tier, or billing.
+[OpenAI's speed reference](https://learn.chatgpt.com/docs/agent-configuration/speed) documents the fast service configuration and subscription usage multiplier.
+The portable quota, spawn, and relaunch regressions are `tests/fm-quota-choose.test.sh`, `tests/fm-spawn-dispatch-profile.test.sh --fast-mode`, and `tests/fm-control-relaunch.test.sh --fast-mode`.
+The service decision precedes the shared launch delivery used by tmux and Herdr; no backend lifecycle changes or live Herdr operations were needed.
+Claude, OpenCode, Pi, Pi-signed, Grok, Kimi, Cursor, OMP, Gemini, Muse, Rovo, AGY, Devin, raw commands, and secondmates retain their existing launch service controls.
+
 ## CI-only worker waits
 
 Verified on 2026-10-29 with Bash 5.3.9, Git 2.56.0 and deterministic no-mistakes/forge fixtures.

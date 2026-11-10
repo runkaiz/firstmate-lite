@@ -2457,6 +2457,47 @@ test_afk_relaunch_serializes_with_fresh_admission() {
   pass 'AFK: concurrent admission cannot pass a relaunch while its provider is still starting'
 }
 
+test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in() {
+  local dir out scenario expected
+  dir=$(new_case fast-service rl-fast)
+  add_ship_task "$dir" rl-fast codex
+  mkdir -p "$dir/home/config"
+  printf 'launch_service_control=codex-fast\n' >> "$dir/home/state/rl-fast.meta"
+  printf 'codex' > "$dir/fake/command"
+  printf 'codex' > "$dir/fake/becomes"
+  cat > "$dir/fakebin/codex" <<'SH'
+#!/usr/bin/env bash
+printf 'fast_mode stable true\n'
+SH
+  cat > "$dir/fakebin/quota-axi" <<'SH'
+#!/usr/bin/env bash
+cat "$FM_FAKE_DIR/quota.json"
+SH
+  chmod +x "$dir/fakebin/codex" "$dir/fakebin/quota-axi"
+  cat > "$dir/fake/quota.json" <<'JSON'
+{"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":50,"resetsAt":"2099-01-01T00:00:00Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":50,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}
+JSON
+  for scenario in off healthy tight; do
+    expected=codex-default
+    case "$scenario" in
+      healthy) touch "$dir/home/config/worker-fast-mode"; expected=codex-fast ;;
+      tight) printf '{}\n' > "$dir/fake/quota.json" ;;
+    esac
+    out=$(run_control "$dir" rl-fast relaunch --note 'recheck service for replacement')
+    expect_code 0 "$?" "fast $scenario relaunch failed: $out"
+    [ "$(meta_field "$dir" rl-fast launch_service_control)" = "$expected" ] || fail "relaunch retained stale service for $scenario"
+    assert_contains "$out" "service_control=$expected" "relaunch profile must report $expected"
+  done
+  pass 'relaunch recomputes service when opt-in or quota changes, preserving task identity'
+}
+
+if [ "${1:-}" = --fast-mode ]; then
+  test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in
+  exit 0
+fi
+
+test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in
+
 test_afk_verified_gone_herdr_worker_releases_capacity
 test_afk_relaunch_reacquires_a_released_slot
 test_afk_relaunch_serializes_with_fresh_admission

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Live guard for the codex crewmate launch's hook posture.
+# Live guard for Codex crewmate hook and optional fast-mode controls.
 #
 # The verdict here comes from the installed codex, not from a stub: a stub can
 # only confirm the assumption already written into it, and what this guard
@@ -43,6 +43,16 @@ capture_codex_launch() {
   fakebin=$(fm_test_make_spawn_fakebin "$case_dir/fake")
   fm_test_spawn_home "$home" codex
   fm_test_spawn_brief "$home" "$id"
+  if [ "$name" = fast ]; then
+    touch "$home/config/worker-fast-mode"
+    cat > "$fakebin/quota-axi" <<'SH'
+#!/usr/bin/env bash
+cat <<'JSON'
+{"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":50,"resetsAt":"2099-01-01T00:00:00Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":50,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}
+JSON
+SH
+    chmod +x "$fakebin/quota-axi"
+  fi
   fm_git_worktree "$proj" "$wt" "wt-$name"
   : > "$launchlog"
   FM_FAKE_LAUNCH_LOG="$launchlog" \
@@ -91,7 +101,20 @@ test_installed_codex_still_reports_the_hook_feature() {
   printf 'ok - codex %s still publishes the hook feature flag firstmate disables\n' "$CODEX_VERSION"
 }
 
+test_installed_codex_accepts_fast_launch_controls() {
+  local launch flags state
+  launch=$(capture_codex_launch fast --mode no-mistakes --yolo off)
+  assert_contains "$launch" 'service_tier="fast"' "codex $CODEX_VERSION: healthy quota opt-in failed to request fast tier"
+  flags=$(codex_global_flags "$launch")
+  state=$(eval "codex $flags features list" 2>&1) ||
+    fail "codex $CODEX_VERSION rejected fast launch controls: $state"
+  printf '%s\n' "$state" | awk '$1 == "fast_mode" && $NF == "true" { found=1 } END { exit !found }' ||
+    fail "codex $CODEX_VERSION: fast feature was not enabled by the captured launch"
+  printf 'ok - codex %s accepts captured fast launch controls with fast_mode enabled\n' "$CODEX_VERSION"
+}
+
 test_installed_codex_still_reports_the_hook_feature
 test_installed_codex_disables_hooks_for_the_captured_crewmate_launch
+test_installed_codex_accepts_fast_launch_controls
 
 echo "# all fm-codex-hook-layer-live-e2e tests passed"

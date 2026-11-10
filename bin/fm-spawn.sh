@@ -374,8 +374,14 @@
 #     not runtime success; effective_profile=unverified states that boundary.
 #     stderr launch-profile reports all three axes; omitted unsupported effort
 #     warns explicitly instead of implying the requested effort took effect.
-#     Canonical Codex workers pass service_tier="default"; Claude workers set
-#     CLAUDE_CODE_DISABLE_FAST_MODE=1. Raw launch commands retain unverified
+#     Canonical Codex workers pass service_tier="default" unless the optional
+#     config/worker-fast-mode presence flag and fm_quota_codex_fast_eligible
+#     permit fast at spawn/relaunch. The installed CLI must accept fast_mode
+#     and service_tier="fast" in a bounded, token-free features-list probe.
+#     Only ships/scouts opt in; secondmates and raw commands do not.
+#     Claude keeps CLAUDE_CODE_DISABLE_FAST_MODE=1 because its fast mode spends
+#     separate paid credits, not the measured subscription allowance.
+#     Raw launch commands retain unverified
 #     controls. These controls never prove account access, provider billing,
 #     service response tier, or an in-session settings change.
 #     Pi's task extension reports generation-bound runtime model/thinking
@@ -393,6 +399,7 @@
 #                  the `browser` MCP server when config/browser-mcp exists and
 #                  verifies (supplies its own trailing space, empty otherwise)
 #     __CLAUDESETTINGS__ quoted state/<task-id>.claude-settings.json path
+#     __CODEXSERVICE__ quoted Codex service config and optional fast_mode feature
 #     __PIBIN__    quoted concrete Pi-family executable path resolved from PATH
 #     __PITUIMODE__ optional --tui-mode regular when that executable advertises it
 #     __PIAPPROVE__ optional --approve on a seeded Pi/pi-signed secondmate when
@@ -1838,7 +1845,7 @@ launch_template() {
   # secondmate launch deliberately keeps hooks on.
   codex)
 
-      printf '%s' 'codex __CODEXMCP____MODELFLAG____EFFORTFLAG__--dangerously-bypass-approvals-and-sandbox --disable hooks -c '\''service_tier="default"'\'' -c "notify=[\"bash\",\"-c\",\"touch __TURNEND__\"]" "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' 'codex __CODEXMCP____MODELFLAG____EFFORTFLAG__--dangerously-bypass-approvals-and-sandbox --disable hooks __CODEXSERVICE__ -c "notify=[\"bash\",\"-c\",\"touch __TURNEND__\"]" "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
 
     ;;
   opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT=__OPENCODECONFIG__ opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
@@ -4729,6 +4736,7 @@ EFFORTFLAG=$(effort_flag_for_harness "$HARNESS" "$EFFORT" "$MODEL") || exit 1
 MODEL_CONTROL=default
 EFFORT_CONTROL=default
 SERVICE_CONTROL=unverified
+CODEX_SERVICE_FLAG='-c '\''service_tier="default"'\'''
 [ -z "$MODELFLAG" ] || MODEL_CONTROL=flag
 if [ -n "$EFFORT" ] && [ "$EFFORT" != default ]; then
   EFFORT_CONTROL=flag
@@ -4738,7 +4746,23 @@ if [ "$RAW_LAUNCH" = 1 ]; then
   MODEL_CONTROL=unverified; EFFORT_CONTROL=unverified
 else
   case "$HARNESS" in
-    codex) SERVICE_CONTROL=codex-default ;;
+    codex)
+      SERVICE_CONTROL=codex-default
+      if [ -e "$CONFIG/worker-fast-mode" ] && { [ "$KIND" = ship ] || [ "$KIND" = scout ]; }; then
+        # Full JSON supplies the bounding windows pace fields for higher burn;
+        # this decision never selects or ranks a dispatch profile.
+        # shellcheck source=bin/fm-quota-axi-lib.sh
+        . "$SCRIPT_DIR/fm-quota-axi-lib.sh"
+        fast_quota=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || fast_quota=
+        if printf '%s\n' "$fast_quota" | fm_quota_codex_fast_eligible "$MODEL"; then
+          fast_features=$(fm_run_timed 5 codex -c 'service_tier="fast"' --enable fast_mode features list 2>/dev/null </dev/null) || fast_features=
+          if printf '%s\n' "$fast_features" | awk '$1 == "fast_mode" && $NF == "true" { supported=1 } END { exit !supported }'; then
+            SERVICE_CONTROL=codex-fast
+            CODEX_SERVICE_FLAG='--enable fast_mode -c '\''service_tier="fast"'\'''
+          fi
+        fi
+      fi
+      ;;
     claude) SERVICE_CONTROL=claude-fast-disabled ;;
   esac
 fi
@@ -4920,6 +4944,7 @@ sq_opinput=$(shell_quote "$FM_ROOT/bin/fm-operational-input.sh")
 sq_worktree=$(shell_quote "$WT")
 LAUNCH=${LAUNCH//__MODELFLAG__/$MODELFLAG}
 LAUNCH=${LAUNCH//__EFFORTFLAG__/$EFFORTFLAG}
+LAUNCH=${LAUNCH//__CODEXSERVICE__/$CODEX_SERVICE_FLAG}
 # Relaunch session continuity. Computed here, where the adopted endpoint (T) is
 # known, and substituted only into the Pi-family template's `__PIRESUME__`
 # placeholder; an empty value leaves every other launch byte-identical.

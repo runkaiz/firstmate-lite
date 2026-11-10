@@ -766,4 +766,47 @@ out=$(bash -c 'set -e; . "$1/fm-quota-axi-lib.sh"; fm_quota_single_provider_for_
 [ "$out" = claude ] || fail "provider-table lookup under set -e printed: $out"
 ok "provider-table lookup prints the provider when called directly under set -e"
 
+# The optional service decision uses the same schema/account join as selection.
+# shellcheck source=bin/fm-quota-axi-lib.sh
+. "$BIN/fm-quota-axi-lib.sh"
+FAST_BASE='{"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":25,"resetsAt":"2099-01-01T00:00:00.000Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":25,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}'
+if ! printf '%s\n' "$FAST_BASE" | fm_quota_codex_fast_eligible gpt-6; then
+  fail "2.5x burn exactly reaching reset must qualify"
+fi
+ok "fast mode covers 2.5x projected burn through reset, including the boundary"
+while IFS='|' read -r label modifier; do
+  snapshot=$(printf '%s\n' "$FAST_BASE" | jq "$modifier") || fail "$label fixture failed"
+  if printf '%s\n' "$snapshot" | fm_quota_codex_fast_eligible gpt-6; then
+    fail "fast mode accepted $label"
+  fi
+  ok "fast mode refuses $label"
+done <<'CASES'
+higher burn|.providers[0].windows[0].pace.burnMultiple = 0.5001
+missing pace|del(.providers[0].windows[0].pace)
+unknown burn|.providers[0].windows[0].pace.burnMultiple = null
+unestablished projection|.providers[0].windows[0].pace.projectionConfidence = "insufficient_history"
+unknown runway|.providers[0].quotaSemantics.effectiveAvailability[0].runway.status = "unknown"
+projected exhaustion|.providers[0].quotaSemantics.effectiveAvailability[0].runway.status = "projected_exhaustion"
+no runway confidence|del(.providers[0].quotaSemantics.effectiveAvailability[0].runway.projectionConfidence)
+stale quota|.providers[0].state.stale = true
+failed provider|.providers[0].state.status = "error"
+missing bound|.providers[0].quotaSemantics.effectiveAvailability[0].boundedBy = ["missing"]
+empty bounds|.providers[0].quotaSemantics.effectiveAvailability[0].boundedBy = []
+expired window|.providers[0].windows[0].resetsAt = "2000-01-01T00:00:00Z"
+zero remaining|.providers[0].windows[0].percentRemaining = 0
+unknown reset|del(.providers[0].windows[0].resetsAt)
+malformed scope|.providers[0].quotaSemantics.effectiveAvailability[0].status = "unknown"
+wrong account|.schemaVersion = 6 | .providers[0].accountKey = "other-account"
+model-specific exhaustion|.providers[0].quotaSemantics.effectiveAvailability += [{"scope":"model:gpt-6","status":"known","effectivePercentRemaining":0,"runway":{"status":"exhausted_now"}}]
+second bounding window too tight|.providers[0].windows += [(.providers[0].windows[0] | .id = "session" | .percentRemaining = 24)] | .providers[0].quotaSemantics.effectiveAvailability[0].boundedBy += ["session"]
+CASES
+snapshot=$(printf '%s\n' "$FAST_BASE" | jq '.schemaVersion = 6 | .providers[0].accountKey = "codex-home" | .providers += [(.providers[0] | .accountKey = "other-account" | .state.stale = true)]')
+printf '%s\n' "$snapshot" | fm_quota_codex_fast_eligible gpt-6 || fail "matching Codex account must qualify"
+ok "fast mode uses the selected Codex account, ignoring unrelated accounts"
+snapshot=$(printf '%s\n' "$FAST_BASE" | jq '.providers[0].quotaSemantics.effectiveAvailability += [{"scope":"model:other","status":"known","effectivePercentRemaining":0,"runway":{"status":"exhausted_now"}}]')
+printf '%s\n' "$snapshot" | fm_quota_codex_fast_eligible gpt-6 || fail "unrelated model scope must not veto fast mode"
+ok "fast mode ignores unrelated model scopes"
+if printf 'malformed\n' | fm_quota_codex_fast_eligible gpt-6; then fail "malformed snapshot qualified"; fi
+ok "malformed snapshot keeps normal mode"
+
 printf '# all fm-quota-choose tests passed\n'
