@@ -13,9 +13,11 @@
 # Readiness is only a no-mistakes drive outcome, checked against the current
 # forge head. Missing required checks remain no-mistakes' responsibility.
 # After NO_CHECK_HOLDS pending holds (roughly 10 minutes) of a CI-only run whose
-# PR has zero registered checks, poll queues one `check` wake per CI round carrying the PR URL
+# PR has zero registered checks, poll queues a `check` wake carrying the PR URL
 # and keeps holding, so checks that register later still return here.
-# bin/fm-watch.sh delivers that wake once per queue key, so each round has its own key.
+# The notice key binds the run and validated head_sha, so bin/fm-watch.sh delivers
+# it once per run/head across listener restarts. A changed head resets the hold
+# bound even if the listener never observed the intervening repair.
 # It reports an absence only; zero checks are never green and it authorizes nothing.
 # Results are evidence for the original worker to reattach, never authority to
 # mark a run passed, merge, edit pipeline-owned code or answer an approval.

@@ -212,19 +212,19 @@ In its `--claude` mode it cooperates with the auto-arm.
 ## Recovery episode acknowledgement
 
 A recovery episode is one generation of the `state/.watcher-down` marker.
-It is retired only by the generation-bound acknowledgement the drain prints as `WAKE_ACK_REQUIRED`.
+Presented recovery work is retired by the generation-bound acknowledgement the drain prints as `WAKE_ACK_REQUIRED`; an empty pending downtime episode is retired silently by the arm check below.
 The away return brief treats a still-open handling episode as a wake in progress, not watcher downtime; an open downtime episode remains a gap.
 
 ### Announcement
 
 An unacknowledged downtime generation is announced at most once.
 A non-successor arm that finds a pending downtime generation with an empty queue acknowledges it without a wake, because status written during the gap still wakes through the ordinary signal scan.
-The first recovery marks that generation announced, and later empty-queue arms leave it announced until durable work or interrupted handling makes recovery pending again.
+When queued work requires recovery, the first recovery marks that generation announced, and later empty-queue arms leave it announced until durable work or interrupted handling makes recovery pending again.
 A non-successor watcher start checks the durable queue and recovery marker under their locks.
 If an announced-but-unacknowledged episode has an empty queue, the arm leaves that generation announced, making repeated empty-queue arms idempotent while a long-poll source is merely alive.
 If a durable row arrived after the announcement, the arm opens a fresh pending downtime generation so buried work still resurfaces once.
 A Codex foreground checkpoint skips the announced-episode reopen transition, so an already-announced generation stays announced while the checkpoint continues its bounded supervision.
-Its ordinary arm check still announces a never-announced generation, including one made pending by a durable queue append during the checkpoint.
+Its ordinary arm check still announces a never-announced generation with queued work, including one made pending by a durable queue append during the checkpoint.
 
 ### Generation reuse
 
@@ -236,7 +236,7 @@ A watcher close leaves an announced downtime episode announced, while a successf
 An announced handling episode becomes pending downtime on the same generation because its handling turn may have been interrupted.
 While unacknowledged rows remain, that handling republication gives a successor exactly one recovery presentation without orphaning the acknowledgement already printed for that generation.
 A watcher stopped so an arm can take its cycle over (`bin/fm-watch-arm.sh --take-over`) publishes downtime like any close, but the taking arm restores an acknowledged episode that stop reopened only when the taken-over arm's cycle-ledger row for that exact arm and watcher records the watcher ending by the take-over's TERM and no wake was appended in between.
-The taking arm waits within a short bound for that row; a missing row or any other signal leaves downtime for the fresh cycle's ordinary recovery wake, while take-over still proceeds.
+The taking arm waits within a short bound for that row; a missing row or any other signal leaves downtime for the fresh cycle's ordinary arm check, while take-over still proceeds.
 Any other episode is left for the next cycle's arm check.
 
 ### What an acknowledgement retires
@@ -251,7 +251,7 @@ It is a non-fatal result that names its own remedy: re-drain, then acknowledge t
 
 The acknowledgement retires the marker only when no rows remain after sequence-bound consumption.
 A concurrently appended wake has a higher sequence, remains queued, and keeps the episode pending for presentation.
-Consequently, a watcher close during handling republishes the same generation as pending and forces one recovery turn even when no queue row remains, while the outstanding generation-bound acknowledgement stays valid.
+Consequently, a watcher close during handling republishes the same generation as pending downtime, while the outstanding generation-bound acknowledgement stays valid.
 An acknowledged episode does not freeze the generation, because the next downtime after it opens an episode of its own.
 
 ## Per-actor acknowledgement

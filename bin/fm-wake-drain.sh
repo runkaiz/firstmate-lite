@@ -147,6 +147,7 @@ retire_unconsumable_rows_locked() {
 # A captured result re-published before its owner ran `handled` leaves a replay
 # row behind. Once the durable handled marker exists, presenting it again only
 # invites a repeat of the report already delivered, so it is retired unpresented.
+# Branch retirement is limited to its granted eligible rows.
 retire_handled_procevent_rows_locked() {
   local epoch seq kind key rest id handled=''
   [ -s "$FM_WAKE_QUEUE" ] || return 0
