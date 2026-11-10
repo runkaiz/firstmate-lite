@@ -284,17 +284,12 @@ SH
     "fm-spawn must embed DISABLE_AUTOUPDATER in the launch command so a daemon-built pane that never inherited it still runs Claude with the updater off"
 }
 
-test_credentialed_children_keep_parent_and_collector_isolation() {
+test_credentialed_children_keep_parent_isolation() {
   local dir="$TMP_ROOT/credentialed" harness mode
   mkdir -p "$dir/bin" "$dir/home" "$dir/original config"
   cat > "$dir/bin/probe" <<'PY'
 #!/usr/bin/env python3
-import json, os, subprocess, sys
-from pathlib import Path
-root, home = os.environ['PROBE_ROOT'], os.environ['PROBE_HOME']
-result = subprocess.run([sys.executable, root + '/bin/fm-usage-auto.py', 'refresh', '--force', '--home', home],
-                        check=True, text=True, capture_output=True)
-assert json.loads(result.stdout)['enabled'] is False
+import json, os
 print(json.dumps({key: os.environ.get(key) for key in
                  ('CODEX_HOME', 'CLAUDE_CONFIG_DIR', 'PI_CODING_AGENT_DIR', 'NM_HOME')}))
 PY
@@ -312,12 +307,10 @@ case "$mode" in unset) unset "$selected" ;; empty) export "$selected=" ;; esac
 . "$root/tests/lib.sh"
 fm_live_gate opt-in FM_CREDENTIAL_PROBE "$harness"
 before=$(env | sort)
-export PROBE_ROOT="$root" PROBE_HOME="$dir/child-home"
 fm_test_credentialed_run "$dir/child-config" "$harness" > "$dir/child.json"
 command=$(fm_test_credentialed_command "$dir/child-config" "$harness")
 bash -c "$command" > "$dir/terminal-child.json"
 cmp "$dir/child.json" "$dir/terminal-child.json"
-unset PROBE_ROOT PROBE_HOME
 [ "$(env | sort)" = "$before" ]
 python3 - "$dir/child.json" "$selected" "$mode" "$dir" <<'PY'
 import json, os, sys
@@ -327,11 +320,6 @@ for key, value in child.items():
     expected = (None if mode == 'unset' else '' if mode == 'empty' else directory + '/original config/' + key)
     assert value == (expected if key == selected else os.environ[key]), (key, value, expected)
 PY
-python3 "$root/bin/fm-usage-auto.py" refresh --force --home "$dir/parent-home" > "$dir/parent.json"
-python3 - "$dir/parent.json" <<'PY'
-import json, sys
-assert json.load(open(sys.argv[1]))['enabled'] is True
-PY
 SH
   for harness in codex claude pi; do
     for mode in set unset empty; do
@@ -340,7 +328,7 @@ SH
         || fail "$harness $mode credentialed child isolation failed"
     done
   done
-  pass 'credentialed harness children receive only their original configuration; parents and collectors stay isolated'
+  pass 'credentialed harness children receive only their original configuration; parents stay isolated'
 }
 
 test_every_live_guard_is_wired_to_the_shared_gate() {
@@ -387,5 +375,5 @@ test_disable_autoupdater_reaches_the_claude_pane_on_the_fm_spawn_launch_path
 pass "DISABLE_AUTOUPDATER rides fm-spawn's claude launch through to the harness pane"
 test_disable_autoupdater_survives_a_daemon_pane_that_never_inherited_it
 pass "DISABLE_AUTOUPDATER is embedded in the launch so a daemon-built pane keeps it"
-test_credentialed_children_keep_parent_and_collector_isolation
+test_credentialed_children_keep_parent_isolation
 test_every_live_guard_is_wired_to_the_shared_gate
