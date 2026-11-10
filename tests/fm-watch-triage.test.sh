@@ -4909,6 +4909,166 @@ test_cleanup_marker_lock_bound_is_decimal_with_zero_default() {
   pass "the cleanup marker-lock bound is decimal and zero falls back to the default"
 }
 
+test_herdr_native_watch_and_notifications() {
+  command -v jq >/dev/null 2>&1 || { pass "Herdr watcher test skipped without jq"; return; }
+  local dir state fakebin out pid
+  dir=$(make_case herdr-native-watch)
+  state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/out"
+  fm_write_meta "$state/native.meta" "window=test:w1:p1" "backend=herdr" "kind=ship"
+  fm_write_meta "$state/fallback.meta" "window=test:fm-fallback" "backend=tmux" "kind=ship"
+  cat > "$fakebin/herdr" <<'SH'
+#!/usr/bin/env bash
+set -u
+args=("$@")
+n=${#args[@]}
+[ "$n" -ge 2 ] && [ "${args[$((n-2))]}" = --session ] && [ "${args[$((n-1))]}" = test ] || exit 1
+case "$1 $2" in
+  'pane get')
+    case "$(cat "$FM_STATE_OVERRIDE/native-presence")" in
+      missing) printf '{"error":{"code":"pane_not_found"}}\n' ;;
+      unknown) exit 1 ;;
+      *) printf '{"result":{"pane":{"pane_id":"%s"}}}\n' "$3" ;;
+    esac
+    ;;
+  'pane process-info')
+    case "$(cat "$FM_STATE_OVERRIDE/native-process")" in
+      unknown) exit 1 ;;
+      shell) processes='[]' ;;
+      *) processes='[{"pid":12345,"name":"claude","argv0":"claude"}]' ;;
+    esac
+    printf '{"result":{"type":"pane_process_info","process_info":{"pane_id":"%s","shell_pid":%s,"foreground_processes":%s}}}\n' "$4" "$(cat "$FM_STATE_OVERRIDE/native-shell-pid")" "$processes"
+    ;;
+  'status --json') printf '{"server":{"running":true}}\n' ;;
+  'agent get')
+    printf 'agent get\n' >> "$FM_STATE_OVERRIDE/herdr-calls"
+    printf '{"result":{"agent":{"agent_status":"%s"}}}\n' "$(cat "$FM_STATE_OVERRIDE/native-agent")"
+    ;;
+  'notification show')
+    [ -s "$FM_STATE_OVERRIDE/.wake-queue" ] || exit 1
+    printf '%s|%s\n' "$3" "$5" >> "$FM_STATE_OVERRIDE/notices"
+    ;;
+  'pane read')
+    printf 'pane read\n' >> "$FM_STATE_OVERRIDE/herdr-calls"
+    exit 1
+    ;;
+  *) exit 1 ;;
+esac
+SH
+  chmod +x "$fakebin/herdr"
+  printf 'present\n' > "$state/native-presence"
+  printf 'agent\n' > "$state/native-process"
+  printf '%s\n' "$$" > "$state/native-shell-pid"
+  printf 'unknown\n' > "$state/native-agent"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0 FM_BUSY_TURN_MAX_SECS=1
+  pid=$!
+  if ! wait_poll_cycle "$state" "$pid"; then
+    reap "$pid"; fail "unknown Herdr activity incorrectly woke the watcher"
+  fi
+  grep -q '^agent get$' "$state/herdr-calls" || fail "watcher never sampled the Herdr agent"
+  ! grep -q '^pane read$' "$state/herdr-calls" || fail "Herdr watcher inferred liveness from scrollback"
+  [ ! -s "$out" ] && [ ! -e "$state/notices" ] || fail "unknown activity produced a wake or notice"
+  printf 'blocked\n' > "$state/native-agent"
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "native blocked level did not wake without the event stream"; }
+  wait "$pid" || fail "native blocked watcher failed"
+  grep -q 'herdr: agent blocked' "$out" || fail "watcher did not report a native blocked agent"
+  [ "$(cat "$state/notices")" = 'Firstmate: decision needed|native' ] || fail "native blocked notice missing"
+  ack_stopped_cycle "$state" || fail "could not acknowledge native blocked wake"
+
+  printf 'done: PR https://github.com/example/test/pull/1 checks green\nworking: routine update\n' > "$state/native.status"
+  printf 'needs-decision: choose a release\n' > "$state/fallback.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "reported delivery did not wake"; }
+  wait "$pid" || fail "delivery watcher failed"
+  grep -q '^signal:' "$out" || fail "delivery did not surface as a status signal"
+  [ "$(cat "$state/notices")" = "$(printf '%s\n' 'Firstmate: decision needed|native' 'Firstmate: review ready|native')" ] \
+    || fail "delivery notice was lost, duplicated, or sent for routine or tmux events"
+  ack_stopped_cycle "$state" || fail "could not acknowledge delivery wake"
+  rm "$state/fallback.meta" "$state/fallback.status"
+
+  printf 'blocked [key=login]: login needed\nneeds-decision [key=release]: choose release\n' >> "$state/native.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "reported login need did not wake"; }
+  wait "$pid" || fail "blocker watcher failed"
+  [ "$(wc -l < "$state/notices" | tr -d ' ')" = 3 ] \
+    && [ "$(tail -n 1 "$state/notices")" = 'Firstmate: decision needed|native' ] \
+    || fail "a blocker and decision batch must send one decision notice"
+  ack_stopped_cycle "$state" || fail "could not acknowledge decision wake"
+
+  printf 'blocked: waiting for dependency\nfailed: build failed\n' >> "$state/native.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "ordinary failure did not wake"; }
+  wait "$pid" || fail "failure watcher failed"
+  [ "$(wc -l < "$state/notices" | tr -d ' ')" = 3 ] || fail "ordinary blockers or failures sent a notice"
+  ack_stopped_cycle "$state" || fail "could not acknowledge failure wake"
+
+  fm_write_meta "$state/other.meta" "window=test:w1:p2" "backend=herdr" "kind=ship"
+  printf 'done: PR https://github.com/example/test/pull/2\n' >> "$state/native.status"
+  printf 'done: PR https://github.com/example/test/pull/3\nneeds-decision: approve release\n' > "$state/other.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "mixed task batch did not wake"; }
+  wait "$pid" || fail "mixed task watcher failed"
+  [ "$(wc -l < "$state/notices" | tr -d ' ')" = 4 ] \
+    && [ "$(tail -n 1 "$state/notices")" = 'Firstmate: decision needed|other' ] \
+    || fail "a multi-task batch must send one notice with decision priority"
+  ack_stopped_cycle "$state" || fail "could not acknowledge mixed task wake"
+  rm "$state/other.meta"
+
+  printf 'done: PR https://github.com/example/test/pull/4\nneeds-decision: approve deployment\n' > "$state/native.status"
+  seen_sig "$state/native.status" > "$state/.seen-native_status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0 FM_HEARTBEAT=1
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "heartbeat missed eligible notices"; }
+  wait "$pid" || fail "heartbeat watcher failed"
+  grep -qx heartbeat "$out" || fail "heartbeat fixture produced another wake: $(cat "$out")"
+  [ "$(wc -l < "$state/notices" | tr -d ' ')" = 5 ] \
+    && [ "$(tail -n 1 "$state/notices")" = 'Firstmate: decision needed|native' ] \
+    || fail "heartbeat batch must send one decision notice"
+  ack_stopped_cycle "$state" || fail "could not acknowledge heartbeat wake"
+
+  printf 'working\n' > "$state/native-agent"
+  printf 'unknown\n' > "$state/native-process"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "an unknown process read was treated as dead"; }
+  printf 'incarnation-one\n' > "$state/native.busy-gen"
+  printf 'shell\n' > "$state/native-process"
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "a killed working agent was never reported"; }
+  wait "$pid" || fail "recovery watcher failed"
+  grep -q 'herdr: agent dead' "$out" || fail "a stale working registration hid agent death: $(cat "$out")"
+  ack_stopped_cycle "$state" || fail "could not acknowledge dead agent wake"
+
+  printf 'unknown\n' > "$state/native-presence"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "an unknown read produced a wake: $(cat "$out")"; }
+  printf 'missing\n' > "$state/native-presence"
+  wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "one incarnation repeated its recovery wake: $(cat "$out")"; }
+
+  printf 'incarnation-two\n' > "$state/native.busy-gen"
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "a replacement incarnation's death was swallowed"; }
+  wait "$pid" || fail "replacement recovery watcher failed"
+  grep -q 'herdr: agent missing' "$out" || fail "missing endpoint recovery was lost"
+  [ "$(wc -l < "$state/notices" | tr -d ' ')" = 5 ] || fail "recovery sent an unapproved notice"
+  ack_stopped_cycle "$state" || fail "could not acknowledge replacement recovery"
+
+  printf 'present\n' > "$state/native-presence"
+  printf 'agent\n' > "$state/native-process"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "a live working agent produced a recovery wake"; }
+  printf 'paused: waiting for external dependency\n' > "$state/native.status"
+  seen_sig "$state/native.status" > "$state/.seen-native_status"
+  printf 'missing\n' > "$state/native-presence"
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "a declared pause hid confirmed endpoint absence"; }
+  wait "$pid" || fail "paused recovery watcher failed"
+  grep -q 'herdr: agent missing' "$out" || fail "paused endpoint recovery was lost"
+  pass "Herdr detects confirmed agent absence once per incarnation and coalesces eligible notifications"
+}
+
 # --- busy pane duration bound: a completed-turn age gate on top of busy -----
 # 2026-07 hibit-agent-focus-nonsteal-r1 incident: a busy pane (herdr "working"
 # and/or the harness's rendered busy footer) is unconditional, unbounded proof
@@ -6762,6 +6922,7 @@ if [ -n "${FM_TEST_ONLY:-}" ]; then
   exit 0
 fi
 
+test_herdr_native_watch_and_notifications
 test_status_span_actionable_classifier
 test_status_span_survives_a_later_routine_append
 test_status_span_respects_decision_closure

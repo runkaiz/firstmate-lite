@@ -1522,95 +1522,29 @@ test_housekeeping_resumed_stale_cleared() {
   pass "resumed (busy) stale clears its marker without escalating"
 }
 
-test_housekeeping_herdr_persistent_stale_resolves_meta() {
-  local dir state key
-  dir=$(make_supercase stale-herdr-persistent)
+test_herdr_native_blocked_bypasses_daemon_wedge_tracking() {
+  local dir state window
+  dir=$(make_supercase stale-herdr-native)
   state="$dir/state"
-  fm_write_meta "$state/herdr-w7.meta" "window=default:w1:p2" "backend=herdr"
-  printf 'working\n' > "$state/herdr-w7.status"
-  key=$(printf '%s' "herdr-w7" | tr ':/.' '___')
-  echo $(( $(date +%s) - 500 )) > "$state/.subsuper-stale-$key"
+  window=test:w1:p2
+  fm_write_meta "$state/native.meta" "window=$window" "backend=herdr"
+  printf 'working: building\n' > "$state/native.status"
+  printf '1\n' > "$state/.subsuper-stale-native"
   (
-    fm_backend_capture() {
-      [ "$1" = herdr ] || fail "expected herdr capture backend, got $1"
-      [ "$2" = "default:w1:p2" ] || fail "expected herdr window target, got $2"
-      printf 'idle prompt\n'
-    }
-    fm_backend_busy_state() {
-      [ "$1" = herdr ] || fail "expected herdr busy backend, got $1"
-      [ "$2" = "default:w1:p2" ] || fail "expected herdr busy target, got $2"
-      printf 'idle'
-    }
-    fm_backend_capture herdr default:w1:p2 40 >/dev/null
-    [ "$(fm_backend_busy_state herdr default:w1:p2)" = idle ] || fail "herdr busy stub did not report idle"
-    FM_STATE_OVERRIDE="$state" FM_STALE_ESCALATE_SECS=240 housekeeping "$state"
-  ) || fail "herdr persistent stale housekeeping failed"
-  [ -s "$state/.subsuper-escalations" ] || fail "persistent herdr stale was not escalated"
-  [ ! -e "$state/.subsuper-stale-$key" ] || fail "herdr stale marker not cleared after escalation"
-  pass "persistent herdr stale resolves the target from metadata and escalates"
-}
-
-# A herdr crew whose native agent.get reads idle (generation state) but whose
-# own semantic busy-state record says busy is still working, so its stale
-# marker clears without escalating. The record - not the pane's rendered
-# footer - is what proves it.
-test_housekeeping_herdr_idle_busy_record_clears_stale() {
-  local dir state key gen
-  dir=$(make_supercase stale-herdr-idle-busy-record)
-  state="$dir/state"
-  fm_write_meta "$state/herdr-footer.meta" "window=default:w1:p4" "backend=herdr" "harness=claude"
-  printf 'working\n' > "$state/herdr-footer.status"
-  gen=$("$ROOT/bin/fm-busy-event.sh" arm "$state" herdr-footer)
-  "$ROOT/bin/fm-busy-event.sh" apply "$state" herdr-footer busy --gen "$gen" \
-    --source claude-hook --event user-prompt-submit
-  key=$(printf '%s' "herdr-footer" | tr ':/.' '___')
-  echo $(( $(date +%s) - 500 )) > "$state/.subsuper-stale-$key"
-  (
-    fm_backend_capture() {
-      [ "$1" = herdr ] || fail "expected herdr capture backend, got $1"
-      [ "$2" = "default:w1:p4" ] || fail "expected herdr window target, got $2"
-      printf 'quiet\n'
-    }
-    fm_backend_busy_state() {
-      [ "$1" = herdr ] || fail "expected herdr busy backend, got $1"
-      [ "$2" = "default:w1:p4" ] || fail "expected herdr busy target, got $2"
-      printf 'idle'
-    }
-    fm_backend_capture herdr default:w1:p4 40 >/dev/null
-    [ "$(fm_backend_busy_state herdr default:w1:p4)" = idle ] || fail "herdr busy stub did not report idle"
-    FM_STATE_OVERRIDE="$state" FM_STALE_ESCALATE_SECS=240 housekeeping "$state"
-  ) || fail "herdr idle busy-footer housekeeping failed"
-  [ ! -e "$state/.subsuper-stale-$key" ] || fail "idle-native busy-record herdr stale marker was not cleared"
-  [ ! -s "$state/.subsuper-escalations" ] || fail "idle-native busy-record herdr stale was escalated"
-  pass "herdr idle busy-footer stale clears through capture corroboration"
-}
-
-test_housekeeping_herdr_resumed_stale_cleared() {
-  local dir state key
-  dir=$(make_supercase stale-herdr-resumed)
-  state="$dir/state"
-  fm_write_meta "$state/herdr-busy.meta" "window=default:w1:p3" "backend=herdr"
-  printf 'working\n' > "$state/herdr-busy.status"
-  key=$(printf '%s' "herdr-busy" | tr ':/.' '___')
-  echo $(( $(date +%s) - 500 )) > "$state/.subsuper-stale-$key"
-  (
-    fm_backend_capture() {
-      [ "$1" = herdr ] || fail "expected herdr capture backend, got $1"
-      [ "$2" = "default:w1:p3" ] || fail "expected herdr window target, got $2"
-      printf 'unchanged pane\n'
-    }
-    fm_backend_busy_state() {
-      [ "$1" = herdr ] || fail "expected herdr busy backend, got $1"
-      [ "$2" = "default:w1:p3" ] || fail "expected herdr busy target, got $2"
-      printf 'busy'
-    }
-    fm_backend_capture herdr default:w1:p3 40 >/dev/null
-    [ "$(fm_backend_busy_state herdr default:w1:p3)" = busy ] || fail "herdr busy stub did not report busy"
-    FM_STATE_OVERRIDE="$state" FM_STALE_ESCALATE_SECS=240 housekeeping "$state"
-  ) || fail "herdr resumed stale housekeeping failed"
-  [ ! -e "$state/.subsuper-stale-$key" ] || fail "busy herdr stale marker was not cleared"
-  [ ! -s "$state/.subsuper-escalations" ] || fail "busy herdr stale was escalated"
-  pass "resumed herdr stale clears through backend-aware busy state"
+    fm_backend_capture() { fail "Herdr housekeeping captured a pane for stale detection"; }
+    FM_STATE_OVERRIDE="$state" FM_STALE_ESCALATE_SECS=1 housekeeping "$state"
+  ) || fail "Herdr stale housekeeping failed"
+  [ ! -s "$state/.subsuper-escalations" ] || fail "a legacy Herdr wedge timer escalated"
+  [ ! -e "$state/.subsuper-stale-native" ] || fail "legacy Herdr wedge marker survived"
+  FM_ESCALATE_BATCH_SECS=999 handle_wake "stale: $window (herdr: agent blocked - waiting for input)" "$state"
+  grep -qF 'herdr: agent blocked - waiting for input' "$state/.subsuper-escalations" \
+    || fail "native Herdr block was not escalated"
+  [ ! -e "$state/.subsuper-stale-native" ] || fail "native Herdr block started a wedge timer"
+  FM_ESCALATE_BATCH_SECS=999 handle_wake "stale: $window (herdr: agent dead - the endpoint is still there with no agent running in it, recovery required - reconcile this record)" "$state"
+  grep -qF 'herdr: agent dead' "$state/.subsuper-escalations" \
+    || fail "confirmed Herdr agent death was absorbed"
+  [ ! -e "$state/.subsuper-stale-native" ] || fail "Herdr recovery started a legacy wedge timer"
+  pass "away supervision escalates a native Herdr block without timing a stale pane"
 }
 
 test_escalate_batches_into_one_digest() {
@@ -3236,9 +3170,7 @@ test_housekeeping_captain_held_resolved_cleared
 test_housekeeping_stale_marker_transitions_to_pause
 test_housekeeping_captain_held_stale_marker_transitions_to_pause
 test_housekeeping_pause_marker_transitions_to_clear
-test_housekeeping_herdr_persistent_stale_resolves_meta
-test_housekeeping_herdr_idle_busy_record_clears_stale
-test_housekeeping_herdr_resumed_stale_cleared
+test_herdr_native_blocked_bypasses_daemon_wedge_tracking
 test_escalate_batches_into_one_digest
 test_escalate_batch_age_uses_first_append
 test_heartbeat_scan_dedup

@@ -2360,9 +2360,12 @@ _fm_status_open_decision_origins() {  # <status-file> [<kind>]
   printf '%s' "$origins"
 }
 
-status_span_first_actionable_record() {  # <status-file> <start-offset> [record-var] [needs-decision-var]
+# The optional events output preserves each surviving event on its own line.
+status_span_first_actionable_record() {  # <status-file> <start-offset> [record-var] [needs-decision-var] [events-var]
   local f=$1 start=${2:-0} output_var=${3-} needs_var=${4-} size ident cur_ident scratch chunk_file result
+  local events_var=${5-} _fm_span_events=''
   local line verb key origins='' folded=0 rc=1 failed=0 line_number=0 live_line='' events='' _line _key _fm_span_needs_decision=0
+  [ -z "$events_var" ] || printf -v "$events_var" '%s' ''
   [ -e "$f" ] || { [ -L "$f" ] && return 2; return 1; }
   [ -f "$f" ] && [ -r "$f" ] && [ ! -L "$f" ] || return 2
   ident=$(_fm_open_decisions_file_ident "$f") || return 2
@@ -2398,6 +2401,7 @@ status_span_first_actionable_record() {  # <status-file> <start-offset> [record-
       # stale classification. The side-band marker lets signal routing surface
       # the captain-owned hold without changing that established stale verdict.
       _fm_span_needs_decision=1
+      [ -z "$events_var" ] || _fm_span_events="$_fm_span_events$line"$'\n'
       continue
     fi
     status_is_captain_relevant "$line" || continue
@@ -2408,6 +2412,7 @@ status_span_first_actionable_record() {  # <status-file> <start-offset> [record-
           [ -n "$events" ] && events="${events} ; "
           events="${events}${line}"
           [ "$verb" = needs-decision ] && _fm_span_needs_decision=1
+          [ -z "$events_var" ] || _fm_span_events="$_fm_span_events$line"$'\n'
           rc=0
           continue
         }
@@ -2415,6 +2420,7 @@ status_span_first_actionable_record() {  # <status-file> <start-offset> [record-
           [ -n "$events" ] && events="${events} ; "
           events="${events}reconciliation-required: ${line}"
           [ "$verb" = needs-decision ] && _fm_span_needs_decision=1
+          [ -z "$events_var" ] || _fm_span_events="$_fm_span_events$line"$'\n'
           rc=0
           continue
         }
@@ -2443,9 +2449,11 @@ EOF
         rc=0
         ;;
     esac
+    [ -z "$events_var" ] || _fm_span_events="$_fm_span_events$line"$'\n'
   done < "$chunk_file"
   rm -f "$chunk_file"
   [ "$failed" -eq 0 ] || return 2
+  [ -z "$events_var" ] || printf -v "$events_var" '%s' "$_fm_span_events"
   if [ "$rc" -eq 0 ]; then result="${size}"$'\t'"${ident}"$'\t'"${events}"; else result="${size}"$'\t'"${ident}"; fi
   if [ -n "$output_var" ]; then
     printf -v "$output_var" '%s' "$result"

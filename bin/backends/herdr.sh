@@ -92,6 +92,9 @@ FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 # same rule (fm_backend_herdr_pane_process_state).
 # shellcheck source=bin/fm-agent-process-lib.sh
 . "$FM_BACKEND_HERDR_ROOT/bin/fm-agent-process-lib.sh"
+# shellcheck source=bin/fm-timeout-lib.sh
+. "$FM_BACKEND_HERDR_ROOT/bin/fm-timeout-lib.sh"
+
 
 FM_BACKEND_HERDR_MIN_PROTOCOL=14
 # events.subscribe (the native pane.agent_status_changed push stream) and its
@@ -387,6 +390,9 @@ fm_backend_herdr_workspace_label() {
 fm_backend_herdr_cli() {  # <session> <herdr-subcommand-and-args...>
   local session=$1 rc=0 err failed_bin selected_bin client_bin=herdr
   shift
+  local -a runner=()
+  # A desktop notice must not delay delivery of its durable wake.
+  [ "${1:-}" != notification ] || runner=(fm_run_timed 2)
   if [ "${FM_BACKEND_HERDR_CLIENT_SESSION:-}" = "$session" ]; then
     client_bin=$(fm_backend_herdr_bin)
   fi
@@ -400,14 +406,14 @@ fm_backend_herdr_cli() {  # <session> <herdr-subcommand-and-args...>
     return $?
   fi
   failed_bin=$client_bin
-  { err=$(HERDR_SESSION="$session" "$failed_bin" "$@" --session "$session" 2>&1 1>&3 3>&-) || rc=$?; } 3>&1
+  { err=$(HERDR_SESSION="$session" "${runner[@]+"${runner[@]}"}" "$failed_bin" "$@" --session "$session" 2>&1 1>&3 3>&-) || rc=$?; } 3>&1
   if [ "$rc" -ne 0 ]; then
     case "$err" in
       *protocol_mismatch*)
         fm_backend_herdr_client_select "$session" force
         selected_bin=$(fm_backend_herdr_bin)
         if [ "$selected_bin" != "$failed_bin" ]; then
-          HERDR_SESSION="$session" "$selected_bin" "$@" --session "$session"
+          HERDR_SESSION="$session" "${runner[@]+"${runner[@]}"}" "$selected_bin" "$@" --session "$session"
           return $?
         fi
         ;;
@@ -2270,8 +2276,9 @@ EOF
 #                 not claimed either. The caller must fail safe toward refusal
 #                 here, never toward closing - this is the conservative
 #                 backstop the husk check depends on.
-fm_backend_herdr_pane_agent_state() {  # <session> <pane_id>
-  local session=$1 pane_id=$2 out code presence status
+# With activity requested, return the native state in place of "live".
+fm_backend_herdr_pane_agent_state() {  # <session> <pane_id> [activity]
+  local session=$1 pane_id=$2 view=${3:-} out code presence status
   presence=$(fm_backend_herdr_pane_presence_state "$session" "$pane_id")
   if [ "$presence" != present ]; then
     case "$presence" in
@@ -2292,7 +2299,7 @@ fm_backend_herdr_pane_agent_state() {  # <session> <pane_id>
     *) printf 'unknown'; return 0 ;;
   esac
   case "$(fm_backend_herdr_pane_process_state "$session" "$pane_id")" in
-    agent|other) printf 'live' ;;
+    agent|other) [ "$view" = activity ] && printf '%s' "$status" || printf 'live' ;;
     shell) printf 'stale-agent' ;;
     *) printf 'unknown' ;;
   esac
@@ -2408,13 +2415,15 @@ fm_backend_herdr_server_running_state() {  # <session>
 # on exactly the reads they refused on before. A server that is running, or
 # whose state cannot itself be read, still yields `unreadable` here too: absence
 # is claimed only from positive evidence of it.
-fm_backend_herdr_agent_state() {  # <target>
-  local target=$1
+fm_backend_herdr_agent_state() {  # <target> [activity]
+  local target=$1 view=${2:-} verdict
   fm_backend_herdr_parse_target "$target" || { printf 'unreadable'; return 0; }
-  case "$(fm_backend_herdr_pane_agent_state "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE")" in
+  verdict=$(fm_backend_herdr_pane_agent_state "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE" "$view")
+  case "$verdict" in
     dead) printf 'missing' ;;
     no-agent|stale-agent) printf 'dead' ;;
     live) printf 'alive' ;;
+    working|idle|done|blocked) printf '%s' "$verdict" ;;
     *)
       case "$(fm_backend_herdr_server_running_state "$FM_BACKEND_HERDR_SESSION")" in
         stopped) printf 'missing' ;;
@@ -3895,7 +3904,7 @@ fm_backend_herdr_list_live() {  # <session>
 # ~/.config/herdr/sessions/<name>/herdr.sock). Empty on any failure.
 fm_backend_herdr_socket_path() {  # <session>
   local session=$1
-  herdr session list --json 2>/dev/null \
+  fm_backend_herdr_cli "$session" session list --json 2>/dev/null \
     | jq -r --arg name "$session" '.sessions[]? | select(.name == $name) | .socket_path // empty' 2>/dev/null \
     | head -1
 }
@@ -3919,10 +3928,10 @@ fm_backend_herdr_events_capable() {  # <session>
   if [ -z "${FM_BACKEND_HERDR_EVENT_READER:-}" ]; then
     command -v python3 >/dev/null 2>&1 || return 1
   fi
-  protocol=$(herdr status --json 2>/dev/null | jq -r '.client.protocol // empty' 2>/dev/null)
+  protocol=$(fm_backend_herdr_cli "$session" status --json 2>/dev/null | jq -r '.client.protocol // empty' 2>/dev/null)
   case "$protocol" in ''|*[!0-9]*) return 1 ;; esac
   [ "$protocol" -ge "$FM_BACKEND_HERDR_MIN_EVENTS_PROTOCOL" ] || return 1
-  schema=$(herdr api schema --json 2>/dev/null) || return 1
+  schema=$(fm_backend_herdr_cli "$session" api schema --json 2>/dev/null) || return 1
   printf '%s' "$schema" | grep -Fq 'events.subscribe' || return 1
   printf '%s' "$schema" | grep -Fq 'pane.agent_status_changed' || return 1
   return 0
@@ -4010,6 +4019,24 @@ fm_backend_herdr_clear_transition() {  # <state_dir> <window>
   rm -f "$marker" 2>/dev/null || true
 }
 
+# Read the current level through the same policy and dedupe as the event stream.
+fm_backend_herdr_check_transition() {  # <state-dir> <session> <pane_id>
+  local raw record key
+  raw=$(fm_backend_herdr_agent_state "$2:$3" activity)
+  case "$raw" in
+    dead|missing)
+      printf '%s' "$raw"
+      return 3
+      ;;
+    blocked|working|idle|done) ;;
+    *) return 1 ;;
+  esac
+  key=$(printf '%s' "$2:$3" | tr ':/.' '___')
+  rm -f "$1/.dead-reported-$key"
+  record=$(fm_backend_herdr_normalize_event "$3" "" "$raw" "")
+  fm_backend_herdr_apply_transition "$1" "$2" "$record"
+}
+
 # fm_backend_herdr_wait_transition: the bounded event wait. Blocks up to
 # <timeout_secs> for one of <pane_window...> ("<session>:<pane_id>") to reach a
 # fresh `blocked` edge, then prints the normalized record and returns 0.
@@ -4051,7 +4078,7 @@ fm_backend_herdr_wait_transition() {  # <session> <timeout_secs> <state_dir> <pa
   done < <(fm_backend_herdr_event_reader_cmd)
   [ "${#reader[@]}" -gt 0 ] || return 2
 
-  local fifo_dir fifo reader_pid line ws status agent raw record hit rc=1 reader_rc=0
+  local fifo_dir fifo reader_pid line ws status agent record hit rc=1 reader_rc=0
   fifo_dir=$(mktemp -d "${TMPDIR:-/tmp}/fm-herdr-eventwait.XXXXXX") || return 2
   fifo="$fifo_dir/events"
   if ! mkfifo "$fifo" 2>/dev/null; then
@@ -4080,10 +4107,7 @@ fm_backend_herdr_wait_transition() {  # <session> <timeout_secs> <state_dir> <pa
       if [ -z "$pane_id" ] || [ "$pane_id" = "$w" ]; then
         continue
       fi
-      raw=$(fm_backend_herdr_agent_status_raw "$session" "$pane_id")
-      [ -n "$raw" ] || continue
-      record=$(fm_backend_herdr_normalize_event "$pane_id" "" "$raw" "")
-      if hit=$(fm_backend_herdr_apply_transition "$state" "$session" "$record"); then
+      if hit=$(fm_backend_herdr_check_transition "$state" "$session" "$pane_id"); then
         printf '%s' "$hit"
         rc=0
         break

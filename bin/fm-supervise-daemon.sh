@@ -730,6 +730,14 @@ task_window_harness() {  # <window> <state>
 stale_window_is_busy() {  # <window> <state>
   local win=$1 state=$2 backend harness label task tail40 verdict
   backend=$(task_window_backend "$win" "$state")
+  if [ "$backend" = herdr ]; then
+    fm_backend_source herdr || return 1
+    case "$(fm_backend_herdr_agent_state "$win" activity)" in
+      working) return 0 ;;
+      dead|missing) return 2 ;;
+      *) return 1 ;;
+    esac
+  fi
   harness=$(task_window_harness "$win" "$state")
   task=$(window_to_task "$win" "$state")
   label="fm-$task"
@@ -1234,6 +1242,10 @@ housekeeping() {  # <state>
       reconcile_pause_tracking "$win" "$state" "$last"
       continue
     fi
+    if [ "$(task_window_backend "$win" "$state")" = herdr ]; then
+      rm -f "$marker"
+      continue
+    fi
     age=$(( now - $(cat "$marker" 2>/dev/null || echo "$now") ))
     [ "$age" -ge "${FM_STALE_ESCALATE_SECS:-$STALE_ESCALATE_SECS_DEFAULT}" ] || continue
     stale_window_is_busy "$win" "$state"
@@ -1295,8 +1307,8 @@ housekeeping() {  # <state>
     else
       [ "$age" -ge "$pause_secs" ] || continue
     fi
-    # Endpoint-readability probe only: exit code 2 means the capture failed, so the
-    # endpoint is gone and there is nothing left to re-surface. The busy/idle verdict
+    # Endpoint probe only: exit code 2 means tmux capture failed or Herdr
+    # confirmed the endpoint is absent. The busy/idle verdict
     # is deliberately discarded here. Do NOT reinstate a `0)` arm dropping the marker
     # on busy: migrate_watcher_pause_markers recreates it with a fresh timestamp on
     # the very next tick while the declaration still stands, so the window would
@@ -1557,6 +1569,8 @@ handle_wake() {  # <reason> <state>
                 *) arg="${reason#signal: }" ;;
               esac
               decision=$(FM_STATUS_SPAN_ENDPOINT_FILE="$capture" classify_signal "$arg" "$state") ;;
+    stale:*" (herdr: agent dead - "*|stale:*" (herdr: agent missing - "*|\
+    stale:*" (herdr: agent blocked - waiting for input)"|\
     stale:*" (unread firstmate instruction: stuck-busy "*|stale:*" (steering-inbox busy bookkeeping unwritable: "*)
               decision="escalate|${reason#stale: }" ;;
     stale:*)  kind=stale; arg="${reason#stale: }"; stale_detail="${arg#"$arg"}"

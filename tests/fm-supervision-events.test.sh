@@ -30,6 +30,8 @@ WAKE_LOG="$TMP/wakes"
 SLEEP_LOG="$TMP/sleeps"
 wake() { printf '%s\n' "$1" >> "$WAKE_LOG"; return 0; }
 sleep() { printf 'SLEEP\n' >> "$SLEEP_LOG"; }
+# shellcheck disable=SC2329 # Runtime override called by the isolated transition handler.
+notify_herdr_task() { :; }
 
 reset_state() {
   rm -f "$STATE_DIR"/*.meta "$STATE_DIR"/*.status "$STATE_DIR"/.wake-queue \

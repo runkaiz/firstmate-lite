@@ -5661,6 +5661,10 @@ case "$cmd $sub" in
   "session list")
     printf '{"sessions":[{"name":"%s","running":true,"default":false,"socket_path":"%s"}]}\n' \
       "${FM_FAKE_SESSION_NAME:-default}" "${FM_FAKE_SOCKET:-/tmp/fm-fake.sock}" ;;
+  "pane get")
+    printf '{"result":{"pane":{"pane_id":"%s"}}}\n' "$3" ;;
+  "pane process-info")
+    printf '{"result":{"type":"pane_process_info","process_info":{"pane_id":"%s","shell_pid":%s,"foreground_processes":[{"pid":%s,"name":"claude","argv0":"claude"}]}}}\n' "$4" "$$" "$$" ;;
   "agent get")
     if [ -n "${FM_FAKE_READER_READY_FILE:-}" ] && [ ! -e "$FM_FAKE_READER_READY_FILE" ]; then
       exit 9

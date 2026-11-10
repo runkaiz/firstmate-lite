@@ -142,6 +142,14 @@ mark_surface_reported() {  # <status-file> <reported-signature>
   status_presentation_marker_report "$(_hb_surfaced_path "$task")" "$2"
 }
 
+# Notifications supplement the durable wake. Pass a short title and a task
+# label only, since notification bodies can be visible outside the terminal.
+notify_herdr_task() {  # <session> <title> <task> <sound>
+  fm_backend_source herdr || return 0
+  fm_backend_herdr_cli "$1" notification show "$2" --body "$3" --sound "$4" \
+    >/dev/null 2>&1 || triage_log "Herdr notification unavailable for $3"
+}
+
 # Act on a fresh actionable transition from a push-capable backend.
 handle_push_transition() {  # <backend> <session> <record>
   local backend=$1 session=$2 record=$3 pane_id to window task reason span_record rest surface_end='' surface_ident=''
@@ -150,6 +158,7 @@ handle_push_transition() {  # <backend> <session> <record>
   [ -n "$pane_id" ] || { sleep 1; return; }
   window="$session:$pane_id"
   task=$(window_to_task "$window" "$STATE")
+  [ -n "$task" ] || return 0
   # A declared wait already names the human this transition would report: an
   # external dependency, or the captain a verified hold transferred the work to.
   # Either way the wait is durably recorded, so absorb the immediate escalation
@@ -164,9 +173,10 @@ handle_push_transition() {  # <backend> <session> <record>
   case $? in
     0|1) surface_end=${span_record%%$'\t'*}; rest=${span_record#*$'\t'}; surface_ident=${rest%%$'\t'*} ;;
   esac
-  reason="stale: $window (herdr: agent $to - waiting on human, escalated immediately, not via wedge timer)"
+  reason="stale: $window (herdr: agent $to - waiting for input)"
   fm_wake_append stale "$window" "$reason" || exit 1
   fm_backend_commit_transition "$backend" "$STATE" "$session" "$record" || exit 1
   mark_surfaced "$STATE/$task.status" "$surface_end" "$surface_ident"
+  [ "$backend" != herdr ] || notify_herdr_task "$session" "Firstmate: decision needed" "$task" request
   wake "$reason"
 }
