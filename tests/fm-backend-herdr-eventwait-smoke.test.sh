@@ -98,6 +98,9 @@ SOCK=$(fm_backend_herdr_socket_path "$SESSION")
 # report-agent is herdr's documented primitive for a non-built-in process to
 # report its own agent state (docs/herdr-backend.md); routed through the lab
 # helper's guarded `run` so it carries the trailing --session.
+lab pane run "$PANE_ID" 'sleep 300' >/dev/null || fail "could not start the test foreground process"
+[ "$(fm_backend_herdr_pane_process_state "$SESSION" "$PANE_ID")" = other ] \
+  || fail "the registered test agent needs a live foreground process"
 lab pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state idle >/dev/null 2>&1 \
   || fail "could not register the pane's agent as idle"
 

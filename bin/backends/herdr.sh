@@ -4021,9 +4021,18 @@ fm_backend_herdr_clear_transition() {  # <state_dir> <window>
 
 # Read the current level through the same policy and dedupe as the event stream.
 fm_backend_herdr_check_transition() {  # <state-dir> <session> <pane_id>
-  local raw record
-  raw=$(fm_backend_herdr_agent_status_raw "$2" "$3")
-  case "$raw" in blocked|working|idle|done) ;; *) return 1 ;; esac
+  local raw record key
+  raw=$(fm_backend_herdr_agent_state "$2:$3" activity)
+  case "$raw" in
+    dead|missing)
+      printf '%s' "$raw"
+      return 3
+      ;;
+    blocked|working|idle|done) ;;
+    *) return 1 ;;
+  esac
+  key=$(printf '%s' "$2:$3" | tr ':/.' '___')
+  rm -f "$1/.dead-reported-$key"
   record=$(fm_backend_herdr_normalize_event "$3" "" "$raw" "")
   fm_backend_herdr_apply_transition "$1" "$2" "$record"
 }

@@ -1540,6 +1540,10 @@ test_herdr_native_blocked_bypasses_daemon_wedge_tracking() {
   grep -qF 'herdr: agent blocked - waiting for input' "$state/.subsuper-escalations" \
     || fail "native Herdr block was not escalated"
   [ ! -e "$state/.subsuper-stale-native" ] || fail "native Herdr block started a wedge timer"
+  FM_ESCALATE_BATCH_SECS=999 handle_wake "stale: $window (herdr: agent dead - the endpoint is still there with no agent running in it, recovery required - reconcile this record)" "$state"
+  grep -qF 'herdr: agent dead' "$state/.subsuper-escalations" \
+    || fail "confirmed Herdr agent death was absorbed"
+  [ ! -e "$state/.subsuper-stale-native" ] || fail "Herdr recovery started a legacy wedge timer"
   pass "away supervision escalates a native Herdr block without timing a stale pane"
 }
 

@@ -107,7 +107,8 @@ Attach to the selected named Herdr session and switch to the relevant home works
 Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.sh <id> '<text>'` without attaching.
 Herdr reports when a worker is active, has finished its turn, or is waiting for input.
 Worker reports still carry task outcomes and decisions.
-A ready pull request or branch, a decision, or a reported blocker or failure also produces a Herdr notification in the worker's session.
+A ready pull request or a captain decision or approval also produces a Herdr notification in the worker's session.
+Each status batch sends at most one notification, with decisions taking priority.
 
 ### Focus
 
@@ -749,7 +750,10 @@ The watcher maps the pane back to the task and skips these:
 ### Polling fallback
 
 The push path only shortens latency.
-The watcher checks native `agent get` levels each cycle, including when any of these is unavailable:
+The watcher checks recovery-grade native agent state each cycle, corroborating registrations with endpoint and process presence.
+Confirmed absence follows the [once-per-incarnation recovery path](architecture.md#event-driven-supervision), including for workers with declared waits.
+Unknown reads retain uncertainty.
+These checks also run when any of these is unavailable:
 
 - Protocol 16.
 - The event schema.

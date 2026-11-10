@@ -1117,7 +1117,7 @@ clear_write_tracking() {  # <window-key>
 # the same reason wedge_wait_evidence names its kind of wait: the two ask the supervisor
 # for different things.
 #
-# The marker is owned entirely by this function and records the verdict together
+# The marker records the verdict together
 # with the agent incarnation it was reported for: the task's per-incarnation busy
 # gen (bin/fm-busy-lib.sh, state/<id>.busy-gen), which changes exactly when the
 # agent is replaced, so a repeat is absorbed only while BOTH still match, a read
@@ -1132,10 +1132,12 @@ clear_write_tracking() {  # <window-key>
 # display absorbs on every threshold either way.
 # Returns 0 when it has handled the window, 1 to escalate on the unchanged path.
 wedge_dead_record() {  # <window> <since-file> <triage-label> <idle-age> <pane-hash> <task>
-  local win=$1 since_file=$2 label=$3 age=$4 hash=$5 task=$6 key marker agent_state detail reason gen id
+  local win=$1 since_file=$2 label=$3 age=$4 hash=$5 task=$6 key marker agent_state=${7:-} detail reason gen id verdict
   key=$(window_key "$win")
   marker="$STATE/.dead-reported-$key"
-  agent_state=$(fm_backend_agent_state "$(window_backend "$win")" "$win" 2>/dev/null) || agent_state=unreadable
+  if [ -z "$agent_state" ]; then
+    agent_state=$(fm_backend_agent_state "$(window_backend "$win")" "$win" 2>/dev/null) || agent_state=unreadable
+  fi
   case "$agent_state" in
     dead) detail='the endpoint is still there with no agent running in it' ;;
     missing) detail='the recorded endpoint is gone' ;;
@@ -1148,7 +1150,9 @@ wedge_dead_record() {  # <window> <since-file> <triage-label> <idle-age> <pane-h
   if gen=$(fm_busy_current_gen "$STATE" "$task"); then
     id=$gen
   fi
-  if [ "$(cat "$marker" 2>/dev/null || true)" = "$agent_state $id" ]; then
+  verdict=$agent_state
+  [ "$(window_backend "$win")" != herdr ] || verdict=gone
+  if [ "$(cat "$marker" 2>/dev/null || true)" = "$verdict $id" ]; then
     triage_log "absorbed $label (agent $agent_state, already reported once, idle ${age}s): $win"
     return 0
   fi
@@ -1157,8 +1161,11 @@ wedge_dead_record() {  # <window> <since-file> <triage-label> <idle-age> <pane-h
   # written ahead of a failed append outlives it, and the next sighting would then
   # absorb the retry - the one way this bound could swallow the report outright
   # rather than deliver it once.
+  if [ "$(window_backend "$win")" = herdr ]; then
+    reason="stale: $win (herdr: agent $agent_state - $detail, recovery required - reconcile this record, and check for unlanded work before any cleanup)"
+  fi
   fm_wake_append stale "$win" "$reason" || exit 1
-  printf '%s %s' "$agent_state" "$id" > "$marker"
+  printf '%s %s' "$verdict" "$id" > "$marker"
   clear_write_tracking "$key"
   wake "$reason"
 }
@@ -2006,9 +2013,9 @@ watcher_capture() {  # <backend> <target> <lines> [expected-label]
 }
 
 # Collect notices from classified events and emit them only after the
-# corresponding wake has been recorded. Coalesce each category per task.
+# corresponding wake has been recorded.
 collect_status_notifications() {  # <task> <events>
-  local task=$1 events=$2 meta="$STATE/$1.meta" target line verb note category categories=''
+  local task=$1 events=$2 meta="$STATE/$1.meta" target line verb note category
   [ -n "$events" ] && [ "$(fm_backend_of_meta "$meta")" = herdr ] || return 0
   target=$(fm_backend_target_of_meta "$meta") || return 0
   case "$target" in ?*:?*) ;; *) return 0 ;; esac
@@ -2017,19 +2024,16 @@ collect_status_notifications() {  # <task> <events>
     status_line_verb "$line" verb
     case "$verb" in
       needs-decision|captain-held) category=decision ;;
-      blocked|failed) category=attention ;;
-      working|paused|resolved) continue ;;
+      blocked|failed|working|paused|resolved) continue ;;
       *)
         note=$line
         [ "$verb" != "done" ] || note=$(status_line_note "$line")
         case "$note" in
-          'PR https://'*|'PR ready'*|*'checks green'*|*'ready in branch '*) category=ready ;;
+          'PR https://'*|'PR ready'*) category=ready ;;
           *) continue ;;
         esac
         ;;
     esac
-    case " $categories " in *" $category "*) continue ;; esac
-    categories="$categories $category"
     FM_STATUS_NOTIFICATIONS="$FM_STATUS_NOTIFICATIONS${target%%:*}"$'\t'"$category"$'\t'"$task"$'\n'
   done <<EOF
 $events
@@ -2037,16 +2041,30 @@ EOF
 }
 
 send_status_notifications() {
-  local session category task
+  local session category task selected_session='' selected_category='' selected_task=''
   while IFS=$'\t' read -r session category task; do
     case "$category" in
-      ready) notify_herdr_task "$session" 'Firstmate: review ready' "$task" "done" ;;
-      decision) notify_herdr_task "$session" 'Firstmate: decision needed' "$task" request ;;
-      attention) notify_herdr_task "$session" 'Firstmate: needs attention' "$task" request ;;
+      decision)
+        selected_session=$session
+        selected_category=$category
+        selected_task=$task
+        break
+        ;;
+      ready)
+        if [ -z "$selected_category" ]; then
+          selected_session=$session
+          selected_category=$category
+          selected_task=$task
+        fi
+        ;;
     esac
   done <<EOF
 $FM_STATUS_NOTIFICATIONS
 EOF
+  case "$selected_category" in
+    ready) notify_herdr_task "$selected_session" 'Firstmate: review ready' "$selected_task" done ;;
+    decision) notify_herdr_task "$selected_session" 'Firstmate: decision needed' "$selected_task" request ;;
+  esac
 }
 
 # 0 when any signaled status file carries a captain-relevant event in the bytes
@@ -2850,9 +2868,15 @@ EOF
     fi
     backend=$(window_backend "$w")
     if [ "$backend" = herdr ]; then
-      if status_is_paused_or_captain_held "$last"; then
+      fm_backend_source herdr || continue
+      transition=$(fm_backend_herdr_check_transition "$STATE" "${w%%:*}" "${w#*:}")
+      transition_rc=$?
+      if [ "$transition_rc" -eq 3 ]; then
+        wedge_dead_record "$w" "$STATE/.stale-since-$key" "$task" 0 "$w" "$task" \
+          "$transition"
+      elif status_is_paused_or_captain_held "$last"; then
         handle_paused_stale "$w" "$task"
-      elif fm_backend_source herdr && transition=$(fm_backend_herdr_check_transition "$STATE" "${w%%:*}" "${w#*:}"); then
+      elif [ "$transition_rc" -eq 0 ]; then
         handle_push_transition herdr "${w%%:*}" "$transition"
       fi
       continue
