@@ -12,7 +12,8 @@ Exact task chronology, branch names, temporary homes, local paths, process ids, 
 
 Verified on 2026-11-10 with codex-cli 0.165.0 on Linux, using the installed CLI without submitting a model request.
 Refresh with `bash bin/fm-test-run.sh tests/fm-codex-hook-layer-live-e2e.test.sh`.
-The guard captures the generated worker launch with measured-quota fixtures, then replays its flags through the real `codex features list` consumer:
+The guard checks installed CLI capability, captures the generated worker launch with measured-quota fixtures, then replays its flags through the real `codex features list` consumer.
+CLIs without `fast_mode` support must accept the captured normal-service fallback; the verified fast-capable CLI produced:
 
 ```text
 codex-cli 0.165.0 accepts captured fast launch controls with fast_mode enabled
@@ -21,8 +22,8 @@ codex-cli 0.165.0 accepts captured fast launch controls with fast_mode enabled
 This verifies CLI acceptance and feature activation, not provider access, effective response tier, or billing.
 [OpenAI's speed reference](https://learn.chatgpt.com/docs/agent-configuration/speed) documents the fast service configuration and subscription usage multiplier.
 The portable quota, spawn, and relaunch regressions are `tests/fm-quota-choose.test.sh`, `tests/fm-spawn-dispatch-profile.test.sh --fast-mode`, and `tests/fm-control-relaunch.test.sh --fast-mode`.
-The service decision probes the destination pane through the existing send path used by tmux and Herdr; no backend lifecycle changes or live Herdr operations were needed.
-Claude, OpenCode, Pi, Pi-signed, Grok, Kimi, Cursor, OMP, Gemini, Muse, Rovo, AGY, Devin, raw commands, and secondmates retain their existing launch service controls.
+Those regressions cover differing pane credentials and CLI paths, launch-environment filtering, unresolved models, unconfirmed probes and changing quota on relaunch; they do not establish live tmux or Herdr behavior.
+The [configuration guide](../configuration.md#worker-fast-mode) owns the opt-in and fallback behavior.
 
 ## CI-only worker waits
 

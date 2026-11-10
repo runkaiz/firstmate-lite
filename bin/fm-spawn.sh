@@ -378,6 +378,8 @@
 #     config/worker-fast-mode presence flag and fm_quota_codex_fast_eligible
 #     permit fast at spawn/relaunch. The installed CLI must accept fast_mode
 #     and service_tier="fast" in a bounded, token-free features-list probe.
+#     Quota and CLI probes run in the destination pane with the worker's launch
+#     environment filter; an unconfirmed probe retains default service.
 #     Only ships/scouts opt in; secondmates and raw commands do not.
 #     Claude keeps CLAUDE_CODE_DISABLE_FAST_MODE=1 because its fast mode spends
 #     separate paid credits, not the measured subscription allowance.
