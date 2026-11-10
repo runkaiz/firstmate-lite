@@ -33,12 +33,15 @@ Do not read or write old status-report files.
 Lead with a short "Since your last look" signal from `since_last_look` when there is a previous checkpoint.
 Call these newly visible deliveries or changed stages, not exact-time event history; the checkpoint compares observed durable facts within the snapshot bounds.
 Report disappeared current rows as no longer observed, never as proof of completion.
-Say briefly when there are no observed changes, then always give the current picture below.
+For an empty comparison, say "No observed changes since your last look" without listing unchanged categories.
 On the first look or an unreadable checkpoint, disclose that there is no earlier comparison rather than inventing a catch-up.
 The command saves only one compact checkpoint, never a report archive.
 
 Aim for a ten-second glance, one line per item, with complete task titles and full artifact URLs.
 Omit empty section headings and all empty-state filler, including unheaded "Nothing needs you right now" after completion.
+If none of the four sections has qualifying items, return only the comparison signal and "Captain, all quiet in the local records."
+Replace that all-clear line with a short uncertainty disclosure when required state is unreadable.
+Never enumerate empty shipped, moving, next, or needs-you inventories in prose.
 Use these sections in order only when they have qualifying items:
 
 - **Shipped**: real recorded merges, local-main landings, and completed scout reports from `landed`.
