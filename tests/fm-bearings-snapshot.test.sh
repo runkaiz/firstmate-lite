@@ -1907,7 +1907,7 @@ test_ahoy_checkpoint_tracks_disappearances_and_blockers() {
   run_captain "$home" "$fakebin" answer local-call --decision-file "$home/answer.txt" \
     >/dev/null || fail "answer local call"
   rm "$home/state/external-wait.meta"
-  "$ROOT/bin/fm-queue.py" done dead-gate --file "$home/data/backlog.md" >/dev/null || fail "close queued row without delivery"
+  "$ROOT/bin/fm-queue.py" "done" dead-gate --file "$home/data/backlog.md" >/dev/null || fail "close queued row without delivery"
   "$ROOT/bin/fm-queue.py" unblock live-gate --by ship-task --file "$home/data/backlog.md" \
     >/dev/null || fail "clear queue dependency"
   "$ROOT/bin/fm-queue.py" unblock blocked-tail --by ship-task --file "$home/data/backlog.md" \
