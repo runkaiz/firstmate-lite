@@ -1,11 +1,4 @@
-eligible alternative
-input captured quota snapshot: {"generatedAt": "2026-11-10T00:00:00Z", "schemaVersion": 5, "providers": [{"provider": "codex", "windows": [], "quotaSemantics": {"status": "known", "effectiveAvailability": [{"scope": "all_models", "status": "known", "effectivePercentRemaining": 0, "runway": {"status": "exhausted_now"}}]}}, {"provider": "pi", "windows": [], "quotaSemantics": {"status": "known", "effectiveAvailability": [{"scope": "all_models", "status": "known", "effectivePercentRemaining": 50, "runway": {"status": "through_reset"}}]}}]}
-$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-quota-choose.sh --snapshot /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/quota.json --candidate codex:test-model --candidate pi:test-model
-pi test-model
-exit: 0
+$ bin/fm-quota-choose.sh --snapshot /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.test-usage-removal/quota.json --candidate codex:lab-model --candidate claude:lab-model
+claude lab-model
 
-all exhausted
-input captured quota snapshot: {"generatedAt": "2026-11-10T00:00:00Z", "schemaVersion": 5, "providers": [{"provider": "codex", "windows": [], "quotaSemantics": {"status": "known", "effectiveAvailability": [{"scope": "all_models", "status": "known", "effectivePercentRemaining": 0, "runway": {"status": "exhausted_now"}}]}}, {"provider": "pi", "windows": [], "quotaSemantics": {"status": "known", "effectiveAvailability": [{"scope": "all_models", "status": "known", "effectivePercentRemaining": 0, "runway": {"status": "exhausted_now"}}]}}]}
-$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-quota-choose.sh --snapshot /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/quota.json --candidate codex:test-model --candidate pi:test-model
-none
-exit: 1
+exit=0

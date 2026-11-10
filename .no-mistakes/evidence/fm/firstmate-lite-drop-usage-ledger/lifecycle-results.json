@@ -1,0 +1,16 @@
+{
+  "task": "ledger-removal-340671",
+  "launch_generation": "s1794342980.340848.9870",
+  "relaunch_generation": "s1794342982.349561.7013",
+  "same_copy": true,
+  "copy_removed": true,
+  "task_retired": true,
+  "usage_ledger_created": false,
+  "model_turn_required": false,
+  "codex_ui_reached": true,
+  "trust_prompt_declined": true,
+  "fleet_events": [
+    "task.dispatched",
+    "task.cleaned_up"
+  ]
+}

@@ -1,0 +1,3 @@
+$ bin/fm-startup-network.sh wait 30
+
+exit=0

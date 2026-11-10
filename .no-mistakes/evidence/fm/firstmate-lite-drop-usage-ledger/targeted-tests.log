@@ -1,4 +1,71 @@
-FM_TEST_BEGIN 2026-11-10T19:47:58Z tests/fm-session-start.test.sh family=session-bootstrap expected_gate_skip=none
+FM_TEST_BEGIN 2026-11-10T20:27:25Z tests/fm-watch-arm.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - watch-arm: an attached arm reports the wake its cycle delivered instead of a false failure
+ok - watch-arm: a delivered wake consumed by the handling turn still closes the attached arm cleanly
+ok - watch-arm: an unusable launch confirm window refuses to arm by name
+ok - watch-arm: a disposable validation checkout refuses to arm
+ok - watch-arm: a watcher exits when its state directory is removed
+ok - watch-arm: a state directory removed before the queue lock still ends the watcher
+ok - watch-arm: a watcher exits when its home is removed
+ok - watch-arm: the test reaper stops a watcher armed for a tracked temporary home
+ok - watch-arm: a cycle that delivered no wake of its own still fails loudly
+ok - watch-arm: an attached arm keeps following a slow live holder and reports its wake
+ok - watch-arm: an attached arm hands a holder stalled past the bound to its owner's replacement
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-arm.sh: line 766: 4120286 Killed                     "$WATCH" > "$child_out"
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4120797.1794342497.dUOhmv
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+ok - watch-arm: re-arm surfaces every queued wake and an open remote decision after downtime
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-arm.sh: line 766: 4126677 Killed                     "$WATCH" > "$child_out"
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4127202.1794342500.9FEqee
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+ok - watch-arm: a re-arm whose recovery cycle runs slowly still surfaces it
+watcher: recovery state could not be persisted; retaining stale lock evidence
+ok - watch-arm: marker publication failure retains stale-lock recovery evidence
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4135011.1794342515.ZyL5S6
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 4137471.1794342516.RnG23q
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+ok - watch-arm: a wake queued after handling drain is recovered once at successor arm
+ok - watch-arm: interrupted handling leaves its wake durable for successor re-drain
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 4146557.1794342520.XGSCzU
+ok - watch-arm: malformed recovery state is quarantined without a successor loop
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4149053.1794342521.5yU2Yp
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+ok - watch-arm: publication after recovery handoff is surfaced
+ok - watch-arm: restart publishes recovery before clearing a reused-pid watcher lock
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 7 --recovery-generation 4150890.1794342522.J8TaVg
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+ok - watch-arm: markerless legacy queues are adopted and recovered
+ok - watch-arm: an idle Lavish source stays quiet and its real result wakes promptly
+ok - watch-arm: appending work reopens an announced empty recovery
+ok - watch-arm: a watcher close during handling keeps the printed acknowledgement valid
+ok - watch-arm: a moved recovery generation consumes handled rows and names its remedy
+ok - watch-arm: downtime marker publication does not follow symlinks
+ok - watch-arm: --stop ends only this home's watcher, publishes downtime, and reports when none runs
+ok - watch-arm: an already-acknowledged handling confirmation succeeds as a no-op
+ok - watch-arm: a churned generation's handling confirmation reports a mismatch and an arm check keeps it
+ok - watch-arm: --take-over attaches to a cycle the named arm does not own and leaves it running
+ok - watch-arm: --take-over owns a fresh cycle without a recovery wake and still surfaces queued work
+watcher: exiting - home no longer exists: /tmp/fm-test-run.Kocg4j/w1/tmp/fm-watch-arm-tests.eysqYg/take-over-self-exit/home
+ok - watch-arm: takeover preserves self-exit downtime and surfaces a recovery wake
+ok - watch-arm: the OpenCode arm plugin decides with the shared supervision predicate
+FM_TEST_END 2026-11-10T20:29:05Z tests/fm-watch-arm.test.sh exit=0 duration_ms=100773 gate_skip=false
+FM_TEST_BEGIN 2026-11-10T20:29:05Z tests/fm-pipeline-spend.test.sh family=pr-forge expected_gate_skip=none
+ok - known spend, including failed and cancelled invocations, is attributed to the task that ran it
+ok - repeated review rounds in a resumed session are counted once
+ok - absent spend reads as zero only when no run exists, and as unavailable when it cannot be read
+ok - older state without delta columns counts only rounds it can prove
+ok - record appends one line per task incarnation
+ok - an absent opt-in flag bypasses task, pipeline, and ledger reads and writes
+ok - the state database resolves under the account home when NM_HOME and HOME are unset
+ok - missing tasks, secondmates, and unsafe ids are refused
+FM_TEST_END 2026-11-10T20:29:06Z tests/fm-pipeline-spend.test.sh exit=0 duration_ms=733 gate_skip=false
+FM_TEST_BEGIN 2026-11-10T20:29:06Z tests/fm-session-start.test.sh family=session-bootstrap expected_gate_skip=none
 ok - context digest distinguishes ABSENT, empty-but-present, and populated files
 ok - a lock refusal prints a loud read-only banner, skips every mutating step, and still completes the digest
 ok - session start stays read-only when lock ownership cannot be published
@@ -17,7 +84,7 @@ ok - status tail lines are capped with a truncation marker while the full log st
 ok - orphan status logs are printed once with bounded tails
 ok - tmux endpoint liveness is reported per task: alive for a live window, dead for a gone one
 ok - herdr endpoint liveness is reported per task: alive, dead for exit 1, dead for any other probe status
-_: line 4: 1027981 Killed                     "$@"
+_: line 4: 51558 Killed                     "$@"
 ok - a killed per-task endpoint read becomes that task's error line and the digest completes
 ok - a hung per-task endpoint read hits its configured bound, reports the task, and leaves nothing stuck
 ok - a padded-zero per-read bound falls back to the 10s default instead of removing the bound
@@ -58,65 +125,8 @@ ok - Codex reset sources do not claim an unavailable instruction-refresh channel
 ok - instruction baselines require SHA-256 and successful startup completion
 ok - --reemit re-verifies lock ownership and keeps repair ownership with whoever holds it
 # fm-session-start.test.sh: all assertions passed
-FM_TEST_END 2026-11-10T19:49:41Z tests/fm-session-start.test.sh exit=0 duration_ms=103451 gate_skip=false
-FM_TEST_BEGIN 2026-11-10T19:49:42Z tests/fm-watch-arm.test.sh family=watcher-wake-lock expected_gate_skip=none
-ok - watch-arm: an attached arm reports the wake its cycle delivered instead of a false failure
-ok - watch-arm: a delivered wake consumed by the handling turn still closes the attached arm cleanly
-ok - watch-arm: an unusable launch confirm window refuses to arm by name
-ok - watch-arm: a disposable validation checkout refuses to arm
-ok - watch-arm: a watcher exits when its state directory is removed
-ok - watch-arm: a state directory removed before the queue lock still ends the watcher
-ok - watch-arm: a watcher exits when its home is removed
-ok - watch-arm: the test reaper stops a watcher armed for a tracked temporary home
-ok - watch-arm: a cycle that delivered no wake of its own still fails loudly
-ok - watch-arm: an attached arm keeps following a slow live holder and reports its wake
-ok - watch-arm: an attached arm hands a holder stalled past the bound to its owner's replacement
-/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-arm.sh: line 766: 1650615 Killed                     "$WATCH" > "$child_out"
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1652274.1794340234.K3exhw
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-ok - watch-arm: re-arm surfaces every queued wake and an open remote decision after downtime
-/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-arm.sh: line 766: 1670250 Killed                     "$WATCH" > "$child_out"
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1671616.1794340237.PajH9l
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-ok - watch-arm: a re-arm whose recovery cycle runs slowly still surfaces it
-watcher: recovery state could not be persisted; retaining stale lock evidence
-ok - watch-arm: marker publication failure retains stale-lock recovery evidence
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1741131.1794340252.fOZF0U
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1752921.1794340253.jmz4WA
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-ok - watch-arm: a wake queued after handling drain is recovered once at successor arm
-ok - watch-arm: interrupted handling leaves its wake durable for successor re-drain
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1778021.1794340257.K8T3Zq
-ok - watch-arm: malformed recovery state is quarantined without a successor loop
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1786513.1794340258.P4Cnoj
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-ok - watch-arm: publication after recovery handoff is surfaced
-ok - watch-arm: restart publishes recovery before clearing a reused-pid watcher lock
-WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 7 --recovery-generation 1798035.1794340260.xnvvwu
-PROACTIVE MODE: off
-Use baseline orchestration; any earlier proactive instruction is inactive.
-ok - watch-arm: markerless legacy queues are adopted and recovered
-ok - watch-arm: an idle Lavish source stays quiet and its real result wakes promptly
-ok - watch-arm: appending work reopens an announced empty recovery
-ok - watch-arm: a watcher close during handling keeps the printed acknowledgement valid
-ok - watch-arm: a moved recovery generation consumes handled rows and names its remedy
-ok - watch-arm: downtime marker publication does not follow symlinks
-ok - watch-arm: --stop ends only this home's watcher, publishes downtime, and reports when none runs
-ok - watch-arm: an already-acknowledged handling confirmation succeeds as a no-op
-ok - watch-arm: a churned generation's handling confirmation reports a mismatch and an arm check keeps it
-ok - watch-arm: --take-over attaches to a cycle the named arm does not own and leaves it running
-ok - watch-arm: --take-over owns a fresh cycle without a recovery wake and still surfaces queued work
-watcher: exiting - home no longer exists: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/tmp/fm-watch-arm-tests.dAJcve/take-over-self-exit/home
-ok - watch-arm: takeover preserves self-exit downtime and surfaces a recovery wake
-ok - watch-arm: the OpenCode arm plugin decides with the shared supervision predicate
-FM_TEST_END 2026-11-10T19:51:24Z tests/fm-watch-arm.test.sh exit=0 duration_ms=102203 gate_skip=false
-FM_TEST_BEGIN 2026-11-10T19:51:24Z tests/fm-live-gate.test.sh family=standalone expected_gate_skip=none
+FM_TEST_END 2026-11-10T20:30:45Z tests/fm-session-start.test.sh exit=0 duration_ms=99063 gate_skip=false
+FM_TEST_BEGIN 2026-11-10T20:30:45Z tests/fm-live-gate.test.sh family=standalone expected_gate_skip=none
 ok - a default-on guard runs wherever its tools are installed
 ok - an absent tool is a named capability skip, not a silent pass
 ok - a prompt-submitting guard stays off until it is asked for
@@ -131,8 +141,8 @@ ok - DISABLE_AUTOUPDATER rides fm-spawn's claude launch through to the harness p
 ok - DISABLE_AUTOUPDATER is embedded in the launch so a daemon-built pane keeps it
 ok - credentialed harness children receive only their original configuration; parents stay isolated
 ok - all 39 live guards refuse together on FM_LIVE=0
-FM_TEST_END 2026-11-10T19:51:29Z tests/fm-live-gate.test.sh exit=0 duration_ms=5483 gate_skip=false
-FM_TEST_BEGIN 2026-11-10T19:51:29Z tests/fm-fleet-ledger.test.sh family=unclassified expected_gate_skip=none
+FM_TEST_END 2026-11-10T20:30:51Z tests/fm-live-gate.test.sh exit=0 duration_ms=5365 gate_skip=false
+FM_TEST_BEGIN 2026-11-10T20:30:51Z tests/fm-fleet-ledger.test.sh family=unclassified expected_gate_skip=none
 ok - flag on: dispatch, polled status lines, the local merge after its task's pending lines, and cleanup are recorded in order
 ok - flag on: a PR merge is recorded once, after the task's pending status lines
 ok - flag on: registering a PR records task.pr_ready with its full URL after the task's pending status lines, and the merge-time re-record adds nothing
@@ -143,25 +153,15 @@ ok - append failing: the worker's status command exits nonzero and records nothi
 ok - ledger failing: the worker's status line still lands exactly, quietly, and the backstop records it later
 ok - flag off: the worker's status command is a plain append and leaves no ledger file, offset, or lock
 ok - flag off: the whole lifecycle leaves no ledger file, offset, or lock
-FM_TEST_END 2026-11-10T19:51:42Z tests/fm-fleet-ledger.test.sh exit=0 duration_ms=12860 gate_skip=false
-FM_TEST_BEGIN 2026-11-10T19:51:42Z tests/fm-pipeline-spend.test.sh family=pr-forge expected_gate_skip=none
-ok - known spend, including failed and cancelled invocations, is attributed to the task that ran it
-ok - repeated review rounds in a resumed session are counted once
-ok - absent spend reads as zero only when no run exists, and as unavailable when it cannot be read
-ok - older state without delta columns counts only rounds it can prove
-ok - record appends one line per task incarnation
-ok - an absent opt-in flag bypasses task, pipeline, and ledger reads and writes
-ok - the state database resolves under the account home when NM_HOME and HOME are unset
-ok - missing tasks, secondmates, and unsafe ids are refused
-FM_TEST_END 2026-11-10T19:51:43Z tests/fm-pipeline-spend.test.sh exit=0 duration_ms=1178 gate_skip=false
-FM_TEST_SUMMARY total=5 failed=0 skipped_gate=0 duration_ms=225241
-FM_TEST_SUMMARY_FAMILY family=pr-forge count=1 duration_ms=1178 failed=0
-FM_TEST_SUMMARY_FAMILY family=session-bootstrap count=1 duration_ms=103451 failed=0
-FM_TEST_SUMMARY_FAMILY family=standalone count=1 duration_ms=5483 failed=0
-FM_TEST_SUMMARY_FAMILY family=unclassified count=1 duration_ms=12860 failed=0
-FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=102203 failed=0
-FM_TEST_SLOWEST rank=1 script=tests/fm-session-start.test.sh duration_ms=103451
-FM_TEST_SLOWEST rank=2 script=tests/fm-watch-arm.test.sh duration_ms=102203
-FM_TEST_SLOWEST rank=3 script=tests/fm-fleet-ledger.test.sh duration_ms=12860
-FM_TEST_SLOWEST rank=4 script=tests/fm-live-gate.test.sh duration_ms=5483
-FM_TEST_SLOWEST rank=5 script=tests/fm-pipeline-spend.test.sh duration_ms=1178
+FM_TEST_END 2026-11-10T20:31:03Z tests/fm-fleet-ledger.test.sh exit=0 duration_ms=12496 gate_skip=false
+FM_TEST_SUMMARY total=5 failed=0 skipped_gate=0 duration_ms=218578
+FM_TEST_SUMMARY_FAMILY family=pr-forge count=1 duration_ms=733 failed=0
+FM_TEST_SUMMARY_FAMILY family=session-bootstrap count=1 duration_ms=99063 failed=0
+FM_TEST_SUMMARY_FAMILY family=standalone count=1 duration_ms=5365 failed=0
+FM_TEST_SUMMARY_FAMILY family=unclassified count=1 duration_ms=12496 failed=0
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=100773 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-arm.test.sh duration_ms=100773
+FM_TEST_SLOWEST rank=2 script=tests/fm-session-start.test.sh duration_ms=99063
+FM_TEST_SLOWEST rank=3 script=tests/fm-fleet-ledger.test.sh duration_ms=12496
+FM_TEST_SLOWEST rank=4 script=tests/fm-live-gate.test.sh duration_ms=5365
+FM_TEST_SLOWEST rank=5 script=tests/fm-pipeline-spend.test.sh duration_ms=733

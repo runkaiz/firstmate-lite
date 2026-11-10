@@ -1,0 +1,4 @@
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.test-usage-removal/fresh
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.test-usage-removal/fresh
+
+exit=0

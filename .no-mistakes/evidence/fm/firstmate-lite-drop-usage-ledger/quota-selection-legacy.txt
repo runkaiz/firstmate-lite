@@ -1,0 +1,3 @@
+$ bin/fm-quota-choose.sh --snapshot .test-usage-removal/quota.json --candidate codex:lab-model --candidate claude:lab-model
+claude lab-model
+exit=0

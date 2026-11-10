@@ -1,0 +1,2 @@
+{"v":1,"ts":1794342980,"event":"task.dispatched","task":"ledger-removal-340671","kind":"ship","project":"sample","harness":"codex","model":null}
+{"v":1,"ts":1794342988,"event":"task.cleaned_up","task":"ledger-removal-340671"}

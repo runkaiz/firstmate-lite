@@ -1,0 +1,37 @@
+[
+  {
+    "scenario": "Fresh startup, monitoring, and reemit create no usage ledger",
+    "data_files": [
+      "data/backlog.md.lock"
+    ]
+  },
+  {
+    "scenario": "Obsolete opt-in and corrupt historical ledger survive startup, monitoring, and reemit",
+    "before": {
+      "status.json": {
+        "sha256": "7dd00483b838b310de539f541bd5cca5c1f239ba5dce8a6d04868d5e42b592ef",
+        "mtime_ns": 1794342569078038774
+      },
+      "events.jsonl": {
+        "sha256": "a381c6cd221948820692138849b3cb8422f35260e8a365a8d4d21dddc1c03ba3",
+        "mtime_ns": 1794342569078054694
+      }
+    },
+    "after": {
+      "status.json": {
+        "sha256": "7dd00483b838b310de539f541bd5cca5c1f239ba5dce8a6d04868d5e42b592ef",
+        "mtime_ns": 1794342569078038774
+      },
+      "events.jsonl": {
+        "sha256": "a381c6cd221948820692138849b3cb8422f35260e8a365a8d4d21dddc1c03ba3",
+        "mtime_ns": 1794342569078054694
+      }
+    }
+  },
+  {
+    "scenario": "Quota selection skips an exhausted candidate and refuses all-exhausted candidates without a usage ledger",
+    "selected": "claude lab-model",
+    "all_exhausted": "none",
+    "all_exhausted_exit": 1
+  }
+]
