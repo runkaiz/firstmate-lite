@@ -2062,7 +2062,7 @@ send_status_notifications() {
 $FM_STATUS_NOTIFICATIONS
 EOF
   case "$selected_category" in
-    ready) notify_herdr_task "$selected_session" 'Firstmate: review ready' "$selected_task" done ;;
+    ready) notify_herdr_task "$selected_session" 'Firstmate: review ready' "$selected_task" "done" ;;
     decision) notify_herdr_task "$selected_session" 'Firstmate: decision needed' "$selected_task" request ;;
   esac
 }
