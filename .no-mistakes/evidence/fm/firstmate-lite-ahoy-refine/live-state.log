@@ -1,0 +1,14 @@
+native-ahoy-disappeared 0 Captain, nothing has changed in the records since your last look.
+
+**Next**
+- Publish the integration guide
+native-ahoy-holds-deliveries 0 Captain, this is your first look, so there's nothing earlier to compare against.
+
+**Shipped**
+- Repair importer retries with a complete long task title that exceeds the old truncation limit: https://github.com/ahoy-lab/example/pull/8
+
+**Next**
+- One decision is on hold until the upstream API stabilizes: whether to revisit the integration.
+
+I haven't checked the status of your upstream contributions yet, so that part of this update may be incomplete.
+LIVE_STATE_COMPLETE

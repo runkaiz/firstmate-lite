@@ -1,1 +1,2 @@
-Attempted chrome-devtools-axi start/open against ahoy-live-replies.html using named session nm-ahoy-validation and workspace-local XDG/profile directories. The initial bridge reported BRIDGE_NOT_READY: attached CDP target appears to have gone away. Retried with inherited browser/MCP connection variables cleared; open did not produce a screenshot before the isolated bridge was stopped. Rendered HTML and actual CLI replies remain available as visual/text evidence.
+chrome-devtools-axi open file:///home/runkai/.no-mistakes/evidence/01M73T4Y8AEWYHTMC8P13ECBWT/ahoy-live-responses.html
+BRIDGE_NOT_READY: attached CDP target went away. Stopped the isolated ahoy-gate bridge. Rendered response HTML retained.

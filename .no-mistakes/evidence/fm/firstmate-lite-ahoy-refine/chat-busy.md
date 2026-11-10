@@ -1,12 +1,14 @@
-Ahoy, Captain. Nothing has changed since your last look at 20:03Z.
+Captain, this is your first look, so there's no earlier checkpoint to compare against.
 
 **Shipped**
-- Fix the authentication redirect: https://github.com/example/lab/pull/12
-- Simplify the local launcher: local main
-- Investigate portability (scout report): [report.md](/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md)
+- Delivered a real fix: https://github.com/ahoy-lab/example/pull/1
 
 **Next**
-- Improve the integration workflow with a complete title longer than sixty characters. Nothing is blocking it.
-- 2 items are on hold: "Revisit the integration approach" waits until the upstream API stabilizes, and "Review the release" waits until 2099-01-01.
+- Implement the approved import workflow with the complete title shown to the captain
+- Publish the importer, blocked by the import workflow above
+- Two holds are deferred: the upstream integration waits until the upstream API stabilizes, and the deployment region waits until 2099-01-01.
 
-Nothing is in progress right now, and nothing needs your input. This check only used local records; it didn't look up live PRs.
+**Needs you**
+- Choose the authentication provider: hosted login or an in-house implementation?
+
+Contribution coverage isn't fully checked yet, so this view may be incomplete. Live PR status wasn't checked.

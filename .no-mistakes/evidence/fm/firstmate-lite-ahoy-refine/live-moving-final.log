@@ -1,0 +1,13 @@
+native-ahoy-real-moving 0 No observed changes since your last look, Captain.
+
+**Moving**
+- Prepare importer follow-up (example): implementing, under a minute elapsed. PR recorded at https://github.com/ahoy-lab/example/pull/4, but its merge status wasn't checked because this view only uses local records.
+
+I haven't checked every contribution yet, so this update may be incomplete.
+native-ahoy-real-completion 0 Captain, there are no observed changes since your last look.
+
+**Moving**
+- Prepare importer follow-up (example): the work is finished, but nobody has checked whether it was published or whether CI passed. Running time was about 1 minute. PR on record: https://github.com/ahoy-lab/example/pull/4. A PR on record doesn't mean it's ready to merge.
+
+Contribution tracking wasn't fully checked, so this view may be missing items there.
+LIVE_PROGRESS_COMPLETE

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/.test-tmp/live-progress.py", line 26, in <module>
+    assert any(x['id']=='worker' and x['state']=='working' and x['stage']=='implementing' and x['elapsed_seconds'] is not None for x in a['in_flight']),a['in_flight']
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [{'id': 'worker', 'kind': 'ship', 'state': 'unknown', 'stage': 'unknown', 'elapsed_seconds': None, 'repo': 'example', 'name': 'Prepare importer follow-up', 'doing': 'worktree gone (torn down?)'}]

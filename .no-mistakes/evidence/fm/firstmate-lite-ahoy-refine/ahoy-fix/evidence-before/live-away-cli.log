@@ -1,0 +1,247 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py add delivered 'Repair the importer retry logic' --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: add delivered
+task:
+  id: delivered
+  title: Repair the importer retry logic
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py add followup 'Publish the importer guide' --kind ship --blocked-by delivered --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: add followup
+task:
+  id: followup
+  title: Publish the importer guide
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: yes
+  blocked_by: delivered
+  deps: delivered
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py add disappeared 'Investigate the previous import route' --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: add disappeared
+task:
+  id: disappeared
+  title: Investigate the previous import route
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py start disappeared --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: start disappeared
+task:
+  id: disappeared
+  title: Investigate the previous import route
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:58:46Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "disappeared",
+      "kind": "ship",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "example",
+      "name": "Investigate the previous import route",
+      "doing": "worktree gone (torn down?)"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [
+    {
+      "id": "delivered",
+      "title": "Repair the importer retry logic",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "followup",
+      "title": "Publish the importer guide",
+      "blocked_by": "delivered",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "unhealthy_endpoints": [
+    {
+      "id": "disappeared",
+      "backend": "tmux",
+      "target": "fm-lab:absent",
+      "exists": false,
+      "agent": "not_checked"
+    }
+  ],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py done delivered --pr https://github.com/ahoy-lab/example/pull/3 --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: done delivered
+task:
+  id: delivered
+  title: Repair the importer retry logic
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: https://github.com/ahoy-lab/example/pull/3
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/bin/fm-queue.py done disappeared --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/data/backlog.md
+ok: done disappeared
+task:
+  id: disappeared
+  title: Investigate the previous import route
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l 'bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/primary.sh'

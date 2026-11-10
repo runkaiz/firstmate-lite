@@ -1,0 +1,7 @@
+native-ahoy-real-completion 0 Captain, nothing has changed since your last look.
+
+**Moving**
+- Prepare importer follow-up: implementation is finished, 1 minute elapsed. It has a PR at https://github.com/ahoy-lab/example/pull/4, but publishing and CI checks were skipped, so it isn't confirmed ready to merge.
+
+Contribution tracking hasn't been checked yet, so that part may be incomplete.
+LIVE_PROGRESS_COMPLETE

@@ -1,0 +1,2 @@
+sed: can't read /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/.opencode-live-e2e.13211/opencode-ahoy-later-home/state/session-start-count: No such file or directory
+not ok - OpenCode native later-message setup did not run session start exactly once

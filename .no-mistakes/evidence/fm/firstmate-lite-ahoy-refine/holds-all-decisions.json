@@ -1,0 +1,77 @@
+{
+  "schema": "fm-bearings.v1",
+  "home": "live-state/holds",
+  "generated": "2026-11-10T23:12:05Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Repair importer retries with a complete long task title that exceeds the old truncation limit",
+      "artifact": "https://github.com/ahoy-lab/example/pull/8",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit integration after upstream API stabilization",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration scope",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ]
+}

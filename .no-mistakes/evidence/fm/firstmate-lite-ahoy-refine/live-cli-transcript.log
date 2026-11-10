@@ -1,0 +1,1292 @@
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:18Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-first snapshot; private fm-lab socket; 120x40]
+This is your first look, so there is no earlier comparison.
+
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:21Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:18Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-repeat snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:24Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 71,
+    "checked": 71,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 71,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:21Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-cached snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:27Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 70,
+    "checked": 70,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 70,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 1,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:24Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-incomplete-1 snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, this update may be incomplete: one contribution record was unreadable.
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-incomplete-2 snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+Captain, this update may be incomplete: one contribution record was unreadable, so contribution coverage is not complete.
+
+$ claude -p [current Ahoy skill + fresh chat-quiet-incomplete-3 snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, this update may be incomplete: one contribution record could not be read.
+
+$ bin/fm-queue.py add shipped 'Delivered a real fix' --kind ship
+ok: add shipped
+task:
+  id: shipped
+  title: Delivered a real fix
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py done shipped --pr https://github.com/ahoy-lab/example/pull/1
+ok: done shipped
+task:
+  id: shipped
+  title: Delivered a real fix
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: https://github.com/ahoy-lab/example/pull/1
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py add folded 'Folded parked idea' --kind idea
+ok: add folded
+task:
+  id: folded
+  title: Folded parked idea
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py done folded
+ok: done folded
+task:
+  id: folded
+  title: Folded parked idea
+  state: done
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py add plain-closed 'Closed without a delivery'
+ok: add plain-closed
+task:
+  id: plain-closed
+  title: Closed without a delivery
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py done plain-closed
+ok: done plain-closed
+task:
+  id: plain-closed
+  title: Closed without a delivery
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-captain-hold.sh hold conditional --title 'Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff' --reason 'Choose integration route' --when 'the upstream API stabilizes'
+exit=0
+conditional
+
+$ bin/fm-captain-hold.sh hold dated --title 'Revisit the deployment region' --reason 'Choose deployment region' --until 2099-01-01
+exit=0
+dated
+
+$ bin/fm-captain-hold.sh hold now --title 'Choose the authentication provider' --reason 'Use hosted login or an in-house implementation?'
+exit=0
+now
+
+$ bin/fm-queue.py add next 'Implement the approved import workflow with the complete title shown to the captain' --kind ship
+ok: add next
+task:
+  id: next
+  title: Implement the approved import workflow with the complete title shown to the captain
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py add blocked 'Publish the importer' --kind ship --blocked-by next
+ok: add blocked
+task:
+  id: blocked
+  title: Publish the importer
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: yes
+  blocked_by: next
+  deps: next
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:40Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "now",
+      "key": "now",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Choose the authentication provider: Use hosted login or an in-house implementation?",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Delivered a real fix",
+      "artifact": "https://github.com/ahoy-lab/example/pull/1",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration route",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Revisit the deployment region",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose deployment region",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "next",
+      "title": "Implement the approved import workflow with the complete title shown to the captain",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "blocked",
+      "title": "Publish the importer",
+      "blocked_by": "next",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ bin/fm-bearings-snapshot.sh --json --record-look --all-decisions
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:40Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "dated",
+      "key": "dated",
+      "verb": "captain-hold",
+      "deferred": true,
+      "summary": "Revisit the deployment region: until 2099-01-01: Choose deployment region",
+      "owner": "(main)"
+    },
+    {
+      "id": "now",
+      "key": "now",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Choose the authentication provider: Use hosted login or an in-house implementation?",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Delivered a real fix",
+      "artifact": "https://github.com/ahoy-lab/example/pull/1",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration route",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "next",
+      "title": "Implement the approved import workflow with the complete title shown to the captain",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "blocked",
+      "title": "Publish the importer",
+      "blocked_by": "next",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:40Z",
+    "changes": [
+      {
+        "surface": "next",
+        "title": "Revisit the deployment region",
+        "current": "no longer observed"
+      }
+    ]
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-busy snapshot; private fm-lab socket; 120x40]
+Captain, this is your first look, so there's no earlier checkpoint to compare against.
+
+**Shipped**
+- Delivered a real fix: https://github.com/ahoy-lab/example/pull/1
+
+**Next**
+- Implement the approved import workflow with the complete title shown to the captain
+- Publish the importer, blocked by the import workflow above
+- Two holds are deferred: the upstream integration waits until the upstream API stabilizes, and the deployment region waits until 2099-01-01.
+
+**Needs you**
+- Choose the authentication provider: hosted login or an in-house implementation?
+
+Contribution coverage isn't fully checked yet, so this view may be incomplete. Live PR status wasn't checked.
+
+$ claude -p [current Ahoy skill + fresh chat-busy-detail snapshot; private fm-lab socket; 120x40]
+Captain, since your last look, the deployment-region revisit is no longer observed in the Next queue. That does not mean it was completed; it is still held as a deferred decision.
+
+**Shipped**
+- Delivered a real fix: https://github.com/ahoy-lab/example/pull/1
+
+**Next**
+- Implement the approved import workflow with the complete title shown to the captain
+- Publish the importer (blocked by the import workflow above)
+- Two items are on hold until a set condition is met:
+  - The upstream integration route waits until the upstream API stabilizes.
+  - The deployment region waits until 2099-01-01.
+
+**Needs you**
+- Choose the authentication provider: hosted login or an in-house implementation?
+
+This view does not include a live PR check, and contribution verdicts have not been checked yet. For more, ask for `include PRs`, item bodies, task paths, watch/steer actions, endpoint detail, or the full scout-report inventory.
+
+$ bin/fm-captain-hold.sh hold conditional --reason 'Choose route' --when condition --until 2099-01-01
+exit=1
+fm-captain-hold: choose --until or --when
+
+$ bin/fm-captain-hold.sh answer now --decision-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/l/answer.txt
+exit=0
+answered: now
+
+$ bin/fm-queue.py done next
+ok: done next
+task:
+  id: next
+  title: Implement the approved import workflow with the complete title shown to the captain
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:50:57Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Delivered a real fix",
+      "artifact": "https://github.com/ahoy-lab/example/pull/1",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration route",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Revisit the deployment region",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose deployment region",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "blocked",
+      "title": "Publish the importer",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:40Z",
+    "changes": [
+      {
+        "surface": "next",
+        "title": "Revisit the deployment region",
+        "current": "[\"until 2099-01-01: Choose deployment region\",\"-\"]"
+      },
+      {
+        "surface": "next",
+        "title": "Publish the importer",
+        "current": "[\"-\",\"-\"]"
+      },
+      {
+        "surface": "call",
+        "title": "Choose the authentication provider: Use hosted login or an in-house implementation?",
+        "current": "no longer observed"
+      },
+      {
+        "surface": "next",
+        "title": "Implement the approved import workflow with the complete title shown to the captain",
+        "current": "no longer observed"
+      }
+    ]
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-transitions snapshot; private fm-lab socket; 120x40]
+**Since your last look**, Captain: two items newly appear in Next, "Revisit the deployment region" and "Publish the importer". The call "Choose the authentication provider: Use hosted login or an in-house implementation?" and the queued "Implement the approved import workflow with the complete title shown to the captain" are no longer observed. Neither of those is confirmed done.
+
+**Shipped**
+- Delivered a real fix: https://github.com/ahoy-lab/example/pull/1
+
+**Next**
+- Publish the importer
+
+Two captain holds are deferred. One waits until the upstream API stabilizes, and the other waits until 2099-01-01.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:51:05Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Delivered a real fix",
+      "artifact": "https://github.com/ahoy-lab/example/pull/1",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration route",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Revisit the deployment region",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose deployment region",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "blocked",
+      "title": "Publish the importer",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:50:57Z",
+    "changes": []
+  }
+}
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:51:05Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "shipped",
+      "what": "Delivered a real fix",
+      "artifact": "https://github.com/ahoy-lab/example/pull/1",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "conditional",
+      "title": "Revisit upstream integration with a complete task title exceeding the previous sixty character cutoff",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration route",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Revisit the deployment region",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose deployment region",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "blocked",
+      "title": "Publish the importer",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ bin/fm-queue.py add complete 'Complete the import workflow' --kind ship
+ok: add complete
+task:
+  id: complete
+  title: Complete the import workflow
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py start complete
+ok: start complete
+task:
+  id: complete
+  title: Complete the import workflow
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:51:05Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "complete",
+      "kind": "ship",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "example",
+      "name": "Complete the import workflow",
+      "doing": "backend target gone: fm-lab:complete"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [
+    {
+      "id": "complete",
+      "url": "https://github.com/ahoy-lab/example/pull/2"
+    }
+  ],
+  "unhealthy_endpoints": [
+    {
+      "id": "complete",
+      "backend": "tmux",
+      "target": "fm-lab:complete",
+      "exists": false,
+      "agent": "not_checked"
+    }
+  ],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh chat-completion snapshot; private fm-lab socket; 120x40]
+Captain, this is the first look, so there's no earlier comparison.
+
+**Moving**
+- Complete the import workflow (example): stage unknown, timing unavailable. Its tmux target `fm-lab:complete` no longer exists, so its real state is unknown. A PR is on record at https://github.com/ahoy-lab/example/pull/2, but that doesn't show it's ready to merge.
+
+Contribution verdicts haven't been checked yet, so this view may be incomplete.

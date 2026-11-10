@@ -1,0 +1,26 @@
+[
+  [
+    "user",
+    "Initialize the session and wait for my next message."
+  ],
+  [
+    "user",
+    "\u2063FIRSTMATE_OP: v1 session-start: Run `bin/fm-session-start.sh` now, exactly once, before executing any other instructions."
+  ],
+  [
+    "assistant",
+    "Already ran at session start (`SESSION_START_DONE count=1`); not re-running to keep it exactly once."
+  ],
+  [
+    "user",
+    "Respond exactly PRIOR_BOUNDARY_ACK."
+  ],
+  [
+    "assistant",
+    "PRIOR_BOUNDARY_ACK"
+  ],
+  [
+    "user",
+    "/ahoy"
+  ]
+]

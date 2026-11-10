@@ -1,0 +1,106 @@
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:59:54Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "delivered",
+      "what": "Repair the importer retry logic",
+      "artifact": "https://github.com/ahoy-lab/example/pull/3",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "followup",
+      "title": "Publish the importer guide",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T22:59:50Z",
+    "changes": [
+      {
+        "surface": "landed",
+        "title": "Repair the importer retry logic",
+        "previous": null,
+        "current": "https://github.com/ahoy-lab/example/pull/3"
+      },
+      {
+        "surface": "next",
+        "title": "Publish the importer guide",
+        "previous": "[\"-\",\"delivered\"]",
+        "current": "[\"-\",\"-\"]"
+      },
+      {
+        "surface": "moving",
+        "title": "Investigate the previous import route",
+        "previous": "unknown/unknown",
+        "current": "no longer observed"
+      },
+      {
+        "surface": "next",
+        "title": "Repair the importer retry logic",
+        "previous": "[\"-\",\"-\"]",
+        "current": "no longer observed"
+      }
+    ]
+  }
+}

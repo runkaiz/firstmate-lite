@@ -1,0 +1,427 @@
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T23:02:18Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh quiet-first snapshot; private fm-lab socket; 120x40]
+This is the first look, so there's no earlier comparison.
+
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T23:02:20Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T23:02:18Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh quiet-repeat snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T23:02:23Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 71,
+    "checked": 71,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 71,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T23:02:20Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh quiet-cached snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, all quiet in the local records.
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T23:02:25Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 70,
+    "checked": 70,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 70,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 1,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T23:02:23Z",
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh quiet-incomplete snapshot; private fm-lab socket; 120x40]
+No observed changes since your last look.
+
+Captain, this update may be incomplete: a contribution record was unreadable, so contribution coverage is not confirmed.
+
+$ bin/fm-queue.py add complete 'Complete the import workflow' --kind ship
+ok: add complete
+task:
+  id: complete
+  title: Complete the import workflow
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-queue.py start complete
+ok: start complete
+task:
+  id: complete
+  title: Complete the import workflow
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ bin/fm-bearings-snapshot.sh --json --record-look 
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T23:02:29Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "complete",
+      "kind": "ship",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "example",
+      "name": "Complete the import workflow",
+      "doing": "backend target gone: fm-lab:complete"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [
+    {
+      "id": "complete",
+      "url": "https://github.com/ahoy-lab/example/pull/2"
+    }
+  ],
+  "unhealthy_endpoints": [
+    {
+      "id": "complete",
+      "backend": "tmux",
+      "target": "fm-lab:complete",
+      "exists": false,
+      "agent": "not_checked"
+    }
+  ],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ claude -p [current Ahoy skill + fresh completion snapshot; private fm-lab socket; 120x40]
+Captain, this is your first look, so there is no earlier checkpoint to compare against.
+
+**Moving**
+- Complete the import workflow: stage unknown, timing unavailable. Its worker session is gone, so its current state is unknown. Recorded PR: https://github.com/ahoy-lab/example/pull/2, merge readiness not confirmed.
+
+Contribution coverage is incomplete, so this update may be missing some items.

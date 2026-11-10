@@ -1,0 +1,41 @@
+native-ahoy-away 0 Captain, since your last look, "Repair the importer retry logic" has newly shown up as delivered. That means "Publish the importer guide" is no longer blocked: it was already queued and is now ready to start. "Repair the importer retry logic" is also no longer in the queue.
+
+**Shipped**
+- Repair the importer retry logic: https://github.com/ahoy-lab/example/pull/3
+
+**Next**
+- Publish the importer guide (no blocker, filed 2026-11-10)
+
+This may not show everything, because the contribution check didn't finish.
+native-ahoy-unchanged 0 Captain, there are no changes since your last look.
+
+**Shipped**
+- Repair the importer retry logic: https://github.com/ahoy-lab/example/pull/3
+
+**Next**
+- Publish the importer guide (not blocked)
+
+I couldn't confirm whether your open contributions need anything from you, so this may not be the full picture.
+native-ahoy-quiet-first 0 This is your first look, so I have nothing earlier to compare against. Captain, all quiet in the local records.
+native-ahoy-quiet-repeat 0 No observed changes since your last look. Captain, all quiet in the local records.
+native-ahoy-quiet-counts 0 No observed changes since your last look.
+
+Captain, all quiet in the local records.
+native-ahoy-incomplete-1 0 No observed changes since your last look.
+
+Captain, this update may be incomplete: one contribution record couldn't be read.
+native-ahoy-incomplete-2 0 The `/ahoy` slash command isn't installed in this session, so I followed the project's Ahoy skill file myself.
+
+No observed changes since your last look. Captain, this update may be incomplete: one contribution record could not be read.
+native-ahoy-incomplete-3 0 No observed changes since your last look.
+
+Captain, this update may be incomplete: one contribution record couldn't be read.
+native-ahoy-completion 0 Ahoy, Captain. No observed changes since your last look.
+
+**Moving**
+- Finish importer error handling (example): state and stage unknown, and timing is unavailable. Its worktree is gone and its tmux session `fm-implementation` is missing, so it may have been torn down. A PR is recorded at https://github.com/ahoy-lab/example/pull/4, but that alone doesn't show it merged or is ready to merge. It's also still listed as queued, with no blocker.
+
+This update may be incomplete: none of the known contributions has been checked yet, and I didn't run a live PR check.
+
+`/ahoy` isn't installed as a command in this session, so I followed the project's Ahoy skill file directly. The only change I made was saving the look checkpoint.
+LIVE_CHAT_COMPLETE

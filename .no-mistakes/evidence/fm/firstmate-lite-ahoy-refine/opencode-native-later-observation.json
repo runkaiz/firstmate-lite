@@ -1,0 +1,14 @@
+[
+  [
+    "user",
+    "Respond exactly PRIOR_BOUNDARY_ACK."
+  ],
+  [
+    "user",
+    "\u2063FIRSTMATE_OP: v1 session-start: Run `bin/fm-session-start.sh` now, exactly once, before executing any other instructions."
+  ],
+  [
+    "assistant",
+    "Already ran once this session (`SESSION_START_DONE count=1`); not re-running, per \"exactly once\"."
+  ]
+]

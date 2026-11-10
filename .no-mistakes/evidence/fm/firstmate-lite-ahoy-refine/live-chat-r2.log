@@ -1,0 +1,35 @@
+native-ahoy-away 0 Captain, since your last look, "Repair the importer retry logic" has a newly visible delivery. It is no longer in the queue. "Publish the importer guide" was waiting on it and is now unblocked.
+
+**Shipped**
+- Repair the importer retry logic: https://github.com/ahoy-lab/example/pull/3
+
+**Next**
+- Publish the importer guide: unblocked and ready to pick up.
+
+I haven't checked contribution follow-ups yet, so that part may be incomplete.
+native-ahoy-unchanged 0 Captain, no observed changes since your last look.
+
+**Shipped**
+- Repair the importer retry logic: https://github.com/ahoy-lab/example/pull/3
+
+**Next**
+- Publish the importer guide (not blocked)
+
+One contribution hasn't been checked yet, so the contribution view may be incomplete.
+native-ahoy-quiet-first 0 Captain, this is your first look, so there's nothing earlier to compare against. All quiet in the local records.
+native-ahoy-quiet-repeat 0 No observed changes since your last look.
+
+Captain, all quiet in the local records.
+native-ahoy-quiet-counts 0 Captain, there are no observed changes since your last look, and all is quiet in the local records.
+native-ahoy-incomplete-1 0 Captain, nothing has changed since your last look, but this update may be incomplete because one contribution record couldn't be read.
+native-ahoy-incomplete-2 0 No observed changes since your last look.
+
+Captain, this update may be incomplete: one contribution record couldn't be read, so contribution follow-ups aren't fully covered.
+native-ahoy-incomplete-3 0 No changes since your last look. Captain, this update may be incomplete: one contribution record couldn't be read.
+native-ahoy-completion 0 Captain, no changes since your last look.
+
+**Moving**
+- Finish importer error handling: its state is unknown because the worker is no longer running and its isolated copy is gone. Elapsed time isn't available. It has a recorded PR, https://github.com/ahoy-lab/example/pull/4, but I haven't confirmed whether that PR is merged or ready to merge. This task is also still listed as open in the queue.
+
+This update didn't include a check of contributions, so that part may be incomplete.
+LIVE_CHAT_COMPLETE

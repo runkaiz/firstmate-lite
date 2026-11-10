@@ -1,0 +1,6 @@
+test_conditional_captain_hold_round_trip_and_release (__main__.QueueTests.test_conditional_captain_hold_round_trip_and_release) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.311s
+
+OK

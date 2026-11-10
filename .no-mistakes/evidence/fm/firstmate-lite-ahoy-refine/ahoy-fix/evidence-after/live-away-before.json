@@ -1,0 +1,103 @@
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73T4Y8AEWYHTMC8P13ECBWT/l",
+  "generated": "2026-11-10T22:59:50Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "disappeared",
+      "kind": "ship",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "example",
+      "name": "Investigate the previous import route",
+      "doing": "worktree gone (torn down?)"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [
+    {
+      "id": "delivered",
+      "title": "Repair the importer retry logic",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "followup",
+      "title": "Publish the importer guide",
+      "blocked_by": "delivered",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "unhealthy_endpoints": [
+    {
+      "id": "disappeared",
+      "backend": "tmux",
+      "target": "fm-lab:absent",
+      "exists": false,
+      "agent": "not_checked"
+    }
+  ],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}

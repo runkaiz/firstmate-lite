@@ -1,0 +1,13 @@
+Before extraction fix
+Captain, contribution coverage is incomplete for this look.
+
+After extraction fix
+Since your last look, Captain: the importer retry repair newly appeared as delivered, which cleared the blocker on "Publish the importer guide," and that repair dropped out of the next queue.
+
+**Shipped**
+- Repair the importer retry logic — https://github.com/ahoy-lab/example/pull/3
+
+**Next**
+- Publish the importer guide — no blocker recorded
+
+Captain, contribution coverage is incomplete for this look.

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T4Y8AEWYHTMC8P13ECBWT/.test-tmp/live-progress.py", line 35, in <module>
+    assert any(x['id']=='worker' and x['state']=='done' and x['stage']=='done' for x in a['in_flight']),a['in_flight']
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [{'id': 'worker', 'kind': 'ship', 'state': 'blocked', 'stage': 'blocked', 'elapsed_seconds': 29, 'repo': 'example', 'name': 'Prepare importer follow-up', 'doing': 'named head 9ed00169b71df725a2e0b70267299df20cd47183 is unreachable outside the worker copy'}]
