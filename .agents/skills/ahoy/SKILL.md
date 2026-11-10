@@ -32,6 +32,7 @@ Do not read or write old status-report files.
 
 Lead with a short "Since your last look" signal from `since_last_look` when there is a previous checkpoint.
 Call these newly visible deliveries or changed stages, not exact-time event history; the checkpoint compares observed durable facts within the snapshot bounds.
+Report disappeared current rows as no longer observed, never as proof of completion.
 Say briefly when there are no observed changes, then always give the current picture below.
 On the first look or an unreadable checkpoint, disclose that there is no earlier comparison rather than inventing a catch-up.
 The command saves only one compact checkpoint, never a report archive.

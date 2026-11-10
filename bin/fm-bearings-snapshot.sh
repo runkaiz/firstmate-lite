@@ -69,7 +69,8 @@ Default collection performs bounded concurrent remote-ledger reads for registere
 remote homes under one shared snapshot budget and may refresh the parent-side cache.
 --include-prs additionally performs live GitHub discovery and checks.
 --record-look compares and saves one compact checkpoint at state/ahoy-last.json.
-  since_last_look reports newly visible deliveries and changed current rows;
+  since_last_look reports newly visible deliveries, changed current rows, and
+  current rows no longer observed, without treating their absence as completion;
   it is observation history, not proof of the exact time a delivery landed.
   Default snapshot calls do not read or change that checkpoint.
 
@@ -315,8 +316,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
     (tostring | gsub("\\s+"; " ") | if (length > $n) then (.[:$n] + "…") else . end) end;
   def live_captain_call: .hold_bucket == "live";
   def plain_stage:
-    if .current_state.state == "done" and .pr.url != null then "PR ready"
-    elif .current_state.state != "working" then .current_state.state
+    if .current_state.state != "working" then .current_state.state
     elif .current_state.source == "run-step" then "in review/tests"
     else "implementing" end;
   def elapsed_seconds:
@@ -355,7 +355,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
     $title + ": " + ((hold_note) as $note | if $note == null then "" else $note + ": " end) + $base;
   def as_gate($owner):
     {id, title:.title,
-     blocked_by:((.unresolved_blocker_ids // []) | if length > 0 then join(",") else "-" end | trunc(120)),
+     blocked_by:((.unresolved_blocker_ids // []) | if length > 0 then join(",") else "-" end),
      reason:hold_gate_reason, deferred:(.hold_bucket != null), owner:$owner,
      filed:((.since // null) | trunc(40))};
   def round_robin_landed($n):
@@ -640,14 +640,18 @@ if [ "$RECORD_LOOK" = 1 ]; then
       ([.landed[] | {key:("landed/" + .owner + "/" + .id),value:.artifact,label:.what}]
        + [.in_flight[] | {key:("moving/" + .id),value:(.stage + "/" + .state),label:.name}]
        + [.decisions_open[] | select(.deferred != true) | {key:("call/" + .owner + "/" + .id),value:.summary,label:.summary}]
-       + [.gates[] | {key:("next/" + .owner + "/" + .id),value:.reason,label:.title}])}') || exit 1
+       + [.gates[] | {key:("next/" + .owner + "/" + .id),value:([.reason,.blocked_by] | tojson),label:.title}])}') || exit 1
   MODEL=$(printf '%s' "$MODEL" | jq --argjson previous "$PREVIOUS" --argjson look "$LOOK" '
     .since_last_look = {
       since:($previous.generated // null),
-      changes:[$look.rows[] as $row
+      changes:([$look.rows[] as $row
         | select($previous != null)
         | select(any($previous.rows[]; .key == $row.key and .value == $row.value) | not)
         | {surface:($row.key | split("/")[0]),title:$row.label,current:$row.value}]
+        + [$previous.rows[]? as $row
+           | select($row.key | startswith("landed/") | not)
+           | select(any($look.rows[]; .key == $row.key) | not)
+           | {surface:($row.key | split("/")[0]),title:$row.label,current:"no longer observed"}])
     }') || exit 1
   mkdir -p "$LOOK_STATE" || exit 1
   LOOK_TMP=$(umask 077; mktemp "$LOOK_STATE/.ahoy-last.XXXXXX") || exit 1
