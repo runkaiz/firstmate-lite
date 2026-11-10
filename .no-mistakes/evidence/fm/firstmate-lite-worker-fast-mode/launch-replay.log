@@ -1,0 +1,23 @@
+allowlist-removes-worker-account: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+allowlist-retains-worker-account: codex-fast -> installed Codex exit=0, hooks=false, fast_mode=true
+claude-remains-normal: claude-fast-disabled
+default-model: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+default-off: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+exhausted-model-bound: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+exhausted-product-bound: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+expired-reset: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+omitted-model: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+opt-in-at-2.5x-boundary: codex-fast -> installed Codex exit=0, hooks=false, fast_mode=true
+raw-command-unmodified: unverified
+relaunch-enables-fast: codex-fast -> installed Codex exit=0, hooks=false, fast_mode=true
+relaunch-initial-normal: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+relaunch-rechecks-disabled-opt-in: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+relaunch-tight-quota-normal: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+scout-opt-in: codex-fast -> installed Codex exit=0, hooks=false, fast_mode=true
+second-bounding-window-tight: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+slightly-insufficient-runway: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+stale-quota: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+unknown-pace: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+worker-account-tight-supervisor-healthy: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+worker-cli-probe-rejected-normal: codex-default -> installed Codex exit=0, hooks=false, fast_mode=true
+Captured generated launch contracts, replayed exact Codex controls, removed known product temp files.

@@ -1,0 +1,9 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-opt-in-at-2-5x-boundary/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-opt-in-at-2-5x-boundary
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-opt-in-at-2-5x-boundary/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: live-opt-in-at-2-5x-boundary ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD dfe65c2)
+HEAD is now at dfe65c2 Disposable live project
+native allocation task=live-opt-in-at-2-5x-boundary source_ref=refs/heads/main base=dfe65c26a3967e5e16ae6e1a1df04b9fa6b8368a worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-opt-in-at-2-5x-boundary/worktree
+launch-profile: requested_model=gpt-6 requested_effort=default model_control=flag effort_control=default service_control=codex-fast effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned live-opt-in-at-2-5x-boundary harness=codex kind=ship mode=local-only yolo=off window=primary:fm-live-opt-in-at-2-5x-boundary worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-opt-in-at-2-5x-boundary/worktree

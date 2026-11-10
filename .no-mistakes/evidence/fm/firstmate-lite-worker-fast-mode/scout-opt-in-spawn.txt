@@ -1,0 +1,7 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l
+warn: no registry at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/projects.md; defaulting project to no-mistakes off
+Preparing worktree (detached HEAD 76ae9cb)
+HEAD is now at 76ae9cb Disposable live project
+native allocation task=live-scout-opt-in source_ref=refs/heads/main base=76ae9cba20a552f49d8bf225875ba1fb679099eb worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-scout-opt-in/worktree
+launch-profile: requested_model=gpt-6 requested_effort=default model_control=flag effort_control=default service_control=codex-fast effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned live-scout-opt-in harness=codex kind=scout window=primary:fm-live-scout-opt-in worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-scout-opt-in/worktree

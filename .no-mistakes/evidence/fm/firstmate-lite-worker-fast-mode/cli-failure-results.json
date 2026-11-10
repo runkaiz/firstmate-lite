@@ -1,0 +1,8 @@
+[
+  {
+    "name": "worker-cli-probe-rejected-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  }
+]

@@ -1,0 +1,15 @@
+window=primary:fm-live-scout-opt-in
+endpoint_task_id=live-scout-opt-in
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-scout-opt-in/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/project
+harness=codex
+kind=scout
+tasktmp=/tmp/fm-live-scout-opt-in
+model=gpt-6
+effort=default
+launch_model_control=flag
+launch_effort_control=default
+launch_service_control=codex-fast
+effective_profile=unverified
+spawn_gen=s1794341668.3453153.28367

@@ -1,0 +1,134 @@
+[
+  {
+    "name": "opt-in-at-2.5x-boundary",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "default-off",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "omitted-model",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "default-model",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "slightly-insufficient-runway",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "stale-quota",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "unknown-pace",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "second-bounding-window-tight",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "expired-reset",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "exhausted-model-bound",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "exhausted-product-bound",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "worker-account-tight-supervisor-healthy",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "allowlist-removes-worker-account",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "allowlist-retains-worker-account",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-rechecks-disabled-opt-in",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "scout-opt-in",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "claude-remains-normal",
+    "expected": "claude-fast-disabled",
+    "actual": "claude-fast-disabled",
+    "result": "pass"
+  },
+  {
+    "name": "raw-command-unmodified",
+    "expected": "unverified",
+    "actual": "unverified",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-initial-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-enables-fast",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-tight-quota-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "worker-cli-probe-rejected-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  }
+]

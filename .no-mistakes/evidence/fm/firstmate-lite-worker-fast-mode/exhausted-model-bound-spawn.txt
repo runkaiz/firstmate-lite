@@ -1,0 +1,10 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l
+WARNING: watcher still down (same stale episode; last beat: 20s ago, grace 300s) - full banner already printed this episode.
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-exhausted-model-bound/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-exhausted-model-bound
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-exhausted-model-bound/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: live-exhausted-model-bound ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD dfe65c2)
+HEAD is now at dfe65c2 Disposable live project
+native allocation task=live-exhausted-model-bound source_ref=refs/heads/main base=dfe65c26a3967e5e16ae6e1a1df04b9fa6b8368a worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-exhausted-model-bound/worktree
+launch-profile: requested_model=gpt-6 requested_effort=default model_control=flag effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned live-exhausted-model-bound harness=codex kind=ship mode=local-only yolo=off window=primary:fm-live-exhausted-model-bound worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-exhausted-model-bound/worktree

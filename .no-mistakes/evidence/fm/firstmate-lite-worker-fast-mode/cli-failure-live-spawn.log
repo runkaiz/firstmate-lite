@@ -1,0 +1,16 @@
+Real product: fm-spawn.sh, native Git allocator, private tmux fm-lab socket, installed codex-cli 0.165.0
+Quota inputs are disposable schema-6 data. Codex has an empty disposable home: no operator data, login, or model request is used.
+
+SCENARIO worker-cli-probe-rejected-normal
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-worker-cli-probe-rejected-normal/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-worker-cli-probe-rejected-normal
+warning: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.l/data/live-worker-cli-probe-rejected-normal/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: live-worker-cli-probe-rejected-normal ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD 7aea122)
+HEAD is now at 7aea122 Disposable live project
+native allocation task=live-worker-cli-probe-rejected-normal source_ref=refs/heads/main base=7aea122124c439ad20490628585770773d559626 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-worker-cli-probe-rejected-normal/worktree
+launch-profile: requested_model=gpt-6 requested_effort=default model_control=flag effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned live-worker-cli-probe-rejected-normal harness=codex kind=ship mode=local-only yolo=off window=primary:fm-live-worker-cli-probe-rejected-normal worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live-worker-cli-probe-rejected-normal/worktree
+
+Observed launch_service_control=codex-default
+Private tmux server stopped and disposable lab/project/copies removed.

@@ -1,0 +1,92 @@
+mentions_v2                              stable             true
+model_catalog_in_context                 under development  false
+multi_agent                              stable             true
+multi_agent_mode                         removed            false
+multi_agent_v2                           stable             false
+multi_agent_v2_dynamic_tools             under development  false
+multi_env_copy_file                      under development  false
+network_proxy                            experimental       false
+non_prefixed_mcp_tool_names              under development  false
+nonfatal_clock_read_errors               under development  false
+omit_app_server_notification_media       under development  false
+output_token_replay                      under development  false
+personality                              removed            false
+plugin_hooks                             removed            false
+plugin_sharing                           stable             true
+plugins                                  stable             true
+powershell_shell_version                 under development  false
+prediction_preserve_parent_tools         stable             true
+prefer_mxc                               under development  false
+prevent_idle_sleep                       experimental       false
+psp                                      under development  false
+realtime_conversation                    removed            true
+reasoning_effort_override                stable             true
+recommended_plugins                      stable             false
+remote_compaction_v2                     removed            false
+remote_control                           removed            false
+remote_models                            removed            false
+remote_plugin                            stable             true
+request_permissions_tool                 under development  false
+request_rule                             removed            false
+resize_all_images                        removed            true
+respect_system_proxy                     under development  false
+responses_websockets                     removed            false
+responses_websockets_v2                  removed            false
+retain_client_developer_messages         under development  false
+retain_client_tool_outputs               under development  false
+rollout_budget                           under development  false
+runtime_agent_instances                  under development  false
+runtime_metrics                          under development  false
+search_tool                              removed            false
+secret_auth_storage                      stable             false
+send_async_message                       removed            false
+send_message_to_user_async               under development  false
+shell_snapshot                           stable             true
+shell_snapshot_v2                        under development  false
+shell_tool                               stable             true
+shell_zsh_fork                           removed            false
+skill_env_var_dependency_prompt          removed            false
+skill_mcp_dependency_install             stable             true
+skill_search                             stable             true
+skip_host_skill_discovery                under development  false
+sleep_tool                               stable             true
+sqlite                                   removed            true
+stable_environment_tools                 removed            false
+standalone_web_search                    under development  false
+steer                                    removed            true
+step_model_switching                     under development  false
+subagent_default_context_limits          under development  false
+subagent_thread_environments             under development  false
+system_proxy_fallback                    stable             true
+terminal_resize_reflow                   removed            true
+terminal_visualization_instructions      under development  false
+token_budget                             under development  false
+tool_call_mcp_elicitation                stable             true
+tool_search                              removed            false
+tool_search_always_defer_mcp_tools       removed            true
+tool_suggest                             stable             true
+transcript_v2                            removed            false
+tui_app_server                           removed            true
+tui_multi_backend                        under development  false
+ultrafast_mode                           stable             true
+unavailable_dummy_tools                  removed            false
+unbounded_connection_retries             stable             true
+undo                                     removed            false
+unified_exec                             stable             true
+unified_exec_tty                         stable             true
+unified_exec_zsh_fork                    removed            false
+unified_image_budget                     under development  false
+use_agent_identity                       under development  false
+use_legacy_landlock                      deprecated         false
+use_linux_sandbox_bwrap                  removed            false
+use_xaa                                  under development  false
+view_image                               stable             true
+wake_on_agent_messages                   under development  false
+web_search_cached                        deprecated         false
+web_search_request                       deprecated         false
+windows_sandbox_service                  under development  false
+workspace_dependencies                   stable             true
+workspace_owner_usage_nudge              removed            false
+worktrees                                removed            true
+write_stdin_approval                     stable             true
+bash-5.3$

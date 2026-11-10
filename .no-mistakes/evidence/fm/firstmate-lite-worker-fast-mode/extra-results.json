@@ -1,0 +1,38 @@
+[
+  {
+    "name": "scout-opt-in",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "claude-remains-normal",
+    "expected": "claude-fast-disabled",
+    "actual": "claude-fast-disabled",
+    "result": "pass"
+  },
+  {
+    "name": "raw-command-unmodified",
+    "expected": "unverified",
+    "actual": "unverified",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-initial-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-enables-fast",
+    "expected": "codex-fast",
+    "actual": "codex-fast",
+    "result": "pass"
+  },
+  {
+    "name": "relaunch-tight-quota-normal",
+    "expected": "codex-default",
+    "actual": "codex-default",
+    "result": "pass"
+  }
+]

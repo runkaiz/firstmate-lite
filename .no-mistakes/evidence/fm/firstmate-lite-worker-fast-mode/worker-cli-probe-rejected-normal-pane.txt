@@ -1,0 +1,32 @@
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/copies/live
+-worker-cli-probe-rejected-normal/worktree'
+bash-5.3$ cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73GH5ZSPN2J2WFM07SKPNBK/.phase-test/c
+opies/live-worker-cli-probe-rejected-normal/worktree'
+bash-5.3$ . '/tmp/fm-live-worker-cli-probe-rejected-normal/fast.kavrhLDg/probe.sh'
+bash-5.3$ export GOTMPDIR=/tmp/fm-live-worker-cli-probe-rejected-normal/gotmp
+bash-5.3$ export COMPACT_ADVISER_DISABLE=1
+bash-5.3$ export FM_TASK_ID=live-worker-cli-probe-rejected-normal
+bash-5.3$ . '/tmp/fm-live-worker-cli-probe-rejected-normal+bfe138986dbd2fb31245d5004dad6e00e7b01be83caa3c44532
+0aa6f0106ebad/launch.s1794341791.3630580.18473.sh'
+Error: invalid type: sequence, expected a string
+in `model`
+
+bash-5.3$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
