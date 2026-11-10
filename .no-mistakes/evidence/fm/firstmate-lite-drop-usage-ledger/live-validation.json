@@ -1,0 +1,71 @@
+{
+  "live_cli_operations": [
+    "writable startup with empty home",
+    "startup and reemit with legacy usage config/data",
+    "quiet watcher checkpoint",
+    "actionable status wake with fleet capture",
+    "Pi spawn in private tmux socket with nonzero 120x40 grid",
+    "stopped endpoint recovery and Pi relaunch",
+    "Pi control-plane relaunch",
+    "Pi control-plane exit",
+    "native task teardown",
+    "default-off and enabled idempotent pipeline-spend record",
+    "quota selection from explicit captured snapshots"
+  ],
+  "spawn_generation": "s1794340320.2132141.19536",
+  "replacement_generation": "s1794340423.2325303.29766",
+  "worktree_before": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree",
+  "worktree_after": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree",
+  "legacy_usage_records_preserved": {
+    "before": {
+      "data/usage-ledger/events.jsonl": {
+        "sha256": "63695698ceebef1c90849d2e1f08bfbcb1b31714f04184c816bcfff6ffc29538",
+        "mtime_ns": 1794340221517027904
+      },
+      "data/usage-ledger/status.json": {
+        "sha256": "e16b08c45099e76565ff492f82be619bc363c0786ea7a9f2ec26a344a430afd4",
+        "mtime_ns": 1794340221517043465
+      }
+    },
+    "after": {
+      "data/usage-ledger/events.jsonl": {
+        "sha256": "63695698ceebef1c90849d2e1f08bfbcb1b31714f04184c816bcfff6ffc29538",
+        "mtime_ns": 1794340221517027904
+      },
+      "data/usage-ledger/status.json": {
+        "sha256": "e16b08c45099e76565ff492f82be619bc363c0786ea7a9f2ec26a344a430afd4",
+        "mtime_ns": 1794340221517043465
+      }
+    },
+    "fresh_start_created_usage_directory": false
+  },
+  "lifecycle_legacy_records_preserved": {
+    "before": {
+      "data/usage-ledger/events.jsonl": {
+        "sha256": "83e3a3bb526dcd794d8b1acd5ba7a24161d04fc009f2eab0990ee82e9c6fffd8",
+        "mtime_ns": 1794340319541700904
+      }
+    },
+    "after": {
+      "data/usage-ledger/events.jsonl": {
+        "sha256": "83e3a3bb526dcd794d8b1acd5ba7a24161d04fc009f2eab0990ee82e9c6fffd8",
+        "mtime_ns": 1794340319541700904
+      }
+    },
+    "copy_removed": true,
+    "metadata_removed": true
+  },
+  "setup_retries": [
+    "Accepted Pi folder trust inside disposable PI_CODING_AGENT_DIR before lifecycle commands.",
+    "Stopped task through fm-control exit before retrying native teardown."
+  ],
+  "scope": "These are Firstmate CLI accounting-hook checks. The real Pi UI launched and lifecycle controls operated; its isolated home had no model credentials. No authenticated model completion or live quota-provider query is claimed. Quota selection uses the public explicit-snapshot interface.",
+  "ui_evidence": "CLI transcripts retained. No browser or graphical layout was changed.",
+  "targeted_regressions": [
+    "tests/fm-session-start.test.sh",
+    "tests/fm-watch-arm.test.sh",
+    "tests/fm-live-gate.test.sh",
+    "tests/fm-fleet-ledger.test.sh",
+    "tests/fm-pipeline-spend.test.sh"
+  ]
+}

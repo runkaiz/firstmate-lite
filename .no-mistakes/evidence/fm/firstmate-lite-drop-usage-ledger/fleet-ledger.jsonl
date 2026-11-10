@@ -1,0 +1,2 @@
+{"v":1,"ts":1794340227,"event":"task.status","task":"ledger-probe","state":"done","key":null,"text":" disposable live usage-removal probe"}
+{"v":1,"ts":1794340228,"event":"task.pr_ready","task":"ledger-probe","pr":"https://example.invalid/pull/1"}

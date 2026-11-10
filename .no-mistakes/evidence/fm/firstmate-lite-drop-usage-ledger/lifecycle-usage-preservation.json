@@ -1,0 +1,16 @@
+{
+  "before": {
+    "data/usage-ledger/events.jsonl": {
+      "sha256": "83e3a3bb526dcd794d8b1acd5ba7a24161d04fc009f2eab0990ee82e9c6fffd8",
+      "mtime_ns": 1794340319541700904
+    }
+  },
+  "after": {
+    "data/usage-ledger/events.jsonl": {
+      "sha256": "83e3a3bb526dcd794d8b1acd5ba7a24161d04fc009f2eab0990ee82e9c6fffd8",
+      "mtime_ns": 1794340319541700904
+    }
+  },
+  "copy_removed": true,
+  "metadata_removed": true
+}

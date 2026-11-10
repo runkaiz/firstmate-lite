@@ -1,0 +1,3 @@
+$ tmux -L fm-lab kill-server
+
+exit: 0

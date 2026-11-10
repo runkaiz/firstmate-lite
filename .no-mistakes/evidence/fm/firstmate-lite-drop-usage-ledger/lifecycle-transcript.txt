@@ -1,0 +1,100 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-spawn.sh fmtest-usage-drop-2131892 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/project --mode local-only --yolo off --harness pi
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+Preparing worktree (detached HEAD a8e1c4c)
+HEAD is now at a8e1c4c Disposable project
+native allocation task=fmtest-usage-drop-2131892 source_ref=refs/heads/main base=a8e1c4cae37cdbb04f83eb04f54f115e9c3f2752 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned fmtest-usage-drop-2131892 harness=pi kind=ship mode=local-only yolo=off window=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-spawn.sh fmtest-usage-drop-2131892 --relaunch --harness pi
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned fmtest-usage-drop-2131892 harness=pi kind=ship mode=local-only yolo=off window=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-peek.sh fmtest-usage-drop-2131892 60
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+bash-5.3$ cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-213189
+2/worktree'
+bash-5.3$ export GOTMPDIR=/tmp/fm-fmtest-usage-drop-2131892/gotmp
+bash-5.3$ export COMPACT_ADVISER_DISABLE=1
+bash-5.3$ export FM_TASK_ID=fmtest-usage-drop-2131892
+bash-5.3$ . '/tmp/fm-fmtest-usage-drop-2131892+d10fa8159e7b79471e4092e1b91e873f2f53aaca7efb9dadca70a08d9eb0d795/launch.s1794340417.2321105.1
+4650.sh'
+
+ ▀▀█  v1.5.2
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+
+[Context]
+  /var/home/runkai/AGENTS.md, /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/AGENTS.md
+
+[Extensions]
+  fmtest-usage-drop-2131892.pi-ext.ts
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Error: No API key found for the selected model.
+
+ Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree (de...
+0.0%/0 (auto)                                                                                                                        unknown
+
+
+
+
+
+
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-control.sh fmtest-usage-drop-2131892 relaunch --note Repeat the disposable lifecycle smoke check without changing files.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+relaunched fmtest-usage-drop-2131892 harness=pi from=pi model=default effort=default backend=tmux endpoint=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-control.sh fmtest-usage-drop-2131892 exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+stopped fmtest-usage-drop-2131892 harness=pi backend=tmux endpoint=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-teardown.sh fmtest-usage-drop-2131892
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown fmtest-usage-drop-2131892 complete (window primary:fm-fmtest-usage-drop-2131892, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree)
+Backlog: fmtest-usage-drop-2131892 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l/data/backlog.md - move fmtest-usage-drop-2131892 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+
+exit: 0
+
+
+$ tmux -L fm-lab kill-server
+
+exit: 0

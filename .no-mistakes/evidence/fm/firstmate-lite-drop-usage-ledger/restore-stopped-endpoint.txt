@@ -1,0 +1,3 @@
+$ tmux -L fm-lab new-window -d -n fm-fmtest-usage-drop-2131892 -c /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0

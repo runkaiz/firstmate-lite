@@ -1,0 +1,23 @@
+{
+  "before": {
+    "data/usage-ledger/events.jsonl": {
+      "sha256": "63695698ceebef1c90849d2e1f08bfbcb1b31714f04184c816bcfff6ffc29538",
+      "mtime_ns": 1794340221517027904
+    },
+    "data/usage-ledger/status.json": {
+      "sha256": "e16b08c45099e76565ff492f82be619bc363c0786ea7a9f2ec26a344a430afd4",
+      "mtime_ns": 1794340221517043465
+    }
+  },
+  "after": {
+    "data/usage-ledger/events.jsonl": {
+      "sha256": "63695698ceebef1c90849d2e1f08bfbcb1b31714f04184c816bcfff6ffc29538",
+      "mtime_ns": 1794340221517027904
+    },
+    "data/usage-ledger/status.json": {
+      "sha256": "e16b08c45099e76565ff492f82be619bc363c0786ea7a9f2ec26a344a430afd4",
+      "mtime_ns": 1794340221517043465
+    }
+  },
+  "fresh_start_created_usage_directory": false
+}

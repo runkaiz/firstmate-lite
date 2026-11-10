@@ -1,0 +1,7 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-spawn.sh fmtest-usage-drop-2131892 --relaunch --harness pi
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned fmtest-usage-drop-2131892 harness=pi kind=ship mode=local-only yolo=off window=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0

@@ -1,0 +1,3 @@
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l codex
+
+exit: 0

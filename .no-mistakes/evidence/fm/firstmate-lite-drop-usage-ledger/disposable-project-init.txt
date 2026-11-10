@@ -1,0 +1,3 @@
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/project
+
+exit: 0

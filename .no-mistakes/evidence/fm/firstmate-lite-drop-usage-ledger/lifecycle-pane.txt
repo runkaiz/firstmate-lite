@@ -1,0 +1,65 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-peek.sh fmtest-usage-drop-2131892 60
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-d
+rop-2131892/worktree'
+
+  Welcome to Bazzite 󰊴
+
+  󱋩  ghcr.io/ublue-os/bazzite-dx-nvidia:stable
+  󰟀  Boot Status: Healthy 󰄳
+
+    Command                                                │ Description
+  ──────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────
+    ujust --choose                                          │ List all available commands
+    ujust toggle-user-motd                                  │ Toggle this banner on/off
+    fastfetch                                               │ View system information
+    brew help                                               │ Manage command line packages
+
+  Confused about what games are compatible with Linux? The  ProtonDB Badges  plugin for Decky Loader adds community-
+  powered game compatibility badges to your entire 󰓓 Steam Library~More info https://github.com/OMGDuke/protondb-decky
+
+  •  Report an issue https://issues.bazzite.gg/
+  • 󰈙 Documentation https://docs.bazzite.gg/
+  • 󰙯 Discord https://discord.bazzite.gg/
+  •  Bluesky https://bluesky.bazzite.gg/
+runkai@griffin:/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/project$ cd -- '/
+var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131
+892/worktree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest
+-usage-drop-2131892/worktree$ export GOTMPDIR=/tmp/fm-fmtest-usage-drop-2131892/gotmp
+export COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest
+-usage-drop-2131892/worktree$ export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=fmtest-usage-drop-2131892
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest
+-usage-drop-2131892/worktree$ export FM_TASK_ID=fmtest-usage-drop-2131892
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest
+-usage-drop-2131892/worktree$ . '/tmp/fm-fmtest-usage-drop-2131892+d10fa8159e7b79471e4092e1b91e873f2f53aaca7efb9dadca70a
+08d9eb0d795/launch.s1794340320.2132141.19536.sh'
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ Trust project folder?
+ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2
+ 131892/worktree
+
+ This allows pi to load .pi settings and resources, install missing project packages, and execute project extensions.
+
+ → Trust
+   Trust parent folder
+ (/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-
+ 2131892)
+   Trust (this session only)
+   Do not trust
+   Do not trust (this session only)
+
+ ↑↓ navigate  enter select  escape/ctrl+c cancel
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+exit: 0

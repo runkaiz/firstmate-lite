@@ -1,0 +1,15 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-checkpoint.sh --seconds 4
+checkpoint: no actionable wake within 4s
+
+exit: 124
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-watch-checkpoint.sh --seconds 8
+check: rearm-resurface
+
+exit: 0
+
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-fleet-ledger.sh pr_ready ledger-probe https://example.invalid/pull/1
+
+exit: 0

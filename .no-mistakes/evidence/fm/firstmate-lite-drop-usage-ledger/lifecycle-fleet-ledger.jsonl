@@ -1,0 +1,6 @@
+{"v":1,"ts":1794340321,"event":"task.dispatched","task":"fmtest-usage-drop-2131892","kind":"ship","project":"project","harness":"pi","model":null}
+{"v":1,"ts":1794340431,"event":"task.status","task":"fmtest-usage-drop-2131892","state":"note","key":null,"text":" worker-profile: runtime observation {\"generation\":\"g1794340379.2272785.20031\",\"model\":\"unknown/unknown\",\"effort\":\"off\",\"service\":\"unverified\"}"}
+{"v":1,"ts":1794340431,"event":"task.status","task":"fmtest-usage-drop-2131892","state":"note","key":null,"text":" worker-profile: runtime observation {\"generation\":\"g1794340389.2278643.22601\",\"model\":\"unknown/unknown\",\"effort\":\"off\",\"service\":\"unverified\"}"}
+{"v":1,"ts":1794340431,"event":"task.status","task":"fmtest-usage-drop-2131892","state":"note","key":null,"text":" worker-profile: runtime observation {\"generation\":\"g1794340417.2321877.10209\",\"model\":\"unknown/unknown\",\"effort\":\"off\",\"service\":\"unverified\"}"}
+{"v":1,"ts":1794340431,"event":"task.status","task":"fmtest-usage-drop-2131892","state":"note","key":null,"text":" worker-profile: runtime observation {\"generation\":\"g1794340423.2326232.585\",\"model\":\"unknown/unknown\",\"effort\":\"off\",\"service\":\"unverified\"}"}
+{"v":1,"ts":1794340431,"event":"task.cleaned_up","task":"fmtest-usage-drop-2131892"}

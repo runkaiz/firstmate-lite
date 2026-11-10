@@ -1,0 +1,83 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-peek.sh fmtest-usage-drop-2131892 60
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+bash-5.3$ cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-213189
+2/worktree'
+bash-5.3$ export GOTMPDIR=/tmp/fm-fmtest-usage-drop-2131892/gotmp
+bash-5.3$ export COMPACT_ADVISER_DISABLE=1
+bash-5.3$ export FM_TASK_ID=fmtest-usage-drop-2131892
+bash-5.3$ . '/tmp/fm-fmtest-usage-drop-2131892+d10fa8159e7b79471e4092e1b91e873f2f53aaca7efb9dadca70a08d9eb0d795/launch.s1794340417.2321105.1
+4650.sh'
+
+ ▀▀█  v1.5.2
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+
+[Context]
+  /var/home/runkai/AGENTS.md, /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/AGENTS.md
+
+[Extensions]
+  fmtest-usage-drop-2131892.pi-ext.ts
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Error: No API key found for the selected model.
+
+ Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree (de...
+0.0%/0 (auto)                                                                                                                        unknown
+
+bash-5.3$ cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-213189
+2/worktree'
+bash-5.3$ export GOTMPDIR=/tmp/fm-fmtest-usage-drop-2131892/gotmp
+bash-5.3$ export COMPACT_ADVISER_DISABLE=1
+bash-5.3$ export FM_TASK_ID=fmtest-usage-drop-2131892
+bash-5.3$ . '/tmp/fm-fmtest-usage-drop-2131892+d10fa8159e7b79471e4092e1b91e873f2f53aaca7efb9dadca70a08d9eb0d795/launch.s1794340423.2325303.2
+9766.sh'
+
+ ▀▀█  v1.5.2
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+
+[Context]
+  /var/home/runkai/AGENTS.md, /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/AGENTS.md
+
+[Extensions]
+  fmtest-usage-drop-2131892.pi-ext.ts
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Error: No API key found for the selected model.
+
+ Use /login to log into a provider via OAuth or API key. See:
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree (de...
+0.0%/0 (auto)                                                                                                                        unknown
+
+exit: 0

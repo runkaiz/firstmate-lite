@@ -1,0 +1,3 @@
+$ tmux -L fm-lab set-option -g default-command exec /bin/bash --noprofile --norc
+
+exit: 0

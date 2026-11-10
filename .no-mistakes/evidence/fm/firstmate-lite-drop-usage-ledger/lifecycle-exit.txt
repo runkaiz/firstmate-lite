@@ -1,0 +1,5 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/bin/fm-control.sh fmtest-usage-drop-2131892 exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.l
+stopped fmtest-usage-drop-2131892 harness=pi backend=tmux endpoint=primary:fm-fmtest-usage-drop-2131892 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73FXDW27CZ6BKZQR9ZYJN1V/.phase-test/copies/fmtest-usage-drop-2131892/worktree
+
+exit: 0
