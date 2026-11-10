@@ -1,0 +1,18 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh provision fm-lab-i
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-i workspace create --cwd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/visual --label notification-proof --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/visual","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/visual","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65ff42f5ac19d1","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},"type":"workspace_created","workspace":{"active_tab_id":"w1:t1","agent_status":"unknown","focused":true,"label":"notification-proof","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"}}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh viewer start fm-lab-i
+viewer attached to fm-lab-i (pid 4130100)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-i pane run w1:p1 printf 'Live Herdr notification verification\n'
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-i notification show Firstmate: review ready --body review-task --sound done
+{"id":"cli:notification:show","result":{"reason":"shown","shown":true,"type":"notification_show"}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-i notification show Firstmate: decision needed --body release-task --sound request
+{"id":"cli:notification:show","result":{"reason":"shown","shown":true,"type":"notification_show"}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh teardown fm-lab-i
+

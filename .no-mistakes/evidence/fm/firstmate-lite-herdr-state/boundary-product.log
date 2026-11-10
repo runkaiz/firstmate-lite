@@ -1,0 +1,65 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh provision fm-lab-b
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b workspace create --cwd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary --label unreadable --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65ff433520e371","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},"type":"workspace_created","workspace":{"active_tab_id":"w1:t1","agent_status":"unknown","focused":true,"label":"unreadable","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"}}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b pane run w1:p1 sleep 300
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b pane report-agent w1:p1 --source fm-live-boundary --agent claude --state idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/home
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/home/state native --state busy --source claude-hook --event UserPromptSubmit
+g1794352297.12664.27610
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: working · source: pane · harness busy (claude-hook)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-busy-event.sh apply /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/home/state native idle --current-gen --source claude-hook --event Stop
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: idle · source: pane · Herdr agent is idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b session list --json
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/h/herdr","socket_path":"/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/h/herdr/herdr.sock"},{"default":false,"name":"fm-lab-b","running":true,"session_dir":"/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/h/herdr/sessions/fm-lab-b","socket_path":"/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/h/herdr/sessions/fm-lab-b/herdr.sock"}]}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b pane get w1:p1
+Error: Os { code: 13, kind: PermissionDenied, message: "Permission denied" }
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-b status --json
+Error: Os { code: 13, kind: PermissionDenied, message: "Permission denied" }
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: unknown · source: none · backend unreachable (Herdr agent state unavailable)
+
+$ bash -c . "$1/bin/fm-backend.sh"; fm_backend_source herdr; fm_backend_herdr_agent_state "$2" activity _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA fm-lab-b:w1:p1
+unreadable
+Unreadable socket crew result: state: unknown · source: none · backend unreachable (Herdr agent state unavailable)
+
+PASS unreadable live socket produced unknown state and no recovery wake
+$ tmux -L fm-lab new-session -d -s checks -n fm-fallback -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary sleep 300
+
+$ tmux -L fm-lab display-message -p #{socket_path},#{pid},0
+/var/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/t/tmux-1000/fm-lab,17216,0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home/state fallback --state idle --source claude-hook --event Stop
+g1794352301.17239.28634
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh fallback
+state: parked · source: status-log · approve the release
+
+$ timeout 20 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-watch.sh
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home/state/fallback.status
+
+TMUX persisted wake:
+1794352302	1	signal	fallback.status	needs-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home/state/fallback.status
+1794352302	2	signal	fallback.status	needs-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/boundary/tmux-home/state/fallback.status
+PASS tmux fallback captain decision still wakes through the status contract
+$ tmux -L fm-lab kill-server
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh teardown fm-lab-b
+

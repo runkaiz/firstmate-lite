@@ -1,0 +1,40 @@
+ spaces                  │   1      +                                                                                   
+                         │bash-5.3$ printf 'Live Herdr notification verification\n'                                     
+ · notification-proof    │Live Herdr notification verification                                                          
+                         │bash-5.3$                                                                                     
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │  ┌──────────────────────────────────────────────────────────────┐                            
+                         │  │  herdr                                                       │                            
+                         │  │  terminal workspace manager for coding agents                │                            
+                         │  │                                                              │                            
+                         │  │  this is a mouse-first terminal.                             │                            
+                         │  │  click the sidebar to switch workspaces, drag pane           │                            
+                         │  │  borders to resize, right-click for context menus.           │                            
+ new                 menu│  │                                                              │                            
+─────────────────────────│  │  ctrl+b enters prefix mode · ? shows keybinds and settings   │                            
+ agents           grouped│  │  next: install optional agent integrations for more reliable │                            
+                         │  │                                                              │                            
+                         │  │                                                              │                            
+                         │  │                                                              │                            
+                         │  │                                                              │                            
+                         │  │ ↵ continue                                                   │                            
+                         │  └──────────────────────────────────────────────────────────────┘                            
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                         │                                                                                              
+                        «│                                                                                             u

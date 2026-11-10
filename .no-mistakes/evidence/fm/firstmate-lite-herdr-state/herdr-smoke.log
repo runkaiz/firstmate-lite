@@ -1,0 +1,14 @@
+FM_TEST_BEGIN 2026-11-10T23:10:48Z tests/fm-backend-herdr-eventwait-smoke.test.sh family=real-herdr-gated expected_gate_skip=herdr
+ok - real herdr (0.9.5): events.subscribe capability gate passes (protocol >= 16, events surface present in api schema)
+ok - real herdr (0.9.5): a driven idle->blocked transition returns the blocked record in 0.679s (pane w1:p1)
+ok - real herdr: the watcher fast-path enqueues a stale wake naming the task window from the live blocked transition
+ok - real herdr: the level check dedupes one blocked episode and detects the next
+ok - real herdr: notification API accepts a scoped review notice
+ok - real herdr (0.9.5): claude (2.1.322 (Claude Code)) settles in the isolated pane
+ok - real herdr (0.9.5): codex (codex-cli 0.167.1) settles in the isolated pane
+ok - real herdr (0.9.5): pi (1.5.2) settles in the isolated pane
+FM_TEST_END 2026-11-10T23:11:07Z tests/fm-backend-herdr-eventwait-smoke.test.sh exit=0 duration_ms=18940 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=18964
+FM_TEST_SUMMARY_FAMILY family=real-herdr-gated count=1 duration_ms=18940 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-backend-herdr-eventwait-smoke.test.sh duration_ms=18940
+fm-test-run: wrote timing artifact: /home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/herdr-smoke-results.json

@@ -1,0 +1,27 @@
+{
+  "surface": "Firstmate native Herdr state, recovery and task notifications; tmux fallback",
+  "isolation": "Named fm-lab-* sessions through bin/fm-herdr-lab.sh; marked disposable FM_HOME; private Herdr configuration and harness roots; private tmux socket; guarded teardown and default-session tripwire",
+  "observations": [
+    "Native working, idle, blocked and unknown states reached the public crew-state CLI.",
+    "Working, idle and unknown levels stayed quiet across complete watcher poll cycles; blocked episodes emitted one wake and notice until working re-armed them.",
+    "Killing a foreground process left a stale working registration, but recovery emitted once; closing its pane did not repeat recovery for that incarnation; a new incarnation re-armed it.",
+    "Confirmed missing endpoint remained actionable during a declared pause.",
+    "A live socket with mode 000 yielded unknown/unreadable and no watcher recovery after a complete cycle; its permissions were restored before teardown.",
+    "Trusted Claude lifecycle busy evidence kept native idle classified working, then an idle lifecycle event restored idle.",
+    "PR-ready notifications used a short task label; mixed PR/decision batches emitted one decision notice; ordinary blocked/failed and resolved decisions emitted none.",
+    "All four watcher-generated notification calls returned shown:true and had a durable wake already queued.",
+    "Real Claude, Codex and Pi CLIs reached settled states in isolated Herdr panes; this startup smoke did not execute model turns.",
+    "Tmux fallback classified a captain decision parked and delivered its status signal on a private server."
+  ],
+  "visual_limit": "Captured the actual 120x40 Herdr viewer and rendered its terminal grid. Native desktop notices are outside that grid; no desktop screenshot API is available. Herdr returned shown:true for both titles.",
+  "evidence": [
+    "live-product.log",
+    "live-notifications.jsonl",
+    "boundary-product.log",
+    "herdr-smoke.log",
+    "visual-product.log",
+    "herdr-viewer.frames.jsonl",
+    "herdr-live-viewer.png",
+    "lab-teardown-sessions.json"
+  ]
+}

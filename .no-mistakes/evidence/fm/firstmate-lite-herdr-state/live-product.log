@@ -1,0 +1,370 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh provision fm-lab-v
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v status --json
+{"client":{"version":"0.9.5","channel":"stable","protocol":22,"endpoint_protocol_generation":1,"endpoint_capabilities":["surface_interest","presentation_effects_fence","health_check"],"remote_host_bridge":true,"remote_bridge_idle_timeout":true,"binary":"/var/home/runkai/.local/bin/herdr","session":"fm-lab-v"},"server":{"status":"running","running":true,"version":"0.9.5","protocol":22,"capabilities":{"live_handoff":true,"detached_server_daemon":false,"endpoint_protocol_generation":1,"surface_interest":true,"health_check":true,"ssh_agent_registration":true},"compatible":true,"endpoint_compatible":true,"socket":"/home/runkai/.no-mistakes/evidence/01M73T6KEWT536RR3MJ2AYEEYA/h/herdr/sessions/fm-lab-v/herdr.sock","session":"fm-lab-v","restart_needed":false,"server_binary_stale":false},"update":{"restart_needed":false,"server_binary_stale":false}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v workspace create --cwd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live --label worker --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65ff42f6c266f1","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},"type":"workspace_created","workspace":{"active_tab_id":"w1:t1","agent_status":"unknown","focused":true,"label":"worker","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"}}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane run w1:p1 sleep 300
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v workspace create --cwd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live --label other --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w2:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w2:t1","terminal_id":"term_65ff42f6c49882","workspace_id":"w2"},"tab":{"agent_status":"unknown","focused":false,"label":"1","number":1,"pane_count":1,"tab_id":"w2:t1","workspace_id":"w2"},"type":"workspace_created","workspace":{"active_tab_id":"w2:t1","agent_status":"unknown","focused":false,"label":"other","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w2"}}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane run w2:p1 sleep 300
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w2:p1 --source fm-live-validation --agent claude --state idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh viewer start fm-lab-v
+viewer attached to fm-lab-v (pid 4130727)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v api snapshot
+{"id":"cli:api:snapshot","result":{"snapshot":{"agents":[{"agent":"claude","agent_status":"idle","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w1:p1","revision":0,"state_change_seq":1,"tab_id":"w1:t1","terminal_id":"term_65ff42f6c266f1","workspace_id":"w1"},{"agent":"claude","agent_status":"idle","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w2:p1","revision":0,"state_change_seq":2,"tab_id":"w2:t1","terminal_id":"term_65ff42f6c49882","workspace_id":"w2"}],"focused_pane_id":"w1:p1","focused_tab_id":"w1:t1","focused_workspace_id":"w1","layouts":[{"area":{"height":39,"width":94,"x":0,"y":0},"focused_pane_id":"w1:p1","panes":[{"focused":true,"pane_id":"w1:p1","rect":{"height":39,"width":94,"x":0,"y":0}}],"splits":[],"tab_id":"w1:t1","workspace_id":"w1","zoomed":false},{"area":{"height":39,"width":94,"x":0,"y":0},"focused_pane_id":"w2:p1","panes":[{"focused":true,"pane_id":"w2:p1","rect":{"height":39,"width":94,"x":0,"y":0}}],"splits":[],"tab_id":"w2:t1","workspace_id":"w2","zoomed":false}],"panes":[{"agent":"claude","agent_status":"idle","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":39},"tab_id":"w1:t1","terminal_id":"term_65ff42f6c266f1","workspace_id":"w1"},{"agent":"claude","agent_status":"idle","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w2:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":39},"tab_id":"w2:t1","terminal_id":"term_65ff42f6c49882","workspace_id":"w2"}],"protocol":22,"tabs":[{"agent_status":"idle","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1:t1","workspace_id":"w1"},{"agent_status":"idle","focused":false,"label":"1","number":1,"pane_count":1,"tab_id":"w2:t1","workspace_id":"w2"}],"version":"0.9.5","workspaces":[{"active_tab_id":"w1:t1","agent_status":"idle","focused":true,"label":"worker","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1"},{"active_tab_id":"w2:t1","agent_status":"idle","focused":false,"label":"other","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w2"}]},"type":"session_snapshot"}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/states
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/states
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state working
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: working · source: pane · harness busy (herdr-native)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: idle · source: pane · Herdr agent is idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state blocked
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: blocked · source: pane · Herdr agent is waiting for input
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state unknown
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-crew-state.sh native
+state: unknown · source: none · backend unreachable (Herdr agent state unavailable)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state unknown
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": false
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state working
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": false
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state idle
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": false
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state blocked
+
+Watcher delivered states
+stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+
+Persisted wake queue states
+1794352244	1	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352244	1	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4138545.1794352244.45K9ee
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4138545.1794352244.45K9ee
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": true
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state working
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": true
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state blocked
+
+Watcher delivered states
+stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+
+Persisted wake queue states
+1794352248	2	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352248	2	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent blocked - waiting for input)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4149984.1794352248.BNkT32
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4149984.1794352248.BNkT32
+
+PASS native state and blocked episode dedupe
+working, idle and unknown stayed quiet; blocked woke once per episode
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w1:p1 --source fm-live-validation --agent claude --state working
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": true
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane send-keys w1:p1 ctrl+c
+
+Watcher delivered states
+stale: fm-lab-v:w1:p1 (herdr: agent dead - the endpoint is still there with no agent running in it, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+Persisted wake queue states
+1794352249	3	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent dead - the endpoint is still there with no agent running in it, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v agent get w1:p1
+{"id":"cli:agent:get","result":{"agent":{"agent":"claude","agent_status":"working","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w1:p1","revision":0,"state_change_seq":12,"tab_id":"w1:t1","terminal_id":"term_65ff42f6c266f1","workspace_id":"w1"},"type":"agent_info"}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane process-info --pane w1:p1
+{"id":"cli:pane:process_info","result":{"process_info":{"foreground_process_group_id":4130643,"foreground_processes":[{"argv":["/bin/bash"],"cmdline":"/bin/bash","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","name":"bash","pid":4130643}],"pane_id":"w1:p1","shell_pid":4130643},"type":"pane_process_info"}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352249	3	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent dead - the endpoint is still there with no agent running in it, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 4154963.1794352249.iDsM8N
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 4154963.1794352249.iDsM8N
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": true
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane close w1:p1
+{"id":"cli:pane:close","result":{"type":"ok"}}
+
+Watcher completed a quiet cycle
+{
+  "home": "states",
+  "output": "",
+  "wake_queue_exists": true
+}
+Watcher delivered states
+stale: fm-lab-v:w1:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+Persisted wake queue states
+1794352252	4	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352252	4	stale	fm-lab-v:w1:p1	stale: fm-lab-v:w1:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 4156640.1794352252.CCQsyK
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 4156640.1794352252.CCQsyK
+
+PASS death recovery
+stale working registration did not hide process death; dead then missing deduped; new incarnation re-armed recovery
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w2:p1 --source fm-live-validation --agent claude --state idle
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused
+
+Watcher delivered paused
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused/state/waiter.status
+
+Persisted wake queue paused
+1794352255	1	signal	waiter.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused/state/waiter.status
+1794352255	2	signal	waiter.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused/state/waiter.status
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352255	2	signal	waiter.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/paused/state/waiter.status
+wake annotation: latest wake-EVENT observed at drain, not current state: waiter.status: paused: waiting for an external dependency
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4160854.1794352255.BFb9jb
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 3s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 4160854.1794352255.BFb9jb
+
+Watcher completed a quiet cycle
+{
+  "home": "paused",
+  "output": "",
+  "wake_queue_exists": true
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane close w2:p1
+{"id":"cli:pane:close","result":{"type":"ok"}}
+
+Watcher delivered paused
+stale: fm-lab-v:w2:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+Persisted wake queue paused
+1794352255	3	stale	fm-lab-v:w2:p1	stale: fm-lab-v:w2:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh
+1794352255	3	stale	fm-lab-v:w2:p1	stale: fm-lab-v:w2:p1 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 4165837.1794352255.I2zYwa
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 4165837.1794352255.I2zYwa
+
+PASS declared wait recovery
+confirmed endpoint absence woke recovery despite paused status
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v workspace create --cwd /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live --label notices --no-focus
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w4:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":39},"tab_id":"w4:t1","terminal_id":"term_65ff430d848ea4","workspace_id":"w4"},"tab":{"agent_status":"unknown","focused":false,"label":"1","number":1,"pane_count":1,"tab_id":"w4:t1","workspace_id":"w4"},"type":"workspace_created","workspace":{"active_tab_id":"w4:t1","agent_status":"unknown","focused":false,"label":"notices","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w4"}}}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane run w4:p1 sleep 300
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v pane report-agent w4:p1 --source fm-live-validation --agent claude --state working
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready
+
+Watcher delivered notice-ready
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready/state/a.status
+
+Persisted wake queue notice-ready
+1794352257	1	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready/state/a.status
+1794352257	2	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready/state/a.status
+
+Notices for ready
+[
+  {
+    "args": [
+      "notification",
+      "show",
+      "Firstmate: review ready",
+      "--body",
+      "a",
+      "--sound",
+      "done",
+      "--session",
+      "fm-lab-v"
+    ],
+    "exit": 0,
+    "reply": "{\"id\":\"cli:notification:show\",\"result\":{\"reason\":\"shown\",\"shown\":true,\"type\":\"notification_show\"}}\n",
+    "stderr": "",
+    "durable_wake_before_notice": "1794352257\t1\tsignal\ta.status\tsignal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready/state/a.status\n1794352257\t2\tsignal\ta.status\tsignal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ready/state/a.status\n"
+  }
+]
+PASS notification ready
+{
+  "expected_title": "Firstmate: review ready",
+  "count": 1
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ordinary
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ordinary
+
+Watcher delivered notice-ordinary
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ordinary/state/a.status
+
+Persisted wake queue notice-ordinary
+1794352259	1	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ordinary/state/a.status
+1794352259	2	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-ordinary/state/a.status
+
+Notices for ordinary
+[]
+PASS notification ordinary
+{
+  "expected_title": null,
+  "count": 0
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed
+
+Watcher delivered notice-mixed
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status
+
+Persisted wake queue notice-mixed
+1794352260	1	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status
+1794352260	2	signal	b.status	needs-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status
+1794352260	3	signal	a.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status
+1794352260	4	signal	b.status	needs-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status
+
+Notices for mixed
+[
+  {
+    "args": [
+      "notification",
+      "show",
+      "Firstmate: decision needed",
+      "--body",
+      "b",
+      "--sound",
+      "request",
+      "--session",
+      "fm-lab-v"
+    ],
+    "exit": 0,
+    "reply": "{\"id\":\"cli:notification:show\",\"result\":{\"reason\":\"shown\",\"shown\":true,\"type\":\"notification_show\"}}\n",
+    "stderr": "",
+    "durable_wake_before_notice": "1794352260\t1\tsignal\ta.status\tsignal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status\n1794352260\t2\tsignal\tb.status\tneeds-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status\n1794352260\t3\tsignal\ta.status\tsignal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status\n1794352260\t4\tsignal\tb.status\tneeds-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/a.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-mixed/state/b.status\n"
+  }
+]
+PASS notification mixed
+{
+  "expected_title": "Firstmate: decision needed",
+  "count": 1
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-resolved
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/notice-resolved
+
+Watcher completed a quiet cycle
+{
+  "home": "notice-resolved",
+  "output": "",
+  "wake_queue_exists": false
+}
+Notices for resolved
+[]
+PASS notification resolved
+{
+  "expected_title": null,
+  "count": 0
+}
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh run fm-lab-v api snapshot
+{"id":"cli:api:snapshot","result":{"snapshot":{"agents":[{"agent":"claude","agent_status":"working","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w4:p1","revision":0,"state_change_seq":13,"tab_id":"w4:t1","terminal_id":"term_65ff430d848ea4","workspace_id":"w4"}],"focused_pane_id":"w3:p1","focused_tab_id":"w3:t1","focused_workspace_id":"w3","layouts":[{"area":{"height":39,"width":94,"x":0,"y":0},"focused_pane_id":"w3:p1","panes":[{"focused":true,"pane_id":"w3:p1","rect":{"height":39,"width":94,"x":0,"y":0}}],"splits":[],"tab_id":"w3:t1","workspace_id":"w3","zoomed":false},{"area":{"height":39,"width":94,"x":0,"y":0},"focused_pane_id":"w4:p1","panes":[{"focused":true,"pane_id":"w4:p1","rect":{"height":39,"width":94,"x":0,"y":0}}],"splits":[],"tab_id":"w4:t1","workspace_id":"w4","zoomed":false}],"panes":[{"agent_status":"unknown","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/user-home","focused":true,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live/user-home","pane_id":"w3:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":39},"tab_id":"w3:t1","terminal_id":"term_65ff430d0212d3","workspace_id":"w3"},{"agent":"claude","agent_status":"working","cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","focused":false,"foreground_cwd":"/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/.test-runtime/live","pane_id":"w4:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":39},"tab_id":"w4:t1","terminal_id":"term_65ff430d848ea4","workspace_id":"w4"}],"protocol":22,"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w3:t1","workspace_id":"w3"},{"agent_status":"working","focused":false,"label":"1","number":1,"pane_count":1,"tab_id":"w4:t1","workspace_id":"w4"}],"version":"0.9.5","workspaces":[{"active_tab_id":"w3:t1","agent_status":"unknown","focused":true,"label":"01M73T6KEWT536RR3MJ2AYEEYA","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w3"},{"active_tab_id":"w4:t1","agent_status":"working","focused":false,"label":"notices","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w4"}]},"type":"session_snapshot"}}
+
+ALL LIVE SCENARIOS PASSED
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73T6KEWT536RR3MJ2AYEEYA/bin/fm-herdr-lab.sh teardown fm-lab-v
+

@@ -1,0 +1,1 @@
+The real 120x40 Herdr viewer was captured while the notification API returned shown:true. Its rendered terminal grid contained neither notification title; desktop notifications render outside this terminal surface. No desktop screenshot API is available in this run. See visual-product.log and herdr-viewer.frames.jsonl.
