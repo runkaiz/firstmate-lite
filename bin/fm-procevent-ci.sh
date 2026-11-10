@@ -71,13 +71,12 @@ ci_only() {
 NO_CHECK_HOLDS=20
 HOLDS=0
 NO_CHECK_DONE=0
-ROUND=1
 surface_no_checks() {
   local count
   count=$(fm_nm_bounded "$WT" 15 gh pr view "$PR" --json statusCheckRollup --jq '.statusCheckRollup | length') || return 1
   case "$count" in
     ''|*[!0-9]*) return 1 ;;
-    0) fm_wake_append check "ci-no-checks:$RUN:$ROUND" \
+    0) fm_wake_append check "ci-no-checks:$RUN:$(field head_sha)" \
          "check: no-mistakes CI wait has zero registered checks after 10 minutes - task=$TASK pr=$PR; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision" || return 1 ;;
     *) return 1 ;;
   esac
@@ -85,7 +84,6 @@ surface_no_checks() {
 pending_hold() {
   if ! ci_only; then
     # A pipeline-owned repair restarts CI, and with it this bound.
-    [ "$NO_CHECK_DONE" -eq 0 ] || ROUND=$((ROUND+1))
     HOLDS=0
     NO_CHECK_DONE=0
   elif [ "$NO_CHECK_DONE" -eq 0 ]; then

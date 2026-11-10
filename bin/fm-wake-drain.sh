@@ -151,6 +151,7 @@ retire_handled_procevent_rows_locked() {
   local epoch seq kind key rest id handled=''
   [ -s "$FM_WAKE_QUEUE" ] || return 0
   while IFS=$(printf '\t') read -r epoch seq kind key rest; do
+    if [ "$ACTOR" = branch ] && ! grep -Fxq -- "$seq" "$ELIGIBLE_ROWS_FILE"; then continue; fi
     case "$key" in procevent:*:*) ;; *) continue ;; esac
     id=${key#procevent:}
     id=${id%:*}
@@ -883,8 +884,8 @@ DRAIN_LOCK_HELD=true
 rotate_scratch_locked
 reclaim_stale_branch_grant_locked || exit 1
 [ "$ACTOR" != main ] || retire_unconsumable_rows_locked
-[ "$ACTOR" != main ] || retire_handled_procevent_rows_locked
 [ "$ACTOR" != branch ] || require_branch_eligible_rows || exit 1
+retire_handled_procevent_rows_locked
 
 if [ -n "$ACK_THROUGH" ]; then
   if [ "$ACTOR" = branch ]; then

@@ -33,6 +33,9 @@ cat > "$LAB/fakebin/no-mistakes" <<'SH'
 set -eu
 count=0
 [ ! -f "$CI_TEST_LAB/drives" ] || read -r count < "$CI_TEST_LAB/drives"
+if [ "$CI_SCENARIO" = late-revalidate ] && [ "$count" -gt 24 ]; then
+  CI_TEST_HEAD=1111111111111111111111111111111111111111
+fi
 if [ "$*" = 'axi status' ]; then
   run=RUN1 branch=fm/ci state=running ci=running review=completed
   case "$CI_SCENARIO" in
@@ -100,7 +103,13 @@ if [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json statusCheckRo
 fi
 [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json url,headRefOid --jq [.url,.headRefOid] | @tsv' ] || exit 99
 head=$CI_TEST_HEAD
-case "$CI_SCENARIO" in stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;; esac
+case "$CI_SCENARIO" in
+  stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;;
+  late-revalidate)
+    read -r count < "$CI_TEST_LAB/drives"
+    if [ "$count" -gt 24 ]; then head=1111111111111111111111111111111111111111; fi
+    ;;
+esac
 printf 'https://github.com/example/repo/pull/1\t%s\n' "$head"
 SH
 cat > "$LAB/fakebin/sleep" <<'SH'
@@ -338,13 +347,13 @@ kill "$watch_pid"; wait "$watch_pid" 2>/dev/null || true
 check 'a surfaced key is not delivered twice' not_grep ci-no-checks "$case_dir/repeat.out"
 # A later CI repair round in the same run wakes firstmate again with a fresh
 # notice, while the already-delivered first round stays quiet.
-reset_counts; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=0
-out=$(poll)
+reset_counts; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=0
+out=$(CI_TEST_HEAD=1111111111111111111111111111111111111111 poll)
 unset CI_CHECKS
 successor_watch "$case_dir/round2.out"
 wait_for_exit "$watch_pid" 100 || { printf 'FAIL: a later round notice never woke the successor watcher\n' >&2; cat "$case_dir/round2.out" >&2; exit 1; }
-check 'a later CI round delivers a fresh zero-check notice' grep -Fq 'ci-no-checks:RUN1:2' "$case_dir/round2.out"
-check 'the later round does not redeliver the first round' not_grep 'ci-no-checks:RUN1:1' "$case_dir/round2.out"
+check 'a restarted listener in a later CI round delivers a fresh zero-check notice' grep -Fq 'ci-no-checks:RUN1:1111111111111111111111111111111111111111' "$case_dir/round2.out"
+check 'the later round does not redeliver the first round' not_grep "ci-no-checks:RUN1:$CI_TEST_HEAD" "$case_dir/round2.out"
 # Execute the handoff command emitted to a worker, rather than only looking
 # for prose. Both config postures use the same supported command.
 for posture in ordinary wait-no-turns; do
