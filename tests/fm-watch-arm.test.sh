@@ -1425,7 +1425,7 @@ test_watcher_exits_when_its_state_directory_is_removed() {
 # Deterministic form of the race behind that case's CI flake: the state
 # directory vanishes after the top-of-cycle check but before the cycle's wake
 # queue lock, whose wait used to spin forever. A copied bin whose per-cycle
-# usage refresh deletes the state directory opens exactly that window.
+# fleet capture deletes the state directory opens exactly that window.
 test_watcher_exits_when_state_is_removed_before_the_queue_lock() {
   local dir state out pid
   dir=$(make_case state-removed-before-queue-lock)
@@ -1433,8 +1433,10 @@ test_watcher_exits_when_state_is_removed_before_the_queue_lock() {
   out="$dir/watch.out"
   mkdir -p "$dir/home/data"
   cp -R "$ROOT/bin" "$dir/bin"
+  mkdir -p "$dir/home/config"
+  : > "$dir/home/config/fleet-ledger"
   # shellcheck disable=SC2016 # The variable expands when the copied helper runs.
-  printf '#!/usr/bin/env bash\nrm -rf -- "${FM_STATE_OVERRIDE:?}"\n' > "$dir/bin/fm-usage-refresh.sh"
+  printf '#!/usr/bin/env bash\nrm -rf -- "${FM_STATE_OVERRIDE:?}"\n' > "$dir/bin/fm-fleet-ledger.sh"
   FM_HOME="$dir/home" FM_STATE_OVERRIDE="$state" FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$dir/bin/fm-watch.sh" > "$out" 2>&1 &
   pid=$!

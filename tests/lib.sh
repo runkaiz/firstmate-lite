@@ -334,23 +334,22 @@ trap 'fm_test_cleanup; exit 143' TERM
 trap 'fm_test_cleanup; exit 129' HUP
 trap 'fm_test_cleanup; exit 131' QUIT
 
-# Lifecycle fixtures run bin/fm-usage-auto.py's default-on collection, which
-# reads these native metadata roots. Point them at an empty suite-owned
-# directory so deterministic cases never read the operator's real stores.
-FM_TEST_USAGE_ROOT_VARS=(CODEX_HOME CLAUDE_CONFIG_DIR PI_CODING_AGENT_DIR NM_HOME)
-FM_TEST_USAGE_ROOTS=$(fm_test_tmproot fm-test-usage-roots) || return 1
-for _fm_usage_var in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
-  if [ "$_fm_usage_var" != NM_HOME ]; then
-    if [ -n "${!_fm_usage_var+x}" ]; then
-      printf -v "FM_TEST_AMBIENT_$_fm_usage_var" '%s' "${!_fm_usage_var}"
+# Keep deterministic fixtures isolated from the operator's harness stores.
+# Credentialed live children restore only their selected harness configuration.
+FM_TEST_HARNESS_ROOT_VARS=(CODEX_HOME CLAUDE_CONFIG_DIR PI_CODING_AGENT_DIR NM_HOME)
+FM_TEST_HARNESS_ROOTS=$(fm_test_tmproot fm-test-harness-roots) || return 1
+for _fm_harness_var in "${FM_TEST_HARNESS_ROOT_VARS[@]}"; do
+  if [ "$_fm_harness_var" != NM_HOME ]; then
+    if [ -n "${!_fm_harness_var+x}" ]; then
+      printf -v "FM_TEST_AMBIENT_$_fm_harness_var" '%s' "${!_fm_harness_var}"
     else
-      unset "FM_TEST_AMBIENT_$_fm_usage_var"
+      unset "FM_TEST_AMBIENT_$_fm_harness_var"
     fi
   fi
-  mkdir -p "$FM_TEST_USAGE_ROOTS/$_fm_usage_var" || return 1
-  export "$_fm_usage_var=$FM_TEST_USAGE_ROOTS/$_fm_usage_var"
+  mkdir -p "$FM_TEST_HARNESS_ROOTS/$_fm_harness_var" || return 1
+  export "$_fm_harness_var=$FM_TEST_HARNESS_ROOTS/$_fm_harness_var"
 done
-unset _fm_usage_var
+unset _fm_harness_var
 
 fm_test_credentialed_command() {
   local config=$1 command=$2 var='' saved key
@@ -361,13 +360,12 @@ fm_test_credentialed_command() {
     pi|pi-signed) var=PI_CODING_AGENT_DIR ;;
   esac
   mkdir -p "$config" || return 1
-  printf 'off\n' > "$config/usage-ledger" || return 1
   printf '%q ' env
   if [ -n "$var" ]; then
     saved=FM_TEST_AMBIENT_$var
     if [ -z "${!saved+x}" ]; then printf '%q ' -u "$var"; fi
   fi
-  for key in "${FM_TEST_USAGE_ROOT_VARS[@]}"; do
+  for key in "${FM_TEST_HARNESS_ROOT_VARS[@]}"; do
     if [ "$key" = "$var" ]; then
       if [ -n "${!saved+x}" ]; then printf '%q ' "$key=${!saved}"; fi
     else

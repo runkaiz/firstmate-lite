@@ -728,12 +728,6 @@ if [ "$READ_ONLY" -eq 0 ]; then
   [ "$REEMIT" -eq 0 ] || NETWORK_STAGE_LOCKED=0
   "$SCRIPT_DIR/fm-startup-network.sh" start \
     --locked "$NETWORK_STAGE_LOCKED" --harvest-pid $$ >/dev/null 2>&1 || true
-  # Refresh the local usage ledger as a side effect; its status is a reporting
-  # surface (/ahoy, docs/usage-ledger.md) with nothing for startup to act on.
-  if [ "$REEMIT" -eq 0 ]; then
-    FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
-      "$SCRIPT_DIR/fm-usage-refresh.sh" --force >/dev/null 2>&1 || true
-  fi
 fi
 
 # --- 2. bootstrap --------------------------------------------------------
