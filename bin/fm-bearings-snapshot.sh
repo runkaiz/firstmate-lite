@@ -6,7 +6,8 @@
 # fm-landed-lib.sh owns delivery selection. This view never parses status prose.
 # Default collection performs no live forge discovery; --include-prs opts in.
 # The underlying snapshot may refresh its bounded remote-home ledger cache.
-# Titles are complete. Main worker stage uses reconciled state and its source;
+# Titles are complete. Main worker stage uses reconciled state and its source.
+# Worker names use nonblank durable task titles, falling back to task ids.
 # elapsed_seconds measures the current spawn incarnation, or null if unavailable.
 # Remote children without that evidence retain their state and null timing.
 # Conditional holds always remain gates; --all-decisions reveals other deferred

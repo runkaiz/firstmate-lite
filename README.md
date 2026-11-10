@@ -91,10 +91,14 @@ A few handy commands once you are under way:
 
 Use the slash form below in Claude Code and Grok; in Codex use `$ahoy`, `$afk`, `$stow`, and `$updatefirstmate`.
 
-- `/ahoy` - catch me up: what is in flight, what is waiting on me.
+- `/ahoy` - a ten-second catch-up: what shipped, what is moving, what is next, and what needs me.
 - `/afk` - I'm stepping away; keep the crew going and brief me when I'm back.
 - `/stow` - save what we learned before I close the session.
 - `/updatefirstmate` - pull the latest Firstmate-lite safely.
+
+Ahoy compares current records with your last look and shows only sections with something to report; it is also the view of your task queue, so you never need a queue command.
+Use `/ahoy detail` for more local detail, `/ahoy lavish` (or `visual`) for the interactive board, and `/ahoy live` (or `include PRs`) for live GitHub PR checks.
+The old `/bearings` alias and `/ahoy file` mode are retired.
 
 ## What it does for you
 

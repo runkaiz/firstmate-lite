@@ -124,11 +124,11 @@ In that status-log fallback, a declared external wait reports the distinct `paus
 The semantic branch reports working only on an exact busy verdict and names the source that produced it; an unknown verdict never becomes working, never permits the status-log fallback, and never becomes a silent idle.
 Published-contribution records, PR verdict freshness against the observed current head, actor classification, measured coverage, and incoming forge signals are owned by `bin/fm-contributions.sh` and verified by `tests/fm-contributions.test.sh`.
 GitHub PRs and issues are observed; unsupported forges remain disclosed as unmeasured coverage rather than fleet work.
-The existing Bearings Captain's Call consumes that coverage, and its skill owns supervisor triage through existing captain holds and durable check wakes.
+The [Ahoy skill](../.agents/skills/ahoy/SKILL.md) owns its catch-up presentation, while [contribution-follow-up](../.agents/skills/contribution-follow-up/SKILL.md) owns supervisor triage through existing captain holds and durable check wakes.
 
 For whole-fleet review, `bin/fm-fleet-snapshot.sh --json` emits schema `fm-fleet-snapshot.v1` from the backlog, task metadata, local current crew state, supervision-owned endpoint evidence, PR/report pointers, scout reports.
-The fleet snapshot and Bearings paths use the concurrent remote-ledger collection, cache, unreadable-home disclosure, and remote-liveness boundary owned by `bin/fm-fleet-snapshot.sh`'s header.
-`bin/fm-fleet-view.sh` renders that snapshot as Markdown for humans, while `bin/fm-bearings-snapshot.sh` provides the bounded bearings projection, so both views consume one structured contract instead of reparsing raw fleet files.
+The fleet snapshot and Ahoy paths use the concurrent remote-ledger collection, cache, unreadable-home disclosure, and remote-liveness boundary owned by `bin/fm-fleet-snapshot.sh`'s header.
+`bin/fm-fleet-view.sh` renders that snapshot as Markdown for humans, while `bin/fm-bearings-snapshot.sh` provides the bounded Ahoy projection, so both views consume one structured contract instead of reparsing raw fleet files.
 The script header owns the exact JSON schema.
 
 On a Pi primary, supervision is default-on: the watcher extension can hand eligible task-local rows from an ordinary actionable wake, plus selected fleet-wide heartbeat reviews, to a persistent in-process supervision conversation while main-only rows remain on the captain-facing path.

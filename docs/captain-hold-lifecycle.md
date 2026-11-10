@@ -15,7 +15,7 @@ This document records the deterministic mechanism, structured surfaces, compatib
 | How does a keyed answer from chat or a board reach the call? | [Answer-time resolution](#answer-time-resolution) |
 | How is a call closed when it stopped being a question? | [Reconcile](#reconcile-re-check-reality-never-a-blind-close) |
 | Why did a decision card disappear from the board? | [Card hygiene](#card-hygiene-a-landed-subject-is-not-a-live-call) |
-| Where does a hold appear in snapshots and Bearings? | [Structured read surfaces](#structured-read-surfaces) |
+| Where does a hold appear in snapshots and Ahoy? | [Structured read surfaces](#structured-read-surfaces) |
 | What does a `RECORD DIVERGENCE` section mean? | [Record divergence](#record-divergence) |
 | How do rows from older installs still work? | [Compatibility with pre-collapse installs](#compatibility-with-pre-collapse-installs) |
 | Which tests prove this, and how is the record refreshed? | [Verification record](#verification-record) |
@@ -152,7 +152,7 @@ After cleanup, and still under the task's own lock, teardown does three things:
 - It runs the native queue's `reopen` operation.
 
 The row returns to Queued with its hold intact.
-It remains on the appropriate Captain's Call or Charted Next decision surface instead of reading as work still under way.
+Its Ahoy presentation follows the [chat contract](../.agents/skills/ahoy/SKILL.md#chat-contract) instead of reading as work still under way.
 
 ### Interrupted cleanup
 
@@ -343,42 +343,14 @@ For a main-home call, the reconcile option is the recovery path for whatever sti
 
 `bin/fm-fleet-snapshot.sh` uses the [native queue observation](queue.md#capture-and-pickup) for automatic homes and parses the Markdown file directly in manual mode.
 It resolves every repeated `blocked-by:` edge against the observation's completed identities and keeps missing blockers unresolved.
-It then assigns every captain hold exactly one `hold_bucket`.
-The bucket is decided only from structured fields: `hold_kind`, `state`, `hold_until`, `unresolved_blocker_ids`, and the machine-written hold-set timestamp.
-Hold reason and body prose are never matched, so no wording can hide, reveal, or reclassify a decision.
-
-The buckets are total and mutually exclusive.
-The first matching row in this order decides the bucket:
-
-| Order | `hold_bucket` | Condition |
-| --- | --- | --- |
-| 1 | `blocked` | Any blocker is unresolved. |
-| 2 | `dated` | `hold_until` is in the future. |
-| 3 | `aged` | An undated hold's hold-set timestamp is at least `FM_SNAPSHOT_UNDATED_HOLD_AGE_DAYS` old (default 14, floored elapsed days). |
-| 4 | `live` | None of the above. |
-
-No captain hold can fall through them and none can match two, which is what keeps a hold from vanishing from every view.
-`captain_actionable` - waiting on the captain now - is exactly `hold_bucket == "live"`.
-
-Existing undated holds without a hold-set stamp fall back to the task's `since` date.
-That aging is a projection safety net only.
-The durable deferral remains re-holding with `--until`.
+Its [header](../bin/fm-fleet-snapshot.sh) owns the total, mutually exclusive structured hold buckets, including conditional deferral, blocker precedence, actionability, and legacy aging fallback.
 
 The fleet snapshot's secondmate-home summary classifies an actionable captain hold as `captain_decision`.
 It preserves every captain hold in the bounded queued inventory of the owning home.
 
-### Bearings placement
+### Ahoy placement
 
-`bin/fm-bearings-snapshot.sh` places each captain hold by its `hold_bucket` and inspects no prose of its own.
-
-| `hold_bucket` | Where the hold appears |
-| --- | --- |
-| `live` | A default Captain's Call entry. |
-| `blocked`, `dated`, or `aged` | Leaves the default Captain's Call, renders as a Charted Next gate stating why - the blocking work, the `until <date>`, or the floored age - and contributes to the concrete `omitted[]` disclosure. |
-
-`--all-decisions` reveals every captain hold available within the remote-summary bound and drops its gate.
-An available hold is therefore never in both Captain's Call and Charted Next.
-An actively worked held task may also appear in Underway, which reports running work independently of those decision buckets.
+The [snapshot header and help](../bin/fm-bearings-snapshot.sh) own projection fields and reveal behavior; the [Ahoy chat contract](../.agents/skills/ahoy/SKILL.md#chat-contract) owns presentation, including deferred-call notes and empty-section omission.
 
 ### Accepted limits
 
@@ -389,14 +361,14 @@ Three accepted limits remain deliberate:
 - Cross-home summaries remain bounded by `FM_SNAPSHOT_SECONDMATE_DECISIONS` and `FM_SNAPSHOT_SECONDMATE_QUEUED`.
   A remote deferred hold beyond those bounds is not exported, so it can be neither gated nor revealed.
 
-Re-holding through the wrapper with `--until` remains the durable fix rather than relying on the projection safety net.
+The [captain-hold lifecycle policy](../.agents/skills/captain-hold-lifecycle/SKILL.md#policy) owns durable deferral instead of relying on the aging safety net.
 
 ### Recently Landed notes
 
 [`bin/fm-landed-lib.sh`](../bin/fm-landed-lib.sh) owns Recently Landed's shared selection and artifact-display compatibility rules.
 The native queue records `local main` as a row artifact; the snapshot also accepts the final body-line form written by the legacy backend.
 A body that carries a captain resolution record is the captain's own prose and is never mined for that note, so a decision worded `local main` does not become a delivery artifact.
-The projection remains read-only and uses the canonical snapshot's structured fields, including the machine-written hold-set timestamp.
+Delivery selection uses the canonical snapshot's structured fields, including the machine-written hold-set timestamp.
 
 ### Merge-to-cleanup window
 

@@ -62,7 +62,7 @@ The absence of a routed work item is not a divergence and the guard never requir
 2. Inventory only genuine unresolved choices that require the captain, and find the task each one gates.
 3. Hold that task - or create one captain-held task for the review's open questions - with a concise reason carrying the question and options.
 4. Run `complete` with the full captain-held inventory for that review pass.
-5. Relay the choices to the captain as decisions from Ahoy' Needs you section under `AGENTS.md` section 9; do not use the word hold in captain chat.
+5. Relay the choices to the captain as decisions from Ahoy's Needs you section under `AGENTS.md` section 9; do not use the word hold in captain chat.
 6. Close each call only through `answer` (or a channel that feeds `answers`), close a board-requested moot call through evidence-backed `reconcile close`, record a still-active reconciliation through `reconcile note`, use `--until` or `--when` when the captain defers it, or confirm a channel already closed it.
 7. Confirm Ahoy reflects the outcome: answered or reconciled-moot calls leave Needs you, released work resumes, active reconciliations remain held, and deferred calls appear only as a short note with their date or condition.
 
