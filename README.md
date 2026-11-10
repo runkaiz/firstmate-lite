@@ -89,11 +89,11 @@ A while later:
 
 A few handy commands once you are under way:
 
-Use the slash form below in Claude Code and Grok; in Codex use `$ahoy`, `$afk`, `$stow`, and `$updatefirstmate`.
+Use the slash form below in Claude Code and Grok; in Codex use `$ahoy`, `$afk`, `$sparespeed on|off|status`, `$stow`, and `$updatefirstmate`.
 
 - `/ahoy` - catch me up: what is in flight, what is waiting on me.
 - `/afk` - I'm stepping away; keep the crew going and brief me when I'm back.
-- `/sparespeed on|off|status` - let Codex workers run in fast mode only while spare quota before the reset allows it.
+- `/sparespeed on|off|status` - let Codex workers run in [fast mode](docs/configuration.md#worker-fast-mode) only while spare quota before the reset allows it.
 - `/stow` - save what we learned before I close the session.
 - `/updatefirstmate` - pull the latest Firstmate-lite safely.
 
