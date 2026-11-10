@@ -31,14 +31,18 @@ Do not read or write old status-report files.
 ## Chat contract
 
 Lead with a short "Since your last look" signal from `since_last_look` when there is a previous checkpoint.
-Call these newly visible deliveries or changed stages, not exact-time event history; the checkpoint compares observed durable facts within the snapshot bounds.
+The comparison gives `previous` and `current` values: only `previous: null` means newly observed; otherwise describe the actual transition.
+For a `next` row, those values encode `[reason, blocked_by]`; a cleared blocker means existing queued work became unblocked, never newly queued.
+Call deliveries newly visible, not exact-time event history; the checkpoint compares observed durable facts within the snapshot bounds.
 Report disappeared current rows as no longer observed, never as proof of completion.
 For an empty comparison, say "No observed changes since your last look" without listing unchanged categories.
 On the first look or an unreadable checkpoint, disclose that there is no earlier comparison rather than inventing a catch-up.
 The command saves only one compact checkpoint, never a report archive.
 
 Aim for a ten-second glance, one line per item, with complete task titles and full artifact URLs.
-Omit empty section headings and all empty-state filler, including unheaded "Nothing needs you right now" after completion.
+Build the whole reply only from the comparison, qualifying work or action items below, and any necessary short uncertainty disclosure.
+Omit empty headings and empty-category statements everywhere, including comparison summaries and closing prose in a mixed catch-up.
+Never print contribution counts or action-free contribution rows; incomplete contribution coverage needs only a short uncertainty disclosure without statistics.
 If none of the four sections has qualifying items, stop before the section list below and return only the comparison signal followed by one sentence:
 
 - With complete readable coverage: "Captain, all quiet in the local records."
@@ -59,7 +63,6 @@ Use these sections in order only when they have qualifying items:
   Keep inventory warnings visible without presenting them as dispatchable work.
 - **Needs you**: only non-deferred `decisions_open`, a confirmed PR-ready merge choice, credentials, or blockers requiring the captain now.
   Include actionable `contributions.captain` rows, deduplicated against existing calls.
-  Do not print contribution counts, checked/known coverage statistics, or action-free contribution rows.
 
 A hold with a recorded revisit condition, future date, or unresolved blocker stays deferred even in detail mode.
 The canonical snapshot's structured hold classification owns that distinction; never guess from hold-reason prose.

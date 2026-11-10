@@ -73,6 +73,7 @@ remote homes under one shared snapshot budget and may refresh the parent-side ca
 --record-look compares and saves one compact checkpoint at state/ahoy-last.json.
   since_last_look reports newly visible deliveries, changed current rows, and
   current rows no longer observed, without treating their absence as completion;
+  each change includes previous (null for a newly observed row) and current values.
   it is observation history, not proof of the exact time a delivery landed.
   Default snapshot calls do not read or change that checkpoint.
 
@@ -648,12 +649,13 @@ if [ "$RECORD_LOOK" = 1 ]; then
       since:($previous.generated // null),
       changes:([$look.rows[] as $row
         | select($previous != null)
-        | select(any($previous.rows[]; .key == $row.key and .value == $row.value) | not)
-        | {surface:($row.key | split("/")[0]),title:$row.label,current:$row.value}]
+        | ([$previous.rows[] | select(.key == $row.key)][0]) as $old
+        | select($old == null or $old.value != $row.value)
+        | {surface:($row.key | split("/")[0]),title:$row.label,previous:($old.value // null),current:$row.value}]
         + [$previous.rows[]? as $row
            | select($row.key | startswith("landed/") | not)
            | select(any($look.rows[]; .key == $row.key) | not)
-           | {surface:($row.key | split("/")[0]),title:$row.label,current:"no longer observed"}])
+           | {surface:($row.key | split("/")[0]),title:$row.label,previous:$row.value,current:"no longer observed"}])
     }') || exit 1
   mkdir -p "$LOOK_STATE" || exit 1
   LOOK_TMP=$(umask 077; mktemp "$LOOK_STATE/.ahoy-last.XXXXXX") || exit 1

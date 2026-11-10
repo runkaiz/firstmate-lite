@@ -5,6 +5,8 @@ set -u
 
 # shellcheck source=tests/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+# shellcheck source=tests/ahoy-live-helpers.sh
+. "$ROOT/tests/ahoy-live-helpers.sh"
 
 fm_live_gate opt-in FM_OPENCODE_LIVE_E2E opencode tmux sqlite3
 
@@ -110,11 +112,13 @@ cleanup() {
 trap cleanup EXIT
 
 run_ahoy_case() {
-  local label=$1 preceding=$2 expected=$3 db="$LAB/opencode-$1.db"
+  local label=$1 preceding=$2 db="$LAB/opencode-$1.db"
   local assistant_text first_out second_out session_id status=0
+  local home="$LAB/opencode-ahoy-$1-home"
+  ahoy_live_home "$home"
   first_out=$(
     cd "$AHOY_PROJECT" &&
-      OPENCODE_DB="$db" OPENCODE_DISABLE_AUTOUPDATE=1 OPENCODE_DISABLE_LSP_DOWNLOAD=1 \
+      FM_HOME="$home" OPENCODE_DB="$db" OPENCODE_DISABLE_AUTOUPDATE=1 OPENCODE_DISABLE_LSP_DOWNLOAD=1 \
         OPENCODE_CONFIG_CONTENT='{"permission":{"*":"allow"}}' \
         opencode run --pure --format json "$preceding"
   ) || status=$?
@@ -125,41 +129,26 @@ run_ahoy_case() {
   status=0
   second_out=$(
     cd "$AHOY_PROJECT" &&
-      OPENCODE_DB="$db" OPENCODE_DISABLE_AUTOUPDATE=1 OPENCODE_DISABLE_LSP_DOWNLOAD=1 \
+      FM_HOME="$home" OPENCODE_DB="$db" OPENCODE_DISABLE_AUTOUPDATE=1 OPENCODE_DISABLE_LSP_DOWNLOAD=1 \
         OPENCODE_CONFIG_CONTENT='{"permission":{"*":"allow"}}' \
         opencode run --pure --format json --session "$session_id" "/ahoy"
   ) || status=$?
   [ "$status" -eq 0 ] || fail "OpenCode Ahoy $label case exited $status: $second_out"
   assistant_text=$(printf '%s\n' "$second_out" | jq -r 'select(.type == "text") | .part.text' | tail -1)
-  case "$expected" in
-    bearings)
-      printf '%s\n' "$assistant_text" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-        || fail "OpenCode Ahoy $label case did not take Bearings: $second_out"
-      ;;
-    boundary)
-      printf '%s\n' "$assistant_text" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-        && fail "OpenCode Ahoy $label near miss was treated as operational: $second_out"
-      ;;
-  esac
+  ahoy_live_assert "$home" "$assistant_text"
 }
 
 run_ahoy_transcript_regressions() {
   mkdir -p \
     "$AHOY_PROJECT/.opencode/plugins" \
     "$AHOY_PROJECT/.agents/skills/ahoy" \
-    "$AHOY_PROJECT/.agents/skills/bearings" \
     "$AHOY_PROJECT/bin"
   git init -q "$AHOY_PROJECT"
   cp "$ROOT/.opencode/plugins/fm-primary-sessionstart-nudge.js" \
     "$ROOT/.opencode/plugins/package.json" \
     "$AHOY_PROJECT/.opencode/plugins/"
-  cp \
-    "$ROOT/bin/fm-sessionstart-nudge.sh" \
-    "$ROOT/bin/fm-primary-scope-lib.sh" \
-    "$ROOT/bin/fm-gate-refuse-lib.sh" \
-    "$ROOT/bin/fm-operational-input.sh" \
-    "$AHOY_PROJECT/bin/"
   cp "$ROOT/.agents/skills/ahoy/SKILL.md" "$AHOY_PROJECT/.agents/skills/ahoy/SKILL.md"
+  cp -R "$ROOT/bin" "$AHOY_PROJECT/"
   chmod +x "$AHOY_PROJECT/bin/fm-sessionstart-nudge.sh"
   # shellcheck disable=SC2016 # Variables expand in the generated script, not this test shell.
   printf '%s\n' \
@@ -175,26 +164,15 @@ run_ahoy_transcript_regressions() {
   chmod +x "$AHOY_PROJECT/bin/fm-session-start.sh"
   # shellcheck disable=SC2016 # Backticks are literal prompt markup.
   printf '%s\n' \
-    '---' \
-    'name: bearings' \
-    'description: Test-only Bearings branch sentinel.' \
-    '---' \
-    '' \
-    '# bearings' \
-    '' \
-    'Respond exactly `AHOY_BEARINGS_BRANCH`.' \
-    > "$AHOY_PROJECT/.agents/skills/bearings/SKILL.md"
-  # shellcheck disable=SC2016 # Backticks are literal prompt markup.
-  printf '%s\n' \
     '# Native OpenCode Ahoy regression fixture' \
     '' \
     'Run `bin/fm-session-start.sh` exactly once at session start.' \
     > "$AHOY_PROJECT/AGENTS.md"
 
-  run_ahoy_case marker-near-miss "$MARKER_NEAR_MISS" boundary
-  run_ahoy_case startup-near-miss "$START_NEAR_MISS" boundary
-  run_ahoy_case quoted-current "$QUOTED_CURRENT" boundary
-  run_ahoy_case ascii-only "$ASCII_ONLY" boundary
+  run_ahoy_case marker-near-miss "$MARKER_NEAR_MISS"
+  run_ahoy_case startup-near-miss "$START_NEAR_MISS"
+  run_ahoy_case quoted-current "$QUOTED_CURRENT"
+  run_ahoy_case ascii-only "$ASCII_ONLY"
 }
 
 wait_for_db_count() {
@@ -222,6 +200,8 @@ run_native_ahoy_regressions() {
   mkdir -p \
     "$first_home/state" "$first_home/config" \
     "$later_home/state" "$later_home/config"
+  ahoy_live_home "$first_home"
+  ahoy_live_home "$later_home"
 
   status=0
   (
@@ -241,8 +221,7 @@ run_native_ahoy_regressions() {
   assistant_text=$(sqlite3 -json "$first_db" \
     "select json_extract(p.data,'$.text') text from message m join part p on p.message_id=m.id where json_extract(m.data,'$.role')='assistant' and json_extract(p.data,'$.type')='text' order by m.time_created desc limit 1;" \
     | jq -r '.[0].text')
-  printf '%s\n' "$assistant_text" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-    || fail "OpenCode native first-message Ahoy did not take Bearings: $assistant_text"
+  ahoy_live_assert "$first_home" "$assistant_text"
   [ "$(sed -n '1p' "$first_home/state/session-start-count")" = 1 ] \
     || fail "OpenCode native first-message Ahoy did not preserve one session-start execution"
   session_count=$(sqlite3 "$first_db" 'select count(*) from session;')
@@ -279,8 +258,7 @@ run_native_ahoy_regressions() {
   assistant_text=$(sqlite3 -json "$later_db" \
     "select json_extract(p.data,'$.text') text from message m join part p on p.message_id=m.id where m.session_id='$session_id' and json_extract(m.data,'$.role')='assistant' and json_extract(p.data,'$.type')='text' order by m.time_created desc limit 1;" \
     | jq -r '.[0].text')
-  printf '%s\n' "$assistant_text" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-    && fail "OpenCode native later-message Ahoy gathered Bearings: $assistant_text"
+  ahoy_live_assert "$later_home" "$assistant_text"
   [ "$(sed -n '1p' "$later_home/state/session-start-count")" = 1 ] \
     || fail "OpenCode native later-message Ahoy reran session start"
   session_count=$(sqlite3 "$later_db" 'select count(*) from session;')
@@ -290,6 +268,10 @@ run_native_ahoy_regressions() {
 mkdir -p "$LAB"
 run_ahoy_transcript_regressions
 run_native_ahoy_regressions
+if [ "${FM_OPENCODE_LIVE_AHOY_ONLY:-0}" = 1 ]; then
+  printf 'ok - OpenCode %s live /ahoy covered fresh first/later catch-ups and queue unblocking\n' "$OPENCODE_VERSION"
+  exit 0
+fi
 git clone -q "$ROOT" "$PROJECT"
 mkdir -p "$PROJECT/.opencode/plugins/lib"
 cp "$ROOT/.opencode/plugins/fm-primary-watch-arm.js" "$PROJECT/.opencode/plugins/fm-primary-watch-arm.js"

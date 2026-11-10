@@ -1890,7 +1890,7 @@ SH
 }
 
 test_ahoy_checkpoint_tracks_disappearances_and_blockers() {
-  local home fakebin json long_blocker
+  local home fakebin json long_blocker blocked_before tail_before
   home=$(make_home ahoy-observation-transitions)
   fakebin=$(make_fakebin "$home")
   write_fixture "$home"
@@ -1903,6 +1903,10 @@ test_ahoy_checkpoint_tracks_disappearances_and_blockers() {
     --blocked-by "$long_blocker" --blocked-by ship-task --file "$home/data/backlog.md" \
     >/dev/null || fail "create row with a late blocker"
   run "$home" "$fakebin" --json --record-look >/dev/null || fail "record initial observations"
+  blocked_before=$(jq -r '.rows[] | select(.key == "next/(main)/live-gate") | .value' "$home/state/ahoy-last.json")
+  tail_before=$(jq -r '.rows[] | select(.key == "next/(main)/blocked-tail") | .value' "$home/state/ahoy-last.json")
+  "$ROOT/bin/fm-queue.py" add newly-queued "New work after the last look" --kind ship \
+    --file "$home/data/backlog.md" >/dev/null || fail "add new queue observation"
   printf 'Use the short route.\n' > "$home/answer.txt"
   run_captain "$home" "$fakebin" answer local-call --decision-file "$home/answer.txt" \
     >/dev/null || fail "answer local call"
@@ -1913,15 +1917,19 @@ test_ahoy_checkpoint_tracks_disappearances_and_blockers() {
   "$ROOT/bin/fm-queue.py" unblock blocked-tail --by ship-task --file "$home/data/backlog.md" \
     >/dev/null || fail "clear dependency beyond the old display bound"
   json=$(run "$home" "$fakebin" --json --record-look) || fail "compare removed observations"
-  printf '%s' "$json" | jq -e --arg long_blocker "$long_blocker" '
+  printf '%s' "$json" | jq -e --arg long_blocker "$long_blocker" --arg blocked_before "$blocked_before" --arg tail_before "$tail_before" '
     (.since_last_look.changes | map(select(.current == "no longer observed"))) as $removed
     | ($removed | any(.surface == "call" and .title == "Choose local route: choose a route"))
       and ($removed | any(.surface == "moving" and .title == "external-wait"))
       and ($removed | any(.surface == "next" and .title == "Old conditional work"))
       and (.since_last_look.changes | any(.surface == "next" and .title == "Real queued work"
+        and .previous == $blocked_before and (.previous | fromjson)[1] == "ship-task"
         and (.current | fromjson) == ["-", "-"]))
       and (.since_last_look.changes | any(.surface == "next" and .title == "Work with a late blocker"
+        and .previous == $tail_before and (.previous | fromjson)[1] == ($long_blocker + ",ship-task")
         and (.current | fromjson) == ["-", $long_blocker]))
+      and (.since_last_look.changes | any(.surface == "next" and .title == "New work after the last look"
+        and .previous == null))
       and (.since_last_look.changes | all(.surface != "landed"))
   ' >/dev/null || fail "disappearance or blocker clearing was lost or claimed as delivery: $json"
   run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.changes == []' \
