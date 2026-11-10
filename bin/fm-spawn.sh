@@ -4789,7 +4789,8 @@ else
 . "$1/fm-timeout-lib.sh"
 . "$1/fm-quota-axi-lib.sh"
 control=codex-default
-if fm_quota_codex_fast_probe "$2"; then
+fast_quota=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || fast_quota=
+if printf '%s\n' "$fast_quota" | fm_quota_codex_fast_eligible "$2"; then
   fast_features=$(fm_run_timed 5 codex -c 'service_tier="fast"' --enable fast_mode features list 2>/dev/null </dev/null) || fast_features=
   if printf '%s\n' "$fast_features" | awk '$1 == "fast_mode" && $NF == "true" { supported=1 } END { exit !supported }'; then
     control=codex-fast

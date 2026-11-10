@@ -254,11 +254,3 @@ fm_quota_codex_fast_eligible() {
           .percentRemaining >= (2.5 * .pace.burnMultiple * .pace.timeRemainingPercent))))
   ' >/dev/null 2>&1
 }
-
-# Collect quota without refreshing credentials, then check the requested model.
-# Callers source fm-timeout-lib.sh for fm_run_timed.
-fm_quota_codex_fast_probe() {
-  local snapshot
-  snapshot=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || return 1
-  printf '%s\n' "$snapshot" | fm_quota_codex_fast_eligible "$1"
-}
