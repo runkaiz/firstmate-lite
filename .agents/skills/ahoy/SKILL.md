@@ -76,6 +76,6 @@ Keep detailed plans, options, evidence, usage accounting, and operational ids ou
 
 ## Authority
 
-A catch-up changes only its observation checkpoint: never dispatch, steer, merge, answer a call, change queue state, or clean up during it.
+Beyond the snapshot command's documented writes, never dispatch, steer, merge, answer a call, change queue state, or clean up during a catch-up.
 Name any needed action and leave execution to the normal lifecycle.
 Only explicit board mode writes its board, binding, and source registration; its later answer wake follows `ahoy-board`.

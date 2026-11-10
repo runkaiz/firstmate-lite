@@ -23,7 +23,7 @@ ahoy_live_assert() {
     || fail "Ahoy omitted the delivered artifact: $reply"
   printf '%s\n' "$reply" | grep -Fq 'Publish the importer guide' \
     || fail "Ahoy omitted the queued follow-up: $reply"
-  printf '%s\n' "$reply" | grep -Eiq 'unblock|no longer blocked|blocker.*clear|dependency.*(clear|satisf)' \
+  printf '%s\n' "$reply" | grep -Eiq 'unblock|no longer blocked|blocker.*clear|cleared the blocker|dependency.*(clear|satisf)' \
     || fail "Ahoy did not describe the existing follow-up becoming unblocked: $reply"
   printf '%s\n' "$reply" | grep -Eiq 'new(ly)? (item.{0,20})?(in the queue|queued)|nothing.{0,30}(in progress|needs.{0,10}(you|decision))|([0-9]+|one) (outside )?contributions?' \
     && fail "Ahoy invented new queued work or emitted empty inventories/counts: $reply"

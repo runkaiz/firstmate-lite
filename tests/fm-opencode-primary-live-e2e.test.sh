@@ -134,7 +134,7 @@ run_ahoy_case() {
         opencode run --pure --format json --session "$session_id" "/ahoy"
   ) || status=$?
   [ "$status" -eq 0 ] || fail "OpenCode Ahoy $label case exited $status: $second_out"
-  assistant_text=$(printf '%s\n' "$second_out" | jq -r 'select(.type == "text") | .part.text' | tail -1)
+  assistant_text=$(printf '%s\n' "$second_out" | jq -sr 'map(select(.type == "text") | .part.text) | last // ""')
   ahoy_live_assert "$home" "$assistant_text"
 }
 
@@ -236,14 +236,22 @@ run_native_ahoy_regressions() {
     i=$((i + 1))
   done
   [ "$i" -lt 120 ] || fail "OpenCode native later-message session did not reach its TUI"
+  "$TMUX" -L "$SOCKET" send-keys -t "$native_session" -l "Initialize the session and wait for my next message."
+  "$TMUX" -L "$SOCKET" send-keys -t "$native_session" Enter
+  i=0
+  while [ "$i" -lt 120 ]; do
+    [ "$(sed -n '1p' "$later_home/state/session-start-count" 2>/dev/null)" = 1 ] && break
+    sleep 0.5
+    i=$((i + 1))
+  done
+  [ "$(sed -n '1p' "$later_home/state/session-start-count")" = 1 ] \
+    || fail "OpenCode native later-message setup did not run session start exactly once"
   "$TMUX" -L "$SOCKET" send-keys -t "$native_session" -l "Respond exactly PRIOR_BOUNDARY_ACK."
   "$TMUX" -L "$SOCKET" send-keys -t "$native_session" Enter
   wait_for_db_count "$later_db" \
     "select count(*) from message m join part p on p.message_id=m.id where json_extract(m.data,'$.role')='assistant' and json_extract(p.data,'$.type')='text' and json_extract(p.data,'$.text') like '%PRIOR_BOUNDARY_ACK%';" \
     1 || fail "OpenCode native later-message setup did not preserve the genuine captain boundary"
   session_id=$(sqlite3 "$later_db" 'select id from session order by time_created desc limit 1;')
-  [ "$(sed -n '1p' "$later_home/state/session-start-count")" = 1 ] \
-    || fail "OpenCode native later-message setup did not run session start exactly once"
   "$TMUX" -L "$SOCKET" kill-server
 
   status=0
