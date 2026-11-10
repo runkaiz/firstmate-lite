@@ -4909,6 +4909,73 @@ test_cleanup_marker_lock_bound_is_decimal_with_zero_default() {
   pass "the cleanup marker-lock bound is decimal and zero falls back to the default"
 }
 
+test_herdr_native_watch_and_notifications() {
+  command -v jq >/dev/null 2>&1 || { pass "Herdr watcher test skipped without jq"; return; }
+  local dir state fakebin out pid
+  dir=$(make_case herdr-native-watch)
+  state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/out"
+  fm_write_meta "$state/native.meta" "window=test:w1:p1" "backend=herdr" "kind=ship"
+  fm_write_meta "$state/fallback.meta" "window=test:fm-fallback" "backend=tmux" "kind=ship"
+  cat > "$fakebin/herdr" <<'SH'
+#!/usr/bin/env bash
+set -u
+args=("$@")
+n=${#args[@]}
+[ "$n" -ge 2 ] && [ "${args[$((n-2))]}" = --session ] && [ "${args[$((n-1))]}" = test ] || exit 1
+case "$1 $2" in
+  'agent get')
+    printf 'agent get\n' >> "$FM_STATE_OVERRIDE/herdr-calls"
+    printf '{"result":{"agent":{"agent_status":"%s"}}}\n' "$(cat "$FM_STATE_OVERRIDE/native-agent")"
+    ;;
+  'notification show')
+    [ -s "$FM_STATE_OVERRIDE/.wake-queue" ] || exit 1
+    printf '%s|%s\n' "$3" "$5" >> "$FM_STATE_OVERRIDE/notices"
+    ;;
+  'pane read')
+    printf 'pane read\n' >> "$FM_STATE_OVERRIDE/herdr-calls"
+    exit 1
+    ;;
+  *) exit 1 ;;
+esac
+SH
+  chmod +x "$fakebin/herdr"
+  printf 'unknown\n' > "$state/native-agent"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0 FM_BUSY_TURN_MAX_SECS=1
+  pid=$!
+  if ! wait_poll_cycle "$state" "$pid"; then
+    reap "$pid"; fail "unknown Herdr activity incorrectly woke the watcher"
+  fi
+  grep -q '^agent get$' "$state/herdr-calls" || fail "watcher never sampled the Herdr agent"
+  ! grep -q '^pane read$' "$state/herdr-calls" || fail "Herdr watcher inferred liveness from scrollback"
+  [ ! -s "$out" ] && [ ! -e "$state/notices" ] || fail "unknown activity produced a wake or notice"
+  printf 'blocked\n' > "$state/native-agent"
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "native blocked level did not wake without the event stream"; }
+  wait "$pid" || fail "native blocked watcher failed"
+  grep -q 'herdr: agent blocked' "$out" || fail "watcher did not report a native blocked agent"
+  [ "$(cat "$state/notices")" = 'Firstmate: decision needed|native' ] || fail "native blocked notice missing"
+  ack_stopped_cycle "$state" || fail "could not acknowledge native blocked wake"
+
+  printf 'done: PR https://github.com/example/test/pull/1 checks green\nworking: routine update\n' > "$state/native.status"
+  printf 'needs-decision: choose a release\n' > "$state/fallback.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "reported delivery did not wake"; }
+  wait "$pid" || fail "delivery watcher failed"
+  grep -q '^signal:' "$out" || fail "delivery did not surface as a status signal"
+  [ "$(cat "$state/notices")" = "$(printf '%s\n' 'Firstmate: decision needed|native' 'Firstmate: review ready|native')" ] \
+    || fail "delivery notice was lost, duplicated, or sent for routine or tmux events"
+  ack_stopped_cycle "$state" || fail "could not acknowledge delivery wake"
+
+  printf 'blocked [key=login]: login needed\nneeds-decision [key=release]: choose release\n' >> "$state/native.status"
+  watch_bg "$state" "$fakebin" "$out" env FM_BACKEND_HERDR_EVENTS_FORCE=0
+  pid=$!
+  wait_for_exit "$pid" 100 || { reap "$pid"; fail "reported login need did not wake"; }
+  wait "$pid" || fail "blocker watcher failed"
+  [ "$(tail -n 2 "$state/notices")" = "$(printf '%s\n' 'Firstmate: needs attention|native' 'Firstmate: decision needed|native')" ] \
+    || fail "coalesced login and decision notices were lost or duplicated"
+  pass "Herdr watches native blocked state and notifies only actionable Herdr events"
+}
+
 # --- busy pane duration bound: a completed-turn age gate on top of busy -----
 # 2026-07 hibit-agent-focus-nonsteal-r1 incident: a busy pane (herdr "working"
 # and/or the harness's rendered busy footer) is unconditional, unbounded proof
@@ -6762,6 +6829,7 @@ if [ -n "${FM_TEST_ONLY:-}" ]; then
   exit 0
 fi
 
+test_herdr_native_watch_and_notifications
 test_status_span_actionable_classifier
 test_status_span_survives_a_later_routine_append
 test_status_span_respects_decision_closure

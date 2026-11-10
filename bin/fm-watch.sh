@@ -728,6 +728,7 @@ signal_turnend_panes_churned() {  # <file> ...
     w=${snapshot_windows[$task_index]}
     key=${snapshot_keys[$task_index]}
     backend=${snapshot_backends[$task_index]}
+    [ "$backend" = tmux ] || return 1
     label=${snapshot_labels[$task_index]}
     hash_file="$STATE/.hash-$key"
     hash_bytes=$(LC_ALL=C wc -c 2>/dev/null < "$hash_file") || return 1
@@ -1245,20 +1246,22 @@ busy_turn_over_age() {  # <task>
 # clock, a token counter) cannot keep resetting the cadence the way a hash-tied
 # timer would. The bounded re-surface itself is the shared resurface_absorbed
 # above, throttled by this window's own .paused-resurfaced-<key> marker. Advances
-# the stale suppressor to <hash> and flags the key paused.
+# the tmux stale suppressor when given a hash and flags the key paused.
 #
 # The recheck distinguishes the declared dependency from a captain decision:
 # the legacy external-wait wording for paused: (bin/fm-classify-lib.sh), and the
 # captain themself for a verified hold. Only the captain-held verb takes the second
 # wording; a caller that reached the bounded cadence off pause tracking alone, with
 # no declaring verb left on the log, keeps the external-wait wording it always had.
-handle_paused_stale() {  # <window> <task> <hash>
-  local win=$1 task=$2 h=$3 key statusf mtime age detail reason declaration last until now min_age
+handle_paused_stale() {  # <window> <task> [tmux-hash]
+  local win=$1 task=$2 h=${3:-} key statusf mtime age detail reason declaration last until now min_age
   key=$(window_key "$win")
-  printf '%s' "$h" > "$STATE/.stale-$key"
   : > "$STATE/.paused-$key"
-  rm -f "$STATE/.stale-since-$key" "$STATE/.wedge-escalations-$key"
-  clear_write_tracking "$key"
+  if [ -n "$h" ]; then
+    printf '%s' "$h" > "$STATE/.stale-$key"
+    rm -f "$STATE/.stale-since-$key" "$STATE/.wedge-escalations-$key"
+    clear_write_tracking "$key"
+  fi
   statusf="$STATE/$task.status"
   mtime=$(stat_mtime "$statusf")
   case "$mtime" in ''|*[!0-9]*) mtime=$(date +%s) ;; esac
@@ -2002,6 +2005,50 @@ watcher_capture() {  # <backend> <target> <lines> [expected-label]
   return "$rc"
 }
 
+# Collect notices from classified events and emit them only after the
+# corresponding wake has been recorded. Coalesce each category per task.
+collect_status_notifications() {  # <task> <events>
+  local task=$1 events=$2 meta="$STATE/$1.meta" target line verb note category categories=''
+  [ -n "$events" ] && [ "$(fm_backend_of_meta "$meta")" = herdr ] || return 0
+  target=$(fm_backend_target_of_meta "$meta") || return 0
+  case "$target" in ?*:?*) ;; *) return 0 ;; esac
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    status_line_verb "$line" verb
+    case "$verb" in
+      needs-decision|captain-held) category=decision ;;
+      blocked|failed) category=attention ;;
+      working|paused|resolved) continue ;;
+      *)
+        note=$line
+        [ "$verb" != "done" ] || note=$(status_line_note "$line")
+        case "$note" in
+          'PR https://'*|'PR ready'*|*'checks green'*|*'ready in branch '*) category=ready ;;
+          *) continue ;;
+        esac
+        ;;
+    esac
+    case " $categories " in *" $category "*) continue ;; esac
+    categories="$categories $category"
+    FM_STATUS_NOTIFICATIONS="$FM_STATUS_NOTIFICATIONS${target%%:*}"$'\t'"$category"$'\t'"$task"$'\n'
+  done <<EOF
+$events
+EOF
+}
+
+send_status_notifications() {
+  local session category task
+  while IFS=$'\t' read -r session category task; do
+    case "$category" in
+      ready) notify_herdr_task "$session" 'Firstmate: review ready' "$task" "done" ;;
+      decision) notify_herdr_task "$session" 'Firstmate: decision needed' "$task" request ;;
+      attention) notify_herdr_task "$session" 'Firstmate: needs attention' "$task" request ;;
+    esac
+  done <<EOF
+$FM_STATUS_NOTIFICATIONS
+EOF
+}
+
 # 0 when any signaled status file carries a captain-relevant event in the bytes
 # appended since this watcher last classified it. The start offset is the
 # classified-position field in that file's .seen-* marker, and fm-classify-lib.sh's
@@ -2021,7 +2068,8 @@ watcher_capture() {  # <backend> <target> <lines> [expected-label]
 # (docs/pi-supervision-branch.md). Stale and heartbeat rows retain their existing
 # eligibility rules.
 signal_files_actionable() {  # <status-file> ...
-  local f task record rest endpoint ident needs_decision rc found=1
+  local f task record rest endpoint ident needs_decision notification_events rc found=1
+  FM_STATUS_NOTIFICATIONS=''
   FM_SIGNAL_SURFACE_ENDPOINTS=''
   FM_SIGNAL_NEEDS_DECISION_FILES=''
   for f in "$@"; do
@@ -2030,7 +2078,7 @@ signal_files_actionable() {  # <status-file> ...
     task=$(basename "$f"); task="${task%.status}"
     record=''; needs_decision=0
     status_span_first_actionable_record "$f" \
-      "$(fm_wake_signal_seen_size "$STATE" "$f")" record needs_decision
+      "$(fm_wake_signal_seen_size "$STATE" "$f")" record needs_decision notification_events
     rc=$?
     [ "$rc" -eq 1 ] && [ -z "$record" ] && continue
     if [ "$rc" -eq 2 ]; then
@@ -2047,6 +2095,7 @@ signal_files_actionable() {  # <status-file> ...
       FM_SIGNAL_NEEDS_DECISION_FILES="${FM_SIGNAL_NEEDS_DECISION_FILES} ${f}"
     fi
     if [ "$rc" -eq 0 ] || [ "$needs_decision" -eq 1 ]; then
+      collect_status_notifications "$task" "${notification_events:-}"
       found=0
     fi
   done
@@ -2084,7 +2133,8 @@ EOF
 # is absorbed; it surfaces only an event the per-wake path absorbed by mistake -
 # the fail-safe backstop.
 heartbeat_scan_finds_actionable() {
-  local f task record rest endpoint ident rc found=1 sig marker exclude
+  local f task record rest endpoint ident notification_events rc found=1 sig marker exclude
+  FM_STATUS_NOTIFICATIONS=''
   # Same self-home exclusion as scan_signals: a remote mate's parent channel
   # must not come back through the heartbeat fail-safe backstop.
   exclude=$(status_scan_parent_channel_exclude "$STATE")
@@ -2093,7 +2143,8 @@ heartbeat_scan_finds_actionable() {
     [ -e "$f" ] || [ -L "$f" ] || continue
     [ "$f" = "$exclude" ] && continue
     task=$(basename "$f"); task="${task%.status}"
-    record=$(status_span_first_actionable_record "$f" "$(hb_surfaced_offset "$task")")
+    record=''
+    status_span_first_actionable_record "$f" "$(hb_surfaced_offset "$task")" record '' notification_events
     rc=$?
     [ "$rc" -eq 1 ] && [ -z "$record" ] && continue
     if [ "$rc" -eq 2 ]; then
@@ -2106,7 +2157,10 @@ heartbeat_scan_finds_actionable() {
     fi
     endpoint=${record%%$'\t'*}; rest=${record#*$'\t'}; ident=${rest%%$'\t'*}
     FM_HEARTBEAT_SURFACE_ENDPOINTS="${FM_HEARTBEAT_SURFACE_ENDPOINTS}${f}"$'\t'"${endpoint}"$'\t'"${ident}"$'\n'
-    [ "$rc" -eq 0 ] && found=0
+    if [ "$rc" -eq 0 ]; then
+      collect_status_notifications "$task" "${notification_events:-}"
+      found=0
+    fi
   done
   return "$found"
 }
@@ -2732,6 +2786,7 @@ EOF
       done <<EOF
 $FM_SIGNAL_SURFACE_ENDPOINTS
 EOF
+      send_status_notifications
       wake "$reason"
     else
       while IFS=$(printf '\t') read -r sf sig f; do
@@ -2761,7 +2816,8 @@ EOF
     fi
   fi
 
-  # Layer 1 backbone: pane staleness. Two consecutive identical hashes with no busy
+  # Herdr uses agent status and the native blocked transition handler.
+  # The tmux fallback uses pane staleness. Two consecutive identical hashes with no busy
   # signature means the crewmate finished, is waiting, or is wedged. Each distinct
   # stale hash is surfaced, absorbed, or timed toward escalation once (.stale-*
   # remembers the hash already classified, or the declaration a busy pane's
@@ -2792,7 +2848,16 @@ EOF
     if [ "$kind" = secondmate ] && ! status_is_paused_or_captain_held "$last"; then
       continue
     fi
-    watcher_capture "$(window_backend "$w")" "$w" 40 "$(window_label "$w")" || continue
+    backend=$(window_backend "$w")
+    if [ "$backend" = herdr ]; then
+      if status_is_paused_or_captain_held "$last"; then
+        handle_paused_stale "$w" "$task"
+      elif fm_backend_source herdr && transition=$(fm_backend_herdr_check_transition "$STATE" "${w%%:*}" "${w#*:}"); then
+        handle_push_transition herdr "${w%%:*}" "$transition"
+      fi
+      continue
+    fi
+    watcher_capture "$backend" "$w" 40 "$(window_label "$w")" || continue
     tail40=$WATCHER_CAPTURE
     h=$(printf '%s' "$tail40" | hash_pane)
     hf="$STATE/.hash-$key"
@@ -2802,11 +2867,7 @@ EOF
     ewf="$STATE/.wedge-escalations-$key"
     pf="$STATE/.paused-$key"   # flag: this key's stale is using the bounded pause cadence
     prev=$(cat "$hf" 2>/dev/null || true)
-    # Busy match: a backend's native semantic state when available (herdr), else
-    # the last 6 non-blank lines only (the TUI footer area, where every verified
-    # harness renders its busy indicator) so busy-looking strings in displayed
-    # content cannot suppress stale detection. Read once per window per poll and
-    # reused below so a busy verdict is consistent within one cycle.
+    # Read the tmux busy verdict once per poll and reuse it throughout triage.
     if window_is_busy "$w" "$tail40"; then busy_now=0; else busy_now=1; fi
     if [ "$busy_now" -eq 0 ] && terminal_delivery_old_busy "$task"; then busy_now=1; fi
     if [ "$busy_now" -eq 0 ] && terminal_delivery_working "$task"; then
@@ -2849,14 +2910,8 @@ EOF
           # (AGENTS.md's sparse status-reporting contract), so the log can
           # keep showing a "done:"/needs-decision/blocked leftover from
           # BEFORE that validation started for the run's entire (possibly
-          # many-minutes) duration, while stale_is_terminal - which has no
-          # run-step awareness - keeps reporting it as still-current on every
-          # poll. Root cause of the 2026-07 herdr false-surface incidents: a
-          # validating crew was surfaced as stale every few minutes despite an
-          # actively-running pipeline, purely because of this stale leftover
-          # line. On a NEW hash, give an active run/busy pane (the same
-          # authoritative source fm-crew-state.sh itself already prioritizes
-          # over the log) a chance to override before trusting the log.
+          # many-minutes) duration. On a new hash, check for an active run or
+          # busy pane before trusting the older status.
           if [ "$(cat "$sf" 2>/dev/null || true)" != "$h" ]; then
             if terminal_delivery_working "$task"; then
               rm -f "$STATE/.terminal-resurfaced-$key"
@@ -3033,6 +3088,7 @@ EOF
       fm_wake_append heartbeat heartbeat heartbeat || exit 1
       touch "$STATE/.last-heartbeat"
       mark_all_captain_relevant_surfaced || true
+      send_status_notifications
       wake "heartbeat"
     else
       if ! mark_all_captain_relevant_surfaced; then

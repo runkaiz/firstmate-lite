@@ -74,16 +74,14 @@ fm_transition_agent()        { fm_transition_field "$1" 5; }
 #                durable wake now). `blocked` is the only immediately-actionable
 #                status today: herdr reports it precisely when a harness is
 #                waiting on the human (a permission/trust dialog, an interactive
-#                menu, a wedged prompt) - the cases that write no status file
-#                and otherwise sit until the stale-pane wedge timer.
+#                menu, a wedged prompt) - including cases with no status file.
 #   absorb     - do NOT wake, but CLEAR this pane's per-pane escalation dedupe
 #                marker so a later `->blocked` edge re-escalates. `working`
 #                (a crew resumed/started a turn) is the clearing edge.
 #   defer      - do NOTHING on the fast path; leave it to the existing
 #                status/turn-end completion semantics and the poll backstop.
 #                `idle`/`done` blip transiently between tool calls, so
-#                fast-pathing them would be a false-positive firehose - they are
-#                already covered by the debounced signal/stale machinery.
+#                task outcomes arrive through debounced status signals.
 #   fallback   - the status is unknown/unrecognized: fall back to polling for
 #                this pane (the permanent fail-closed backstop), taking no fast
 #                action from an ambiguous read.

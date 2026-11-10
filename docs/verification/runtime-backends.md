@@ -1920,24 +1920,30 @@ FM_SEND_MARKER_HERDR_E2E=1 \
   tests/fm-send-secondmate-marker-herdr-e2e.test.sh
 ```
 
-### Native blocked event
+### Native agent supervision
 
-The protocol-16 event path was measured on 2026-07-11 with Herdr 0.7.3 and Python 3.13:
+On 2026-11-10, Herdr 0.9.5 (protocol 22) was exercised in a guarded named lab session:
 
 ```sh
-HERDR_LAB_HELPER=bin/fm-herdr-lab.sh \
-  tests/fm-backend-herdr-eventwait-smoke.test.sh
+FM_HERDR_EVENTWAIT_LIVE=1 bash tests/fm-backend-herdr-eventwait-smoke.test.sh
 ```
 
-Observed output:
+The run reported:
 
 ```text
-ok - real herdr: events.subscribe capability gate passes
-ok - real herdr: a driven idle->blocked transition returns the blocked record in 0.129s
-ok - real herdr: the watcher fast-path enqueues a stale wake naming the task window
+ok - real herdr (0.9.5): events.subscribe capability gate passes (protocol >= 16, events surface present in api schema)
+ok - real herdr (0.9.5): a driven idle->blocked transition returns the blocked record in 0.061s (pane w1:p1)
+ok - real herdr: the watcher fast-path enqueues a stale wake naming the task window from the live blocked transition
+ok - real herdr: the level check dedupes one blocked episode and detects the next
+ok - real herdr: notification API accepts a scoped review notice
+ok - real herdr (0.9.5): claude (2.1.322 (Claude Code)) settles in the isolated pane
+ok - real herdr (0.9.5): codex (codex-cli 0.167.1) settles in the isolated pane
+ok - real herdr (0.9.5): pi (1.5.2) settles in the isolated pane
 ```
 
-Polling remained active and is covered as the fallback for capability, connect, subscribe, and repeated reader failure.
+The three harness checks launched real agents with their Herdr integrations installed in isolated configuration directories and waited for a settled state without submitting a prompt.
+
+`tests/fm-watch-triage.test.sh` covers the native level fallback without a subscription, the absence of scrollback reads for unknown activity, and notices for newly reported outcomes while ignoring routine progress and tmux reports.
 
 ### Agent lifecycle control
 

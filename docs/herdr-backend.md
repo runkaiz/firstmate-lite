@@ -105,6 +105,9 @@ When the launcher has no Herdr workspace to inherit, the adapter maintains one d
 
 Attach to the selected named Herdr session and switch to the relevant home workspace to watch its task tabs.
 Routine supervision uses `bin/fm-peek.sh <id>` and `FM_HOME=<home> bin/fm-send.sh <id> '<text>'` without attaching.
+Herdr reports when a worker is active, has finished its turn, or is waiting for input.
+Worker reports still carry task outcomes and decisions.
+A ready pull request or branch, a decision, or a reported blocker or failure also produces a Herdr notification in the worker's session.
 
 ### Focus
 
@@ -746,7 +749,7 @@ The watcher maps the pane back to the task and skips these:
 ### Polling fallback
 
 The push path only shortens latency.
-Polling runs every cycle and remains the permanent fallback when any of these is unavailable:
+The watcher checks native `agent get` levels each cycle, including when any of these is unavailable:
 
 - Protocol 16.
 - The event schema.

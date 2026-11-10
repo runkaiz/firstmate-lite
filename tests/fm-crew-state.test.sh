@@ -2436,7 +2436,7 @@ test_no_run_grok_uses_isolated_fallback() {
   pass "grok still reads working through its isolated rendered-tail fallback"
 }
 
-test_no_run_herdr_unknown_uses_backend_capture() {
+test_no_run_herdr_working_uses_native_state() {
   command -v jq >/dev/null 2>&1 || { pass "herdr pane fallback skipped without jq"; return; }
   reset_fakes
   local d; d=$(new_case herdr-busy)
@@ -2624,8 +2624,8 @@ test_no_run_herdr_idle_agent_status_outranked_by_record() {
   pass "a mid-tool-call crew stays working because its record outranks herdr's generation state"
 }
 
-# The record must not mask a genuinely idle or human-blocked agent: an idle
-# record with idle agent_status still reads not-busy.
+# Native idle and done describe a settled agent, even with old progress text.
+# Blocked is actionable even while a hook claims its turn is still open.
 test_no_run_herdr_idle_agent_status_and_idle_record_stays_idle() {
   command -v jq >/dev/null 2>&1 || { pass "herdr idle+idle-record skipped without jq"; return; }
   reset_fakes
@@ -2644,9 +2644,23 @@ test_no_run_herdr_idle_agent_status_and_idle_record_stays_idle() {
   "$ROOT/bin/fm-busy-event.sh" apply "$d/state" feat-herdr-stopped idle --gen "$gen" \
     --source claude-hook --event stop
   local out; out=$(run_crew_state "$d" feat-herdr-stopped)
-  assert_not_contains "$out" "source: pane" "an idle record must not read as busy"
-  assert_contains "$out" "source: status-log" "an idle record falls to the status log"
-  pass "an idle record with idle agent_status stays not-busy (no regression for a human-blocked agent)"
+  assert_contains "$out" "state: idle" "old progress must not override native idle"
+  assert_contains "$out" "source: pane" "settled activity comes from Herdr"
+  FM_FAKE_HERDR_AGENT_STATUS="done"
+  out=$(run_crew_state "$d" feat-herdr-stopped)
+  assert_contains "$out" "state: idle" "Herdr done ends a turn without declaring task completion"
+  "$ROOT/bin/fm-busy-event.sh" apply "$d/state" feat-herdr-stopped busy --gen "$gen" \
+    --source claude-hook --event user-prompt-submit
+  FM_FAKE_HERDR_AGENT_STATUS=blocked
+  out=$(run_crew_state "$d" feat-herdr-stopped)
+  assert_contains "$out" "state: blocked" "native blocked overrides a busy hook record"
+  printf 'needs-decision: choose a database\n' >> "$d/state/feat-herdr-stopped.status"
+  FM_FAKE_HERDR_AGENT_STATUS=unknown
+  FM_FAKE_HERDR_PROCESS=shell
+  out=$(run_crew_state "$d" feat-herdr-stopped)
+  assert_contains "$out" "state: parked" "an unknown agent state preserves an authored decision"
+  assert_not_contains "$out" "backend target gone" "unknown must never become positive death evidence"
+  pass "Herdr distinguishes settled, blocked and unknown agent activity"
 }
 
 # (g) no run + idle pane -> the status-log verb, as-is
@@ -5420,7 +5434,7 @@ test_no_run_busy_pane
 test_no_run_launch_prompt_parked_is_not_working
 test_no_run_footer_text_alone_is_not_working
 test_no_run_grok_uses_isolated_fallback
-test_no_run_herdr_unknown_uses_backend_capture
+test_no_run_herdr_working_uses_native_state
 test_no_run_herdr_cli_failure_reads_unreachable_not_gone
 test_no_run_herdr_alive_with_failed_read_stays_live
 test_no_run_herdr_husk_dead_still_reads_gone

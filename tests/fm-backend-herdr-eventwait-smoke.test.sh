@@ -15,12 +15,9 @@ set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-fail() { printf 'not ok - %s\n' "$1" >&2; cleanup_all; exit 1; }
-pass() { printf 'ok - %s\n' "$1"; }
-
-command -v herdr >/dev/null 2>&1 || { echo "skip: herdr not found"; exit 0; }
-command -v jq >/dev/null 2>&1 || { echo "skip: jq not found (required by the herdr adapter)"; exit 0; }
-command -v python3 >/dev/null 2>&1 || { echo "skip: python3 not found (required by the event subscriber)"; exit 0; }
+# shellcheck source=tests/lib.sh
+. "$ROOT/tests/lib.sh"
+fm_live_gate default-on FM_HERDR_EVENTWAIT_LIVE herdr jq python3
 
 # shellcheck source=tests/herdr-test-safety.sh
 . "$ROOT/tests/herdr-test-safety.sh"
@@ -33,16 +30,34 @@ herdr_forget_inherited_pane
 HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
 SESSION=$("$HERDR_LAB_HELPER" name eventwait) || exit 1
 export HERDR_SESSION="$SESSION"
-SCRATCH=
+ORIGINAL_PATH=$PATH
+SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/fm-evwait.XXXXXX")
 CLEANED=0
 cleanup_all() {
   [ "$CLEANED" = 0 ] || return 0
   CLEANED=1
-  "$HERDR_LAB_HELPER" teardown "$SESSION" || return 1
-  [ -z "$SCRATCH" ] || rm -rf "$SCRATCH"
+  local rc=0
+  PATH="$ORIGINAL_PATH" "$HERDR_LAB_HELPER" teardown "$SESSION" || rc=1
+  rm -rf -- "${SCRATCH:?}"
+  fm_test_cleanup
+  return "$rc"
 }
-trap cleanup_all EXIT
+trap 'rc=$?; cleanup_all || rc=1; exit "$rc"' EXIT
 "$HERDR_LAB_HELPER" provision "$SESSION" || fail "could not provision isolated Herdr lab session"
+lab() { PATH="$ORIGINAL_PATH" "$HERDR_LAB_HELPER" run "$SESSION" "$@"; }
+mkdir "$SCRATCH/fakebin"
+cat > "$SCRATCH/fakebin/herdr" <<'SH'
+#!/usr/bin/env bash
+set -u
+args=("$@")
+n=${#args[@]}
+[ "$n" -ge 2 ] && [ "${args[$((n-2))]}" = --session ] \
+  && [ "${args[$((n-1))]}" = "$SESSION" ] || exit 1
+exec env PATH="$ORIGINAL_PATH" "$HERDR_LAB_HELPER" run "$SESSION" "${args[@]:0:$((n-2))}"
+SH
+chmod +x "$SCRATCH/fakebin/herdr"
+export ORIGINAL_PATH SESSION HERDR_LAB_HELPER
+export PATH="$SCRATCH/fakebin:$ORIGINAL_PATH"
 
 # The dispatcher is a separately linted production boundary. Its dynamic
 # adapter source edges stop at each independently linted canonical adapter.
@@ -50,7 +65,7 @@ trap cleanup_all EXIT
 . "$ROOT/bin/fm-backend.sh"
 fm_backend_source herdr || fail "fm_backend_source herdr failed"
 
-HERDR_VERSION=$(herdr --version 2>/dev/null | head -1)
+HERDR_VERSION=$(lab status --json | jq -er '.client.version') || fail "could not read Herdr version"
 
 # --- real capability gate ----------------------------------------------------
 
@@ -64,18 +79,11 @@ pass "real herdr ($HERDR_VERSION): events.subscribe capability gate passes (prot
 
 # --- container + a real task pane in the isolated session --------------------
 
-CONTAINER_RAW=$(fm_backend_herdr_container_ensure /tmp) || fail "container_ensure failed"
-CONTAINER=${CONTAINER_RAW%%$'\t'*}
-SEEDED_TAB_ID=${CONTAINER_RAW#*$'\t'}
-IDS=$(fm_backend_herdr_create_task "$CONTAINER" "fm-evwait1" /tmp "$SEEDED_TAB_ID") || fail "create_task failed"
-read -r _TAB_ID PANE_ID <<EOF
-$IDS
-EOF
-[ -n "$PANE_ID" ] || fail "create_task did not return a pane id"
+WORKSPACE=$(lab workspace create --cwd "$SCRATCH" --label fm-evwait --no-focus) || fail "workspace create failed"
+PANE_ID=$(printf '%s' "$WORKSPACE" | jq -er '.result.root_pane.pane_id') || fail "workspace create did not return its pane id"
 TARGET="$SESSION:$PANE_ID"
 
 # scratch firstmate state so window_to_task and the wake queue resolve
-SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/fm-evwait.XXXXXX")
 STATE="$SCRATCH/state"; mkdir -p "$STATE"
 cat > "$STATE/evwait1.meta" <<EOF
 window=$TARGET
@@ -90,7 +98,7 @@ SOCK=$(fm_backend_herdr_socket_path "$SESSION")
 # report-agent is herdr's documented primitive for a non-built-in process to
 # report its own agent state (docs/herdr-backend.md); routed through the lab
 # helper's guarded `run` so it carries the trailing --session.
-fm_herdr_lab_cli "$SESSION" pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state idle >/dev/null 2>&1 \
+lab pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state idle >/dev/null 2>&1 \
   || fail "could not register the pane's agent as idle"
 
 OUT="$SCRATCH/out"; RCF="$SCRATCH/rc"
@@ -102,7 +110,7 @@ WPID=$!
 sleep 0.5   # let it connect, subscribe, and reconcile the idle baseline
 
 START=$(python3 -c 'import time; print(time.time())')
-fm_herdr_lab_cli "$SESSION" pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state blocked >/dev/null 2>&1 \
+lab pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state blocked >/dev/null 2>&1 \
   || fail "could not drive the pane's agent to blocked"
 wait "$WPID"
 END=$(python3 -c 'import time; print(time.time())')
@@ -116,9 +124,9 @@ REC_PANE=$(fm_transition_pane_id "$REC")
 REC_TO=$(fm_transition_to_status "$REC")
 [ "$REC_PANE" = "$PANE_ID" ] || fail "the returned record's pane_id ('$REC_PANE') must match the driven pane ('$PANE_ID')"
 [ "$REC_TO" = "blocked" ] || fail "the returned record's to_status must be 'blocked', got '$REC_TO'"
-# Sub-second: comfortably under the ~240s stale-pane wedge timer this replaces.
+# The event path should usually deliver before the next status poll.
 UNDER_ONE=$(python3 -c "print('yes' if (($END)-($START)) < 1.0 else 'no')" 2>/dev/null || echo "no")
-[ "$UNDER_ONE" = yes ] || echo "note: idle->blocked wake took ${ELAPSED}s (>1s; still far under the 240s wedge timer, not fatal)" >&2
+[ "$UNDER_ONE" = yes ] || echo "note: idle->blocked wake took ${ELAPSED}s (>1s)" >&2
 pass "real herdr ($HERDR_VERSION): a driven idle->blocked transition returns the blocked record in ${ELAPSED}s (pane $PANE_ID)"
 
 # --- the watcher's fast-path lands a stale record in the scratch wake queue ---
@@ -135,6 +143,51 @@ grep -q 'stale' "$STATE/.wake-queue" || fail "the wake queue must carry a stale 
 grep -q "$TARGET" "$STATE/.wake-queue" || fail "the stale record must name the task window $TARGET"
 grep -q 'herdr: agent blocked' "$STATE/.wake-queue" || fail "the stale payload must name the herdr-blocked cause"
 pass "real herdr: the watcher fast-path enqueues a stale wake naming the task window from the live blocked transition"
+
+# A reconnect or unavailable stream sees the same native level and dedupes the
+# already delivered episode.
+if fm_backend_herdr_check_transition "$STATE" "$SESSION" "$PANE_ID"; then
+  fail "current blocked level repeated an already delivered transition"
+fi
+lab pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state working >/dev/null \
+  || fail "could not drive the pane's agent to working"
+fm_backend_herdr_check_transition "$STATE" "$SESSION" "$PANE_ID" && fail "working should not escalate"
+lab pane report-agent "$PANE_ID" --source fm-evwait-test --agent claude --state blocked >/dev/null \
+  || fail "could not drive the second blocked episode"
+REC=$(fm_backend_herdr_check_transition "$STATE" "$SESSION" "$PANE_ID") || fail "the second blocked episode was lost"
+[ "$(fm_transition_to_status "$REC")" = blocked ] || fail "expected native blocked level"
+pass "real herdr: the level check dedupes one blocked episode and detects the next"
+
+if lab notification show --help >/dev/null 2>&1; then
+  NOTICE=$(lab notification show 'Firstmate: review ready' --body evwait1 --sound "done") \
+    || fail "Herdr $HERDR_VERSION notification API refused a review notice"
+  printf '%s' "$NOTICE" | jq -e '.result != null' >/dev/null || fail "notification API did not return a result"
+  pass "real herdr: notification API accepts a scoped review notice"
+else
+  printf 'skip: Herdr %s has no notification show command\n' "$HERDR_VERSION"
+fi
+
+# These launches use the isolated harness roots supplied by tests/lib.sh.
+# Recognizing a real agent and waiting for idle or done needs no model calls.
+if lab agent start --help >/dev/null 2>&1 && lab integration install --help >/dev/null 2>&1; then
+  for harness in claude codex pi; do
+    if ! command -v "$harness" >/dev/null; then
+      printf 'skip: %s is not installed\n' "$harness"
+      continue
+    fi
+    version=$("$harness" --version 2>/dev/null | head -n 1)
+    lab integration install "$harness" >/dev/null || fail "Herdr $HERDR_VERSION could not install the isolated $harness integration"
+    workspace=$(lab workspace create --cwd "$SCRATCH" --label "$harness-test" --no-focus) || fail "could not create $harness test workspace"
+    pane=$(printf '%s' "$workspace" | jq -er '.result.root_pane.pane_id') || fail "missing $harness test pane"
+    lab agent start "$harness-test" --kind "$harness" --pane "$pane" --timeout 15000 >/dev/null \
+      || fail "Herdr $HERDR_VERSION did not recognize $harness ($version)"
+    lab agent wait "$pane" --until idle --until "done" --timeout 5000 >/dev/null \
+      || fail "Herdr $HERDR_VERSION did not report $harness ($version) settled"
+    pass "real herdr ($HERDR_VERSION): $harness ($version) settles in the isolated pane"
+  done
+else
+  printf 'skip: Herdr %s lacks agent start or integration install\n' "$HERDR_VERSION"
+fi
 
 if ! cleanup_all; then
   trap - EXIT
