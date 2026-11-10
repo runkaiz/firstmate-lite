@@ -1021,7 +1021,8 @@ This applies only to agents Firstmate launches; the captain's own primary Firstm
 
 ### Worker fast mode
 
-Create the local, gitignored `config/worker-fast-mode` presence file to opt ships and scouts into quota-gated Codex fast mode at spawn or relaunch; absent means off.
+Use `/sparespeed on`, `/sparespeed off`, or `/sparespeed status` to set or inspect quota-gated Codex worker fast mode.
+The local, gitignored `config/worker-fast-mode` presence file opts ships and scouts in at spawn or relaunch; absent means off.
 An omitted or `default` model, unknown quota, an unconfirmed worker-context probe, or an unsupported CLI keeps normal mode; `bin/fm-quota-axi-lib.sh` owns the 2.5x burn-through-reset threshold, and `launch_service_control` records the selected control without claiming runtime verification.
 Claude stays normal because [its fast mode](https://code.claude.com/docs/en/fast-mode) spends separate paid usage credits outside the measured subscription allowance; other harnesses are unchanged.
 
