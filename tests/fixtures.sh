@@ -120,6 +120,11 @@ case "${1:-}" in
     ;;
   has-session|new-session|new-window|kill-window|set-window-option) exit 0 ;;
   send-keys)
+    if [ -n "${FM_FAKE_PANE_RUNNER:-}" ]; then
+      case "${4:-}" in
+        ". '"*"'") "$FM_FAKE_PANE_RUNNER" -c "$4" || exit 1 ;;
+      esac
+    fi
     if [ -n "${FM_FAKE_LAUNCH_LOG:-}" ]; then
       prev=
       for a in "$@"; do

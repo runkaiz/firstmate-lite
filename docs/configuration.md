@@ -1018,6 +1018,12 @@ This applies only to agents Firstmate launches; the captain's own primary Firstm
 
 [`fm-spawn.sh --help`](../bin/fm-spawn.sh) owns the delivery mechanics, with focused regression coverage in [`tests/fm-spawn-compact-adviser-disable.test.sh`](../tests/fm-spawn-compact-adviser-disable.test.sh) and the retained route-only remote transport tests.
 
+### Worker fast mode
+
+Create the local, gitignored `config/worker-fast-mode` presence file to opt ships and scouts into quota-gated Codex fast mode at spawn or relaunch; absent means off.
+An omitted or `default` model, unknown quota, an unconfirmed worker-context probe, or an unsupported CLI keeps normal mode; `bin/fm-quota-axi-lib.sh` owns the 2.5x burn-through-reset threshold, and `launch_service_control` records the selected control without claiming runtime verification.
+Claude stays normal because [its fast mode](https://code.claude.com/docs/en/fast-mode) spends separate paid usage credits outside the measured subscription allowance; other harnesses are unchanged.
+
 ### Commit attribution
 
 The optional local, gitignored `config/keep-ai-trailers` presence flag opts this home into keeping AI co-author trailers on its launched workers.

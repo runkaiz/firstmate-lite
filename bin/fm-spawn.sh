@@ -374,8 +374,16 @@
 #     not runtime success; effective_profile=unverified states that boundary.
 #     stderr launch-profile reports all three axes; omitted unsupported effort
 #     warns explicitly instead of implying the requested effort took effect.
-#     Canonical Codex workers pass service_tier="default"; Claude workers set
-#     CLAUDE_CODE_DISABLE_FAST_MODE=1. Raw launch commands retain unverified
+#     Canonical Codex workers pass service_tier="default" unless the optional
+#     config/worker-fast-mode presence flag and fm_quota_codex_fast_eligible
+#     permit fast at spawn/relaunch. The installed CLI must accept fast_mode
+#     and service_tier="fast" in a bounded, token-free features-list probe.
+#     Quota and CLI probes run in the destination pane with the worker's launch
+#     environment filter; an unconfirmed probe retains default service.
+#     Only ships/scouts opt in; secondmates and raw commands do not.
+#     Claude keeps CLAUDE_CODE_DISABLE_FAST_MODE=1 because its fast mode spends
+#     separate paid credits, not the measured subscription allowance.
+#     Raw launch commands retain unverified
 #     controls. These controls never prove account access, provider billing,
 #     service response tier, or an in-session settings change.
 #     Pi's task extension reports generation-bound runtime model/thinking
@@ -393,6 +401,7 @@
 #                  the `browser` MCP server when config/browser-mcp exists and
 #                  verifies (supplies its own trailing space, empty otherwise)
 #     __CLAUDESETTINGS__ quoted state/<task-id>.claude-settings.json path
+#     __CODEXSERVICE__ quoted Codex service config and optional fast_mode feature
 #     __PIBIN__    quoted concrete Pi-family executable path resolved from PATH
 #     __PITUIMODE__ optional --tui-mode regular when that executable advertises it
 #     __PIAPPROVE__ optional --approve on a seeded Pi/pi-signed secondmate when
@@ -1838,7 +1847,7 @@ launch_template() {
   # secondmate launch deliberately keeps hooks on.
   codex)
 
-      printf '%s' 'codex __CODEXMCP____MODELFLAG____EFFORTFLAG__--dangerously-bypass-approvals-and-sandbox --disable hooks -c '\''service_tier="default"'\'' -c "notify=[\"bash\",\"-c\",\"touch __TURNEND__\"]" "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' 'codex __CODEXMCP____MODELFLAG____EFFORTFLAG__--dangerously-bypass-approvals-and-sandbox --disable hooks __CODEXSERVICE__ -c "notify=[\"bash\",\"-c\",\"touch __TURNEND__\"]" "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
 
     ;;
   opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT=__OPENCODECONFIG__ opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
@@ -4720,6 +4729,37 @@ else
   fi
 fi
 
+if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
+  LAUNCH_ENV_PREFIX='/usr/bin/env -i'
+  # COMPACT_ADVISER_DISABLE is the intentional declarative floor-membership
+  # entry; the explicit COMPACT_ADVISER_DISABLE=1 assignment below is the
+  # authoritative setter.
+  for env_name in HOME PATH USER LOGNAME SHELL TERM COLORTERM LANG LC_ALL LC_CTYPE \
+    TMPDIR TMP TEMP GOTMPDIR TMUX TMUX_PANE HERDR_ENV HERDR_SESSION HERDR_SOCKET_PATH \
+    HERDR_PANE_ID FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
+    $LAUNCH_ENV_NAMES; do
+    # Only validated names enter shell syntax. Values expand once, quoted, in
+    # the pane shell and never become source text or spawn-process snapshots.
+    # shellcheck disable=SC2016
+    printf -v env_arg '${%s+"%s=$%s"}' "$env_name" "$env_name" "$env_name"
+    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX $env_arg"
+  done
+  # COMPACT_ADVISER_DISABLE is retained by the floor loop above, which forwards
+  # whatever the pane export set, and then pinned here to the one value Firstmate
+  # launches on. The literal assignment comes last deliberately: `env` applies
+  # assignments left to right, so this one wins over a forwarded pane value, and
+  # it still delivers the switch on a pane whose export never landed. Unlike the
+  # trace carrier below it carries no gate, so it is appended unconditionally.
+  # Setting it here rather than relying on the assignment already carried by
+  # $LAUNCH is what gives the wrapping `/bin/sh` itself the switch, not only the
+  # agent command it runs.
+  LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX COMPACT_ADVISER_DISABLE=1"
+  if [ -n "$SPAWN_TRACEPARENT" ]; then
+    # shellcheck disable=SC2016
+    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX "'${TRACEPARENT+"TRACEPARENT=$TRACEPARENT"}'
+  fi
+fi
+
 MODELFLAG=$(model_flag_for_harness "$HARNESS" "$MODEL")
 # A pinned Pi launch confines Pi's model lookup to the declared provider.
 [ -z "$WORKER_ACCOUNT_PROVIDER" ] || MODELFLAG="--provider $(shell_quote "$WORKER_ACCOUNT_PROVIDER") $MODELFLAG"
@@ -4729,6 +4769,7 @@ EFFORTFLAG=$(effort_flag_for_harness "$HARNESS" "$EFFORT" "$MODEL") || exit 1
 MODEL_CONTROL=default
 EFFORT_CONTROL=default
 SERVICE_CONTROL=unverified
+CODEX_SERVICE_FLAG='-c '\''service_tier="default"'\'''
 [ -z "$MODELFLAG" ] || MODEL_CONTROL=flag
 if [ -n "$EFFORT" ] && [ "$EFFORT" != default ]; then
   EFFORT_CONTROL=flag
@@ -4738,7 +4779,44 @@ if [ "$RAW_LAUNCH" = 1 ]; then
   MODEL_CONTROL=unverified; EFFORT_CONTROL=unverified
 else
   case "$HARNESS" in
-    codex) SERVICE_CONTROL=codex-default ;;
+    codex)
+      SERVICE_CONTROL=codex-default
+      if [ -e "$CONFIG/worker-fast-mode" ] && [ -n "$MODEL" ] && [ "$MODEL" != default ] &&
+        { [ "$KIND" = ship ] || [ "$KIND" = scout ]; }; then
+        fast_dir=$(mktemp -d "$TASK_TMP/fast.XXXXXXXX") || fast_dir=
+        if [ -n "$fast_dir" ]; then
+          cat > "$fast_dir/check.sh" <<'SH'
+. "$1/fm-timeout-lib.sh"
+. "$1/fm-quota-axi-lib.sh"
+control=codex-default
+fast_quota=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || fast_quota=
+if printf '%s\n' "$fast_quota" | fm_quota_codex_fast_eligible "$2"; then
+  fast_features=$(fm_run_timed 5 codex -c 'service_tier="fast"' --enable fast_mode features list 2>/dev/null </dev/null) || fast_features=
+  if printf '%s\n' "$fast_features" | awk '$1 == "fast_mode" && $NF == "true" { supported=1 } END { exit !supported }'; then
+    control=codex-fast
+  fi
+fi
+printf '%s\n' "$control" > "$3/result"
+SH
+          fast_command="env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI bash $(shell_quote "$fast_dir/check.sh") $(shell_quote "$SCRIPT_DIR") $(shell_quote "$MODEL") $(shell_quote "$fast_dir")"
+          if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
+            fast_command="$LAUNCH_ENV_PREFIX /bin/sh -c $(shell_quote "$fast_command")"
+          fi
+          printf '%s\n' "$fast_command" > "$fast_dir/probe.sh"
+          if spawn_send_text_line "$T" ". $(shell_quote "$fast_dir/probe.sh")"; then
+            for ((fast_poll=0; fast_poll<250; fast_poll++)); do
+              [ ! -f "$fast_dir/result" ] || break
+              sleep 0.1
+            done
+            if [ "$(cat "$fast_dir/result" 2>/dev/null)" = codex-fast ]; then
+              SERVICE_CONTROL=codex-fast
+              CODEX_SERVICE_FLAG='--enable fast_mode -c '\''service_tier="fast"'\'''
+            fi
+          fi
+          rm -rf -- "$fast_dir"
+        fi
+      fi
+      ;;
     claude) SERVICE_CONTROL=claude-fast-disabled ;;
   esac
 fi
@@ -4915,6 +4993,7 @@ sq_opinput=$(shell_quote "$FM_ROOT/bin/fm-operational-input.sh")
 sq_worktree=$(shell_quote "$WT")
 LAUNCH=${LAUNCH//__MODELFLAG__/$MODELFLAG}
 LAUNCH=${LAUNCH//__EFFORTFLAG__/$EFFORTFLAG}
+LAUNCH=${LAUNCH//__CODEXSERVICE__/$CODEX_SERVICE_FLAG}
 # Relaunch session continuity. Computed here, where the adopted endpoint (T) is
 # known, and substituted only into the Pi-family template's `__PIRESUME__`
 # placeholder; an empty value leaves every other launch byte-identical.
@@ -5169,34 +5248,6 @@ if [ -n "$SPAWN_TRACEPARENT" ]; then
   fi
 fi
 if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
-  LAUNCH_ENV_PREFIX='/usr/bin/env -i'
-  # COMPACT_ADVISER_DISABLE is the intentional declarative floor-membership
-  # entry; the explicit COMPACT_ADVISER_DISABLE=1 assignment below is the
-  # authoritative setter.
-  for env_name in HOME PATH USER LOGNAME SHELL TERM COLORTERM LANG LC_ALL LC_CTYPE \
-    TMPDIR TMP TEMP GOTMPDIR TMUX TMUX_PANE HERDR_ENV HERDR_SESSION HERDR_SOCKET_PATH \
-    HERDR_PANE_ID FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
-    $LAUNCH_ENV_NAMES; do
-    # Only validated names enter shell syntax. Values expand once, quoted, in
-    # the pane shell and never become source text or spawn-process snapshots.
-    # shellcheck disable=SC2016
-    printf -v env_arg '${%s+"%s=$%s"}' "$env_name" "$env_name" "$env_name"
-    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX $env_arg"
-  done
-  # COMPACT_ADVISER_DISABLE is retained by the floor loop above, which forwards
-  # whatever the pane export set, and then pinned here to the one value Firstmate
-  # launches on. The literal assignment comes last deliberately: `env` applies
-  # assignments left to right, so this one wins over a forwarded pane value, and
-  # it still delivers the switch on a pane whose export never landed. Unlike the
-  # trace carrier below it carries no gate, so it is appended unconditionally.
-  # Setting it here rather than relying on the assignment already carried by
-  # $LAUNCH is what gives the wrapping `/bin/sh` itself the switch, not only the
-  # agent command it runs.
-  LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX COMPACT_ADVISER_DISABLE=1"
-  if [ -n "$SPAWN_TRACEPARENT" ]; then
-    # shellcheck disable=SC2016
-    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX "'${TRACEPARENT+"TRACEPARENT=$TRACEPARENT"}'
-  fi
   LAUNCH="$LAUNCH_ENV_PREFIX /bin/sh -c $(shell_quote "$LAUNCH")"
 fi
 if ! (umask 077 && mkdir "$LAUNCH_DIR") 2>/dev/null; then
