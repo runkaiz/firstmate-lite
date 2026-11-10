@@ -396,6 +396,7 @@ Other fresh allocations select current origin history when origin is configured,
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 Startup reports orphan native reservations through the existing bootstrap diagnostics; [`fm-task-record-restore.sh`](../bin/fm-task-record-restore.sh) owns explicit restoration of byte-verified archived metadata without changing its original contract.
 [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
+After branch-retaining cleanup, [`fm-merge-local.sh`](../bin/fm-merge-local.sh) can still land a local-only branch under its existing merge-authority and clean fast-forward guards.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
