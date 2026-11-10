@@ -822,4 +822,35 @@ ok "fast mode ignores unrelated model scopes"
 if printf 'malformed\n' | fm_quota_codex_fast_eligible gpt-6; then fail "malformed snapshot qualified"; fi
 ok "malformed snapshot keeps normal mode"
 
+fastmode() {
+  FM_HOME="$LAB/fast-home" FM_CONFIG_OVERRIDE="$LAB/fast-config" \
+    PATH="$FAKEBIN:$PATH" QUOTA_AXI_CALLS="$LAB/fast-calls" QUOTA_AXI_FIXTURE="$LAB/fast-quota.json" \
+    bash "$BIN/fm-fastmode.sh" "$@"
+}
+
+out=$(fastmode status gpt-6) || fail "fastmode initial status failed"
+[[ "$out" == *"WORKER FAST MODE: off"* ]] || fail "fastmode must default to off"
+[ ! -e "$LAB/fast-config" ] && [ ! -e "$LAB/fast-calls" ] || fail "off status touched config or quota"
+fastmode on >/dev/null || fail "fastmode on failed"
+flag="$LAB/fast-config/worker-fast-mode"
+[ -f "$flag" ] && [ ! -e "$LAB/fast-home/config" ] || fail "fastmode on did not use the config override"
+printf 'existing\n' > "$flag"
+fastmode on >/dev/null || fail "repeated fastmode on failed"
+[ "$(cat "$flag")" = existing ] || fail "fastmode on rewrote an existing presence flag"
+out=$(fastmode status default) || fail "unresolved fastmode status failed"
+[[ "$out" == *"requires an explicit worker model"* ]] || fail "fastmode guessed the model"
+[ ! -e "$LAB/fast-calls" ] || fail "fastmode queried quota without an explicit model"
+printf '%s\n' "$FAST_BASE" > "$LAB/fast-quota.json"
+out=$(fastmode status gpt-6) || fail "fastmode status failed"
+[[ "$out" == *"quota qualifies in this environment"* ]] || fail "fastmode did not report qualifying quota"
+[ "$(cat "$LAB/fast-calls")" = called ] || fail "fastmode status took more than one quota snapshot"
+jq '.providers[0].windows[0].percentRemaining = 24' "$LAB/fast-quota.json" > "$LAB/fast-tight.json"
+mv "$LAB/fast-tight.json" "$LAB/fast-quota.json"
+out=$(fastmode status gpt-6) || fail "fastmode tight-quota status failed"
+[[ "$out" == *"quota eligibility could not be confirmed"* ]] || fail "fastmode reported qualifying quota with insufficient runway"
+fastmode off >/dev/null || fail "fastmode off failed"
+fastmode off >/dev/null || fail "fastmode off was not idempotent"
+[ ! -e "$flag" ] || fail "fastmode off left the presence flag in place"
+ok "fastmode persists the presence flag and reports model-specific quota without changing the preference"
+
 printf '# all fm-quota-choose tests passed\n'

@@ -513,6 +513,10 @@
       "audience": "agent-runtime"
     },
     {
+      "path": ".agents/skills/fastmode/SKILL.md",
+      "audience": "agent-runtime"
+    },
+    {
       "path": ".agents/skills/proactive/SKILL.md",
       "audience": "agent-runtime"
     },
