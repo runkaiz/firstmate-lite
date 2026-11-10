@@ -930,12 +930,21 @@ fm_recovery_marker_arm_check_locked() {
       return 0
       ;;
     pending:downtime:*)
-      if ! _fm_recovery_marker_write_locked "$marker" downtime "${line##*:}" announced; then
+      # With no durable row there is nothing to recover: status written during
+      # the gap still wakes through the signal scan, so retire silently.
+      if [ ! -s "$FM_WAKE_QUEUE" ]; then
+        if ! _fm_recovery_marker_write_locked "$marker" downtime "${line##*:}" acked; then
+          fm_lock_release "$lock"
+          return 1
+        fi
+        FM_RECOVERY_MARKER_TOKEN="acked:downtime:${line##*:}"
+      elif ! _fm_recovery_marker_write_locked "$marker" downtime "${line##*:}" announced; then
         fm_lock_release "$lock"
         return 1
+      else
+        FM_RECOVERY_MARKER_TOKEN="announced:downtime:${line##*:}"
+        FM_RECOVERY_MARKER_ACTION='recover'
       fi
-      FM_RECOVERY_MARKER_TOKEN="announced:downtime:${line##*:}"
-      FM_RECOVERY_MARKER_ACTION='recover'
       ;;
     acked:*)
       if [ -s "$FM_WAKE_QUEUE" ]; then

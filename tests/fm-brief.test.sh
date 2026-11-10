@@ -464,6 +464,10 @@ test_no_mistakes_dod_green_detection() {
     "no-mistakes DOD must forbid waiting on a status poll"
   assert_grep "reattach at once by re-running \`no-mistakes axi run\` without flags" "$brief" \
     "no-mistakes DOD must reattach the drive call after a bounded return"
+  # A worker once reattached past its CI-only handoff, which the DOD listed
+  # only after the reattach rule; the status check now comes first.
+  assert_grep "run \`no-mistakes axi status\` once and apply the CI-only handoff below when it qualifies; otherwise reattach at once" "$brief" \
+    "no-mistakes DOD must check the CI-only handoff before reattaching"
   assert_grep "once checks are green it returns \`checks-passed\` immediately" "$brief" \
     "no-mistakes DOD must say a reattach reports an already-green PR"
   assert_no_grep "poll \`no-mistakes axi status\` from a separate call" "$brief" \

@@ -15,7 +15,7 @@
 # After NO_CHECK_HOLDS pending holds (roughly 10 minutes) of a CI-only run whose
 # PR has zero registered checks, poll queues one `check` wake per CI round carrying the PR URL
 # and keeps holding, so checks that register later still return here.
-# bin/fm-watch.sh delivers that wake once per queue key.
+# bin/fm-watch.sh delivers that wake once per queue key, so each round has its own key.
 # It reports an absence only; zero checks are never green and it authorizes nothing.
 # Results are evidence for the original worker to reattach, never authority to
 # mark a run passed, merge, edit pipeline-owned code or answer an approval.
@@ -71,12 +71,13 @@ ci_only() {
 NO_CHECK_HOLDS=20
 HOLDS=0
 NO_CHECK_DONE=0
+ROUND=1
 surface_no_checks() {
   local count
   count=$(fm_nm_bounded "$WT" 15 gh pr view "$PR" --json statusCheckRollup --jq '.statusCheckRollup | length') || return 1
   case "$count" in
     ''|*[!0-9]*) return 1 ;;
-    0) fm_wake_append check "ci-no-checks:$RUN" \
+    0) fm_wake_append check "ci-no-checks:$RUN:$ROUND" \
          "check: no-mistakes CI wait has zero registered checks after 10 minutes - task=$TASK pr=$PR; tell the captain with this PR URL, zero checks are not green, do not merge; see validation-supervision" || return 1 ;;
     *) return 1 ;;
   esac
@@ -84,6 +85,7 @@ surface_no_checks() {
 pending_hold() {
   if ! ci_only; then
     # A pipeline-owned repair restarts CI, and with it this bound.
+    [ "$NO_CHECK_DONE" -eq 0 ] || ROUND=$((ROUND+1))
     HOLDS=0
     NO_CHECK_DONE=0
   elif [ "$NO_CHECK_DONE" -eq 0 ]; then

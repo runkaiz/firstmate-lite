@@ -190,6 +190,7 @@ for initial_checks in 2 0; do
   out=$(poll)
   if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
   check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+  check 'each CI round has its own notice key' test "$(cut -f4 "$queue" | sort -u | wc -l | tr -d ' ')" = "$expected_wakes"
 done
 reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=
 out=$(poll)
@@ -335,6 +336,15 @@ beacon_cycles
 check 'a later successor keeps polling on the already-surfaced key' kill -0 "$watch_pid"
 kill "$watch_pid"; wait "$watch_pid" 2>/dev/null || true
 check 'a surfaced key is not delivered twice' not_grep ci-no-checks "$case_dir/repeat.out"
+# A later CI repair round in the same run wakes firstmate again with a fresh
+# notice, while the already-delivered first round stays quiet.
+reset_counts; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=0
+out=$(poll)
+unset CI_CHECKS
+successor_watch "$case_dir/round2.out"
+wait_for_exit "$watch_pid" 100 || { printf 'FAIL: a later round notice never woke the successor watcher\n' >&2; cat "$case_dir/round2.out" >&2; exit 1; }
+check 'a later CI round delivers a fresh zero-check notice' grep -Fq 'ci-no-checks:RUN1:2' "$case_dir/round2.out"
+check 'the later round does not redeliver the first round' not_grep 'ci-no-checks:RUN1:1' "$case_dir/round2.out"
 # Execute the handoff command emitted to a worker, rather than only looking
 # for prose. Both config postures use the same supported command.
 for posture in ordinary wait-no-turns; do
@@ -345,7 +355,7 @@ for posture in ordinary wait-no-turns; do
     "$ROOT/bin/fm-brief.sh" task example --mode no-mistakes >/dev/null
   cp "$LAB/home/state/task.meta" "$genhome/state/task.meta"
   # shellcheck disable=SC2016 # Extract the literal backtick-delimited command from the generated interface.
-  command=$(sed -n 's/^When only CI remains running.*using `\(.*\)`\.$/\1/p' "$genhome/data/task/brief.md")
+  command=$(sed -n 's/^Then do not reattach; delegate the next drive return using `\(.*\)`\.$/\1/p' "$genhome/data/task/brief.md")
   check 'generated handoff command is present in either wait configuration' test -n "$command"
   check 'generated wait status carries the PR URL' grep -Fq 'CI wait delegated for <the PR URL arming printed>' "$genhome/data/task/brief.md"
   bash -c "$command" > "$genhome/arm.out"

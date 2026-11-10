@@ -296,13 +296,13 @@ fm_nm_driving_block() {  # <forge> <task-id>
 It bounds its own hold for you: \`--wait\` (default 8m) exists precisely so a harness with a ten-minute command cap gets a structured return instead of being killed mid-hold.
 Declare that wait using the brief's status-reporting rule before the foreground drive call.
 Never background a wait, and never arm a timer to stand in for one: a backgrounded call returns in milliseconds, so it does not wait at all, and every timer left behind fires later as a paid wake for nothing.
-${pr_return_line}Whenever a drive call returns without a gate or an outcome - its own wait elapsed, or it was killed or timed out - that is not a failure: reattach at once by re-running \`no-mistakes axi run\` without flags, and issue the same foreground call again, one at a time, until a gate or outcome comes back${pr_reattach_clause} if it refuses because no run is active, read the finished outcome from \`no-mistakes axi status\`."
+${pr_return_line}Whenever a drive call returns without a gate or an outcome - its own wait elapsed, or it was killed or timed out - that is not a failure: run \`no-mistakes axi status\` once and apply the CI-only handoff below when it qualifies; otherwise reattach at once by re-running \`no-mistakes axi run\` without flags, and issue the same foreground call again, one at a time, until a gate or outcome comes back${pr_reattach_clause} if it refuses because no run is active, read the finished outcome from \`no-mistakes axi status\`."
   else
     drive_block="One drive call blocks until the next gate or outcome, which routinely outlives what your harness lets a single command run: Claude Code kills a command at ten minutes maximum, while one fix round is capped around thirty minutes and up to three rounds chain.
 So background the drive call instead of sitting in one blocking hold your harness will kill, and read its return when it finishes.
 Declare that wait using the brief's status-reporting rule before waiting on the backgrounded drive call.
 Where a harness's own command limit is not established, assume it bounds commands and use that same backgrounded shape.
-${pr_return_line}Whenever a drive call returns without a gate or an outcome - its own wait elapsed, or it was killed or timed out - reattach at once by re-running \`no-mistakes axi run\` without flags, backgrounded the same way${pr_reattach_clause} if it refuses because no run is active, read the finished outcome from \`no-mistakes axi status\`."
+${pr_return_line}Whenever a drive call returns without a gate or an outcome - its own wait elapsed, or it was killed or timed out - run \`no-mistakes axi status\` once and apply the CI-only handoff below when it qualifies; otherwise reattach at once by re-running \`no-mistakes axi run\` without flags, backgrounded the same way${pr_reattach_clause} if it refuses because no run is active, read the finished outcome from \`no-mistakes axi status\`."
   fi
   cat <<EOF
 You drive no-mistakes by responding to its gates, not by implementing fixes.
@@ -319,8 +319,8 @@ Do not hand-edit, commit, or fix findings yourself while a run is active - the p
 
 $drive_block
 
-CI-only exception to the reattachment instructions above (always enabled, independent of proactive mode or wait configuration): after an elapsed drive hold, inspect \`no-mistakes axi status\` once.
-When only CI remains running and every preceding step completed (a skipped rebase is allowed), delegate the next drive return using \`$ci_command\`.
+CI-only handoff (always enabled, independent of proactive mode or wait configuration): it qualifies when that status shows only CI still running and every preceding step completed (a skipped rebase is allowed).
+Then do not reattach; delegate the next drive return using \`$ci_command\`.
 On confirmed listener success, append one \`paused [at=<epoch>]: CI wait delegated for <the PR URL arming printed>; waiting for the bound no-mistakes gate or outcome\` status and END YOUR TURN.
 Do not run another drive, forge watch, inbox poll, timer or background monitor while that registration owns the wait.
 The existing runner handles pending holds without model turns and wakes firstmate only for action or a broken monitor.

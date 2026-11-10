@@ -1778,6 +1778,18 @@ done
 [ "$auth_count" -eq 0 ] || fail "a result already durably handled was authorized again: count=$auth_count"
 pass "a drained-but-unhandled result survives a replacement session and is retired only by explicit handling, never twice"
 
+# A replay row queued before handling must not be presented again once the
+# result is handled: that presentation is what produced a repeat report.
+mv "$HW/state/.wake-queue.post-handle" "$HW/state/.wake-queue"
+printf '%s\t%s\tcheck\tunrelated\tcheck: unrelated wake\n' "$(date +%s)" 99 >> "$HW/state/.wake-queue"
+drain_out=$(FM_HOME="$HW" FM_STATE_OVERRIDE="$HW/state" "$ROOT/bin/fm-wake-drain.sh" 2> "$TMP_ROOT/replay-drain.err") \
+  || fail "drain with an already-handled replay failed: $(cat "$TMP_ROOT/replay-drain.err")"
+assert_not_contains "$drain_out" "restart-cut-src" "an already-handled replay row was presented again"
+assert_not_contains "$(cat "$TMP_ROOT/replay-drain.err")" "PROCEVENT_HANDLED_REQUIRED" \
+  "an already-handled replay asked for handling again"
+assert_contains "$drain_out" "check: unrelated wake" "retiring a handled replay hid an unrelated wake"
+pass "an already-handled result's queued replay is retired by the drain instead of presented again"
+
 HP="$TMP_ROOT/hp"; new_home "$HP"
 mkdir -p "$HP/state/procevent-inbox"
 for seq in 10 2 1; do

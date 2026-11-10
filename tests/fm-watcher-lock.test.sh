@@ -770,20 +770,23 @@ test_watch_restart_rejects_reused_pid() {
   printf '%s\n' "stale watcher identity" > "$state/.watch.lock/pid-identity"
   PATH="$fakebin:$PATH" FM_HOME="$dir" FM_POLL=5 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH_ARM" --restart > "$out" &
   pid=$!
+  # With nothing queued, the downtime published for the replaced lock is
+  # retired without a wake while the new cycle keeps running.
   i=0
   while [ "$i" -lt 80 ] && is_live_non_zombie "$pid"; do
+    case "$(cat "$state/.watcher-down" 2>/dev/null)" in acked:downtime:*) break ;; esac
     sleep 0.1
     i=$((i + 1))
   done
-  is_live_non_zombie "$pid" \
-    && fail "restart did not surface recovery after replacing a reused-pid lock"
-  wait "$pid" 2>/dev/null || true
-  grep -F 'check: rearm-resurface' "$out" >/dev/null \
-    || fail "restart replaced reused-pid lock without surfacing recovery: $(cat "$out")"
+  case "$(cat "$state/.watcher-down" 2>/dev/null)" in
+    acked:downtime:*) ;;
+    *) fail "restart replaced reused-pid lock without publishing downtime: $(cat "$state/.watcher-down" 2>/dev/null)" ;;
+  esac
+  is_live_non_zombie "$pid" || fail "restart woke with nothing queued: $(cat "$out")"
   is_live_non_zombie "$live" || fail "restart killed a reused unrelated pid"
-  kill "$live" 2>/dev/null || true
-  wait "$live" 2>/dev/null || true
-  pass "watch restart preserves recovery without signaling a reused pid"
+  kill "$pid" "$live" 2>/dev/null || true
+  wait "$pid" "$live" 2>/dev/null || true
+  pass "watch restart publishes downtime without signaling a reused pid"
 }
 
 test_watch_restart_attaches_to_healthy_peer() {
