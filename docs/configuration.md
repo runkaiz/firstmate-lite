@@ -111,7 +111,7 @@ Untracked files and directories whose names begin with `scratchpad` are also git
 
 - `docs/sessionstart-nudge.md` owns the native session-open adapter tiers that run or nudge the digest command, and the source routing between them.
 
-- `AGENTS.md` retains the run-once and read-once operator rules, lock-refusal safety, installation consent, and direct-report recovery boundaries because those facts apply at every session start.
+- `AGENTS.md` retains the run-once and read-once operator rules, lock-refusal safety, and direct-report recovery boundaries because those facts apply at every session start.
 
 
 ## Orchestrator behavior (AGENTS.md)
@@ -1120,8 +1120,6 @@ Set it high when a wrong pick is costly and low when the rule is a safe runner-u
 
 A profile `provider` optionally names the quota-axi provider family whose rows apply to that profile; when present, profile and rule-floor provider IDs must match the strict whole-string pattern `^[a-z0-9]+(-[a-z0-9]+)*\z`.
 Typed resolution and quota failover both read profile `provider`; failover needs no typed-resolution key.
-
-Typed resolution additively recognizes `gemini` because AGENTS.md section 4 verifies it for crewmate and scout dispatch.
 
 | Harness | Provider declaration on the opted-in resolver path |
 | --- | --- |

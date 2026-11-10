@@ -16,7 +16,7 @@ FM_HOME=/absolute/firstmate python3 /absolute/firstmate/bin/fm-usage-auto.py sta
 python3 /absolute/firstmate/bin/fm-usage-ledger.py summary --db /absolute/firstmate/data/usage-ledger/usage.sqlite --group-by day,harness,model,task --text
 ```
 
-`status` reports the latest refresh time, observed byte count, wall/CPU time, source count, and explicit coverage gaps without opening native logs.
+`status` reports the latest refresh time, observed byte count, wall/CPU time, source count, and explicit coverage gaps without opening native logs; startup refreshes silently instead of printing this report.
 An absent result means measurement has not been proved active; a stale result means ongoing collection has not been proved current.
 `summary` reads only the sanitized ledger and retains unknown counters and partial coverage.
 At task outcomes and `/ahoy`, report these observed subtotals and their time window beside the existing accounting owner, without adding overlapping pipeline counters.

@@ -121,8 +121,8 @@ Consult existing reports and evidence before commissioning an investigation, and
 Resolve every ship task's delivery mode and `yolo` merge posture at intake and pass them explicitly, since each command refuses to guess:
 
 - A current explicit captain instruction wins; otherwise the project's registry entry stands, and dropping below its rigor needs a stated reason.
-- Pass the registered ship-branch prefix (`bin/fm-project-mode.sh --branch-prefix <project>`) as `--branch-prefix`, and a non-default start and target branch as `--base-branch`, to the brief, spawn, and any promotion.
-- For this firstmate repository, pass the project directory as `--project` and any captain-approved one-task consent as `--upstream-consent <host>/<owner>/<repo>`.
+- Pass the registered ship-branch prefix (`bin/fm-project-mode.sh --branch-prefix <project>`) as `--branch-prefix` to the ship brief, spawn, and promotion; pass a non-default start and target branch as `--base-branch` to the ship or scout brief and spawn, with promotion retaining the recorded base.
+- For this firstmate repository, pass the project directory to the brief as `--project` and any captain-approved one-task consent as `--upstream-consent <host>/<owner>/<repo>` to the brief, spawn, and promotion.
 - On a `no-mistakes-prod-only` project, pass `--delivery-surface internal-only|product-facing|mixed|unknown`; only internal tooling, automation, process, and release work ships `direct-PR`, and never infer internal-only from location or name.
 - An unregistered project or absent registry resolves to `no-mistakes` with yolo off, and the gap goes to the captain.
 - Record the mode, posture, and any deviation reason in the backlog item note.
@@ -132,7 +132,7 @@ Serialize only for a true semantic dependency, shared mutable external state, in
 
 ### Dispatch and supervision handoff
 
-Write the brief under section 11, then spawn only through `bin/fm-spawn.sh` after the section 4 checks; it must resolve an isolated task worktree distinct from the primary checkout (a failed assertion stops the task), records the backlog transition, and refuses work this home has no item for.
+Write the brief under section 11, then spawn only through `bin/fm-spawn.sh` after the section 4 checks; it must resolve an isolated task worktree distinct from the primary checkout (a failed assertion stops the task), and where the automatic transition gate applies it records the backlog transition and refuses work this home has no item for ([manual exception](docs/configuration.md#home-addressing-and-manual-mode)).
 After spawning, confirm the worker is processing the brief and handle any trust dialog through `harness-adapters`.
 Steer with `bin/fm-send.sh` (durable inbox plus doorbell; pass `--resolve-key` when answering an open keyed decision), and drive lifecycle only through `bin/fm-control.sh <task-id> interrupt|exit|relaunch` ([`docs/agent-control.md`](docs/agent-control.md)), never through steer text.
 When the captain adds or changes an ask mid-task, append their words without speaker labels or direct address to the brief's `## Captain's intent` and relay them; Firstmate constraints stay in `## Firstmate spec` or the steer.
