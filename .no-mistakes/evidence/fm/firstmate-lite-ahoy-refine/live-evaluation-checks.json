@@ -1,0 +1,8 @@
+{
+  "empty_action_section": "FAIL: completion reply emits Needs you: Nothing right now despite no actionable rows",
+  "uncertainty": "PASS",
+  "quiet_contribution_suppression": "PASS",
+  "moving_stage_and_timing": "PASS",
+  "disappeared_rows": "PASS",
+  "missing_state_disclosure": "PASS"
+}

@@ -1,0 +1,7 @@
+{
+  "done": "pass: empty action section omitted; uncertainty retained",
+  "done-repeat": "pass: empty action section omitted; uncertainty retained",
+  "quiet": "fail: empty-state filler retained",
+  "quiet-contributions": "fail: empty-state filler retained",
+  "unreadable-input": "pass: disclosed unreadable contribution record instead of all-clear"
+}

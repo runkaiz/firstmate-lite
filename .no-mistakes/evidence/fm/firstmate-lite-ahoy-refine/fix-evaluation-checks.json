@@ -1,0 +1,14 @@
+{
+  "after-removal": {
+    "empty_action_section": "pass",
+    "empty_action_filler": "pass",
+    "publication_and_ci_uncertainty": "pass",
+    "snapshot_semantics_unchanged": "pass"
+  },
+  "after-confirm": {
+    "empty_action_section": "pass",
+    "empty_action_filler": "pass",
+    "publication_and_ci_uncertainty": "pass",
+    "snapshot_semantics_unchanged": "pass"
+  }
+}

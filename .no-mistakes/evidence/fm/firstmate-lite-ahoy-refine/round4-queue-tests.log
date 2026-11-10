@@ -1,0 +1,50 @@
+test_active_archive_conflict_fails_without_discarding (__main__.QueueTests.test_active_archive_conflict_fails_without_discarding) ... ok
+test_active_record_beside_archived_history_stays_refused (__main__.QueueTests.test_active_record_beside_archived_history_stays_refused) ... ok
+test_add_usage_error_shows_full_form_and_names_misused_title_flag (__main__.QueueTests.test_add_usage_error_shows_full_form_and_names_misused_title_flag) ... ok
+test_ambiguous_content_is_refused_before_persistence (__main__.QueueTests.test_ambiguous_content_is_refused_before_persistence) ... ok
+test_archive_cannot_replace_the_active_lock (__main__.QueueTests.test_archive_cannot_replace_the_active_lock) ... ok
+test_archive_lookup_reopen_and_identity_reservation (__main__.QueueTests.test_archive_lookup_reopen_and_identity_reservation) ... ok
+test_archived_edits_append_idempotent_revisions (__main__.QueueTests.test_archived_edits_append_idempotent_revisions) ... ok
+test_backend_selection_precedence_and_native_defaults (__main__.QueueTests.test_backend_selection_precedence_and_native_defaults) ... ok
+test_bad_history_links_stay_ambiguous (__main__.QueueTests.test_bad_history_links_stay_ambiguous) ... ok
+test_capture_authorization_and_restart (__main__.QueueTests.test_capture_authorization_and_restart) ... ok
+test_compatibility_check_and_backup_never_rewrite (__main__.QueueTests.test_compatibility_check_and_backup_never_rewrite) ... ok
+test_concurrent_history_links_record_once (__main__.QueueTests.test_concurrent_history_links_record_once) ... ok
+test_concurrent_writers_and_duplicate_admission (__main__.QueueTests.test_concurrent_writers_and_duplicate_admission) ... ok
+test_conditional_captain_hold_round_trip_and_release (__main__.QueueTests.test_conditional_captain_hold_round_trip_and_release) ... ok
+test_corrupt_records_transactions_and_adapters_fail_closed (__main__.QueueTests.test_corrupt_records_transactions_and_adapters_fail_closed) ... ok
+test_cross_queue_history_moves_refuse_without_changing_either_store (__main__.QueueTests.test_cross_queue_history_moves_refuse_without_changing_either_store) ... ok
+test_deferral_does_not_answer_a_human_question (__main__.QueueTests.test_deferral_does_not_answer_a_human_question) ... ok
+test_dependency_completion_with_archived_prerequisite (__main__.QueueTests.test_dependency_completion_with_archived_prerequisite) ... ok
+test_existing_dispatch_recovery_reuses_binding_without_completion (__main__.QueueTests.test_existing_dispatch_recovery_reuses_binding_without_completion) ... ok
+test_existing_hold_answer_owner_and_wrapper_need_no_external_cli (__main__.QueueTests.test_existing_hold_answer_owner_and_wrapper_need_no_external_cli) ... ok
+test_explicit_history_link_resolves_latest_and_reopen_continues_it (__main__.QueueTests.test_explicit_history_link_resolves_latest_and_reopen_continues_it) ... ok
+test_fleet_snapshot_resolves_archived_prerequisite (__main__.QueueTests.test_fleet_snapshot_resolves_archived_prerequisite) ... ok
+test_held_listing_distinguishes_real_questions_from_parked_context (__main__.QueueTests.test_held_listing_distinguishes_real_questions_from_parked_context) ... ok
+test_hold_reasons_never_supply_structured_metadata (__main__.QueueTests.test_hold_reasons_never_supply_structured_metadata) ... ok
+test_interrupted_archive_transaction_recovers_once (__main__.QueueTests.test_interrupted_archive_transaction_recovers_once) ... ok
+test_late_evidence_after_linked_recompletion_recovers_once (__main__.QueueTests.test_late_evidence_after_linked_recompletion_recovers_once) ... ok
+test_late_evidence_preserves_legacy_completion_verbs (__main__.QueueTests.test_late_evidence_preserves_legacy_completion_verbs) ... ok
+test_legacy_dated_archive_sections_are_completed_history (__main__.QueueTests.test_legacy_dated_archive_sections_are_completed_history) ... ok
+test_legacy_history_survives_crash_recovery_and_concurrent_writers (__main__.QueueTests.test_legacy_history_survives_crash_recovery_and_concurrent_writers) ... ok
+test_malformed_or_unreadable_effective_backend_refuses (__main__.QueueTests.test_malformed_or_unreadable_effective_backend_refuses) ... ok
+test_multi_id_handoff_and_destination_recovery (__main__.QueueTests.test_multi_id_handoff_and_destination_recovery) ... ok
+test_ready_and_start_agree_for_ordinary_kinds (__main__.QueueTests.test_ready_and_start_agree_for_ordinary_kinds) ... ok
+test_recoverable_updates_under_same_id (__main__.QueueTests.test_recoverable_updates_under_same_id) ... ok
+test_relative_backup_destination_uses_caller_directory (__main__.QueueTests.test_relative_backup_destination_uses_caller_directory) ... ok
+test_relocated_data_keeps_configured_archive_and_retention (__main__.QueueTests.test_relocated_data_keeps_configured_archive_and_retention) ... ok
+test_removal_never_implies_prerequisite_completion (__main__.QueueTests.test_removal_never_implies_prerequisite_completion) ... ok
+test_removed_commands_and_flags_refuse_without_rewriting (__main__.QueueTests.test_removed_commands_and_flags_refuse_without_rewriting) ... ok
+test_reopened_single_record_keeps_identity_and_appends_completion (__main__.QueueTests.test_reopened_single_record_keeps_identity_and_appends_completion) ... ok
+test_repeated_archived_identity_is_refused_not_guessed (__main__.QueueTests.test_repeated_archived_identity_is_refused_not_guessed) ... ok
+test_retained_context_requires_authorization_for_kind_changes (__main__.QueueTests.test_retained_context_requires_authorization_for_kind_changes) ... ok
+test_single_record_continuation_rm_and_reopen_recover (__main__.QueueTests.test_single_record_continuation_rm_and_reopen_recover) ... ok
+test_symlinked_user_selection_and_named_refusal_sources (__main__.QueueTests.test_symlinked_user_selection_and_named_refusal_sources) ... ok
+test_unicode_body_survives_mutations_history_and_archive (__main__.QueueTests.test_unicode_body_survives_mutations_history_and_archive) ... ok
+test_user_backend_refusal_preserves_existing_and_absent_queues (__main__.QueueTests.test_user_backend_refusal_preserves_existing_and_absent_queues) ... ok
+test_wrapper_cli_backend_precedence (__main__.QueueTests.test_wrapper_cli_backend_precedence) ... ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 28.877s
+
+OK

@@ -1,0 +1,6 @@
+[
+  {
+    "command": "FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l bin/fm-bearings-snapshot.sh --json --record-look",
+    "description": "Take a fresh bearings snapshot and record the look checkpoint"
+  }
+]

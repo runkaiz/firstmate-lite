@@ -1,0 +1,14 @@
+{
+  "missing": "pass: comparison and short uncertainty only",
+  "missing-confirm": "pass: comparison and short uncertainty only",
+  "missing-confirm-repeat": "pass: comparison and short uncertainty only",
+  "missing-confirm-third": "pass: comparison and short uncertainty only",
+  "quiet": "pass: comparison and single all-clear; no empty inventories or contribution counts",
+  "quiet-restored": "pass: comparison and single all-clear; no empty inventories or contribution counts",
+  "quiet-contributions": "pass: comparison and single all-clear; no empty inventories or contribution counts",
+  "done": "pass: completion uncertainty preserved without empty action section",
+  "done-repeat": "pass: completion uncertainty preserved without empty action section",
+  "busy": "pass: delivery artifacts, full title, implementing stage, 15-minute timing and deferred holds visible",
+  "actionable": "pass: only live route decision asks for action; conditional hold stays deferred",
+  "disappeared": "pass: no longer observed does not imply completion"
+}

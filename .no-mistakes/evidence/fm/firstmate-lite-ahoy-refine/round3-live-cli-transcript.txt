@@ -1,0 +1,1273 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add next Improve the integration workflow with a complete title longer than sixty characters --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add next
+task:
+  id: next
+  title: Improve the integration workflow with a complete title longer than sixty characters
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add prerequisite Wait for prerequisite --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add prerequisite
+task:
+  id: prerequisite
+  title: Wait for prerequisite
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py block next --by prerequisite --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: block next
+task:
+  id: next
+  title: Improve the integration workflow with a complete title longer than sixty characters
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: yes
+  blocked_by: prerequisite
+  deps: prerequisite
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add folded Folded idea --kind idea --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add folded
+task:
+  id: folded
+  title: Folded idea
+  state: queued
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done folded --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done folded
+task:
+  id: folded
+  title: Folded idea
+  state: done
+  kind: idea
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "idea only; not authorized"
+  hold_kind: parked
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add closed Closed without delivery --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add closed
+task:
+  id: closed
+  title: Closed without delivery
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done closed --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done closed
+task:
+  id: closed
+  title: Closed without delivery
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add merged Fix the authentication redirect --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add merged
+task:
+  id: merged
+  title: Fix the authentication redirect
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done merged --pr https://github.com/example/lab/pull/12 --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done merged
+task:
+  id: merged
+  title: Fix the authentication redirect
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: https://github.com/example/lab/pull/12
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add local Simplify the local launcher --kind ship --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add local
+task:
+  id: local
+  title: Simplify the local launcher
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done local --note local main --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done local
+task:
+  id: local
+  title: Simplify the local launcher
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: local main
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py add scouted Investigate portability --kind scout --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: add scouted
+task:
+  id: scouted
+  title: Investigate portability
+  state: queued
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done scouted --report data/scouted/report.md --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done scouted
+task:
+  id: scouted
+  title: Investigate portability
+  state: done
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: data/scouted/report.md
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-captain-hold.sh hold conditional --title Revisit the integration approach --reason Choose integration --when the upstream API stabilizes
+conditional
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-captain-hold.sh hold dated --title Review the release --reason Choose release --until 2099-01-01
+dated
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-captain-hold.sh hold call --title Choose a launch route --reason Pick a route
+call
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:56Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "call",
+      "key": "call",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Choose a launch route: Pick a route",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "prerequisite",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "prerequisite",
+      "title": "Wait for prerequisite",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --all-decisions
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:56Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "dated",
+      "key": "dated",
+      "verb": "captain-hold",
+      "deferred": true,
+      "summary": "Review the release: until 2099-01-01: Choose release",
+      "owner": "(main)"
+    },
+    {
+      "id": "call",
+      "key": "call",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Choose a launch route: Pick a route",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "prerequisite",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "prerequisite",
+      "title": "Wait for prerequisite",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ]
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:56Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "call",
+      "key": "call",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Choose a launch route: Pick a route",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "prerequisite",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "prerequisite",
+      "title": "Wait for prerequisite",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T20:26:56Z",
+    "changes": []
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-captain-hold.sh answer call --decision-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/answer.txt
+answered: call
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py done prerequisite --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: done prerequisite
+task:
+  id: prerequisite
+  title: Wait for prerequisite
+  state: done
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: 2026-11-10
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-queue.py unblock next --by prerequisite --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/backlog.md
+ok: unblock next
+task:
+  id: next
+  title: Improve the integration workflow with a complete title longer than sixty characters
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-10
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:57Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T20:26:56Z",
+    "changes": [
+      {
+        "surface": "next",
+        "title": "Improve the integration workflow with a complete title longer than sixty characters",
+        "current": "[\"-\",\"-\"]"
+      },
+      {
+        "surface": "call",
+        "title": "Choose a launch route: Pick a route",
+        "current": "no longer observed"
+      },
+      {
+        "surface": "next",
+        "title": "Wait for prerequisite",
+        "current": "no longer observed"
+      }
+    ]
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:57Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": "2026-11-10T20:26:57Z",
+    "changes": []
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:57Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ]
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+{
+  "schema": "fm-bearings.v1",
+  "home": "01M73G5Q90CZZH9110408J88VH/.l",
+  "generated": "2026-11-10T20:26:57Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [
+    {
+      "id": "scouted",
+      "what": "Investigate portability",
+      "artifact": "data/scouted/report.md",
+      "owner": "(main)"
+    },
+    {
+      "id": "merged",
+      "what": "Fix the authentication redirect",
+      "artifact": "https://github.com/example/lab/pull/12",
+      "owner": "(main)"
+    },
+    {
+      "id": "local",
+      "what": "Simplify the local launcher",
+      "artifact": "local main",
+      "owner": "(main)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "next",
+      "title": "Improve the integration workflow with a complete title longer than sixty characters",
+      "blocked_by": "-",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "conditional",
+      "title": "Revisit the integration approach",
+      "blocked_by": "-",
+      "reason": "when the upstream API stabilizes: Choose integration",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    },
+    {
+      "id": "dated",
+      "title": "Review the release",
+      "blocked_by": "-",
+      "reason": "until 2099-01-01: Choose release",
+      "deferred": true,
+      "owner": "(main)",
+      "filed": "2026-11-10"
+    }
+  ],
+  "reports": [
+    {
+      "id": "scouted",
+      "path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md"
+    }
+  ],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "deferred captain holds: 2",
+      "reveal": "--all-decisions"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ],
+  "since_last_look": {
+    "since": null,
+    "changes": []
+  }
+}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-bearings-snapshot.sh --json --record-look
+fm-bearings-snapshot: refusing symlink checkpoint
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/bin/fm-captain-hold.sh hold conditional --reason Both --when API stable --until 2099-01-01
+fm-captain-hold: choose --until or --when

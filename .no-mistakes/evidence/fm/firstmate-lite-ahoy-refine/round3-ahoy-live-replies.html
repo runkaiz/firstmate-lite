@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ahoy real chat evaluation — round 3</title><style>*{box-sizing:border-box}body{font:16px/1.5 system-ui;background:#f5f5f5;color:#242424;margin:0}main{max-width:960px;margin:auto;padding:24px}article{background:white;border:1px solid #ccc;padding:24px;margin:20px 0;border-radius:8px;min-width:0}.reply{white-space:pre-wrap;overflow-wrap:anywhere}h1{font-size:26px}h2{font-size:20px}article:target{outline:3px solid #c44}a{color:#13569b}</style><main><h1>Ahoy real chat evaluation — round 3</h1><p>Actual replies from Claude with the current Ahoy skill and real snapshot executable, in a disposable marked lab on a private tmux socket. Rendered transcript; not a UI mockup. Skills were supplied through the system prompt; native slash-command discovery was not evaluated.</p><p>Quiet-day and completion replies omit empty sections. The incomplete-coverage reply correctly warns about unreadable state, then incorrectly enumerates empty categories.</p><nav><a href="#quiet">quiet</a> · <a href="#quiet-contributions">quiet-contributions</a> · <a href="#done">done</a> · <a href="#done-repeat">done-repeat</a> · <a href="#busy">busy</a> · <a href="#actionable">actionable</a> · <a href="#disappeared">disappeared</a> · <a href="#missing">missing</a></nav><article id="quiet"><h2>quiet</h2><div class="reply">This is your first look, so I have nothing earlier to compare against.
+
+Captain, all quiet in the local records.
+</div></article><article id="quiet-contributions"><h2>quiet-contributions</h2><div class="reply"><strong>Since your last look:</strong> two items are no longer in the records. This doesn&#x27;t mean they were completed.
+- The call &quot;Choose the launch route: Choose route A or route B&quot;
+- The next item &quot;Revisit integration&quot;
+
+Captain, all quiet in the local records.
+</div></article><article id="done"><h2>done</h2><div class="reply">Captain, here&#x27;s your catch-up. <strong>Since your last look:</strong> one stage changed. &quot;Produce the current fleet catch-up&quot; is now `done`.
+
+<strong>Shipped</strong>
+- Investigate portability: [scout report](/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md)
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: local main
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up: done, 15m. The worker has finished, but nothing has confirmed that https://github.com/example/lab/pull/99 was published or that CI passed. The PR link alone doesn&#x27;t show it&#x27;s ready to merge.
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters
+- On hold: Revisit the integration approach, until the upstream API stabilizes. Review the release, until 2099-01-01.
+
+I only checked local records, not live PRs. Say &quot;ahoy include PRs&quot; if you want those checked.
+</div></article><article id="done-repeat"><h2>done-repeat</h2><div class="reply">Captain, no observed changes since your last look.
+
+<strong>Shipped</strong>
+- Investigate portability — scout report: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md`
+- Fix the authentication redirect — https://github.com/example/lab/pull/12
+- Simplify the local launcher — local main
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up — done, 15m elapsed. The worker finished, but publication and CI aren&#x27;t verified yet. A PR is recorded at https://github.com/example/lab/pull/99, but that doesn&#x27;t mean it&#x27;s ready to merge.
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters — no blockers.
+- Two items are on hold: &quot;Revisit the integration approach&quot; waits until the upstream API stabilizes, and &quot;Review the release&quot; waits until 2099-01-01.
+
+This uses local records only. Say &quot;include PRs&quot; for a live PR check.
+</div></article><article id="busy"><h2>busy</h2><div class="reply">Ahoy, Captain. <strong>Since your last look:</strong> &quot;Produce the current fleet catch-up&quot; changed stage and is now implementing.
+
+<strong>Shipped</strong>
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: local main
+- Investigate portability (scout report): [data/scouted/report.md](/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md)
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up: implementing, about 15 minutes in. It has a recorded PR, https://github.com/example/lab/pull/99. That record doesn&#x27;t show the PR is ready to merge, and this look didn&#x27;t check live PRs.
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters
+
+Two holds are waiting on you but deferred for now. &quot;Revisit the integration approach&quot; waits until the upstream API is stable. &quot;Review the release&quot; waits until 2099-01-01.
+</div></article><article id="actionable"><h2>actionable</h2><div class="reply">This is your first look, so I have nothing earlier to compare against.
+
+<strong>Next</strong>
+- Revisit integration is on hold until the upstream API stabilizes.
+
+<strong>Needs you</strong>
+- Captain, choose the launch route: route A or route B.
+
+PRs weren&#x27;t checked live this time. Say &quot;include PRs&quot; if you want that.
+</div></article><article id="disappeared"><h2>disappeared</h2><div class="reply">Ahoy, Captain. <strong>Since your last look:</strong> &quot;Produce the current fleet catch-up&quot; is no longer showing as moving. That only means it wasn&#x27;t seen this time. It doesn&#x27;t prove the task finished.
+
+<strong>Shipped</strong>
+- Investigate portability: [scout report](/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md)
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: `local main`
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters (nothing blocking it)
+- Two decisions are on hold: &quot;Revisit the integration approach&quot; waits until the upstream API stabilizes, and &quot;Review the release&quot; waits until 2099-01-01.
+
+This view comes from local records only. Live PR status wasn&#x27;t checked; ask for &quot;include PRs&quot; if you want it.
+</div></article><article id="missing"><h2>missing</h2><div class="reply">No observed changes since your last look.
+
+Captain, I can&#x27;t call it all clear: one contribution record couldn&#x27;t be read, so the local records may be missing something. Otherwise nothing is shipped, moving, queued or waiting on you. Say `detail` if you want me to look into the record that couldn&#x27;t be read.
+</div></article><article id="missing-confirm"><h2>missing-confirm</h2><div class="reply">No observed changes since your last look.
+
+Captain, one contribution record couldn&#x27;t be read, so I can&#x27;t say it&#x27;s all quiet with certainty. Ask for `detail` if you want me to look into the gap.
+</div></article><article id="missing-confirm-repeat"><h2>missing-confirm-repeat</h2><div class="reply">No observed changes since your last look.
+
+Captain, nothing is shipped, moving, queued, or waiting on you in what I could read, but I can&#x27;t call it all clear: one contribution record couldn&#x27;t be read. Ask for `detail` if you want me to look into it.
+</div></article><article id="quiet-restored"><h2>quiet-restored</h2><div class="reply">No changes since your last look.
+
+Captain, everything is quiet in the local records.
+</div></article></main></html>

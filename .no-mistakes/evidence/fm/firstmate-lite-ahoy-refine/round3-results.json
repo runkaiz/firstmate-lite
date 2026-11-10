@@ -1,0 +1,9 @@
+{
+  "shipped-deliveries": "pass: actual recorded artifacts shown; folded and artifact-free closures excluded",
+  "conditional-holds-and-queue": "pass: full queued title, condition and date remain deferred, actual call shown separately",
+  "worker-progress-and-completion": "pass: real snapshots and Claude replies preserve stage, elapsed time and unverified publication/CI; no empty Needs you",
+  "checkpoint-transitions": "pass: disappearing worker/call/queued rows reported as no longer observed; cleared blockers observed; no invented deliveries",
+  "quiet-and-cached-contributions": "pass: both actual replies contain a comparison and single all-clear; no action-free contribution counts",
+  "catchup-authority-and-refusals": "pass: backlog bytes unchanged by observations, monitor leaves checkpoint unchanged, corrupt checkpoint disclosed and replaced, symlink and incompatible deferral refused",
+  "incomplete-coverage": "fail: two of three fresh real Claude evaluations enumerate empty categories despite correctly disclosing unreadable input"
+}

@@ -1,0 +1,7 @@
+test_conditional_captain_hold_round_trip_and_release (__main__.QueueTests.test_conditional_captain_hold_round_trip_and_release) ... ok
+test_hold_reasons_never_supply_structured_metadata (__main__.QueueTests.test_hold_reasons_never_supply_structured_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.506s
+
+OK

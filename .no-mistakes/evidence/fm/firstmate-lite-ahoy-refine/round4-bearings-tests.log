@@ -1,0 +1,331 @@
+ok - Ahoy saves one observation checkpoint and compares fresh facts without changing the queue
+ok - completed runs and worker messages preserve PR verification uncertainty
+ok - Ahoy compares missing current rows and cleared blockers without inventing completion
+ok - Ahoy excludes closures and defers conditional calls while preserving titles and elapsed time
+ok - task teardown during metadata capture is omitted without aborting the snapshot
+ok - current state and decision hints share one captured status observation
+ok - reused live state is discarded when task generation changes
+ok - large local snapshot overlaps local reads with byte-identical serial and concurrent projections
+ok - repeated snapshots keep the same current landed baseline and ignore prior reports
+ok - default output is bounded, local-only, and marks omitted surfaces
+ok - TOON and JSON are parity representations of the same model
+ok - landed accepts only kind-owned delivery artifacts while answered questions stay out
+ok - kind fallback matches tasks-axi word boundaries and preserves scout deliveries
+ok - Bearings keeps a live blocker in structured live state and never converts it to Charted Next queue work
+ok - action-free items (working/done/queued/landed) do not leak into Captain's Call
+ok - main orphan in-flight stays out of Underway and is disclosed in omitted/gates
+ok - main unstructured current is disclosed while structured siblings still project
+ok - counterfactual meta clears main inventory warning and projects the live task
+ok - working captain holds retain main and secondmate bucket surfaces
+ok - newest filed gates are selected before snapshot bounds
+ok - Underway rows carry the durable task name and gates carry their filed date
+ok - main and secondmate captain actionability use the same blocker readiness
+ok - a completed scout with decision-like report prose is a pointer, not pending
+ok - current report pointers surface
+ok - queued body prose never hides an item from the board
+ok - --include-prs is the only path that fetches, and it enriches correctly
+ok - --include-prs maps a custom branch-prefix PR back to its recorded task
+ok - a partial GitHub failure degrades gracefully
+ok - Perl fallback bounds stalled GitHub calls without coreutils timeout
+ok - all fleet-sized sections are capped with counted opt-in expansion
+ok - captain-held tasks of any kind reach Captain's Call, deferral is honored, and landed excludes answered calls
+ok - structured hold buckets decide decisions, gates, and the reveal
+ok - a blocked deferred hold stays gated when its date arrives and is revealed by --all-decisions
+ok - revealed deferred holds display their deferral reason while live calls stay unannotated
+not ok - PR repository truncation was not recorded: {
+  "schema": "fm-bearings.v1",
+  "home": "fm-bearings.4WnBLG/repo-caps",
+  "generated": "2026-07-11T18:00:00Z",
+  "prs": "checked (2 repos, 2 open)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 5,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 5,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": false,
+    "proven_clear": false,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "dead-1",
+      "kind": "scout",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "repo-1",
+      "name": "dead-1",
+      "doing": "backend target gone: firstmate:fm-dead-1"
+    },
+    {
+      "id": "dead-2",
+      "kind": "scout",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "repo-2",
+      "name": "dead-2",
+      "doing": "backend target gone: firstmate:fm-dead-2"
+    },
+    {
+      "id": "dead-3",
+      "kind": "scout",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "repo-3",
+      "name": "dead-3",
+      "doing": "backend target gone: firstmate:fm-dead-3"
+    },
+    {
+      "id": "dead-4",
+      "kind": "scout",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "repo-4",
+      "name": "dead-4",
+      "doing": "backend target gone: firstmate:fm-dead-4"
+    },
+    {
+      "id": "dead-5",
+      "kind": "scout",
+      "state": "unknown",
+      "stage": "unknown",
+      "elapsed_seconds": null,
+      "repo": "repo-5",
+      "name": "dead-5",
+      "doing": "backend target gone: firstmate:fm-dead-5"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [
+    {
+      "id": "decision-1",
+      "key": "decision-1",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Decision 1: captain choice pending",
+      "owner": "(main)"
+    },
+    {
+      "id": "decision-2",
+      "key": "decision-2",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Decision 2: captain choice pending",
+      "owner": "(main)"
+    },
+    {
+      "id": "decision-3",
+      "key": "decision-3",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Decision 3: captain choice pending",
+      "owner": "(main)"
+    },
+    {
+      "id": "decision-4",
+      "key": "decision-4",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Decision 4: captain choice pending",
+      "owner": "(main)"
+    },
+    {
+      "id": "decision-5",
+      "key": "decision-5",
+      "verb": "captain-hold",
+      "deferred": false,
+      "summary": "Decision 5: captain choice pending",
+      "owner": "(main)"
+    }
+  ],
+  "landed": [],
+  "gates": [
+    {
+      "id": "gate-1",
+      "title": "Gate 1",
+      "blocked_by": "task-1",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "gate-2",
+      "title": "Gate 2",
+      "blocked_by": "task-2",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "gate-3",
+      "title": "Gate 3",
+      "blocked_by": "task-3",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "gate-4",
+      "title": "Gate 4",
+      "blocked_by": "task-4",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "gate-5",
+      "title": "Gate 5",
+      "blocked_by": "task-5",
+      "reason": "-",
+      "deferred": false,
+      "owner": "(main)",
+      "filed": null
+    }
+  ],
+  "reports": [
+    {
+      "id": "dead-1",
+      "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.ahoy-unit-tmp/fm-bearings.4WnBLG/repo-caps/data/dead-1/report.md"
+    },
+    {
+      "id": "dead-2",
+      "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.ahoy-unit-tmp/fm-bearings.4WnBLG/repo-caps/data/dead-2/report.md"
+    },
+    {
+      "id": "dead-3",
+      "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.ahoy-unit-tmp/fm-bearings.4WnBLG/repo-caps/data/dead-3/report.md"
+    },
+    {
+      "id": "dead-4",
+      "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.ahoy-unit-tmp/fm-bearings.4WnBLG/repo-caps/data/dead-4/report.md"
+    },
+    {
+      "id": "dead-5",
+      "path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.ahoy-unit-tmp/fm-bearings.4WnBLG/repo-caps/data/dead-5/report.md"
+    }
+  ],
+  "recorded_prs": [
+    {
+      "id": "dead-1",
+      "url": "https://github.com/acme/repo-1/pull/1"
+    },
+    {
+      "id": "dead-2",
+      "url": "https://github.com/acme/repo-2/pull/2"
+    },
+    {
+      "id": "dead-3",
+      "url": "https://github.com/acme/repo-3/pull/3"
+    },
+    {
+      "id": "dead-4",
+      "url": "https://github.com/acme/repo-4/pull/4"
+    },
+    {
+      "id": "dead-5",
+      "url": "https://github.com/acme/repo-5/pull/5"
+    }
+  ],
+  "unhealthy_endpoints": [
+    {
+      "id": "dead-1",
+      "backend": "tmux",
+      "target": "firstmate:fm-dead-1",
+      "exists": false,
+      "agent": "not_checked"
+    },
+    {
+      "id": "dead-2",
+      "backend": "tmux",
+      "target": "firstmate:fm-dead-2",
+      "exists": false,
+      "agent": "not_checked"
+    },
+    {
+      "id": "dead-3",
+      "backend": "tmux",
+      "target": "firstmate:fm-dead-3",
+      "exists": false,
+      "agent": "not_checked"
+    },
+    {
+      "id": "dead-4",
+      "backend": "tmux",
+      "target": "firstmate:fm-dead-4",
+      "exists": false,
+      "agent": "not_checked"
+    },
+    {
+      "id": "dead-5",
+      "backend": "tmux",
+      "target": "firstmate:fm-dead-5",
+      "exists": false,
+      "agent": "not_checked"
+    }
+  ],
+  "candidate_prs": [
+    {
+      "num": "9",
+      "repo": "acme/repo-1",
+      "task": "ship-task",
+      "url": "https://github.com/kunchenguid/firstmate/pull/9",
+      "review": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "checks": "passing"
+    },
+    {
+      "num": "9",
+      "repo": "acme/repo-2",
+      "task": "ship-task",
+      "url": "https://github.com/kunchenguid/firstmate/pull/9",
+      "review": "APPROVED",
+      "mergeable": "MERGEABLE",
+      "checks": "passing"
+    }
+  ],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "PR repositories showing 2 of 6",
+      "reveal": "--all-pr-repos"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Actual Ahoy replies — live validation</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f6ecd3;color:#3f3224;font:16px/1.55 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:32px 24px}h1,h2{color:#241c14}h1{font-size:27px}h2{text-transform:capitalize;font-size:19px;margin:0 0 16px}article{min-width:0;background:#fffdf7;border:1px solid #ddc89c;border-radius:12px;padding:24px;margin:24px 0}.reply{white-space:pre-wrap;overflow-wrap:anywhere}strong{color:#241c14}a{color:#2f6688}.note{color:#6f5e46}article:target{outline:3px solid #e0a52e}
+</style><main><h1>Actual Ahoy replies</h1><p class="note">Saved responses from real Claude executions on a private 120×40 tmux lab, using the exact Ahoy skill and the real snapshot executable. This page displays the observed replies; it is not a mockup of a Firstmate UI. Fixture data is disposable. Colors follow the repository’s board tokens.</p><nav><a href="#done">done</a> · <a href="#quiet">quiet</a> · <a href="#moving">moving</a> · <a href="#moving-repeat">moving-repeat</a> · <a href="#disappeared">disappeared</a> · <a href="#missing">missing</a> · <a href="#busy">busy</a></nav><article id="done"><h2>done</h2><div class="reply">Ahoy, Captain. Here&#x27;s your catch-up.
+
+<strong>Since your last look</strong> (20:05:23Z): one stage change. &quot;Produce the current fleet catch-up&quot; now shows done/done. This compares what the two snapshots observed; it isn&#x27;t a full event history.
+
+<strong>Shipped</strong>
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: local main
+- Investigate portability (scout report): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up: done after about 15 minutes. The worker&#x27;s output is complete, but it hasn&#x27;t been confirmed as published and CI hasn&#x27;t been checked. A PR is on record at https://github.com/example/lab/pull/99, but that doesn&#x27;t mean it&#x27;s ready to merge.
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters: not blocked.
+- 2 items are on hold until a condition is met: one waits until the upstream API stabilizes, the other until 2099-01-01.
+
+<strong>Needs you:</strong> Nothing right now. This snapshot used saved records and didn&#x27;t check PRs live; say &quot;include PRs&quot; if you want that.</div></article><article id="quiet"><h2>quiet</h2><div class="reply">Ahoy, captain. This is your first recorded look, so I have nothing earlier to compare against for a catch-up.
+
+All clear for now: nothing has shipped, nothing is moving, nothing is queued, and nothing needs you. This is based on local records only; I didn&#x27;t check pull requests live.</div></article><article id="moving"><h2>moving</h2><div class="reply">Ahoy, Captain. Here&#x27;s where things stand.
+
+<strong>Since your last look</strong> (20:06 UTC): one new task is moving and one new decision is waiting for you.
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up: implementing, working for about 15 min.
+
+<strong>Needs you</strong>
+- Choose the launch route: direct or staged.
+
+Nothing has shipped and nothing is queued. This used local records only. Say &quot;include PRs&quot; for a live PR check.</div></article><article id="moving-repeat"><h2>moving-repeat</h2><div class="reply">Ahoy, captain. Here&#x27;s the catch-up.
+
+<strong>Since your last look</strong> (20:05 UTC): one stage change. &quot;Produce the current fleet catch-up&quot; is now at implementing/working. Nothing else has changed.
+
+<strong>Shipped</strong>
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: local main
+- Investigate portability (scout report): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md
+
+<strong>Moving</strong>
+- Produce the current fleet catch-up: implementing, about 15 min so far
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters: not blocked
+- 2 items are on hold until a set condition or date: the integration approach waits for the upstream API to stabilize, and the release review waits until 2099-01-01.
+
+Nothing needs you right now. This used saved local records only; to check pull requests live, ask for &quot;include PRs&quot;.</div></article><article id="disappeared"><h2>disappeared</h2><div class="reply">Ahoy, captain. Here&#x27;s the catch-up.
+
+<strong>Since your last look</strong> (checkpoint 20:07:16Z, 26 seconds before this one): two items I could see then are gone from the current state. That doesn&#x27;t mean they finished:
+- &quot;Produce the current fleet catch-up&quot; is no longer showing as moving.
+- &quot;Choose the launch route: Choose the direct or staged launch&quot; is no longer showing as an open decision.
+
+<strong>Right now:</strong> all clear. Nothing is in flight, queued, newly shipped, or waiting on you. This view uses local records only; ask for &quot;include PRs&quot; if you want a live PR check.</div></article><article id="missing"><h2>missing</h2><div class="reply">Ahoy, captain. <strong>Since your last look</strong> (20:07 UTC today), I didn&#x27;t see any new deliveries or stage changes.
+
+<strong>Current picture:</strong> nothing shipped, nothing moving, nothing queued next, and no decisions waiting on you.
+
+One record couldn&#x27;t be read, so I can&#x27;t confirm everything is clear. Ask for `detail` if you want me to look into it.</div></article><article id="busy"><h2>busy</h2><div class="reply">Ahoy, Captain. Nothing has changed since your last look at 20:03Z.
+
+<strong>Shipped</strong>
+- Fix the authentication redirect: https://github.com/example/lab/pull/12
+- Simplify the local launcher: local main
+- Investigate portability (scout report): [report.md](/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73G5Q90CZZH9110408J88VH/.l/data/scouted/report.md)
+
+<strong>Next</strong>
+- Improve the integration workflow with a complete title longer than sixty characters. Nothing is blocking it.
+- 2 items are on hold: &quot;Revisit the integration approach&quot; waits until the upstream API stabilizes, and &quot;Review the release&quot; waits until 2099-01-01.
+
+Nothing is in progress right now, and nothing needs your input. This check only used local records; it didn&#x27;t look up live PRs.</div></article></main></html>
