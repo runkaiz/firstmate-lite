@@ -1,0 +1,40 @@
+ok - sibling-PR, retained-branch and legacy local-main notes survive serialization and repeated replay
+ok - malformed and foreign completion notes refuse without changing the queue or consuming the marker
+Preparing worktree (detached HEAD 589a98a)
+HEAD is now at 589a98a initial
+Restored retire-scout metadata with sha256=0da0d221d1a82e9440835d2e8ce446964649e2f244ef2f0f8c40956ff81be0fc; endpoint and copy unchanged.
+ok - archived scout record restores byte-exactly and an unchanged copy retires despite replaced source history
+Preparing worktree (detached HEAD 9ce9377)
+HEAD is now at 9ce9377 initial
+ok - unchanged local-only copy retires with its base retained when the source history was replaced
+Preparing worktree (detached HEAD dffed66)
+HEAD is now at dffed66 initial
+ok - local-only delivery landed as an identical patch retires, while a commit with no equivalent still refuses
+Preparing worktree (detached HEAD 02b653a)
+HEAD is now at 02b653a initial
+ok - native and legacy teardown reject unlanded merge resolutions and accept ancestral merges
+Preparing worktree (detached HEAD 610480c)
+HEAD is now at 610480c initial
+ok - branch-kept commits retire only by explicit retention, with the branch kept and the commit pinned
+ok - an approved local landing fast-forwards a retained branch after its task record is gone
+Preparing worktree (detached HEAD 8911ee7)
+HEAD is now at 8911ee7 initial
+ok - a merged PR rewritten by its pipeline retires only when the pipeline binds this exact clean HEAD to the merged head
+Preparing worktree (detached HEAD a3b07b5)
+HEAD is now at a3b07b5 initial
+ok - pipeline delivery proof permits covered leftovers while tracked edits and incorrect bindings refuse
+Preparing worktree (detached HEAD c378531)
+HEAD is now at c378531 initial
+ok - herdr-success closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD c354359)
+HEAD is now at c354359 initial
+ok - herdr-failed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 3d6ff7c)
+HEAD is now at 3d6ff7c initial
+ok - herdr-unconfirmed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD d7e1a05)
+HEAD is now at d7e1a05 initial
+ok - herdr-foreign closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD a5cf14c)
+HEAD is now at a5cf14c initial
+ok - tmux-success closes the recorded shell before preserving and retiring the native copy

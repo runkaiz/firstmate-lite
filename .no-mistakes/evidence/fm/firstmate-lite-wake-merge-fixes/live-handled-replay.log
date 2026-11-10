@@ -1,0 +1,20 @@
+SCENARIO: a real captured result survives unhandled replay, then is suppressed for both actors once handled
+registered: lab-result (lavish)
+retired: lab-result
+disposable lab result
+reconciled: published=1 started=0 stopped=0 uncertain=0 failed=0
+1794348864	2	check	procevent:lab-result:1	check: procevent lavish lab-result 1
+handled: lab-result 1
+already-handled: lab-result 1
+
+Actor branch output:
+1794348865	99	check	unrelated	check: unrelated actionable note
+Queue after actor branch drain:
+1794348865	98	check	procevent:lab-result:1	check: main-owned handled replay
+1794348865	99	check	unrelated	check: unrelated actionable note
+
+Actor main output:
+1794348865	99	check	unrelated	check: unrelated actionable note
+Queue after actor main drain:
+1794348865	99	check	unrelated	check: unrelated actionable note
+Observed: both actors suppressed handled results; branch preserved the main-owned replay and unrelated work remained visible.

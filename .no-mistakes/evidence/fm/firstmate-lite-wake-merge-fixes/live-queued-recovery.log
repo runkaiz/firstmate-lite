@@ -1,0 +1,4 @@
+SCENARIO: queued work survives downtime and resurfaces on re-arm
+check: rearm-resurface
+1794348864	1	check	inbox:lab-queued	check: lab note queued while monitoring was down
+Observed: recovery presented the exact queued note.

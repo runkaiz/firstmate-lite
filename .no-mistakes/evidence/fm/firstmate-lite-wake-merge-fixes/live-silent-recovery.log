@@ -1,0 +1,8 @@
+SCENARIO: empty monitoring recovery remains silent, then new work wakes it
+acked:downtime:994443.1794348860.LnAeiW
+watcher: started pid=994501 (beacon fresh)
+Observed: live monitoring remained active for three seconds, with no notification and no queued work.
+watcher: started pid=994501 (beacon fresh)
+check: rearm-resurface
+1794348863	1	check	inbox:lab-new	check: lab actionable note after silent recovery
+Observed: the newly appended actionable note reached the drain.

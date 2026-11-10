@@ -1,0 +1,8 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/counterfactual
+BASE d3c6453: attempt the retained landing with no task metadata
+error: no meta for task kept at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/counterfactual/state/kept.meta
+
+TARGET 6ecfe0f: retry the exact same persisted state
+merged fm/kept into local main (048f261 -> 4c79f53) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/counterfactual/projects/demo
+retained result
+Observed: base refused the missing task record; target landed the same retained commit and retired its landing record.

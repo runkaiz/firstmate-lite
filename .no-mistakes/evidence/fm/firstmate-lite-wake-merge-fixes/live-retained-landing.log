@@ -1,0 +1,27 @@
+SCENARIO: keep a completed branch during cleanup, then land it with the normal guards
+Preparing worktree (detached HEAD 5b0d1b1)
+HEAD is now at 5b0d1b1 initial
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: task delivery is not proven landed; preserving copy
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown retained-demo complete (window fm-lab:fm-retained-demo, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/copies-retained/retained-demo/worktree)
+Backlog: retained-demo just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained/data/backlog.md - move retained-demo to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained/projects/demo
+mode=local-only
+branch=fm/retained-demo
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained/projects/demo has a dirty working tree; refusing to merge into it
+merged fm/retained-demo into local main (5b0d1b1 -> c417c5e) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained/projects/demo
+delivered locally
+error: no meta for task retained-demo at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73R30H4BF6WJNPT335EKD5M/.gate-test-lab/retained/state/retained-demo.meta
+REFUSED: fm/divergent is not a fast-forward of main (it has diverged).
+Have the crewmate rebase fm/divergent onto main, then retry.
+Observed: divergent retained branch refused without moving main or deleting its landing record.
+Observed: cleanup retained the commit without landing it; dirty-main landing refused; clean landing fast-forwarded main; repeat landing refused.
