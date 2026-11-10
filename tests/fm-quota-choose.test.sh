@@ -822,41 +822,41 @@ ok "fast mode ignores unrelated model scopes"
 if printf 'malformed\n' | fm_quota_codex_fast_eligible gpt-6; then fail "malformed snapshot qualified"; fi
 ok "malformed snapshot keeps normal mode"
 
-fastmode() {
+sparespeed() {
   FM_HOME="$LAB/fast-home" FM_CONFIG_OVERRIDE="$LAB/fast-config" \
     PATH="$FAKEBIN:$PATH" QUOTA_AXI_CALLS="$LAB/fast-calls" \
-    bash "$BIN/fm-fastmode.sh" "$@"
+    bash "$BIN/fm-sparespeed.sh" "$@"
 }
 
-out=$(fastmode) || fail "fastmode initial status failed"
-[ "$out" = "WORKER FAST MODE: off" ] || fail "fastmode must default to off"
+out=$(sparespeed) || fail "sparespeed initial status failed"
+[ "$out" = "WORKER FAST MODE: off" ] || fail "sparespeed must default to off"
 [ ! -e "$LAB/fast-config" ] && [ ! -e "$LAB/fast-calls" ] || fail "off status touched config or quota"
-out=$(fastmode on) || fail "fastmode on failed"
-[ "$out" = "WORKER FAST MODE: on" ] || fail "fastmode on did not report on"
+out=$(sparespeed on) || fail "sparespeed on failed"
+[ "$out" = "WORKER FAST MODE: on" ] || fail "sparespeed on did not report on"
 flag="$LAB/fast-config/worker-fast-mode"
-[ -f "$flag" ] && [ ! -e "$LAB/fast-home/config" ] || fail "fastmode on did not use the config override"
+[ -f "$flag" ] && [ ! -e "$LAB/fast-home/config" ] || fail "sparespeed on did not use the config override"
 printf 'existing\n' > "$flag"
-fastmode on >/dev/null || fail "repeated fastmode on failed"
-[ "$(cat "$flag")" = existing ] || fail "fastmode on rewrote an existing presence flag"
+sparespeed on >/dev/null || fail "repeated sparespeed on failed"
+[ "$(cat "$flag")" = existing ] || fail "sparespeed on rewrote an existing presence flag"
 for action in '' status; do
-  out=$(fastmode "$action") || fail "fastmode status failed"
-  [ "$out" = "WORKER FAST MODE: on" ] || fail "fastmode status did not report on"
-  [ "$(cat "$flag")" = existing ] || fail "fastmode status changed the presence flag"
+  out=$(sparespeed "$action") || fail "sparespeed status failed"
+  [ "$out" = "WORKER FAST MODE: on" ] || fail "sparespeed status did not report on"
+  [ "$(cat "$flag")" = existing ] || fail "sparespeed status changed the presence flag"
 done
 for action in on off status; do
-  fastmode "$action" gpt-6 >"$LAB/fast-error" 2>&1
-  [ "$?" -eq 2 ] || fail "fastmode $action accepted an extra model argument"
-  [ "$(cat "$flag")" = existing ] || fail "invalid fastmode $action changed the presence flag"
+  sparespeed "$action" gpt-6 >"$LAB/fast-error" 2>&1
+  [ "$?" -eq 2 ] || fail "sparespeed $action accepted an extra model argument"
+  [ "$(cat "$flag")" = existing ] || fail "invalid sparespeed $action changed the presence flag"
 done
-fastmode maybe >"$LAB/fast-error" 2>&1
-[ "$?" -eq 2 ] || fail "fastmode accepted an unknown action"
-out=$(fastmode off) || fail "fastmode off failed"
-[ "$out" = "WORKER FAST MODE: off" ] || fail "fastmode off did not report off"
-fastmode off >/dev/null || fail "fastmode off was not idempotent"
-[ ! -e "$flag" ] || fail "fastmode off left the presence flag in place"
-out=$(fastmode status) || fail "fastmode off status failed"
-[ "$out" = "WORKER FAST MODE: off" ] || fail "fastmode status did not report off"
-[ ! -e "$LAB/fast-calls" ] || fail "fastmode queried quota"
-ok "fastmode sets and reports only the presence flag, rejecting extra arguments without querying quota"
+sparespeed maybe >"$LAB/fast-error" 2>&1
+[ "$?" -eq 2 ] || fail "sparespeed accepted an unknown action"
+out=$(sparespeed off) || fail "sparespeed off failed"
+[ "$out" = "WORKER FAST MODE: off" ] || fail "sparespeed off did not report off"
+sparespeed off >/dev/null || fail "sparespeed off was not idempotent"
+[ ! -e "$flag" ] || fail "sparespeed off left the presence flag in place"
+out=$(sparespeed status) || fail "sparespeed off status failed"
+[ "$out" = "WORKER FAST MODE: off" ] || fail "sparespeed status did not report off"
+[ ! -e "$LAB/fast-calls" ] || fail "sparespeed queried quota"
+ok "sparespeed sets and reports only the presence flag, rejecting extra arguments without querying quota"
 
 printf '# all fm-quota-choose tests passed\n'

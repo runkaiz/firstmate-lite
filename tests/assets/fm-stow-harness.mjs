@@ -69,7 +69,7 @@ assert.deepEqual(prompts[0], prompts[1]);
 assert.equal(prompts[0].text, "/skill:ahoy detail");
 assert.equal(prompts[0].options.expandPromptTemplates, true);
 console.log("ok - ahoy and bearings use one command owner and mode expansion");
-for (const command of ["proactive", "fastmode"]) {
+for (const command of ["proactive", "sparespeed"]) {
   const before = prompts.length;
   for (const argument of ["", "on", "off", "status"]) {
     await commands.get(command).handler(argument, ctx);

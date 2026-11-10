@@ -65,7 +65,7 @@ export default function (pi: ExtensionAPI) {
   }
   for (const [name, description] of [
     ["proactive", "Toggle or inspect persisted proactive orchestration"],
-    ["fastmode", "Set or inspect quota-gated Codex worker fast mode"],
+    ["sparespeed", "Set or inspect quota-gated Codex worker fast mode"],
   ]) {
     pi.registerCommand(name, {
       description,

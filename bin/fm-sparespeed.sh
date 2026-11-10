@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Usage: fm-fastmode.sh [on|off|status]
+# Usage: fm-sparespeed.sh [on|off|status]
 # Defaults to status. The preference is a presence flag in the effective
 # config directory (FM_CONFIG_OVERRIDE, FM_HOME, FM_ROOT_OVERRIDE, repo root).
 set -euo pipefail
 
-usage='Usage: fm-fastmode.sh [on|off|status]'
+usage='Usage: fm-sparespeed.sh [on|off|status]'
 command=${1:-status}
 case "$command" in
   -h|--help) printf '%s\n' "$usage"; exit 0 ;;

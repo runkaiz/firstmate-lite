@@ -93,6 +93,7 @@ Use the slash form below in Claude Code and Grok; in Codex use `$ahoy`, `$afk`, 
 
 - `/ahoy` - catch me up: what is in flight, what is waiting on me.
 - `/afk` - I'm stepping away; keep the crew going and brief me when I'm back.
+- `/sparespeed on|off|status` - let Codex workers run in fast mode only while spare quota before the reset allows it.
 - `/stow` - save what we learned before I close the session.
 - `/updatefirstmate` - pull the latest Firstmate-lite safely.
 
