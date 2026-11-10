@@ -248,7 +248,8 @@ Cursor's refresh command is `FM_CURSOR_PRIMARY_LIVE_E2E=1 tests/fm-cursor-primar
 
 The retired Ahoy first-message boundary was reverified on 2026-07-22 with Pi 0.81.1 and OpenCode 1.17.18.
 Marked current operational input and the two exact legacy compatibility shapes selected Bearings, while genuine near-miss captain messages remained real boundaries.
-Those Ahoy fixtures still expect a Bearings sentinel, leaving their coverage of the [current catch-up command](../../.agents/skills/ahoy/SKILL.md) unverified.
+Both fixtures inject `AHOY_BEARINGS_BRANCH` through a test-only Bearings skill; the [current Ahoy skill](../../.agents/skills/ahoy/SKILL.md) no longer delegates to that skill.
+Their native Ahoy projects also omit its snapshot executable and retain the retired first-message versus later-message expectations, so these guards need updated fixtures and fresh live evidence before they can verify the current catch-up.
 The detailed reconciliation and task chronology stay in the private audit report and PR evidence.
 
 ### Per-task endpoint reads cannot truncate the digest
