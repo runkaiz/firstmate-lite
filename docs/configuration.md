@@ -396,6 +396,7 @@ Other fresh allocations select current origin history when origin is configured,
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 Startup reports orphan native reservations through the existing bootstrap diagnostics; [`fm-task-record-restore.sh`](../bin/fm-task-record-restore.sh) owns explicit restoration of byte-verified archived metadata without changing its original contract.
 [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
+After branch-retaining cleanup, [`fm-merge-local.sh`](../bin/fm-merge-local.sh) can still land a local-only branch under its existing merge-authority and clean fast-forward guards.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
@@ -1558,7 +1559,7 @@ A long-polling external process is registered as a *source* through its adapter,
 No-mistakes workers can delegate a CI-only wait to the existing process-event runner regardless of proactive mode or `config/wait-no-turns`; no additional monitoring service or setting is needed.
 After a confirmed handoff, the worker records the PR link in its paused status, and unchanged pending CI consumes no worker or routine supervision-review turns; a drive response requiring action or a monitoring error returns through firstmate to the original worker.
 After roughly 10 minutes of pending CI holds, a PR with zero registered checks wakes firstmate through the existing watcher with its link while the wait continues; zero checks never count as green.
-Pipeline repairs restart that notification window, and an unreadable forge response is retried rather than treated as zero checks.
+Pipeline repairs restart that notification window even when the listener observes only the changed head between polls; notice identity survives listener restarts, and an unreadable forge response is retried rather than treated as zero checks.
 [`bin/fm-procevent-ci.sh`](../bin/fm-procevent-ci.sh) owns eligibility, listener confirmation, run and head binding, and exclusive monitoring; [`validation-supervision`](../.agents/skills/validation-supervision/SKILL.md) owns handling the captured result.
 The [verification record](verification/runtime-backends.md#ci-only-worker-waits) states the tested scope and live-evidence limits.
 
@@ -1919,6 +1920,7 @@ A value this command cannot use is refused by name before anything is launched, 
 The runner proves exactly one durability boundary: output that reached the runner is stored at mode `0600` before any event referencing it is published, and a captured result with no durable handled acknowledgement remains eligible for bounded re-announcement across any number of drains and restarts, not only the crash window right after capture.
 
 - `bin/fm-procevent.sh handled <source-id> <sequence>` is the only thing that stops re-announcement: a generation-keyed, private, path-safe, durable, and idempotent acknowledgement that atomically checks and deduplicates by the exact source and sequence, so a paired effect gated on its first-time-vs-repeat report is never authorized twice.
+  The drain also retires queued replays covered by that acknowledgement before presentation, with branch retirement confined to its granted eligible rows.
 - Default and fallback `check` publication is still best-effort, so the same source and sequence can repeat even before any restart; handlers deduplicate that identity rather than assuming a wake is unique.
 - The runner proves nothing about the source side, and the handled acknowledgement proves nothing about a paired external effect performed before it: a crash between that effect and the acknowledgement call can still repeat the effect on replay, so this is never a generic exactly-once guarantee.
 - The published `lavish-axi poll` clears feedback destructively before returning it, so a result lost between that clearing and the runner reading process output is unrecoverable.

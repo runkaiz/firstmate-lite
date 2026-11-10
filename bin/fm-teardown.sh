@@ -2432,14 +2432,22 @@ teardown_native_local_landed() {
 # contained in the recorded branch= ref, and that commit is also pinned at
 # refs/firstmate/retained-work/<id> so the work outlives a later branch delete.
 # It never claims landing; the backlog note names the retained refs.
+# state/<id>.retained keeps the project, mode, and branch so an approved
+# bin/fm-merge-local.sh can still land the branch after the task record is gone.
 teardown_native_branch_retained() {
-  local branch tip head
+  local branch tip head tmp
   branch=$(fm_meta_get "$META" branch) || return 1
   [ -n "$branch" ] && git check-ref-format --branch "$branch" >/dev/null 2>&1 || return 1
   tip=$(git -C "$PROJ" rev-parse --verify --quiet "refs/heads/$branch^{commit}") || return 1
   head=$(git -C "$WT" rev-parse --verify HEAD) || return 1
   git -C "$WT" merge-base --is-ancestor "$head" "$tip" || return 1
   fm_git_worktree_pin "$PROJ" "refs/firstmate/retained-work/$ID" "$head" || return 1
+  tmp=$(mktemp "$STATE/.$ID.retained.XXXXXX") || return 1
+  if ! printf 'project=%s\nmode=%s\nbranch=%s\n' "$PROJ" "$MODE" "$branch" > "$tmp" \
+    || ! mv -f -- "$tmp" "$STATE/$ID.retained"; then
+    rm -f -- "$tmp"
+    return 1
+  fi
   RETAINED_HEAD="refs/heads/$branch and refs/firstmate/retained-work/$ID at $head"
 }
 if [ -n "$SIBLING_PR" ] && [ -d "$WT" ]; then

@@ -33,6 +33,11 @@ cat > "$LAB/fakebin/no-mistakes" <<'SH'
 set -eu
 count=0
 [ ! -f "$CI_TEST_LAB/drives" ] || read -r count < "$CI_TEST_LAB/drives"
+case "$CI_SCENARIO" in
+  late-revalidate|late-head-change)
+    if [ "$count" -gt 24 ]; then CI_TEST_HEAD=1111111111111111111111111111111111111111; fi
+    ;;
+esac
 if [ "$*" = 'axi status' ]; then
   run=RUN1 branch=fm/ci state=running ci=running review=completed
   case "$CI_SCENARIO" in
@@ -93,14 +98,20 @@ if [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json statusCheckRo
   read -r count < "$CI_TEST_LAB/drives"
   case "$CI_SCENARIO" in
     checks-disappear) if [ "$count" -gt 20 ]; then CI_CHECKS=0; fi ;;
-    late-revalidate) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
+    late-revalidate|late-head-change) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
   esac
   printf '%s\n' "$CI_CHECKS"
   exit 0
 fi
 [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json url,headRefOid --jq [.url,.headRefOid] | @tsv' ] || exit 99
 head=$CI_TEST_HEAD
-case "$CI_SCENARIO" in stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;; esac
+case "$CI_SCENARIO" in
+  stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;;
+  late-revalidate|late-head-change)
+    read -r count < "$CI_TEST_LAB/drives"
+    if [ "$count" -gt 24 ]; then head=1111111111111111111111111111111111111111; fi
+    ;;
+esac
 printf 'https://github.com/example/repo/pull/1\t%s\n' "$head"
 SH
 cat > "$LAB/fakebin/sleep" <<'SH'
@@ -185,12 +196,20 @@ check 'registered checks keep zero-check detection active' test "$(rollup_calls)
 reset_counts; export CI_SCENARIO=checks-disappear
 out=$(poll)
 check 'checks disappearing after a positive read surface once' test "$(line_count "$queue")" = 1
-for initial_checks in 2 0; do
-  reset_counts; rm -f "$queue"; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=$initial_checks
-  out=$(poll)
-  if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
-  check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
+for scenario in late-revalidate late-head-change; do
+  for initial_checks in 2 0; do
+    reset_counts; rm -f "$queue"; export CI_SCENARIO=$scenario CI_AFTER=48 CI_CHECKS=$initial_checks
+    out=$(poll)
+    if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
+    check "$scenario allows one zero-check wake per CI round" test "$(line_count "$queue")" = "$expected_wakes"
+    check "$scenario gives each CI round its own notice key" test "$(cut -f4 "$queue" | sort -u | wc -l | tr -d ' ')" = "$expected_wakes"
+    check "$scenario keeps driving to the real pipeline outcome" contains "$out" 'outcome: checks-passed'
+  done
 done
+reset_counts; rm -f "$queue"; export CI_SCENARIO=late-head-change CI_AFTER=44 CI_CHECKS=2
+out=$(poll)
+check 'a new head waits the full zero-check bound' test ! -s "$queue"
+check 'a new head does not query checks before its bound' test "$(rollup_calls)" = 5
 reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=
 out=$(poll)
 check 'unreadable forge does not count as zero checks' test ! -s "$queue"
@@ -335,6 +354,15 @@ beacon_cycles
 check 'a later successor keeps polling on the already-surfaced key' kill -0 "$watch_pid"
 kill "$watch_pid"; wait "$watch_pid" 2>/dev/null || true
 check 'a surfaced key is not delivered twice' not_grep ci-no-checks "$case_dir/repeat.out"
+# A later CI repair round in the same run wakes firstmate again with a fresh
+# notice, while the already-delivered first round stays quiet.
+reset_counts; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=0
+out=$(CI_TEST_HEAD=1111111111111111111111111111111111111111 poll)
+unset CI_CHECKS
+successor_watch "$case_dir/round2.out"
+wait_for_exit "$watch_pid" 100 || { printf 'FAIL: a later round notice never woke the successor watcher\n' >&2; cat "$case_dir/round2.out" >&2; exit 1; }
+check 'a restarted listener in a later CI round delivers a fresh zero-check notice' grep -Fq 'ci-no-checks:RUN1:1111111111111111111111111111111111111111' "$case_dir/round2.out"
+check 'the later round does not redeliver the first round' not_grep "ci-no-checks:RUN1:$CI_TEST_HEAD" "$case_dir/round2.out"
 # Execute the handoff command emitted to a worker, rather than only looking
 # for prose. Both config postures use the same supported command.
 for posture in ordinary wait-no-turns; do
@@ -345,7 +373,7 @@ for posture in ordinary wait-no-turns; do
     "$ROOT/bin/fm-brief.sh" task example --mode no-mistakes >/dev/null
   cp "$LAB/home/state/task.meta" "$genhome/state/task.meta"
   # shellcheck disable=SC2016 # Extract the literal backtick-delimited command from the generated interface.
-  command=$(sed -n 's/^When only CI remains running.*using `\(.*\)`\.$/\1/p' "$genhome/data/task/brief.md")
+  command=$(sed -n 's/^Then do not reattach; delegate the next drive return using `\(.*\)`\.$/\1/p' "$genhome/data/task/brief.md")
   check 'generated handoff command is present in either wait configuration' test -n "$command"
   check 'generated wait status carries the PR URL' grep -Fq 'CI wait delegated for <the PR URL arming printed>' "$genhome/data/task/brief.md"
   bash -c "$command" > "$genhome/arm.out"

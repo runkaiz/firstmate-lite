@@ -248,6 +248,24 @@ retired || fail 'branch retention left resources'
 assert_closed_note "copy retired unlanded; commits retained on refs/heads/fm/$ID and refs/firstmate/retained-work/$ID at $head"
 pass 'branch-kept commits retire only by explicit retention, with the branch kept and the commit pinned'
 
+# An approved local landing still works after retention removed the task record.
+merge_local() {
+  env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+    FM_CONFIG_OVERRIDE="$HOME_DIR/config" bash "$ROOT/bin/fm-merge-local.sh" "$ID"
+}
+printf 'dirt\n' > "$PROJ/dirt"
+if out=$(merge_local 2>&1); then fail 'retained-branch landing ignored a dirty main checkout'; fi
+assert_contains "$out" 'dirty working tree' 'retained-branch landing lost the clean-main guard'
+rm -f -- "$PROJ/dirt"
+out=$(merge_local 2>&1)
+expect_code 0 "$?" "retained branch could not be landed locally: $out"
+[ "$(git -C "$PROJ" rev-parse "refs/heads/$MAIN")" = "$head" ] || fail 'retained-branch landing did not fast-forward main'
+[ ! -e "$HOME_DIR/state/$ID.retained" ] || fail 'landing left the retained-branch record behind'
+if out=$(merge_local 2>&1); then fail 'a landed retained branch merged twice'; fi
+assert_contains "$out" 'no meta for task' 'repeat landing lost its missing-record refusal'
+pass 'an approved local landing fast-forwards a retained branch after its task record is gone'
+
 # Rebased and reworded merged PR (audit: edf28acf submitted, PR #13 head
 # 4934c119 after rebase and document rounds rewrote the same lines).
 make_pipeline_case() {

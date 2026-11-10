@@ -20,6 +20,9 @@
 # The supervisor still verifies the task's validation evidence and scope, as
 # attended: a done declaration is not a machine attestation of passing tests.
 # The away record lock spans the final authority read and synchronous merge.
+# A task whose cleanup kept its branch (bin/fm-teardown.sh --retain-branch) has
+# no task record; its state/<id>.retained record stands in under the same
+# guards, and a successful landing removes it.
 # Usage: fm-merge-local.sh <task-id>
 set -eu
 
@@ -57,6 +60,8 @@ fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
 # shellcheck source=bin/fm-afk-contract.sh
 . "$SCRIPT_DIR/fm-afk-contract.sh"
 
+RETAINED="$STATE/$ID.retained"
+if [ ! -e "$META" ] && [ -f "$RETAINED" ] && [ ! -L "$RETAINED" ]; then META=$RETAINED; fi
 [ -f "$META" ] || { echo "error: no meta for task $ID at $META" >&2; exit 1; }
 if ! fm_backlog_meta_spawn_gen_optional "$META" "$STATE"; then
   echo "error: local merge refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
@@ -179,6 +184,7 @@ fm_afk_contract_lock_release || true
 fm_lock_release "$MERGE_CONTROL_LOCK" || true
 MERGE_CONTROL_LOCK=
 [ "$merge_status" -eq 0 ] || exit "$merge_status"
+[ "$META" != "$RETAINED" ] || rm -f -- "$RETAINED"
 after=$(git -C "$PROJ" rev-parse --short "$DEFAULT")
 # Opt-in fleet activity ledger (docs/fleet-ledger.md); off costs one file test.
 [ ! -e "${FM_CONFIG_OVERRIDE:-$FM_HOME/config}/fleet-ledger" ] || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE "$SCRIPT_DIR/fm-fleet-ledger.sh" merged "$ID" local || true

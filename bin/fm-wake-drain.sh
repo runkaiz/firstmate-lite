@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Present durable watcher wake records, retire rows no actor could ever consume,
+# Present durable watcher wake records, retire rows no actor could ever consume
+# and replay rows of already-handled process-event results,
 # optionally acknowledge handled records,
 # annotate every unread line for validated signal status keys, surface unread
 # informational status lines, latest captain-facing statuses not covered by a
@@ -37,6 +38,8 @@ SCRIPT_DIR="$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd
 . "$SCRIPT_DIR/fm-supervision-engine-lib.sh"
 # shellcheck source=bin/fm-afk-contract.sh
 . "$SCRIPT_DIR/fm-afk-contract.sh"
+# shellcheck source=bin/fm-procevent-lib.sh
+. "$SCRIPT_DIR/fm-procevent-lib.sh"
 
 DRAIN_TMP=
 DRAIN_VIEW_TMP=
@@ -139,6 +142,39 @@ retire_unconsumable_rows_locked() {
   fi
   printf 'wake drain: unusable queue row(s) could not be retired (check that %s is readable and %s is writable); continuing with the rows that remain usable\n' \
     "$FM_WAKE_QUEUE" "$STATE" >&2
+}
+
+# A captured result re-published before its owner ran `handled` leaves a replay
+# row behind. Once the durable handled marker exists, presenting it again only
+# invites a repeat of the report already delivered, so it is retired unpresented.
+# Branch retirement is limited to its granted eligible rows.
+retire_handled_procevent_rows_locked() {
+  local epoch seq kind key rest id handled=''
+  [ -s "$FM_WAKE_QUEUE" ] || return 0
+  while IFS=$(printf '\t') read -r epoch seq kind key rest; do
+    if [ "$ACTOR" = branch ] && ! grep -Fxq -- "$seq" "$ELIGIBLE_ROWS_FILE"; then continue; fi
+    case "$key" in procevent:*:*) ;; *) continue ;; esac
+    id=${key#procevent:}
+    id=${id%:*}
+    case "$id" in ''|*/*|.|..) continue ;; esac
+    case "${key##*:}" in ''|*[!0-9]*) continue ;; esac
+    fm_procevent_is_handled "$STATE" "$id" "${key##*:}" && handled="$handled $seq"
+  done < "$FM_WAKE_QUEUE"
+  [ -n "$handled" ] || return 0
+  if DRAIN_TMP=$(mktemp "$STATE/.wake-queue.retire.XXXXXX") \
+    && chmod 0600 "$DRAIN_TMP" \
+    && awk -F '\t' -v seqs="$handled" '
+      BEGIN { n = split(seqs, s, " "); for (i = 1; i <= n; i++) drop[s[i]] = 1 }
+      NF >= 5 && ($2 in drop) { next }
+      { print }
+    ' "$FM_WAKE_QUEUE" > "$DRAIN_TMP" \
+    && _fm_atomic_replace "$DRAIN_TMP" "$FM_WAKE_QUEUE"; then
+    DRAIN_TMP=
+    return 0
+  fi
+  [ -z "$DRAIN_TMP" ] || rm -f -- "$DRAIN_TMP"
+  DRAIN_TMP=
+  printf 'wake drain: already-handled process-event replay row(s) could not be retired; continuing\n' >&2
 }
 
 # One bounded line naming the rows a live branch grant is holding, so a main
@@ -850,6 +886,7 @@ rotate_scratch_locked
 reclaim_stale_branch_grant_locked || exit 1
 [ "$ACTOR" != main ] || retire_unconsumable_rows_locked
 [ "$ACTOR" != branch ] || require_branch_eligible_rows || exit 1
+retire_handled_procevent_rows_locked
 
 if [ -n "$ACK_THROUGH" ]; then
   if [ "$ACTOR" = branch ]; then

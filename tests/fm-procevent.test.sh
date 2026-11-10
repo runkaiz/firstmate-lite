@@ -1778,6 +1778,34 @@ done
 [ "$auth_count" -eq 0 ] || fail "a result already durably handled was authorized again: count=$auth_count"
 pass "a drained-but-unhandled result survives a replacement session and is retired only by explicit handling, never twice"
 
+# A replay row queued before handling must not be presented again once the
+# result is handled: that presentation is what produced a repeat report.
+replay_seq=$(cut -f2 "$HW/state/.wake-queue.post-handle")
+for actor in branch main; do
+  cp "$HW/state/.wake-queue.post-handle" "$HW/state/.wake-queue"
+  printf '%s\t98\tcheck\tprocevent:restart-cut-src:1\tcheck: main-owned replay\n' "$(date +%s)" >> "$HW/state/.wake-queue"
+  printf '%s\t99\tcheck\tunrelated\tcheck: unrelated wake\n' "$(date +%s)" >> "$HW/state/.wake-queue"
+  if [ "$actor" = branch ]; then
+    FM_HOME="$HW" "$ROOT/bin/fm-wake-grant.sh" activate "$$" replay || fail "branch activation failed"
+    FM_HOME="$HW" "$ROOT/bin/fm-wake-grant.sh" publish replay "$replay_seq" 99 || fail "branch grant failed"
+  fi
+  drain_out=$(FM_HOME="$HW" FM_STATE_OVERRIDE="$HW/state" FM_SUPERVISION_ACTOR="$actor" \
+    "$ROOT/bin/fm-wake-drain.sh" 2> "$TMP_ROOT/replay-drain.err") \
+    || fail "$actor drain with an already-handled replay failed: $(cat "$TMP_ROOT/replay-drain.err")"
+  assert_not_contains "$drain_out" "restart-cut-src" "$actor presented an already-handled replay row"
+  assert_not_contains "$(cat "$TMP_ROOT/replay-drain.err")" "PROCEVENT_HANDLED_REQUIRED" \
+    "$actor asked for handling again"
+  assert_contains "$drain_out" "check: unrelated wake" "$actor retiring a handled replay hid an unrelated wake"
+  if awk -F '\t' -v seq="$replay_seq" '$2 == seq { found=1 } END { exit !found }' "$HW/state/.wake-queue"; then
+    fail "$actor left its handled replay queued"
+  fi
+  if [ "$actor" = branch ]; then
+    assert_grep 'check: main-owned replay' "$HW/state/.wake-queue" "branch retired a main-owned handled replay"
+    FM_HOME="$HW" "$ROOT/bin/fm-wake-grant.sh" deactivate "$$" replay || fail "branch deactivation failed"
+  fi
+done
+pass "an already-handled result's queued replay is retired by the drain instead of presented again"
+
 HP="$TMP_ROOT/hp"; new_home "$HP"
 mkdir -p "$HP/state/procevent-inbox"
 for seq in 10 2 1; do

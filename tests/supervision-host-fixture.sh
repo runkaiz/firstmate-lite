@@ -161,7 +161,7 @@ unset FM_SUPERVISION_ACTOR FM_BRANCH_REPORT_TURN FM_LEASE_HOLDER_PID PI_CODING_A
 # whose variables never reach this shell.
 HOMES_FILE="$TMP_ROOT/homes"
 # Stop whatever a case left running, by the exact pids its home recorded.
-stop_home_processes() {  # <home>
+stop_home_cycle() {  # <home>
   local home=$1 pid arms='' i=0
   if [ -f "$home/state/.supervision-host" ]; then
     arms=$(awk -F '\t' '$1 == "arm" { print $2 }' "$home/state/.supervision-host")
@@ -177,8 +177,21 @@ stop_home_processes() {  # <home>
   done
   pid=$(cat "$home/state/.watch.lock/pid" 2>/dev/null || true)
   [ -z "$pid" ] || kill -TERM "$pid" 2>/dev/null || true
+}
+stop_home_processes() {  # <home>
+  local home=$1 pid i
+  stop_home_cycle "$home"
   while IFS= read -r pid; do
     if [ -e "$home/session.stop" ]; then
+      # A stopped cycle with nothing queued re-arms quietly, so keep stopping
+      # the hook's fresh cycles until the session sees its stop file.
+      i=0
+      while [ "$i" -lt 50 ] && kill -0 "$pid" 2>/dev/null; do
+        stop_home_cycle "$home"
+        sleep 0.2
+        i=$((i + 1))
+      done
+      kill -TERM "$pid" 2>/dev/null || true
       wait "$pid" 2>/dev/null || true
     else
       kill -TERM "$pid" 2>/dev/null || true
@@ -1797,10 +1810,12 @@ SH
   pass "host: the dialog mirror, its feed, and the wake file are owner-only"
 }
 
-# Park again after a host was stopped mid-park: the new cycle's first close is
-# the watcher's downtime resurface, which main drains before the next park.
-# That close can end the park before its cycle is ever seen live, so this
-# waits for the exit itself.
+# Park again after a host was stopped mid-park. With a wake still queued, the
+# new cycle's first close is the watcher's downtime resurface, which main
+# drains before the next park; with nothing queued that downtime is retired
+# silently and the park simply starts its cycle.
+# A resurface close can end the park before its cycle is ever seen live, so
+# that path waits for the exit itself.
 # The resurface pass-through leaves its successor running. Stop that watcher
 # and acknowledge the downtime its exit records, so the next park starts a
 # watcher it owns. Attaching instead would not observe the exit until the
@@ -1828,6 +1843,10 @@ quiet_pass_through_successor() {  # <home>
 }
 
 park_after_stop() {  # <home>
+  if [ ! -s "$1/state/.wake-queue" ]; then
+    park_again "$1"
+    return
+  fi
   rm -f "$1/host.rc"
   : > "$1/park.go"
   wait_until 150 host_exited "$1" || fail "the watcher's downtime resurface did not reach main: $(cat "$1/host.out")"
