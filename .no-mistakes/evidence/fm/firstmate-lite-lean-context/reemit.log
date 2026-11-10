@@ -1,0 +1,123 @@
+$ bash bin/fm-session-start.sh --reemit
+
+================================================================================
+SESSION START (CONTEXT RE-EMIT) - /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73DHBJNPJH59DCDGS0CRYD5/.test-lean-context/lab
+================================================================================
+This session already took the helm at its own startup and has only lost its
+context. Lock ownership is re-verified and the durable records below are
+reprinted, but the sweeps startup already reconciled - project clone refresh,
+secondmate convergence and liveness, pending remote handoff
+retry and stale Herdr child cleanup - are NOT repeated.
+Queued wakes ARE still drained: they arrived after startup and are this turn work.
+
+LOCK
+--------------------------------------------------------------------------------
+lock acquired: harness pid 3049548
+
+HOME ROLE
+--------------------------------------------------------------------------------
+fm-role: user (default)
+
+BOOTSTRAP
+--------------------------------------------------------------------------------
+CREW_DISPATCH: invalid config/crew-dispatch.json - malformed JSON
+
+WAKE QUEUE
+--------------------------------------------------------------------------------
+1794337713	5	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73DHBJNPJH59DCDGS0CRYD5/bin/fm-startup-network.sh report
+1794337713	6	check	lean-context	review: lean context event remains actionable
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 6 --recovery-generation 3135360.1794337592.2tG4Y7
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+================================================================================
+SUPERVISION OPERATING INSTRUCTIONS - primary harness: unknown
+================================================================================
+Current state:
+- Lock: held by this session; this session owns normal supervision unless away mode says otherwise.
+- Away/quiet mode: inactive.
+- Ordinary wake: follow the continuation in the harness protocol below; do not use shell &.
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+
+Mode: Unknown harness fallback.
+
+This primary harness does not have a verified watcher wake adapter.
+Follow the generic supervision contract in `AGENTS.md`.
+First cycle: drain queued wakes, then choose a supervision wait that the harness can actually wake from.
+Ordinary wake: drain, handle all emitted wakes, reconcile open decisions and unread status lines, and run the exact `--ack-through` command printed as `WAKE_ACK_REQUIRED`, then repeat that verified wait while supervision is still required.
+Before that acknowledgement, interruption leaves the work durable for idempotent re-handling.
+Use `bin/fm-watch-arm.sh` only when the harness has a tracked background mechanism that survives the tool call and notifies the model on process exit.
+Use a bounded foreground wait over `bin/fm-watch.sh` when that wake mechanism is not verified.
+Never use shell `&` for watcher supervision.
+Failure or missing cycle only: inspect the failure and restore the same verified wait shape.
+
+Record new verification evidence before promoting an unknown harness to a named snippet.
+
+
+================================================================================
+READ-ONCE CONTRACT
+================================================================================
+Printed below: every state/*.meta, a compact backlog listing,
+a bounded tail of every state/*.status, and the projects, captain,
+shared-captain, and learnings files. Do NOT re-read any of them after reading this digest. Go to a source
+only when it is ABSENT or corrupt, an older or capped status line matters (full
+log paths are printed), a full task body is needed (bin/fm-tasks-axi.sh show
+<id> --full), omitted queued items are needed, an IN PROGRESS network verdict
+is needed (bin/fm-startup-network.sh report), or a
+STARTUP TRUNCATED banner named the stage that would have printed it.
+
+================================================================================
+FLEET STATE
+================================================================================
+
+data/backlog.md
+--------------------------------------------------------------------------------
+ABSENT
+
+Work under way (state/*.meta)
+--------------------------------------------------------------------------------
+(none)
+
+Orphan status logs (state/*.status without matching .meta)
+--------------------------------------------------------------------------------
+(none)
+
+AFK
+--------------------------------------------------------------------------------
+absent
+
+================================================================================
+NETWORK CHECKS
+================================================================================
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+================================================================================
+CONTEXT
+================================================================================
+
+data/projects.md
+--------------------------------------------------------------------------------
+ABSENT
+
+data/captain.md
+--------------------------------------------------------------------------------
+ABSENT
+
+data/captain-shared.md (shared, main-authoritative, read-only in secondmate homes)
+--------------------------------------------------------------------------------
+ABSENT
+
+data/learnings.md
+--------------------------------------------------------------------------------
+ABSENT
+
+================================================================================
+NEXT STEP
+================================================================================
+Follow the supervision operating instructions block above for harness 'unknown'; this script never starts supervision itself.
+The digest above is complete for this session start. The READ-ONCE CONTRACT above governs further reads.
+
+exit: 0

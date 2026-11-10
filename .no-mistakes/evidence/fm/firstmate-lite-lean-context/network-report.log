@@ -1,0 +1,10 @@
+$ bash bin/fm-startup-network.sh report
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+26      elapsed=16
+  stage       network-checks probe                       start=+11      elapsed=33
+  slowest: stage network-checks probe 33ms, phase gh-auth 16ms
+
+exit: 0

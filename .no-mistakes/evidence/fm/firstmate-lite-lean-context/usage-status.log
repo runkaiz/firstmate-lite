@@ -1,0 +1,4 @@
+$ python3 bin/fm-usage-auto.py status
+{"bytes_read":0,"coverage":"partial","cpu_seconds":0.011559309000000004,"enabled":true,"gaps":["claude_native_store_unavailable","codex_native_index_unavailable","no_native_sources_observed_usage_unknown","pi_native_store_unavailable"],"known_sources":0,"metadata_bytes_read":0,"observed_at":1794337711.9443707,"pipeline_counters":"separate_fm_pipeline_spend_owner","schema_version":1,"selected_sources":0,"wall_seconds":0.011747798998840153}
+
+exit: 0

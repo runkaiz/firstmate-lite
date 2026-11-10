@@ -1,0 +1,42 @@
+[
+  {
+    "name": "quiet startup retains automatic usage collection",
+    "pass_": true,
+    "detail": "baseline digest 7456 bytes; new digest 6216 bytes; usage enabled=True, coverage=partial"
+  },
+  {
+    "name": "always-loaded instruction bulk reduced by a third to a half",
+    "pass_": true,
+    "detail": "AGENTS.md 46518 -> 28220 bytes (39.3% reduction); size measurement only, not an instruction-behavior assertion"
+  },
+  {
+    "name": "re-emission retains actions and does not refresh accounting",
+    "pass_": true,
+    "detail": "Emitted durable wake, acknowledgement requirement, invalid dispatch diagnostic; usage status stayed byte-identical"
+  },
+  {
+    "name": "deferred credential diagnostic survives lean output",
+    "pass_": true,
+    "detail": "Isolated empty GH_CONFIG_DIR yields real NEEDS_GH_AUTH, available in digest or deferred report"
+  },
+  {
+    "name": "away restart keeps the correct supervision owner",
+    "pass_": true,
+    "detail": "Actual startup emits mode-specific delegation and closing guidance"
+  },
+  {
+    "name": "quiet restart keeps the correct supervision owner",
+    "pass_": true,
+    "detail": "Actual startup emits mode-specific delegation and closing guidance"
+  },
+  {
+    "name": "unwritable lock refuses mutation and keeps queued actions",
+    "pass_": true,
+    "detail": "All 18 lab files byte-identical after read-only startup"
+  },
+  {
+    "name": "Claude startup renderer preserves hook ownership",
+    "pass_": true,
+    "detail": "Generated instruction interface includes Stop ownership, drain/ack, no manual rearm, and guard reference; no model interpretation claim"
+  }
+]

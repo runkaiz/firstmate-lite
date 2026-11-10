@@ -1,0 +1,3 @@
+$ bash -c . bin/fm-wake-lib.sh; fm_wake_append check lean-context "review: lean context event remains actionable"
+
+exit: 0
