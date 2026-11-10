@@ -1,0 +1,10 @@
+RPC OUTPUT
+{"id":"0","type":"response","command":"prompt","success":true,"data":{"disposition":"handled"}}
+{"type":"extension_ui_request","id":"505f38b1-7209-4576-b54d-173c8d800546","method":"notify","message":"Usage: /sparespeed [on|off|status]","notifyType":"info"}
+{"id":"1","type":"response","command":"prompt","success":true,"data":{"disposition":"handled"}}
+{"id":"2","type":"response","command":"prompt","success":true,"data":{"disposition":"handled"}}
+
+PROBE EVENTS
+{"type":"ready","pid":1359289}
+{"type":"input","text":"/skill:sparespeed on","source":"extension"}
+{"type":"input","text":"/skill:sparespeed status","source":"extension"}

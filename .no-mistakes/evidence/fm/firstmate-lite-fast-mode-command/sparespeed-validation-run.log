@@ -1,0 +1,95 @@
+$ bash bin/fm-sparespeed.sh 
+WORKER FAST MODE: off
+exit=0
+Observed initial status leaves the absent home and config absent.
+$ bash bin/fm-sparespeed.sh on
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh on
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh 
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh status
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh 
+WORKER FAST MODE: on
+exit=0
+Existing presence file contents and modification time survive on, bare, empty-action and status calls.
+$ bash bin/fm-sparespeed.sh maybe
+Usage: fm-sparespeed.sh [on|off|status]
+exit=2
+$ bash bin/fm-sparespeed.sh on gpt-6
+Usage: fm-sparespeed.sh [on|off|status]
+exit=2
+$ bash bin/fm-sparespeed.sh off gpt-6
+Usage: fm-sparespeed.sh [on|off|status]
+exit=2
+$ bash bin/fm-sparespeed.sh status gpt-6
+Usage: fm-sparespeed.sh [on|off|status]
+exit=2
+$ bash bin/fm-sparespeed.sh off
+WORKER FAST MODE: off
+exit=0
+$ bash bin/fm-sparespeed.sh off
+WORKER FAST MODE: off
+exit=0
+$ bash bin/fm-sparespeed.sh status
+WORKER FAST MODE: off
+exit=0
+24 concurrent on calls each returned WORKER FAST MODE: on and exit=0. One empty presence file persisted.
+$ bash bin/fm-sparespeed.sh off
+WORKER FAST MODE: off
+exit=0
+$ bash bin/fm-sparespeed.sh on
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh off
+WORKER FAST MODE: off
+exit=0
+$ bash bin/fm-sparespeed.sh on
+WORKER FAST MODE: on
+exit=0
+$ bash bin/fm-sparespeed.sh off
+WORKER FAST MODE: off
+exit=0
+FM_CONFIG_OVERRIDE and FM_ROOT_OVERRIDE persisted only their isolated flags. No action called the monitored quota-axi dependency.
+Targeted existing tests/fm-quota-choose.test.sh completed successfully, including its executable sparespeed cases.
+Started installed Pi RPC with the real fm-stow extension, isolated agent/home directories, and an input observer that stops delivery at the model boundary.
+Final isolated Pi catalog sources ["", "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73RFQ2ZN4FRRV48HJA6BDRH/.agents"]
+Installed Pi command catalog [{"name": "sparespeed", "description": "Set or inspect quota-gated Codex worker fast mode", "source": "extension", "sourceInfo": {"path": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73RFQ2ZN4FRRV48HJA6BDRH/.pi/extensions/fm-stow.ts", "source": "cli", "scope": "temporary", "origin": "top-level"}}, {"name": "skill:sparespeed", "description": "Set or inspect worker fast mode on /sparespeed, /sparespeed on, /sparespeed off, or /sparespeed status.", "source": "skill", "sourceInfo": {"path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73RFQ2ZN4FRRV48HJA6BDRH/.agents/skills/sparespeed/SKILL.md", "source": "auto", "scope": "project", "origin": "top-level", "baseDir": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73RFQ2ZN4FRRV48HJA6BDRH/.agents"}}]
+Pi user input '/sparespeed'
+Pi emitted {"type": "input", "text": "/skill:sparespeed ", "source": "extension"}
+Pi user input '/sparespeed on'
+Pi emitted {"type": "input", "text": "/skill:sparespeed on", "source": "extension"}
+Pi user input '/sparespeed off'
+Pi emitted {"type": "input", "text": "/skill:sparespeed off", "source": "extension"}
+Pi user input '/sparespeed status'
+Pi emitted {"type": "input", "text": "/skill:sparespeed status", "source": "extension"}
+Pi user input '/sparespeed   on  '
+Pi emitted {"type": "input", "text": "/skill:sparespeed on", "source": "extension"}
+Pi user input '/sparespeed maybe'
+Pi notification Usage: /sparespeed [on|off|status]
+Pi user input '/sparespeed on gpt-6'
+Pi notification Usage: /sparespeed [on|off|status]
+Pi user input '/sparespeed off gpt-6'
+Pi notification Usage: /sparespeed [on|off|status]
+Pi user input '/sparespeed status gpt-6'
+Pi notification Usage: /sparespeed [on|off|status]
+Pi user input '/sparespeed on'
+Pi notification /sparespeed requires the owning Firstmate session.
+Pi user input '/sparespeed status'
+Pi emitted {"type": "input", "text": "/skill:sparespeed status", "source": "extension"}
+Pi user input '/proactive'
+Pi emitted {"type": "input", "text": "/skill:proactive ", "source": "extension"}
+Pi user input '/proactive on'
+Pi emitted {"type": "input", "text": "/skill:proactive on", "source": "extension"}
+Pi user input '/proactive off'
+Pi emitted {"type": "input", "text": "/skill:proactive off", "source": "extension"}
+Pi user input '/proactive status'
+Pi emitted {"type": "input", "text": "/skill:proactive status", "source": "extension"}
+Real Pi routed every supported sparespeed action, rejected invalid arguments and a foreign owner, recovered when ownership returned, and preserved proactive routing.
+Model-backed skill execution was excluded under the recorded validation-scope decision. The actual skill-owned script was exercised separately above.
+Removed all disposable homes, agent state, monitors, and test-generated files from the worktree.

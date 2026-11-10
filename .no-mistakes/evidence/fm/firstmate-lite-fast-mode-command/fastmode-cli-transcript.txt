@@ -1,0 +1,67 @@
+ISOLATED HOME: home with spaces; no existing config
+$ bash bin/fm-fastmode.sh
+WORKER FAST MODE: off
+exit: 0
+$ bash bin/fm-fastmode.sh status
+WORKER FAST MODE: off
+exit: 0
+Status left the absent home absent.
+$ bash bin/fm-fastmode.sh on
+WORKER FAST MODE: on
+exit: 0
+Persisted presence file: home with spaces/config/worker-fast-mode
+$ bash bin/fm-fastmode.sh on
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh status
+WORKER FAST MODE: on
+exit: 0
+Repeated on and status preserved existing flag bytes and mtime.
+$ bash bin/fm-fastmode.sh maybe
+Usage: fm-fastmode.sh [on|off|status]
+exit: 2
+$ bash bin/fm-fastmode.sh on gpt-6
+Usage: fm-fastmode.sh [on|off|status]
+exit: 2
+$ bash bin/fm-fastmode.sh off gpt-6
+Usage: fm-fastmode.sh [on|off|status]
+exit: 2
+$ bash bin/fm-fastmode.sh status gpt-6
+Usage: fm-fastmode.sh [on|off|status]
+exit: 2
+Every invalid command preserved the enabled preference.
+$ bash bin/fm-fastmode.sh off
+WORKER FAST MODE: off
+exit: 0
+$ bash bin/fm-fastmode.sh off
+WORKER FAST MODE: off
+exit: 0
+$ bash bin/fm-fastmode.sh status
+WORKER FAST MODE: off
+exit: 0
+Repeated off removed only the presence file.
+$ bash bin/fm-fastmode.sh on
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh off
+WORKER FAST MODE: off
+exit: 0
+Config override took precedence over FM_HOME and affected only its own flag.
+$ bash bin/fm-fastmode.sh on
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh status
+WORKER FAST MODE: on
+exit: 0
+$ bash bin/fm-fastmode.sh off
+WORKER FAST MODE: off
+exit: 0
+Root fallback on/status/off also persisted and removed its own flag.
+ALL DIRECT PRODUCT SCENARIOS PASSED
+Disposable manual home removed.

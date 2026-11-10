@@ -1,0 +1,39 @@
+
+ ▀▀█  v1.5.2
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Skills]
+  afk, agent-skill-trigger-index, ahoy, ask-user-authority, away-quiet-supervision, bearings,
+bootstrap-diagnostics, captain-hold-lifecycle, decision-hold-lifecycle, diagnostic-reasoning, fastmode,
+firstmate-codexapp, firstmate-coding-guidelines, firstmate-self-repo, harness-adapters, no-mistakes,
+operational-home-layout, proactive, process-event-sources, project-management, quiet, quota-array-dispatch,
+reverse-engineer-anything, scout-completion, session-start-recovery, ship-landing, stow,
+stuck-crewmate-recovery, updatefirstmate, validation-supervision, work-queue
+
+[Extensions]
+  fm-stow.ts
+
+
+ Warning: fd not found. Offline mode enabled, skipping download.
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+
+ /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/provider
+ s.md
+
+ /var/home/runkai/.pi/agent/install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/docs/models.m
+ d
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to
+ ~/.tmux.conf and restart tmux.
+
+ /fastmode requires the owning Firstmate session.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M73RFQ2ZN4FRRV48HJA6BDRH (detached)
+0.0%/0 (auto)                                                                                          unknown

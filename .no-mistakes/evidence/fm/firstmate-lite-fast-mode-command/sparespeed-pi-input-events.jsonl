@@ -1,0 +1,11 @@
+{"type":"ready","pid":1445251}
+{"type":"input","text":"/skill:sparespeed ","source":"extension"}
+{"type":"input","text":"/skill:sparespeed on","source":"extension"}
+{"type":"input","text":"/skill:sparespeed off","source":"extension"}
+{"type":"input","text":"/skill:sparespeed status","source":"extension"}
+{"type":"input","text":"/skill:sparespeed on","source":"extension"}
+{"type":"input","text":"/skill:sparespeed status","source":"extension"}
+{"type":"input","text":"/skill:proactive ","source":"extension"}
+{"type":"input","text":"/skill:proactive on","source":"extension"}
+{"type":"input","text":"/skill:proactive off","source":"extension"}
+{"type":"input","text":"/skill:proactive status","source":"extension"}
