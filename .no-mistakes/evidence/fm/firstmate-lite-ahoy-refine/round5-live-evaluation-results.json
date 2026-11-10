@@ -1,0 +1,10 @@
+{
+  "deliveries": "pass: merged PR, local-main, and scout-report artifacts included; folded and artifact-free closures excluded",
+  "holds-and-queue": "pass: full title preserved, condition/date stay deferred in default and detail, only current route choice actionable",
+  "progress": "pass: real Claude reports implementing and elapsed 15 minutes without invented percentages or ETA",
+  "completion": "pass: two replies retain unverified publication/CI and omit empty Needs you",
+  "checkpoint": "pass: first/unchanged/disappeared states and cleared structured blockers observed without invented completion",
+  "quiet": "pass: ordinary, restored, and 71-cached-contribution replies omit empty inventories and counts",
+  "incomplete-coverage": "pass: four real Claude evaluations contain only comparison and short uncertainty disclosure",
+  "authority-and-refusals": "pass: observations preserve queue bytes, monitor preserves checkpoint, corrupt checkpoint resets comparison; symlink and incompatible deferrals refused"
+}
