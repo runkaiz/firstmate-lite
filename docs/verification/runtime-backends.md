@@ -21,7 +21,7 @@ codex-cli 0.165.0 accepts captured fast launch controls with fast_mode enabled
 This verifies CLI acceptance and feature activation, not provider access, effective response tier, or billing.
 [OpenAI's speed reference](https://learn.chatgpt.com/docs/agent-configuration/speed) documents the fast service configuration and subscription usage multiplier.
 The portable quota, spawn, and relaunch regressions are `tests/fm-quota-choose.test.sh`, `tests/fm-spawn-dispatch-profile.test.sh --fast-mode`, and `tests/fm-control-relaunch.test.sh --fast-mode`.
-The service decision precedes the shared launch delivery used by tmux and Herdr; no backend lifecycle changes or live Herdr operations were needed.
+The service decision probes the destination pane through the existing send path used by tmux and Herdr; no backend lifecycle changes or live Herdr operations were needed.
 Claude, OpenCode, Pi, Pi-signed, Grok, Kimi, Cursor, OMP, Gemini, Muse, Rovo, AGY, Devin, raw commands, and secondmates retain their existing launch service controls.
 
 ## CI-only worker waits

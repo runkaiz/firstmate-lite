@@ -55,7 +55,7 @@ SH
   fi
   fm_git_worktree "$proj" "$wt" "wt-$name"
   : > "$launchlog"
-  FM_FAKE_LAUNCH_LOG="$launchlog" \
+  FM_FAKE_LAUNCH_LOG="$launchlog" FM_FAKE_PANE_RUNNER=/bin/sh \
     fm_test_run_spawn "$home" "$wt" "$fakebin" "$id" "$proj" "$@" >/dev/null 2>&1 ||
     fail "codex $CODEX_VERSION: fm-spawn could not build a crewmate launch"
   cat "$launchlog"
@@ -102,15 +102,28 @@ test_installed_codex_still_reports_the_hook_feature() {
 }
 
 test_installed_codex_accepts_fast_launch_controls() {
-  local launch flags state
-  launch=$(capture_codex_launch fast --mode no-mistakes --yolo off)
-  assert_contains "$launch" 'service_tier="fast"' "codex $CODEX_VERSION: healthy quota opt-in failed to request fast tier"
+  local launch flags state supported=0
+  if state=$(codex -c 'service_tier="fast"' --enable fast_mode features list 2>&1) &&
+    printf '%s\n' "$state" | awk '$1 == "fast_mode" && $NF == "true" { found=1 } END { exit !found }'; then
+    supported=1
+  fi
+  launch=$(capture_codex_launch fast --model gpt-6 --mode no-mistakes --yolo off)
+  if [ "$supported" = 1 ]; then
+    assert_contains "$launch" 'service_tier="fast"' "codex $CODEX_VERSION: healthy quota opt-in failed to request fast tier"
+  else
+    assert_contains "$launch" 'service_tier="default"' "codex $CODEX_VERSION: unsupported fast controls must retain normal service"
+    assert_not_contains "$launch" '--enable fast_mode' "codex $CODEX_VERSION: unsupported fast feature was requested"
+  fi
   flags=$(codex_global_flags "$launch")
   state=$(eval "codex $flags features list" 2>&1) ||
-    fail "codex $CODEX_VERSION rejected fast launch controls: $state"
-  printf '%s\n' "$state" | awk '$1 == "fast_mode" && $NF == "true" { found=1 } END { exit !found }' ||
-    fail "codex $CODEX_VERSION: fast feature was not enabled by the captured launch"
-  printf 'ok - codex %s accepts captured fast launch controls with fast_mode enabled\n' "$CODEX_VERSION"
+    fail "codex $CODEX_VERSION rejected captured service controls: $state"
+  if [ "$supported" = 1 ]; then
+    printf '%s\n' "$state" | awk '$1 == "fast_mode" && $NF == "true" { found=1 } END { exit !found }' ||
+      fail "codex $CODEX_VERSION: fast feature was not enabled by the captured launch"
+    printf 'ok - codex %s accepts captured fast launch controls with fast_mode enabled\n' "$CODEX_VERSION"
+  else
+    printf 'ok - codex %s accepts captured normal service fallback without fast_mode support\n' "$CODEX_VERSION"
+  fi
 }
 
 test_installed_codex_still_reports_the_hook_feature

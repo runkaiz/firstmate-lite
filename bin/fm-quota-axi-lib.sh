@@ -231,8 +231,8 @@ fm_quota_codex_fast_eligible() {
     ($model | sub("^model:"; "")) as $m |
     [$p.quotaSemantics.effectiveAvailability[]? |
       select(.scope == "all_models" or .scope == "all_products" or
-        ($m != "" and $m != "default" and
-          (.scope == ("model:" + $m) or .scope == ("product:" + $m))))] as $scopes |
+        .scope == ("model:" + $m) or .scope == ("product:" + $m))] as $scopes |
+    $m != "" and $m != "default" and
     $p.state.status == "fresh" and $p.state.stale == false and
     ($scopes | length) > 0 and
     all($scopes[];

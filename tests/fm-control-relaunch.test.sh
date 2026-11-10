@@ -115,6 +115,11 @@ case "${1:-}" in
           ;;
       esac
     else
+      if [ -n "${FM_FAKE_PANE_RUNNER:-}" ]; then
+        case "$payload" in
+          ". '"*"'") "$FM_FAKE_PANE_RUNNER" -c "$payload" || exit 1 ;;
+        esac
+      fi
       printf '%s\n' "$payload" >> "$D/keys"
       case "$payload" in
         'export GOTMPDIR='*)
@@ -2458,7 +2463,7 @@ test_afk_relaunch_serializes_with_fresh_admission() {
 }
 
 test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in() {
-  local dir out scenario expected
+  local dir out scenario expected model
   dir=$(new_case fast-service rl-fast)
   add_ship_task "$dir" rl-fast codex
   mkdir -p "$dir/home/config"
@@ -2477,13 +2482,15 @@ SH
   cat > "$dir/fake/quota.json" <<'JSON'
 {"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":50,"resetsAt":"2099-01-01T00:00:00Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":50,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}
 JSON
-  for scenario in off healthy tight; do
+  for scenario in off healthy default-model tight; do
     expected=codex-default
+    model=gpt-6
     case "$scenario" in
       healthy) touch "$dir/home/config/worker-fast-mode"; expected=codex-fast ;;
+      default-model) model=default ;;
       tight) printf '{}\n' > "$dir/fake/quota.json" ;;
     esac
-    out=$(run_control "$dir" rl-fast relaunch --note 'recheck service for replacement')
+    out=$(FM_FAKE_PANE_RUNNER=/bin/sh run_control "$dir" rl-fast relaunch --model "$model" --note 'recheck service for replacement')
     expect_code 0 "$?" "fast $scenario relaunch failed: $out"
     [ "$(meta_field "$dir" rl-fast launch_service_control)" = "$expected" ] || fail "relaunch retained stale service for $scenario"
     assert_contains "$out" "service_control=$expected" "relaunch profile must report $expected"

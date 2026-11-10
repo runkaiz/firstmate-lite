@@ -2280,8 +2280,9 @@ test_non_claude_harness_ignores_claude_permission_mode() {
 }
 
 test_worker_fast_mode_is_opt_in_and_quota_gated() {
-  local scenario harness id rec out launch expected
-  for scenario in off healthy scout tight unknown unsupported claude pi raw; do
+  local scenario harness id rec out launch expected model runner
+  local -a model_args
+  for scenario in off healthy scout tight unknown unsupported omitted-model default-model pane-account filtered-account retained-account pane-cli no-context claude pi raw; do
     harness=codex
     case "$scenario" in claude|pi) harness=$scenario ;; esac
     id="fast-$scenario"
@@ -2291,6 +2292,17 @@ test_worker_fast_mode_is_opt_in_and_quota_gated() {
     cat > "$FAKEBIN_DIR/fast-quota.json" <<'JSON'
 {"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":50,"resetsAt":"2099-01-01T00:00:00Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":50,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}
 JSON
+    model=gpt-6
+    runner=/bin/sh
+    case "$scenario" in
+      omitted-model) model= ;;
+      default-model) model=default ;;
+      no-context) runner= ;;
+      filtered-account) : > "$HOME_DIR/config/launch-env-allowlist" ;;
+      retained-account) printf 'CODEX_HOME\n' > "$HOME_DIR/config/launch-env-allowlist" ;;
+    esac
+    model_args=(--model "$model")
+    case "$scenario" in omitted-model|claude|pi) model_args=() ;; esac
     case "$scenario" in
       tight) jq '.providers[0].windows[0].pace.burnMultiple=2' "$FAKEBIN_DIR/fast-quota.json" > "$CASE_DIR/tight.json"; mv "$CASE_DIR/tight.json" "$FAKEBIN_DIR/fast-quota.json" ;;
       unknown) printf '{}\n' > "$FAKEBIN_DIR/fast-quota.json" ;;
@@ -2298,7 +2310,11 @@ JSON
     cat > "$FAKEBIN_DIR/quota-axi" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "$(dirname "$0")/quota-calls"
-cat "$(dirname "$0")/fast-quota.json"
+if [ -e "$(dirname "$0")/require-account" ] && [ "${CODEX_HOME:-}" != healthy ]; then
+  printf '{}\n'
+else
+  cat "$(dirname "$0")/fast-quota.json"
+fi
 SH
     cat > "$FAKEBIN_DIR/codex" <<'SH'
 #!/usr/bin/env bash
@@ -2308,14 +2324,32 @@ SH
     chmod +x "$FAKEBIN_DIR/codex"
     [ "$scenario" != unsupported ] || touch "$FAKEBIN_DIR/unsupported"
     case "$scenario" in
-      scout) out=$(run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --scout) ;;
+      pane-account|filtered-account|retained-account) touch "$FAKEBIN_DIR/require-account" ;;
+    esac
+    case "$scenario" in
+      pane-account|pane-cli)
+        runner="$CASE_DIR/pane-shell"
+        cat > "$runner" <<SH
+#!/usr/bin/env bash
+export CODEX_HOME=tight
+[ '$scenario' != pane-cli ] || export PATH='$CASE_DIR/pane-bin':\$PATH
+exec /bin/sh "\$@"
+SH
+        chmod +x "$runner"
+        mkdir -p "$CASE_DIR/pane-bin"
+        printf '#!/usr/bin/env bash\nexit 1\n' > "$CASE_DIR/pane-bin/codex"
+        chmod +x "$CASE_DIR/pane-bin/codex"
+        ;;
+    esac
+    case "$scenario" in
+      scout) out=$(FM_FAKE_PANE_RUNNER="$runner" CODEX_HOME=healthy run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" "${model_args[@]}" --scout) ;;
       raw) out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" 'codex --no-alt-screen') ;;
-      *) out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR") ;;
+      *) out=$(FM_FAKE_PANE_RUNNER="$runner" CODEX_HOME=healthy run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" "${model_args[@]}") ;;
     esac
     expect_code 0 "$?" "fast mode $scenario spawn failed: $out"
     expected=codex-default
     case "$scenario" in
-      healthy|scout) expected=codex-fast ;;
+      healthy|scout|retained-account) expected=codex-fast ;;
       claude) expected=claude-fast-disabled ;;
       pi|raw) expected=unverified ;;
     esac
@@ -2328,7 +2362,7 @@ SH
       claude-fast-disabled) assert_contains "$launch" 'CLAUDE_CODE_DISABLE_FAST_MODE=1' "Claude must not spend paid fast credits" ;;
     esac
     case "$scenario" in
-      off|claude|pi|raw) [ ! -e "$FAKEBIN_DIR/quota-calls" ] || fail "$scenario must not probe fast quota" ;;
+      off|omitted-model|default-model|no-context|claude|pi|raw) [ ! -e "$FAKEBIN_DIR/quota-calls" ] || fail "$scenario must not probe fast quota" ;;
       *) assert_contains "$(cat "$FAKEBIN_DIR/quota-calls")" '--provider codex --full --json --no-credential-refresh' "quota read must be scoped and read-only" ;;
     esac
     pass "worker fast mode: $scenario"
@@ -2337,6 +2371,7 @@ SH
 
 if [ "${1:-}" = --fast-mode ]; then
   test_worker_fast_mode_is_opt_in_and_quota_gated
+  test_launch_environment_allowlist
   exit 0
 fi
 

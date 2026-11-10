@@ -770,6 +770,18 @@ ok "provider-table lookup prints the provider when called directly under set -e"
 # shellcheck source=bin/fm-quota-axi-lib.sh
 . "$BIN/fm-quota-axi-lib.sh"
 FAST_BASE='{"schemaVersion":5,"providers":[{"provider":"codex","state":{"status":"fresh","stale":false},"windows":[{"id":"weekly","percentRemaining":25,"resetsAt":"2099-01-01T00:00:00.000Z","pace":{"burnMultiple":0.5,"timeRemainingPercent":20,"projectionConfidence":"established"}}],"quotaSemantics":{"status":"known","effectiveAvailability":[{"scope":"all_models","status":"known","effectivePercentRemaining":25,"boundedBy":["weekly"],"runway":{"status":"through_reset","projectionConfidence":"established"}}]}}]}'
+for model in '' default model: model:default; do
+  for scope in all_models model:gpt-6 product:gpt-6; do
+    snapshot=$(printf '%s\n' "$FAST_BASE" | jq --arg scope "$scope" '.providers[0].quotaSemantics.effectiveAvailability += [(.providers[0].quotaSemantics.effectiveAvailability[0] | .scope = $scope | .effectivePercentRemaining = 0 | .runway.status = "exhausted_now")]')
+    if printf '%s\n' "$snapshot" | fm_quota_codex_fast_eligible "$model"; then
+      fail "unknown model $model accepted with $scope bound"
+    fi
+  done
+  if printf '%s\n' "$FAST_BASE" | fm_quota_codex_fast_eligible "$model"; then
+    fail "unknown model $model accepted with healthy account quota"
+  fi
+  ok "fast mode refuses unresolved model $model"
+done
 if ! printf '%s\n' "$FAST_BASE" | fm_quota_codex_fast_eligible gpt-6; then
   fail "2.5x burn exactly reaching reset must qualify"
 fi
@@ -797,6 +809,7 @@ zero remaining|.providers[0].windows[0].percentRemaining = 0
 unknown reset|del(.providers[0].windows[0].resetsAt)
 malformed scope|.providers[0].quotaSemantics.effectiveAvailability[0].status = "unknown"
 wrong account|.schemaVersion = 6 | .providers[0].accountKey = "other-account"
+product-specific exhaustion|.providers[0].quotaSemantics.effectiveAvailability += [{"scope":"product:gpt-6","status":"known","effectivePercentRemaining":0,"runway":{"status":"exhausted_now"}}]
 model-specific exhaustion|.providers[0].quotaSemantics.effectiveAvailability += [{"scope":"model:gpt-6","status":"known","effectivePercentRemaining":0,"runway":{"status":"exhausted_now"}}]
 second bounding window too tight|.providers[0].windows += [(.providers[0].windows[0] | .id = "session" | .percentRemaining = 24)] | .providers[0].quotaSemantics.effectiveAvailability[0].boundedBy += ["session"]
 CASES

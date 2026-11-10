@@ -4727,6 +4727,37 @@ else
   fi
 fi
 
+if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
+  LAUNCH_ENV_PREFIX='/usr/bin/env -i'
+  # COMPACT_ADVISER_DISABLE is the intentional declarative floor-membership
+  # entry; the explicit COMPACT_ADVISER_DISABLE=1 assignment below is the
+  # authoritative setter.
+  for env_name in HOME PATH USER LOGNAME SHELL TERM COLORTERM LANG LC_ALL LC_CTYPE \
+    TMPDIR TMP TEMP GOTMPDIR TMUX TMUX_PANE HERDR_ENV HERDR_SESSION HERDR_SOCKET_PATH \
+    HERDR_PANE_ID FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
+    $LAUNCH_ENV_NAMES; do
+    # Only validated names enter shell syntax. Values expand once, quoted, in
+    # the pane shell and never become source text or spawn-process snapshots.
+    # shellcheck disable=SC2016
+    printf -v env_arg '${%s+"%s=$%s"}' "$env_name" "$env_name" "$env_name"
+    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX $env_arg"
+  done
+  # COMPACT_ADVISER_DISABLE is retained by the floor loop above, which forwards
+  # whatever the pane export set, and then pinned here to the one value Firstmate
+  # launches on. The literal assignment comes last deliberately: `env` applies
+  # assignments left to right, so this one wins over a forwarded pane value, and
+  # it still delivers the switch on a pane whose export never landed. Unlike the
+  # trace carrier below it carries no gate, so it is appended unconditionally.
+  # Setting it here rather than relying on the assignment already carried by
+  # $LAUNCH is what gives the wrapping `/bin/sh` itself the switch, not only the
+  # agent command it runs.
+  LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX COMPACT_ADVISER_DISABLE=1"
+  if [ -n "$SPAWN_TRACEPARENT" ]; then
+    # shellcheck disable=SC2016
+    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX "'${TRACEPARENT+"TRACEPARENT=$TRACEPARENT"}'
+  fi
+fi
+
 MODELFLAG=$(model_flag_for_harness "$HARNESS" "$MODEL")
 # A pinned Pi launch confines Pi's model lookup to the declared provider.
 [ -z "$WORKER_ACCOUNT_PROVIDER" ] || MODELFLAG="--provider $(shell_quote "$WORKER_ACCOUNT_PROVIDER") $MODELFLAG"
@@ -4748,18 +4779,39 @@ else
   case "$HARNESS" in
     codex)
       SERVICE_CONTROL=codex-default
-      if [ -e "$CONFIG/worker-fast-mode" ] && { [ "$KIND" = ship ] || [ "$KIND" = scout ]; }; then
-        # Full JSON supplies the bounding windows pace fields for higher burn;
-        # this decision never selects or ranks a dispatch profile.
-        # shellcheck source=bin/fm-quota-axi-lib.sh
-        . "$SCRIPT_DIR/fm-quota-axi-lib.sh"
-        fast_quota=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || fast_quota=
-        if printf '%s\n' "$fast_quota" | fm_quota_codex_fast_eligible "$MODEL"; then
-          fast_features=$(fm_run_timed 5 codex -c 'service_tier="fast"' --enable fast_mode features list 2>/dev/null </dev/null) || fast_features=
-          if printf '%s\n' "$fast_features" | awk '$1 == "fast_mode" && $NF == "true" { supported=1 } END { exit !supported }'; then
-            SERVICE_CONTROL=codex-fast
-            CODEX_SERVICE_FLAG='--enable fast_mode -c '\''service_tier="fast"'\'''
+      if [ -e "$CONFIG/worker-fast-mode" ] && [ -n "$MODEL" ] && [ "$MODEL" != default ] &&
+        { [ "$KIND" = ship ] || [ "$KIND" = scout ]; }; then
+        fast_dir=$(mktemp -d "$TASK_TMP/fast.XXXXXXXX") || fast_dir=
+        if [ -n "$fast_dir" ]; then
+          cat > "$fast_dir/check.sh" <<'SH'
+. "$1/fm-timeout-lib.sh"
+. "$1/fm-quota-axi-lib.sh"
+control=codex-default
+fast_quota=$(fm_run_timed 15 quota-axi --provider codex --full --json --no-credential-refresh 2>/dev/null </dev/null) || fast_quota=
+if printf '%s\n' "$fast_quota" | fm_quota_codex_fast_eligible "$2"; then
+  fast_features=$(fm_run_timed 5 codex -c 'service_tier="fast"' --enable fast_mode features list 2>/dev/null </dev/null) || fast_features=
+  if printf '%s\n' "$fast_features" | awk '$1 == "fast_mode" && $NF == "true" { supported=1 } END { exit !supported }'; then
+    control=codex-fast
+  fi
+fi
+printf '%s\n' "$control" > "$3/result"
+SH
+          fast_command="env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI bash $(shell_quote "$fast_dir/check.sh") $(shell_quote "$SCRIPT_DIR") $(shell_quote "$MODEL") $(shell_quote "$fast_dir")"
+          if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
+            fast_command="$LAUNCH_ENV_PREFIX /bin/sh -c $(shell_quote "$fast_command")"
           fi
+          printf '%s\n' "$fast_command" > "$fast_dir/probe.sh"
+          if spawn_send_text_line "$T" ". $(shell_quote "$fast_dir/probe.sh")"; then
+            for ((fast_poll=0; fast_poll<250; fast_poll++)); do
+              [ ! -f "$fast_dir/result" ] || break
+              sleep 0.1
+            done
+            if [ "$(cat "$fast_dir/result" 2>/dev/null)" = codex-fast ]; then
+              SERVICE_CONTROL=codex-fast
+              CODEX_SERVICE_FLAG='--enable fast_mode -c '\''service_tier="fast"'\'''
+            fi
+          fi
+          rm -rf -- "$fast_dir"
         fi
       fi
       ;;
@@ -5199,34 +5251,6 @@ if [ -n "$SPAWN_TRACEPARENT" ]; then
   fi
 fi
 if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
-  LAUNCH_ENV_PREFIX='/usr/bin/env -i'
-  # COMPACT_ADVISER_DISABLE is the intentional declarative floor-membership
-  # entry; the explicit COMPACT_ADVISER_DISABLE=1 assignment below is the
-  # authoritative setter.
-  for env_name in HOME PATH USER LOGNAME SHELL TERM COLORTERM LANG LC_ALL LC_CTYPE \
-    TMPDIR TMP TEMP GOTMPDIR TMUX TMUX_PANE HERDR_ENV HERDR_SESSION HERDR_SOCKET_PATH \
-    HERDR_PANE_ID FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
-    $LAUNCH_ENV_NAMES; do
-    # Only validated names enter shell syntax. Values expand once, quoted, in
-    # the pane shell and never become source text or spawn-process snapshots.
-    # shellcheck disable=SC2016
-    printf -v env_arg '${%s+"%s=$%s"}' "$env_name" "$env_name" "$env_name"
-    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX $env_arg"
-  done
-  # COMPACT_ADVISER_DISABLE is retained by the floor loop above, which forwards
-  # whatever the pane export set, and then pinned here to the one value Firstmate
-  # launches on. The literal assignment comes last deliberately: `env` applies
-  # assignments left to right, so this one wins over a forwarded pane value, and
-  # it still delivers the switch on a pane whose export never landed. Unlike the
-  # trace carrier below it carries no gate, so it is appended unconditionally.
-  # Setting it here rather than relying on the assignment already carried by
-  # $LAUNCH is what gives the wrapping `/bin/sh` itself the switch, not only the
-  # agent command it runs.
-  LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX COMPACT_ADVISER_DISABLE=1"
-  if [ -n "$SPAWN_TRACEPARENT" ]; then
-    # shellcheck disable=SC2016
-    LAUNCH_ENV_PREFIX="$LAUNCH_ENV_PREFIX "'${TRACEPARENT+"TRACEPARENT=$TRACEPARENT"}'
-  fi
   LAUNCH="$LAUNCH_ENV_PREFIX /bin/sh -c $(shell_quote "$LAUNCH")"
 fi
 if ! (umask 077 && mkdir "$LAUNCH_DIR") 2>/dev/null; then
