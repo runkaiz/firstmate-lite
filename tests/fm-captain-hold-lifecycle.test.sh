@@ -2694,19 +2694,17 @@ SH
         and (.landed | any(.id == $approved_id and .artifact == $approved_pr))
         and (.landed | any(.id == $local_id))
         and (.landed | any(.id == $released_id and .artifact == $released))
-        # Without the explicit captain-kind boundary, the artifactless answered
-        # call falls through the compatibility path and this assertion fails.
+        # Answering a call does not publish a delivery.
         and (.landed | any(.id == $answered_id) | not)
         # Without the explicit scout-kind boundary, this row is rendered with
         # an empty artifact even though a scout has no delivery without a report.
         and (.landed | any(.id == $reportless_scout_id) | not)
-        # Requiring a present non-captain kind would also remove this older
-        # artifactless delivery, so the compatibility boundary stays observable.
-        and (.landed | any(.id == $legacy_id))
+        # Artifactless historical closures are not evidence of a delivery.
+        and (.landed | any(.id == $legacy_id) | not)
         # The captain worded this decision "local main" and the work closed
         # with no artifact, so reading that prose as a recorded note would
         # publish a local-only landing that never happened.
-        and (.landed | any(.id == $decision_local_id and .artifact == "-"))
+        and (.landed | any(.id == $decision_local_id) | not)
     ' >/dev/null || fail "released, retained, or rejected deliveries were misclassified: $json"
   pass "release and scout report retention distinguish deliveries from rejected merge answers"
 }

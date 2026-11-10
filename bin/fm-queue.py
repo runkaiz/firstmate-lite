@@ -39,7 +39,7 @@ SECTIONS = {"In flight": "in_flight", "Queued": "queued", "Done": "done"}
 HEADINGS = {v: k for k, v in SECTIONS.items()}
 ROW = re.compile(r"^[-*] (?:\[([ xX])\] ([^\s]+)|\*\*([^*]+)\*\*) - (.*)$")
 ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
-META = re.compile(r"\s+\((repo|kind|priority|hold|hold-kind|hold-until):\s*([^)]*)\)|\s+\((since|merged|reported|done)\s+([^)]*)\)")
+META = re.compile(r"\s+\((repo|kind|priority|hold|hold-kind|hold-until|hold-when):\s*([^)]*)\)|\s+\((since|merged|reported|done)\s+([^)]*)\)")
 ARCHIVED = re.compile(r"Archived \d{4}-\d{2}-\d{2}")
 LINK = re.compile(r"^## (\S+) - Completion history link - [^\n]*\n", re.M)
 LINK_BODY = re.compile(r"\n  predecessor: (sha256:[0-9a-f]{64}#[1-9][0-9]*)\n  successor: (sha256:[0-9a-f]{64}#[1-9][0-9]*|active)\n")
@@ -235,9 +235,9 @@ class Task:
                 require("hold" not in metadata, f"duplicate hold metadata for {identifier or bold}")
                 metadata["hold"] = m[2].strip()
                 return ""
-            components = re.split(r",\s*(?=(?:repo|kind|priority|hold|hold-kind|hold-until):|(?:since|merged|reported|done)\s)", content)
+            components = re.split(r",\s*(?=(?:repo|kind|priority|hold|hold-kind|hold-until|hold-when):|(?:since|merged|reported|done)\s)", content)
             for component in components:
-                item = re.fullmatch(r"(repo|kind|priority|hold|hold-kind|hold-until):\s*(.*)|(since|merged|reported|done)\s+(.*)", component)
+                item = re.fullmatch(r"(repo|kind|priority|hold|hold-kind|hold-until|hold-when):\s*(.*)|(since|merged|reported|done)\s+(.*)", component)
                 require(item is not None, f"malformed metadata for {identifier or bold}")
                 key, value = (item[1], item[2]) if item[1] else (item[3], item[4])
                 require(key != "hold", "a hold reason requires its own metadata block")
@@ -263,7 +263,7 @@ class Task:
         task = cls(identifier or bold, rest.strip(), state, "".join(lines), body, metadata, list(dict.fromkeys(deps)), links)
         require(bool(task.title), f"empty title for {task.id}")
         task.block_reason = reason[1] if reason else ""
-        require(not (metadata.get("hold-kind") or metadata.get("hold-until")) or bool(metadata.get("hold")), f"hold metadata without reason for {task.id}")
+        require(not (metadata.get("hold-kind") or metadata.get("hold-until") or metadata.get("hold-when")) or bool(metadata.get("hold")), f"hold metadata without reason for {task.id}")
         validate_metadata(task.meta)
         return task
 
@@ -273,7 +273,7 @@ class Task:
         title = self.title
         for link in self.links:
             title += " - " + link
-        for key in ("repo", "kind", "since", "priority", "merged", "reported", "done", "hold", "hold-kind", "hold-until"):
+        for key in ("repo", "kind", "since", "priority", "merged", "reported", "done", "hold", "hold-kind", "hold-until", "hold-when"):
             if key in self.meta:
                 delimiter = " " if key in ("since", "merged", "reported", "done") else ": "
                 title += f" ({key}{delimiter}{self.meta[key]})"
@@ -304,13 +304,13 @@ class Task:
 
     def snapshot_metadata(self):
         result = {key: self.meta.get(key) for key in ("repo", "kind", "priority", "since", "merged", "reported", "done")}
-        result.update({"state": self.state, "hold_reason": self.meta.get("hold"), "hold_kind": self.meta.get("hold-kind"), "hold_until": self.meta.get("hold-until"), "blocked_by_ids": self.deps, "blocked_by": self.deps[-1] if self.deps else None, "blocked_reason": self.block_reason or None, "completion": self.completion()})
+        result.update({"state": self.state, "hold_reason": self.meta.get("hold"), "hold_kind": self.meta.get("hold-kind"), "hold_until": self.meta.get("hold-until"), "hold_when": self.meta.get("hold-when"), "blocked_by_ids": self.deps, "blocked_by": self.deps[-1] if self.deps else None, "blocked_reason": self.block_reason or None, "completion": self.completion()})
         return result
 
     def data(self, all_tasks):
         return {"id": self.id, "title": self.title, "state": self.state, "kind": self.meta.get("kind", "task"),
                 "repo": self.meta.get("repo"), "priority": self.meta.get("priority"), "held": self.held(),
-                "hold_reason": self.meta.get("hold"), "hold_kind": self.meta.get("hold-kind"), "hold_until": self.meta.get("hold-until"),
+                "hold_reason": self.meta.get("hold"), "hold_kind": self.meta.get("hold-kind"), "hold_until": self.meta.get("hold-until"), "hold_when": self.meta.get("hold-when"),
                 "blocked": bool(self.blocked(all_tasks)), "blocked_by": self.deps, "deps": self.deps,
                 "created": self.meta.get("since"), "closed": self.completion()["date"],
                 "links": self.links, "body": self.body, "archived": self.archived}
@@ -691,7 +691,7 @@ def parser():
   ready [--repo NAME] [--include-held]
   update/edit <id> [--body-file PATH] [--title TEXT] [--priority 0-4]
   hold <id> --reason TEXT [--kind captain|external|load|parked|future]
-       [--until YYYY-MM-DD]   unhold <id>
+       [--until YYYY-MM-DD | --when CONDITION]   unhold <id>
   block/unblock <id> --by <other-id>
   start <id>    done/close <id> [--pr URL] [--report PATH] [--note TEXT]
        [--keep N | --no-prune]    reopen <id>
@@ -701,13 +701,14 @@ def parser():
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
 Dates are UTC. Captain holds require an answer/release even after their date.
+--when records a revisit condition; it is never evaluated as code or auto-released.
 Storage --start is accepted for compatibility imports; fm-queue.sh refuses
 add/create --start because fm-spawn owns the worker binding.
 --json returns structured records; ordinary output is the existing TOON API.
 '''
     p.add_argument("command", nargs="?", default="list")
     p.add_argument("items", nargs="*")
-    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "fields", "backup-dir", "predecessor", "successor"):
+    for flag in ("file", "backend", "kind", "hold-kind", "repo", "body", "body-file", "title", "pr", "report", "note", "to", "reason", "until", "when", "fields", "backup-dir", "predecessor", "successor"):
         p.add_argument("--" + flag)
     p.add_argument("--priority", choices=list("01234"))
     p.add_argument("--state", choices=("queued", "in_flight", "done", "held"))
@@ -895,7 +896,7 @@ def execute(options, stores):
                 task.title = options.title
             if verb == "authorize":
                 task.meta["kind"] = options.kind or "task"
-                for key in ("hold", "hold-kind", "hold-until"):
+                for key in ("hold", "hold-kind", "hold-until", "hold-when"):
                     task.meta.pop(key, None)
         elif verb in ("start", "done", "reopen", "rm"):
             require(verb != "rm" or task.state == "done", "unfinished work cannot be removed as if completed; retain it with a parked hold")
@@ -933,13 +934,19 @@ def execute(options, stores):
                 task.meta["hold-kind"] = options.kind
             else:
                 task.meta.pop("hold-kind", None)
+            require(not (options.until and options.when), "choose --until or --when")
+            if options.when:
+                require(options.kind == "captain", "--when requires a captain hold")
+                task.meta["hold-when"] = options.when
+            else:
+                task.meta.pop("hold-when", None)
             if options.until:
                 task.meta["hold-until"] = date(options.until)
             else:
                 task.meta.pop("hold-until", None)
         elif verb == "unhold":
             require(task.meta.get("kind") not in ("idea", "outcome"), "retained context requires explicit authorization, not unhold")
-            for key in ("hold", "hold-kind", "hold-until"):
+            for key in ("hold", "hold-kind", "hold-until", "hold-when"):
                 task.meta.pop(key, None)
         elif verb in ("block", "unblock"):
             require(options.by, "dependency operation requires --by")

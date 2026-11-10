@@ -21,7 +21,7 @@
 #
 # Usage:
 #   fm-captain-hold.sh hold <task-id> --reason <reason> \
-#     [--title <title>] [--repo <repo>] [--origin <origin-id>] [--until YYYY-MM-DD]
+#     [--title <title>] [--repo <repo>] [--origin <origin-id>] [--until YYYY-MM-DD | --when <condition>]
 #   fm-captain-hold.sh answer <task-id> --decision-file <path> [--release]
 #   fm-captain-hold.sh answers [<legacy-origin> | --any-origin] --source <provenance>   (keyed answers on stdin)
 #   fm-captain-hold.sh reconcile-requests --source-id <source-id> --source <provenance>   (task ids on stdin)
@@ -53,6 +53,8 @@
 # `--until` records the captain's own deferral date through native `hold`,
 # so a "revisit later" answer is stored as a date instead of a live
 # card.
+# `--when` records an explicit revisit condition without a date; it remains
+# deferred until firstmate verifies that condition and re-holds or answers it.
 #
 # `answer` records the captain's exact words and resolves the call in the same
 # act. It requires a non-empty captain decision file of at most 8192 bytes and
@@ -876,7 +878,7 @@ verify_entry_durable() {  # <origin-or-empty> <entry>; prints "<id> <how> <origi
 }
 
 command_hold() {
-  local id=${1:-} title='' reason='' repo='' origin='' until='' show state existing_title body='' hold_kind hold_set occurrence
+  local id=${1:-} title='' reason='' repo='' origin='' until='' when='' show state existing_title body='' hold_kind hold_set occurrence
   local existing_hold_kind='' existing_held='' preserve_hold_set=0 stored_reason previous_origin='' hold_status=0
   [ "$#" -ge 1 ] || { usage >&2; exit 2; }
   shift
@@ -887,6 +889,7 @@ command_hold() {
       --repo) shift; repo=${1:-} ;;
       --origin) shift; origin=${1:-} ;;
       --until) shift; until=${1:-} ;;
+      --when) shift; when=${1:-} ;;
       *) usage >&2; exit 2 ;;
     esac
     shift
@@ -902,6 +905,12 @@ command_hold() {
     case "$until" in
       [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) : ;;
       *) fail "--until must be a YYYY-MM-DD date: $until" ;;
+    esac
+  fi
+  [ -z "$until" ] || [ -z "$when" ] || fail "choose --until or --when"
+  if [ -n "$when" ]; then
+    case "$when" in
+      *[\(\),]*|*$'\n'*|*$'\r'*|*$'\t'*) fail "--when must be single-line metadata without parentheses or commas" ;;
     esac
   fi
   hold_set=${FM_CAPTAIN_HOLD_NOW:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}
@@ -960,7 +969,10 @@ command_hold() {
     previous_origin=$(body_hold_origin "$(show_field_value "$show" body)")
     write_hold_origin "$id" "$(show_field "$show" body)" "$origin" || exit $?
   fi
-  if [ -n "$until" ]; then
+  if [ -n "$when" ]; then
+    tasks_axi hold "$id" --reason "$stored_reason" --kind captain --when "$when" >/dev/null \
+      || hold_status=$?
+  elif [ -n "$until" ]; then
     tasks_axi hold "$id" --reason "$stored_reason" --kind captain --until "$until" >/dev/null \
       || hold_status=$?
   else

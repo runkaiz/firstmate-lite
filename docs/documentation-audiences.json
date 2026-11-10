@@ -105,10 +105,6 @@
       "audience": "agent-runtime"
     },
     {
-      "path": ".agents/skills/bearings/SKILL.md",
-      "audience": "agent-runtime"
-    },
-    {
       "path": ".agents/skills/bootstrap-diagnostics/SKILL.md",
       "audience": "agent-runtime"
     },
@@ -523,6 +519,14 @@
     {
       "path": "docs/queue.md",
       "audience": "operator-current"
+    },
+    {
+      "path": ".agents/skills/ahoy-board/SKILL.md",
+      "audience": "agent-runtime"
+    },
+    {
+      "path": ".agents/skills/contribution-follow-up/SKILL.md",
+      "audience": "agent-runtime"
     }
   ]
 }

@@ -530,7 +530,7 @@ test_collapsed_captain_call_deferral_and_landed() {
 
 ## Done
 - [x] answered-call - Answered captain question (repo: firstmate) (kind: captain) (done 2026-07-10) (hold: captain choice pending) (hold-kind: captain)
-- [x] shipped-work - Ordinary landed work (repo: firstmate) (kind: ship) (merged 2026-07-10)
+- [x] shipped-work - Ordinary landed work https://github.com/o/r/pull/77 (repo: firstmate) (kind: ship) (merged 2026-07-10)
 EOF
   fakebin=$(make_fakebin "$home")
   json=$(run "$home" "$fakebin" --json)
@@ -546,7 +546,7 @@ EOF
       and (.gates | any(.[]; .id == "external-gate"))
       and (.landed | any(.[]; .id == "shipped-work"))
       and (.landed | any(.[]; .id == "answered-call") | not)
-      and (.omitted | any(.[]; .surface | startswith("captain holds bucketed blocked, dated, or aged")))
+      and (.omitted | any(.[]; .surface | startswith("deferred captain holds")))
   ' >/dev/null || fail "the collapsed captain-call projection is wrong: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions --all-queued)
   printf '%s' "$json" | jq -e '
@@ -610,7 +610,7 @@ EOF
       and (.gates | any(.id == "blocked-parked" and .blocked_by == "missing-blocker"))
       and (.gates | any(.id == "aged-call" and (.reason | startswith("held 40d"))))
       and (.gates | any(.id == "legacy-old-hold" and (.reason | startswith("held 40d"))))
-      and (.omitted | any(.surface == "captain holds bucketed blocked, dated, or aged: 4"))
+      and (.omitted | any(.surface == "deferred captain holds: 4"))
   ' >/dev/null || fail "structured buckets must decide decision placement: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions)
   printf '%s' "$json" | jq -e '
@@ -640,7 +640,7 @@ EOF
   printf '%s' "$json" | jq -e '
     (.gates | any(.id == "only-blocked-parked" and .blocked_by == "missing-blocker"
                   and (.reason | startswith("blocked-by missing-blocker"))))
-      and (.omitted | any(.surface == "captain holds bucketed blocked, dated, or aged: 1"))
+      and (.omitted | any(.surface == "deferred captain holds: 1"))
   ' >/dev/null || fail "a lone blocked deferred hold lacked its concrete disclosure: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions)
   printf '%s' "$json" | jq -e '
@@ -883,7 +883,7 @@ test_projection_and_toon_fail_closed() {
   out=$(run "$home" "$fakebin" --json 2> "$err"); rc=$?
   [ "$rc" -ne 0 ] || fail "projection failure exited successfully"
   [ -z "$out" ] || fail "projection failure emitted output"
-  grep -F 'projection failed' "$err" >/dev/null || fail "projection failure lacked a diagnostic"
+  grep -F 'projection failed' "$err" >/dev/null || fail "projection failure lacked a diagnostic: $(cat "$err")"
   install_failing_jq "$fakebin" toon
   err="$home/toon.err"
   out=$(run "$home" "$fakebin" 2> "$err"); rc=$?
@@ -1396,7 +1396,8 @@ EOF
       and ([.decisions_open[] | select(
           (.id == "working-blocked")
           and (.summary | contains("blocked-by blocker-alpha-123456789012345678901234567890 +1 more"))
-          and (.summary | length) <= 90)] | length) == 1
+          and (.summary | startswith("Working blocked call: "))
+          and .deferred == true)] | length) == 1
       and ([.gates[] | select(.id == "working-live" or .id == "working-live-two" or .id == "working-blocked"
           or .id == "working-dated" or .id == "working-aged")] | length) == 0
   ' >/dev/null || fail "--all-decisions did not keep working holds Underway and reveal each gate-free: $expanded"
@@ -1812,6 +1813,53 @@ SH
 
 
 
+test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue() {
+  local home fakebin first unchanged changed before
+  home=$(make_home ahoy-checkpoint)
+  fakebin=$(make_fakebin "$home")
+  write_fixture "$home"
+  before=$(cat "$home/data/backlog.md")
+  first=$(run "$home" "$fakebin" --json --record-look) || fail "first look"
+  printf '%s' "$first" | jq -e '.since_last_look.since == null and .since_last_look.changes == []' >/dev/null || fail "invented first-look history"
+  unchanged=$(run "$home" "$fakebin" --json --record-look) || fail "unchanged look"
+  printf '%s' "$unchanged" | jq -e '.since_last_look.since == "2026-07-11T18:00:00Z" and .since_last_look.changes == []' >/dev/null || fail "unchanged look invented changes"
+  [ "$before" = "$(cat "$home/data/backlog.md")" ] || fail "Ahoy changed queue storage"
+  cat >> "$home/data/backlog.md" <<'EOF'
+- [x] just-landed - Delivered since the last look https://github.com/o/r/pull/99 (kind: ship) (merged 2026-07-11)
+EOF
+  changed=$(run "$home" "$fakebin" --json --record-look) || fail "changed look"
+  printf '%s' "$changed" | jq -e '.since_last_look.changes | any(.surface == "landed" and .current == "https://github.com/o/r/pull/99")' >/dev/null || fail "new delivery missing from catch-up"
+  run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.changes == []' >/dev/null || fail "delivery repeated as a change"
+  printf 'corrupt checkpoint\n' > "$home/state/ahoy-last.json"
+  run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.since == null' >/dev/null || fail "corrupt checkpoint invented history"
+  pass "Ahoy saves one observation checkpoint and compares fresh facts without changing the queue"
+}
+
+test_ahoy_delivery_titles_timing_and_conditional_hold() {
+  local home fakebin json
+  home=$(make_home ahoy-glance)
+  fakebin=$(make_fakebin "$home")
+  write_fixture "$home"
+  printf 'spawn_gen=s1783791900.123.4\n' >> "$home/state/ship-task.meta"
+  cat >> "$home/data/backlog.md" <<'EOF'
+- [x] folded - Folded idea (kind: idea) (done 2026-07-11)
+- [x] plain-closed - Closed without an artifact (done 2026-07-11)
+EOF
+  "$ROOT/bin/fm-queue.py" add conditional "Revisit integration with a complete task title that exceeds the old sixty-character cutoff" --file "$home/data/backlog.md" >/dev/null || fail "add condition"
+  run_captain "$home" "$fakebin" hold conditional --reason "Choose integration" --when "the upstream API stabilizes" >/dev/null || fail "record condition"
+  json=$(run "$home" "$fakebin" --json --all-decisions --all-landed) || fail "ahoy glance snapshot"
+  printf '%s' "$json" | jq -e '
+    (.landed | all(.id != "folded" and .id != "plain-closed" and .artifact != "-"))
+    and (.decisions_open | all(.id != "conditional"))
+    and (.gates | any(.id == "conditional" and .deferred == true and .reason == "when the upstream API stabilizes: Choose integration"
+      and .title == "Revisit integration with a complete task title that exceeds the old sixty-character cutoff"))
+    and (.in_flight | any(.id == "ship-task" and .stage == "implementing" and .elapsed_seconds == 900))
+  ' >/dev/null || fail "Ahoy lost delivery, condition, title, or timing evidence: $json"
+  pass "Ahoy excludes closures and defers conditional calls while preserving titles and elapsed time"
+}
+
+test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue
+test_ahoy_delivery_titles_timing_and_conditional_hold
 test_task_teardown_during_metadata_capture_does_not_abort_snapshot
 test_current_state_uses_captured_status_observation
 test_relaunched_task_does_not_inherit_reused_endpoint_state
