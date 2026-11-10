@@ -38,8 +38,8 @@ On the first look or an unreadable checkpoint, disclose that there is no earlier
 The command saves only one compact checkpoint, never a report archive.
 
 Aim for a ten-second glance, one line per item, with complete task titles and full artifact URLs.
-Omit empty sections entirely; a quiet snapshot needs at most one all-clear line.
-Use these sections in order when they contain something useful:
+Omit empty section headings and all empty-state filler, including unheaded "Nothing needs you right now" after completion.
+Use these sections in order only when they have qualifying items:
 
 - **Shipped**: real recorded merges, local-main landings, and completed scout reports from `landed`.
   Include each row's artifact: the full PR URL, `local main`, or the scout report link.
@@ -58,6 +58,7 @@ A hold with a recorded revisit condition, future date, or unresolved blocker sta
 The canonical snapshot's structured hold classification owns that distinction; never guess from hold-reason prose.
 An elapsed date does not authorize dispatch or close a decision.
 A recorded PR URL alone does not prove merge readiness.
+Put publication or CI uncertainty on the affected work row or in a short unheaded note; it alone creates no captain action.
 Completed scout reports, active validation, and declared external waits never become captain calls merely because they exist.
 If required state is unreadable, say so briefly instead of claiming all clear; leave detailed omissions behind `detail`.
 Include the required captain address naturally once.
