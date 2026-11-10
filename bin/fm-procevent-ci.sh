@@ -71,6 +71,7 @@ ci_only() {
 NO_CHECK_HOLDS=20
 HOLDS=0
 NO_CHECK_DONE=0
+NO_CHECK_HEAD=
 surface_no_checks() {
   local count
   count=$(fm_nm_bounded "$WT" 15 gh pr view "$PR" --json statusCheckRollup --jq '.statusCheckRollup | length') || return 1
@@ -82,6 +83,13 @@ surface_no_checks() {
   esac
 }
 pending_hold() {
+  local head
+  head=$(field head_sha)
+  if [ "$head" != "$NO_CHECK_HEAD" ]; then
+    NO_CHECK_HEAD=$head
+    HOLDS=0
+    NO_CHECK_DONE=0
+  fi
   if ! ci_only; then
     # A pipeline-owned repair restarts CI, and with it this bound.
     HOLDS=0

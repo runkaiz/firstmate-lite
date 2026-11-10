@@ -33,9 +33,11 @@ cat > "$LAB/fakebin/no-mistakes" <<'SH'
 set -eu
 count=0
 [ ! -f "$CI_TEST_LAB/drives" ] || read -r count < "$CI_TEST_LAB/drives"
-if [ "$CI_SCENARIO" = late-revalidate ] && [ "$count" -gt 24 ]; then
-  CI_TEST_HEAD=1111111111111111111111111111111111111111
-fi
+case "$CI_SCENARIO" in
+  late-revalidate|late-head-change)
+    if [ "$count" -gt 24 ]; then CI_TEST_HEAD=1111111111111111111111111111111111111111; fi
+    ;;
+esac
 if [ "$*" = 'axi status' ]; then
   run=RUN1 branch=fm/ci state=running ci=running review=completed
   case "$CI_SCENARIO" in
@@ -96,7 +98,7 @@ if [ "$*" = 'pr view https://github.com/example/repo/pull/1 --json statusCheckRo
   read -r count < "$CI_TEST_LAB/drives"
   case "$CI_SCENARIO" in
     checks-disappear) if [ "$count" -gt 20 ]; then CI_CHECKS=0; fi ;;
-    late-revalidate) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
+    late-revalidate|late-head-change) if [ "$count" -gt 24 ]; then CI_CHECKS=0; fi ;;
   esac
   printf '%s\n' "$CI_CHECKS"
   exit 0
@@ -105,7 +107,7 @@ fi
 head=$CI_TEST_HEAD
 case "$CI_SCENARIO" in
   stale-green|post-return-rebase) head=1111111111111111111111111111111111111111 ;;
-  late-revalidate)
+  late-revalidate|late-head-change)
     read -r count < "$CI_TEST_LAB/drives"
     if [ "$count" -gt 24 ]; then head=1111111111111111111111111111111111111111; fi
     ;;
@@ -194,13 +196,20 @@ check 'registered checks keep zero-check detection active' test "$(rollup_calls)
 reset_counts; export CI_SCENARIO=checks-disappear
 out=$(poll)
 check 'checks disappearing after a positive read surface once' test "$(line_count "$queue")" = 1
-for initial_checks in 2 0; do
-  reset_counts; rm -f "$queue"; export CI_SCENARIO=late-revalidate CI_AFTER=48 CI_CHECKS=$initial_checks
-  out=$(poll)
-  if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
-  check 'repair allows one zero-check wake per CI round' test "$(line_count "$queue")" = "$expected_wakes"
-  check 'each CI round has its own notice key' test "$(cut -f4 "$queue" | sort -u | wc -l | tr -d ' ')" = "$expected_wakes"
+for scenario in late-revalidate late-head-change; do
+  for initial_checks in 2 0; do
+    reset_counts; rm -f "$queue"; export CI_SCENARIO=$scenario CI_AFTER=48 CI_CHECKS=$initial_checks
+    out=$(poll)
+    if [ "$initial_checks" = 2 ]; then expected_wakes=1; else expected_wakes=2; fi
+    check "$scenario allows one zero-check wake per CI round" test "$(line_count "$queue")" = "$expected_wakes"
+    check "$scenario gives each CI round its own notice key" test "$(cut -f4 "$queue" | sort -u | wc -l | tr -d ' ')" = "$expected_wakes"
+    check "$scenario keeps driving to the real pipeline outcome" contains "$out" 'outcome: checks-passed'
+  done
 done
+reset_counts; rm -f "$queue"; export CI_SCENARIO=late-head-change CI_AFTER=44 CI_CHECKS=2
+out=$(poll)
+check 'a new head waits the full zero-check bound' test ! -s "$queue"
+check 'a new head does not query checks before its bound' test "$(rollup_calls)" = 5
 reset_counts; rm -f "$queue"; export CI_SCENARIO=pending CI_AFTER=26 CI_CHECKS=
 out=$(poll)
 check 'unreadable forge does not count as zero checks' test ! -s "$queue"
