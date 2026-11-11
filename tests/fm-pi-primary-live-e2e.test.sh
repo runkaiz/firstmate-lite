@@ -6,6 +6,8 @@ set -u
 
 # shellcheck source=tests/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+# shellcheck source=tests/ahoy-live-helpers.sh
+. "$ROOT/tests/ahoy-live-helpers.sh"
 
 fm_live_gate opt-in FM_PI_LIVE_E2E pi tmux
 
@@ -117,48 +119,31 @@ wait_pid_dead() {
 }
 
 run_ahoy_case() {
-  local label=$1 preceding=$2 expected=$3 out status=0
+  local label=$1 preceding=$2 out status=0
+  local home="$LAB/pi-ahoy-$1-home"
+  ahoy_live_home "$home"
   out=$(
     cd "$PROJECT" &&
-      fm_test_credentialed_run "$HOME_DIR/config" pi --print --approve --no-session --no-context-files --no-extensions \
-        --no-skills --skill .agents/skills --tools read \
+      FM_HOME="$home" fm_test_credentialed_run "$home/config" pi --print --approve --no-session --no-context-files --no-extensions \
+        --no-skills --skill .agents/skills --tools read,bash \
         --model openai-codex/gpt-5.6-sol --thinking low \
         "$preceding" "/ahoy"
   ) || status=$?
   [ "$status" -eq 0 ] || fail "Pi Ahoy $label case exited $status: $out"
-  case "$expected" in
-    bearings)
-      printf '%s\n' "$out" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-        || fail "Pi Ahoy $label case did not take Bearings: $out"
-      ;;
-    boundary)
-      printf '%s\n' "$out" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-        && fail "Pi Ahoy $label near miss was treated as operational: $out"
-      ;;
-  esac
+  ahoy_live_assert "$home" "$out"
 }
 
 run_ahoy_transcript_regressions() {
-  mkdir -p "$PROJECT/.agents/skills/ahoy" "$PROJECT/.agents/skills/bearings"
+  mkdir -p "$PROJECT/.agents/skills/ahoy"
   cp "$ROOT/.agents/skills/ahoy/SKILL.md" "$PROJECT/.agents/skills/ahoy/SKILL.md"
-  # shellcheck disable=SC2016 # Backticks are literal prompt markup.
-  printf '%s\n' \
-    '---' \
-    'name: bearings' \
-    'description: Test-only Bearings branch sentinel.' \
-    '---' \
-    '' \
-    '# bearings' \
-    '' \
-    'Respond exactly `AHOY_BEARINGS_BRANCH`.' \
-    > "$PROJECT/.agents/skills/bearings/SKILL.md"
+  cp -R "$ROOT/bin" "$PROJECT/"
 
-  run_ahoy_case legacy-start "$LEGACY_START" bearings
-  run_ahoy_case legacy-away "$LEGACY_AWAY" bearings
-  run_ahoy_case marker-near-miss "$MARKER_NEAR_MISS" boundary
-  run_ahoy_case startup-near-miss "$START_NEAR_MISS" boundary
-  run_ahoy_case quoted-current "$QUOTED_CURRENT" boundary
-  run_ahoy_case ascii-only "$ASCII_ONLY" boundary
+  run_ahoy_case legacy-start "$LEGACY_START"
+  run_ahoy_case legacy-away "$LEGACY_AWAY"
+  run_ahoy_case marker-near-miss "$MARKER_NEAR_MISS"
+  run_ahoy_case startup-near-miss "$START_NEAR_MISS"
+  run_ahoy_case quoted-current "$QUOTED_CURRENT"
+  run_ahoy_case ascii-only "$ASCII_ONLY"
 }
 
 run_native_ahoy_regressions() {
@@ -169,20 +154,16 @@ run_native_ahoy_regressions() {
   mkdir -p \
     "$AHOY_PROJECT/.pi/extensions/lib" \
     "$AHOY_PROJECT/.agents/skills/ahoy" \
-    "$AHOY_PROJECT/.agents/skills/bearings" \
     "$AHOY_PROJECT/bin" \
     "$first_home/state" "$first_home/config" \
     "$later_home/state" "$later_home/config"
+  ahoy_live_home "$first_home"
+  ahoy_live_home "$later_home"
   git init -q "$AHOY_PROJECT"
   cp "$ROOT/.pi/extensions/fm-primary-turnend-guard.ts" "$AHOY_PROJECT/.pi/extensions/"
   cp "$ROOT/.pi/extensions/lib/fm-operational-input.ts" "$AHOY_PROJECT/.pi/extensions/lib/"
-  cp \
-    "$ROOT/bin/fm-sessionstart-nudge.sh" \
-    "$ROOT/bin/fm-primary-scope-lib.sh" \
-    "$ROOT/bin/fm-gate-refuse-lib.sh" \
-    "$ROOT/bin/fm-operational-input.sh" \
-    "$AHOY_PROJECT/bin/"
   cp "$ROOT/.agents/skills/ahoy/SKILL.md" "$AHOY_PROJECT/.agents/skills/ahoy/SKILL.md"
+  cp -R "$ROOT/bin" "$AHOY_PROJECT/"
   chmod +x "$AHOY_PROJECT/bin/fm-sessionstart-nudge.sh"
   # shellcheck disable=SC2016 # Variables expand in the generated script, not this test shell.
   printf '%s\n' \
@@ -198,17 +179,6 @@ run_native_ahoy_regressions() {
   chmod +x "$AHOY_PROJECT/bin/fm-session-start.sh"
   # shellcheck disable=SC2016 # Backticks are literal prompt markup.
   printf '%s\n' \
-    '---' \
-    'name: bearings' \
-    'description: Test-only Bearings branch sentinel.' \
-    '---' \
-    '' \
-    '# bearings' \
-    '' \
-    'Respond exactly `AHOY_BEARINGS_BRANCH`.' \
-    > "$AHOY_PROJECT/.agents/skills/bearings/SKILL.md"
-  # shellcheck disable=SC2016 # Backticks are literal prompt markup.
-  printf '%s\n' \
     '# Native Pi Ahoy regression fixture' \
     '' \
     'Run `bin/fm-session-start.sh` exactly once at session start.' \
@@ -222,8 +192,7 @@ run_native_ahoy_regressions() {
         --model openai-codex/gpt-5.6-sol --thinking low \
         "/ahoy"
   )
-  printf '%s\n' "$first_out" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-    || fail "Pi native first-message Ahoy did not take Bearings: $first_out"
+  ahoy_live_assert "$first_home" "$first_out"
   [ "$(sed -n '1p' "$first_home/state/session-start-count")" = 1 ] \
     || fail "Pi native first-message Ahoy did not preserve one session-start execution"
 
@@ -237,8 +206,7 @@ run_native_ahoy_regressions() {
   )
   printf '%s\n' "$later_out" | grep -Fq "PRIOR_BOUNDARY_ACK" \
     || fail "Pi native later-message setup did not preserve the genuine captain boundary: $later_out"
-  printf '%s\n' "$later_out" | grep -Fq "AHOY_BEARINGS_BRANCH" \
-    && fail "Pi native later-message Ahoy gathered Bearings: $later_out"
+  ahoy_live_assert "$later_home" "$later_out"
   [ "$(sed -n '1p' "$later_home/state/session-start-count")" = 1 ] \
     || fail "Pi native later-message Ahoy reran session start"
 }
@@ -248,6 +216,10 @@ git clone -q "$ROOT" "$PROJECT"
 if [ "$WATCH_ONLY" -eq 0 ]; then
   run_ahoy_transcript_regressions
   run_native_ahoy_regressions
+  if [ "${FM_PI_LIVE_AHOY_ONLY:-0}" = 1 ]; then
+    printf 'ok - Pi %s live /ahoy covered fresh first/later catch-ups and queue unblocking\n' "$PI_VERSION"
+    exit 0
+  fi
 fi
 mkdir -p "$PROJECT/.pi/extensions/lib"
 cp "$ROOT/.pi/extensions/fm-calm.ts" "$PROJECT/.pi/extensions/fm-calm.ts"

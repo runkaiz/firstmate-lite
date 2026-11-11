@@ -1,96 +1,22 @@
 #!/usr/bin/env bash
-# fm-bearings-snapshot.sh - compact, bounded, TOON-by-default bearings projection.
-#
-# A thin wrapper OVER the canonical bin/fm-fleet-snapshot.sh. It does not parse
-# fleet state itself: it shells out to `fm-fleet-snapshot.sh --json`, projects that
-# complete structured contract down to the small set of fields a "pick up where I
-# left off" read needs, and renders TOON at the output boundary. The internal data
-# model stays JSON (`--json` prints it verbatim); TOON is the default agent-facing
-# format per the AXI standard, and TOON/JSON are parity representations of the same
-# projected model. The projection is view-specific: it DROPS fields from the bearings
-# output, it never removes them from - or otherwise weakens - the canonical snapshot,
-# which stays complete.
-#
-# By default the canonical snapshot performs bounded concurrent remote-ledger reads
-# for registered remote homes under one shared collection budget and may atomically
-# refresh its parent-side ledger cache. It MAY surface PR URLs already recorded in
-# task meta (recorded_prs), but performs no live GitHub discovery or checks. Live PR
-# discovery/checks happen ONLY under --include-prs; all gh coupling lives in that
-# branch and never in the canonical snapshot. The default output states explicitly
-# (the prs: line and the omitted[] surfaces) what was not requested, so an absence is
-# never ambiguous.
-#
-# This wrapper consumes canonical status decisions plus canonically normalized
-# backlog roles, unresolved blockers, and captain actionability.
-# Contributions project cached coverage and required actors from fm-contributions.sh;
-# only captain rows are exposed, with counts for the other actors and unmeasured homes. It never infers
-# decisions from report or visual-review prose or reimplements snapshot semantics.
-# Underway (in_flight) projects every main live worker plus every active child
-# from every readable secondmate ledger, independently of that home's
-# bearings_state. Each row's name is the durable task title when nonblank and
-# its durable task id otherwise, so renderers always receive a task-identifying
-# label instead of having to substitute run status. A home classified
-# captain_decision because it has an open
-# captain hold still contributes each working child as its own Underway row;
-# the home row on secondmates[] keeps the decision and gate classification.
-# Captain-hold placement follows the canonical snapshot's hold_bucket and
-# nothing else; this wrapper never inspects hold reason or body prose. The
-# buckets are total and mutually exclusive, so every captain hold appears in
-# exactly one decision bucket and none can fall through both. An actively worked
-# held task may also appear in Underway. A "live" hold is a default Captain's Call
-# entry; "blocked", "dated", and "aged" leave the default Captain's Call, render
-# as Charted Next gates stating why (the blocking work, the until date, or the
-# floored age), and are counted in omitted[].
-# --all-decisions reveals every captain hold available within the bounded snapshot
-# and drops its gate, so a hold is never in both Captain's Call and Charted Next.
-# Aging is a projection safety net only; the durable
-# deferral remains re-holding with --until.
-#
-# Ordinary Charted Next gates are ordered by durable filed date, newest first,
-# before the FM_BEARINGS_GATES bound is applied. Gates without a comparable filed
-# date keep their input order after dated gates. The synthetic (return-catchup)
-# posture row is reserved ahead of that ordering and bound so it always surfaces.
-#
-# Main-home inventory validity comes from the canonical snapshot's main_inventory
-# object (orphan structured in-flight without meta, unstructured current rows).
-# Bearings never invents Underway rows from backlog-only ids; it discloses those
-# gaps in omitted[] and, when invalid, a Charted Next gate line so the four-section
-# chat cannot claim an empty fleet while main current state is broken.
-#
-# An open away-return catch-up is disclosed the same way, as a single action-free
-# (return-catchup) gate row naming the blockers left to clear or the reason the
-# catch-up was retained. Reporting is not ordinary captain work, so the gate never
-# suppresses the digest; an ACTIVE away window still refuses, because the right
-# answer there is to run the return first. bin/fm-afk-return.sh owns the gate.
-#
-# The landed section merges this home's Done with the canonical snapshot's
-# secondmate_landed roll-up (fm-fleet-snapshot.sh), so merges a secondmate managed -
-# recorded in ITS OWN backlog, never the main one - are visible. It stays bounded by
-# a per-home cap and an overall cap, with omitted[] disclosure of both and of any
-# secondmate home whose backlog was unreadable; no live GitHub call is involved.
-# The default landed baseline is balanced across homes: each home keeps its internal
-# newest-first ordering, homes iterate in deterministic id order, sparse homes do not
-# waste capacity, and --all-landed switches back to the complete global newest-first
-# order. Which closed rows either side contributes is bin/fm-landed-lib.sh's rule.
-#
-# Flags:
-#   (default)        compact projection with bounded remote-ledger collection, TOON
-#   --json           the same projected model as JSON (machine/debug; parity form)
-#   --include-prs    ALSO do live GitHub open-PR discovery + checks
-#   --fields <list>  opt in to dropped surfaces: bodies,paths,actions,endpoints
-#   --all-in-flight  include every in-flight task
-#   --all-decisions  include every open decision and captain hold in the bounded snapshot
-#   --all-secondmates include every aggregated secondmate record
-#   --all-landed     include every landed record from every home (default: bounded)
-#   --all-reports    include the full scout-report inventory (default: relevant only)
-#   --all-queued     include every queued gate present in the bounded snapshot
-#   --all-recorded-prs include every locally recorded PR
-#   --all-unhealthy  include every unhealthy endpoint
-#   --all-pr-repos   query every discovered repository under --include-prs
-#   -h,--help        usage
-#
-# Output contract: `fm-bearings.v1`. No locks or reports; the underlying snapshot's
-# parent-side remote-ledger cache refresh is the only default fleet-state mutation.
+# fm-bearings-snapshot.sh - bounded Ahoy view over fm-fleet-snapshot.sh.
+# Usage: fm-bearings-snapshot.sh [--json] [--record-look] [--include-prs] [--fields <list>]
+# Run --help for bounds and expansion flags. TOON and JSON share fm-bearings.v1.
+# The canonical snapshot owns fleet state, hold buckets, and cached contributions;
+# fm-landed-lib.sh owns delivery selection. This view never parses status prose.
+# Default collection performs no live forge discovery; --include-prs opts in.
+# The underlying snapshot may refresh its bounded remote-home ledger cache.
+# Titles are complete. Main worker stage uses reconciled state and its source.
+# Worker names use nonblank durable task titles, falling back to task ids.
+# elapsed_seconds measures the current spawn incarnation, or null if unavailable.
+# Remote children without that evidence retain their state and null timing.
+# Conditional holds always remain gates; --all-decisions reveals other deferred
+# holds with deferred=true, which never makes them actionable. Queued rows sort newest filed first, undated rows last.
+# Landings balance a per-home cap and an overall cap; --all-landed expands both.
+# Inventory and away-return warnings remain action-free gates, never workers.
+# Relevant report pointers are included. Extra reports, paths, actions, endpoints,
+# and live PRs are opt-in. omitted discloses unreadable inputs and bounds.
+# No report files, locks, or queue mutations.
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -133,7 +59,7 @@ validate_bound FM_BEARINGS_PR_LIMIT "$FM_BEARINGS_PR_LIMIT"
 
 usage() {
   cat <<'EOF'
-usage: fm-bearings-snapshot.sh [--json] [--include-prs] [--fields <list>]
+usage: fm-bearings-snapshot.sh [--json] [--record-look] [--include-prs] [--fields <list>]
                                [--all-in-flight] [--all-decisions]
                                [--all-secondmates] [--all-landed]
                                [--all-reports] [--all-queued]
@@ -144,8 +70,14 @@ Compact bearings projection over fm-fleet-snapshot.sh. TOON by default.
 Default collection performs bounded concurrent remote-ledger reads for registered
 remote homes under one shared snapshot budget and may refresh the parent-side cache.
 --include-prs additionally performs live GitHub discovery and checks.
+--record-look compares and saves one compact checkpoint at state/ahoy-last.json.
+  since_last_look reports newly visible deliveries, changed current rows, and
+  current rows no longer observed, without treating their absence as completion;
+  each change includes previous (null for a newly observed row) and current values.
+  it is observation history, not proof of the exact time a delivery landed.
+  Default snapshot calls do not read or change that checkpoint.
 
-Default fields: schema, home, generated, prs, in_flight{id,kind,state,repo,name,doing},
+Default fields: schema, home, generated, prs, in_flight{id,kind,state,stage,elapsed_seconds,repo,name,doing},
   secondmates{id,state,doing,provenance,freshness,age_seconds,contradiction,reason},
   secondmate_reconcile{id,spawn_gen,host,kind,ids},
   decisions_open{id,key,verb,summary,owner}, landed{id,what,artifact,owner},
@@ -173,6 +105,7 @@ EOF
 
 FORMAT=toon
 INCLUDE_PRS=0
+RECORD_LOOK=0
 ALL_REPORTS=0
 ALL_QUEUED=0
 ALL_IN_FLIGHT=0
@@ -186,6 +119,7 @@ FIELDS=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --json) FORMAT=json ;;
+    --record-look) RECORD_LOOK=1 ;;
     --include-prs) INCLUDE_PRS=1 ;;
     --all-reports) ALL_REPORTS=1 ;;
     --all-queued) ALL_QUEUED=1 ;;
@@ -244,7 +178,7 @@ HOME_LABEL=$(printf '%s' "$SNAP" | jq -er '.fm_home | strings | split("/") | (.[
   || { echo "fm-bearings-snapshot: invalid canonical snapshot" >&2; exit 1; }
 
 # --- optional live GitHub PR enrichment -------------------------------------
-PR_STATUS='not_requested (run: /bearings include PRs)'
+PR_STATUS='not_requested (run: /ahoy include PRs)'
 CANDIDATE_PRS='[]'
 PR_REPOS_TOTAL=0
 PR_REPOS_SHOWN=0
@@ -383,12 +317,15 @@ MODEL=$(printf '%s' "$SNAP" | jq \
   --argjson candidate_prs "$CANDIDATE_PRS" "$FM_LANDED_JQ_DEFS"'
   def trunc($n): if . == null then null else
     (tostring | gsub("\\s+"; " ") | if (length > $n) then (.[:$n] + "…") else . end) end;
-  def fit($n):
-    tostring | gsub("\\s+"; " ")
-    | if $n <= 0 then ""
-      elif length > $n then (if $n == 1 then "…" else (.[:($n - 1)] + "…") end)
-      else . end;
   def live_captain_call: .hold_bucket == "live";
+  def plain_stage:
+    if .current_state.state != "working" then .current_state.state
+    elif .current_state.source == "run-step" then "in review/tests"
+    else "implementing" end;
+  def elapsed_seconds:
+    ((.spawn_gen // "" | capture("^s(?<epoch>[0-9]+)\\.")? | .epoch | tonumber) // null) as $start
+    | if $start == null then null
+      else [0, (($now | fromdateiso8601) - $start)] | max end;
   def projected_deferred_hold:
     .hold_bucket != null and .hold_bucket != "live";
   def bounded_blocker_note($n):
@@ -408,6 +345,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
       end;
   def hold_note:
     if .hold_bucket == "blocked" then bounded_blocker_note(70)
+    elif .hold_bucket == "conditional" then ("when " + .hold_when)
     elif .hold_bucket == "dated" then ("until " + (.hold_until // "-"))
     elif .hold_bucket == "aged" and .hold_age_days != null then
       ("held " + (.hold_age_days | tostring) + "d")
@@ -417,20 +355,11 @@ MODEL=$(printf '%s' "$SNAP" | jq \
     | (hold_note) as $note
     | if $note == null then $base else ($note + ": " + $base) end;
   def hold_summary($title; $base):
-    (hold_note) as $note
-    | if $note == null then (($title + ": " + $base) | trunc(90))
-      else ($note | length) as $note_n
-      | (86 - $note_n) as $context_n
-      | if $context_n < 2 then ($note | fit(90))
-        else ([46, ($context_n / 2 | floor)] | min) as $title_n
-        | (($title | fit($title_n)) + ": " + $note + ": "
-           + ($base | fit($context_n - $title_n)))
-        end
-      end;
+    $title + ": " + ((hold_note) as $note | if $note == null then "" else $note + ": " end) + $base;
   def as_gate($owner):
-    {id, title:(.title | trunc(60)),
-     blocked_by:((.unresolved_blocker_ids // []) | if length > 0 then join(",") else "-" end | trunc(120)),
-     reason:(hold_gate_reason | trunc(40)), owner:$owner,
+    {id, title:.title,
+     blocked_by:((.unresolved_blocker_ids // []) | if length > 0 then join(",") else "-" end),
+     reason:hold_gate_reason, deferred:(.hold_bucket != null), owner:$owner,
      filed:((.since // null) | trunc(40))};
   def round_robin_landed($n):
     . as $groups
@@ -506,9 +435,11 @@ MODEL=$(printf '%s' "$SNAP" | jq \
        | select(.backlog.current_role != "held" or .current_state.state == "working")
        | {id, kind,
         state: .current_state.state,
+        stage:plain_stage,
+        elapsed_seconds:elapsed_seconds,
         repo:(.backlog.repo // .project // null),
         name:((.backlog.title // "") as $name
-              | (if ($name | test("[^[:space:]]")) then $name else .id end) | trunc(70)),
+              | (if ($name | test("[^[:space:]]")) then $name else .id end)),
         doing: ((.current_state.detail // "") as $d
                 | (if $d != "" then $d else (.hints.last_event_text // "") end) | trunc(90))
       } ]
@@ -517,32 +448,34 @@ MODEL=$(printf '%s' "$SNAP" | jq \
          | {id:($m.id + "/" + .id),
             kind:(.kind // "secondmate"),
             state:(.state // "working"),
+            stage:(.stage // .state // "unknown"),
+            elapsed_seconds:(.elapsed_seconds // null),
             repo:(.repo // null),
             name:((.name // "") as $name
                   | (if (($name | type) == "string" and ($name | test("[^[:space:]]")))
-                     then $name else ($m.id + "/" + .id) end) | trunc(70)),
+                     then $name else ($m.id + "/" + .id) end)),
             doing:((.doing // .state) | trunc(90))} ]) as $in_flight_all
   | ([ .backlog.records[]
          | . as $record
          | select(.structured and .hold_bucket != null)
-         | select(($all_decisions == 1) or live_captain_call)
-         | {id,key:.id,verb:"captain-hold",
+         | select(.hold_bucket != "conditional" and (($all_decisions == 1) or live_captain_call))
+         | {id,key:.id,verb:"captain-hold",deferred:(.hold_bucket != "live"),
             summary:hold_summary(.title; .hold_reason),owner:"(main)"} ]
      + [ (.secondmate_current.records // [])[] as $m
          | ([ $m.decisions_open[]?
               | select(.source == "backlog" and .verb == "captain-hold")
-              | select(($all_decisions == 1) or live_captain_call)
-              | {id:($m.id + "/" + .id),key,verb,
+              | select(.hold_bucket != "conditional" and (($all_decisions == 1) or live_captain_call))
+              | {id:($m.id + "/" + .id),key,verb,deferred:(.hold_bucket != "live"),
                  summary:hold_summary((.summary // .id);
                                       (.reason // "captain decision pending")),owner:$m.id} ]
             + [ $m.queued[]?
-                | select($all_decisions == 1 and .hold_kind == "captain")
+                | select($all_decisions == 1 and .hold_kind == "captain" and .hold_bucket != "conditional")
                 | select(.id as $id
                          | [$m.decisions_open[]?
                             | select(.source == "backlog" and .verb == "captain-hold")
                             | .id]
                          | index($id) | not)
-                | {id:($m.id + "/" + .id),key:.id,verb:"captain-hold",
+                | {id:($m.id + "/" + .id),key:.id,verb:"captain-hold",deferred:(.hold_bucket != "live"),
                    summary:hold_summary((.title // .id);
                                         (.hold_reason // "captain decision pending")),owner:$m.id} ])[] ]) as $decisions_all
   | ([ .backlog.records[]
@@ -578,13 +511,13 @@ MODEL=$(printf '%s' "$SNAP" | jq \
              (.hold_bucket != null or .state == "queued" or
               (.state == "in_flight" and .current_role == "held" and ($working_ids | index($record.id) | not))))
          | select(.captain_actionable != true)
-         | select((.hold_bucket == null) or ($all_decisions == 0))
+         | select(.hold_bucket == null or .hold_bucket == "conditional" or $all_decisions == 0)
          | as_gate("(main)") ]
      + [ (.secondmate_current.records // [])[] as $m
          | select($m.provenance.selected == "structured-home")
          | $m.queued[]?
          | select(.captain_actionable != true)
-         | select((.hold_bucket == null) or ($all_decisions == 0))
+         | select(.hold_bucket == null or .hold_bucket == "conditional" or $all_decisions == 0)
          | as_gate($m.id) ]) as $gates_all
   | ([ .scout_reports[]
        | . as $r
@@ -641,7 +574,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
         | select(.reconcile_inventory != null)
         | {id, spawn_gen:(.spawn_gen // null), host:(.host // null), kind:(.reconcile_inventory.kind // null), ids:((.reconcile_inventory.ids // []) | map(select(type == "string")) | sort)} ],
       decisions_open: (if $all_decisions == 1 then $decisions_all else $decisions_all[:$decisions_n] end),
-      landed: ($done | map({id, what:(.title | trunc(70)),
+      landed: ($done | map({id, what:.title,
                             artifact:(landed_artifact // "-"),owner:.home_id})),
       gates: ($return_catchup_gate
               + ($gates_all | newest_filed_first
@@ -686,7 +619,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
         (([($snap.secondmate_current.records // [])[] | select(.parent_event.activity_scan.input_truncated == true or .parent_event.activity_scan.retained_truncated == true)] | length) as $n | if $n > 0 then {surface:("secondmate parent activity evidence truncated for \($n) record(s)"), reveal:"raise FM_SNAPSHOT_PARENT_ACTIVITY_LINES, FM_SNAPSHOT_PARENT_ACTIVITY_BYTES, or FM_SNAPSHOT_PARENT_ACTIVITIES"} else empty end),
         (([($snap.secondmate_current.records // [])[] | select(.parent_event.activity_scan.available == false)] | length) as $n | if $n > 0 then {surface:("secondmate parent activity evidence unavailable for \($n) record(s)"), reveal:"inspect the parent status logs"} else empty end),
         (if $all_decisions == 0 and ($decisions_all | length) > $decisions_n then {surface:("decisions_open showing \($decisions_n) of \($decisions_all | length)"), reveal:"--all-decisions"} else empty end),
-        (if $all_decisions == 0 and $decisions_marked_deferred > 0 then {surface:("captain holds bucketed blocked, dated, or aged: \($decisions_marked_deferred)"), reveal:"--all-decisions"} else empty end),
+        (if $all_decisions == 0 and $decisions_marked_deferred > 0 then {surface:("deferred captain holds: \($decisions_marked_deferred)"), reveal:"--all-decisions"} else empty end),
         (if $all_queued == 0 and ($gates_all | length) > $gates_n then {surface:("gates showing \($gates_n) of \($gates_all | length)"), reveal:"--all-queued"} else empty end),
         (if $all_reports == 0 and ($reports_all | length) > $reports_n then {surface:("reports showing \($reports_n) of \($reports_all | length)"), reveal:"--all-reports"} else empty end),
         (if $all_recorded_prs == 0 and ($recorded_prs_all | length) > $recorded_prs_n then {surface:("recorded_prs showing \($recorded_prs_n) of \($recorded_prs_all | length)"), reveal:"--all-recorded-prs"} else empty end),
@@ -695,6 +628,43 @@ MODEL=$(printf '%s' "$SNAP" | jq \
         (if $include_prs == 1 and $pr_rows_capped > 0 then {surface:("candidate_prs showing \($candidate_prs | length) of at least \($pr_rows_min_total); capped in \($pr_rows_capped) repo(s)"), reveal:"raise FM_BEARINGS_PR_LIMIT"} else empty end),
         (if $include_prs == 1 then empty else {surface:"live PR discovery + checks", reveal:"--include-prs"} end) ]) }
 ') || { echo "fm-bearings-snapshot: projection failed" >&2; exit 1; }
+
+# Only an actual Ahoy invocation records a look; monitoring snapshots stay read-only.
+if [ "$RECORD_LOOK" = 1 ]; then
+  LOOK_STATE=${FM_STATE_OVERRIDE:-$(printf '%s' "$SNAP" | jq -er '.fm_home')/state}
+  LOOK_PATH=$LOOK_STATE/ahoy-last.json
+  [ ! -L "$LOOK_PATH" ] || { echo "fm-bearings-snapshot: refusing symlink checkpoint" >&2; exit 1; }
+  PREVIOUS=null
+  if [ -f "$LOOK_PATH" ]; then
+    PREVIOUS=$(jq -ce 'select(.schema == "fm-ahoy-look.v1" and (.generated | type) == "string" and (.rows | type) == "array" and all(.rows[]; (.key | type) == "string" and (.value | type) == "string" and (.label | type) == "string"))' "$LOOK_PATH" 2>/dev/null) || PREVIOUS=null
+  fi
+  LOOK=$(printf '%s' "$MODEL" | jq -c '
+    {schema:"fm-ahoy-look.v1", generated, rows:
+      ([.landed[] | {key:("landed/" + .owner + "/" + .id),value:.artifact,label:.what}]
+       + [.in_flight[] | {key:("moving/" + .id),value:(.stage + "/" + .state),label:.name}]
+       + [.decisions_open[] | select(.deferred != true) | {key:("call/" + .owner + "/" + .id),value:.summary,label:.summary}]
+       + [.gates[] | {key:("next/" + .owner + "/" + .id),value:([.reason,.blocked_by] | tojson),label:.title}])}') || exit 1
+  MODEL=$(printf '%s' "$MODEL" | jq --argjson previous "$PREVIOUS" --argjson look "$LOOK" '
+    .since_last_look = {
+      since:($previous.generated // null),
+      changes:([$look.rows[] as $row
+        | select($previous != null)
+        | ([$previous.rows[] | select(.key == $row.key)][0]) as $old
+        | select($old == null or $old.value != $row.value)
+        | {surface:($row.key | split("/")[0]),title:$row.label,previous:($old.value // null),current:$row.value}]
+        + [$previous.rows[]? as $row
+           | select($row.key | startswith("landed/") | not)
+           | select(any($look.rows[]; .key == $row.key) | not)
+           | {surface:($row.key | split("/")[0]),title:$row.label,previous:$row.value,current:"no longer observed"}])
+    }') || exit 1
+  mkdir -p "$LOOK_STATE" || exit 1
+  LOOK_TMP=$(umask 077; mktemp "$LOOK_STATE/.ahoy-last.XXXXXX") || exit 1
+  if ! printf '%s\n' "$LOOK" > "$LOOK_TMP" || ! mv "$LOOK_TMP" "$LOOK_PATH"; then
+    rm -f -- "$LOOK_TMP"
+    echo "fm-bearings-snapshot: cannot save Ahoy checkpoint" >&2
+    exit 1
+  fi
+fi
 
 if [ "$FORMAT" = json ]; then
   printf '%s\n' "$MODEL"

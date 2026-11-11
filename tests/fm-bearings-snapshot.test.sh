@@ -530,7 +530,7 @@ test_collapsed_captain_call_deferral_and_landed() {
 
 ## Done
 - [x] answered-call - Answered captain question (repo: firstmate) (kind: captain) (done 2026-07-10) (hold: captain choice pending) (hold-kind: captain)
-- [x] shipped-work - Ordinary landed work (repo: firstmate) (kind: ship) (merged 2026-07-10)
+- [x] shipped-work - Ordinary landed work https://github.com/o/r/pull/77 (repo: firstmate) (kind: ship) (merged 2026-07-10)
 EOF
   fakebin=$(make_fakebin "$home")
   json=$(run "$home" "$fakebin" --json)
@@ -546,7 +546,7 @@ EOF
       and (.gates | any(.[]; .id == "external-gate"))
       and (.landed | any(.[]; .id == "shipped-work"))
       and (.landed | any(.[]; .id == "answered-call") | not)
-      and (.omitted | any(.[]; .surface | startswith("captain holds bucketed blocked, dated, or aged")))
+      and (.omitted | any(.[]; .surface | startswith("deferred captain holds")))
   ' >/dev/null || fail "the collapsed captain-call projection is wrong: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions --all-queued)
   printf '%s' "$json" | jq -e '
@@ -610,7 +610,7 @@ EOF
       and (.gates | any(.id == "blocked-parked" and .blocked_by == "missing-blocker"))
       and (.gates | any(.id == "aged-call" and (.reason | startswith("held 40d"))))
       and (.gates | any(.id == "legacy-old-hold" and (.reason | startswith("held 40d"))))
-      and (.omitted | any(.surface == "captain holds bucketed blocked, dated, or aged: 4"))
+      and (.omitted | any(.surface == "deferred captain holds: 4"))
   ' >/dev/null || fail "structured buckets must decide decision placement: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions)
   printf '%s' "$json" | jq -e '
@@ -640,7 +640,7 @@ EOF
   printf '%s' "$json" | jq -e '
     (.gates | any(.id == "only-blocked-parked" and .blocked_by == "missing-blocker"
                   and (.reason | startswith("blocked-by missing-blocker"))))
-      and (.omitted | any(.surface == "captain holds bucketed blocked, dated, or aged: 1"))
+      and (.omitted | any(.surface == "deferred captain holds: 1"))
   ' >/dev/null || fail "a lone blocked deferred hold lacked its concrete disclosure: $json"
   json=$(run "$home" "$fakebin" --json --all-decisions)
   printf '%s' "$json" | jq -e '
@@ -883,7 +883,7 @@ test_projection_and_toon_fail_closed() {
   out=$(run "$home" "$fakebin" --json 2> "$err"); rc=$?
   [ "$rc" -ne 0 ] || fail "projection failure exited successfully"
   [ -z "$out" ] || fail "projection failure emitted output"
-  grep -F 'projection failed' "$err" >/dev/null || fail "projection failure lacked a diagnostic"
+  grep -F 'projection failed' "$err" >/dev/null || fail "projection failure lacked a diagnostic: $(cat "$err")"
   install_failing_jq "$fakebin" toon
   err="$home/toon.err"
   out=$(run "$home" "$fakebin" 2> "$err"); rc=$?
@@ -1396,7 +1396,8 @@ EOF
       and ([.decisions_open[] | select(
           (.id == "working-blocked")
           and (.summary | contains("blocked-by blocker-alpha-123456789012345678901234567890 +1 more"))
-          and (.summary | length) <= 90)] | length) == 1
+          and (.summary | startswith("Working blocked call: "))
+          and .deferred == true)] | length) == 1
       and ([.gates[] | select(.id == "working-live" or .id == "working-live-two" or .id == "working-blocked"
           or .id == "working-dated" or .id == "working-aged")] | length) == 0
   ' >/dev/null || fail "--all-decisions did not keep working holds Underway and reveal each gate-free: $expanded"
@@ -1812,6 +1813,160 @@ SH
 
 
 
+test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue() {
+  local home fakebin first unchanged changed before
+  home=$(make_home ahoy-checkpoint)
+  fakebin=$(make_fakebin "$home")
+  write_fixture "$home"
+  before=$(cat "$home/data/backlog.md")
+  first=$(run "$home" "$fakebin" --json --record-look) || fail "first look"
+  printf '%s' "$first" | jq -e '.since_last_look.since == null and .since_last_look.changes == []' >/dev/null || fail "invented first-look history"
+  unchanged=$(run "$home" "$fakebin" --json --record-look) || fail "unchanged look"
+  printf '%s' "$unchanged" | jq -e '.since_last_look.since == "2026-07-11T18:00:00Z" and .since_last_look.changes == []' >/dev/null || fail "unchanged look invented changes"
+  [ "$before" = "$(cat "$home/data/backlog.md")" ] || fail "Ahoy changed queue storage"
+  cat >> "$home/data/backlog.md" <<'EOF'
+- [x] just-landed - Delivered since the last look https://github.com/o/r/pull/99 (kind: ship) (merged 2026-07-11)
+EOF
+  changed=$(run "$home" "$fakebin" --json --record-look) || fail "changed look"
+  printf '%s' "$changed" | jq -e '.since_last_look.changes | any(.surface == "landed" and .current == "https://github.com/o/r/pull/99")' >/dev/null || fail "new delivery missing from catch-up"
+  run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.changes == []' >/dev/null || fail "delivery repeated as a change"
+  printf 'corrupt checkpoint\n' > "$home/state/ahoy-last.json"
+  run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.since == null' >/dev/null || fail "corrupt checkpoint invented history"
+  pass "Ahoy saves one observation checkpoint and compares fresh facts without changing the queue"
+}
+
+test_ahoy_completion_does_not_infer_pr_readiness() {
+  local home fakebin worktree head outcome json
+  home=$(make_home ahoy-pr-uncertainty)
+  fakebin=$(make_fakebin "$home")
+  worktree="$home/projects/ship-wt"
+  fm_git_init_commit "$worktree"
+  git -C "$worktree" checkout -qb fm/ship-task
+  head=$(git -C "$worktree" rev-parse HEAD)
+  cat > "$home/data/backlog.md" <<'EOF'
+## In flight
+- [ ] ship-task - Ship the thing (repo: firstmate) (kind: ship)
+
+## Queued
+
+## Done
+EOF
+  fm_write_meta "$home/state/ship-task.meta" \
+    "window=firstmate:fm-ship-task" "worktree=$worktree" "project=firstmate" \
+    "harness=claude" "kind=ship" "mode=no-mistakes" "pr=https://github.com/o/r/pull/1"
+  cat > "$fakebin/no-mistakes" <<'SH'
+#!/usr/bin/env bash
+[ "${1:-}" = axi ] || exit 0
+cat <<EOF
+run:
+  id: "01RUN"
+  branch: fm/ship-task
+  status: completed
+  head: "$FAKE_AHOY_HEAD"
+  pr: "https://github.com/o/r/pull/1"
+outcome: $FAKE_AHOY_OUTCOME
+EOF
+SH
+  for outcome in passed-with-skips passed checks-passed; do
+    json=$(FAKE_AHOY_HEAD="$head" FAKE_AHOY_OUTCOME="$outcome" FM_CREW_STATE_NO_FORGE=1 \
+      run "$home" "$fakebin" --json --record-look) || fail "completed run snapshot"
+    printf '%s' "$json" | jq -e '
+      (.in_flight | any(.id == "ship-task" and .state == "done" and .stage == "done"))
+      and (.recorded_prs | any(.id == "ship-task" and .url == "https://github.com/o/r/pull/1"))
+    ' >/dev/null || fail "completion plus a PR URL inferred readiness: $json"
+    if [ "$outcome" = passed-with-skips ]; then
+      printf '%s' "$json" | jq -e '.in_flight | any(.doing | contains("publication/CI verification skipped"))' \
+        >/dev/null || fail "skipped verification uncertainty was lost: $json"
+    fi
+    jq -e '.rows | any(.key == "moving/ship-task" and .value == "done/done")' \
+      "$home/state/ahoy-last.json" >/dev/null || fail "checkpoint claimed PR readiness"
+  done
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$fakebin/no-mistakes"
+  record_claude_state "$home/state" ship-task idle
+  printf 'done: implementation finished\n' > "$home/state/ship-task.status"
+  run "$home" "$fakebin" --json | jq -e '.in_flight | any(.state == "done" and .stage == "done")' \
+    >/dev/null || fail "worker completion plus a recorded PR inferred readiness"
+  pass "completed runs and worker messages preserve PR verification uncertainty"
+}
+
+test_ahoy_checkpoint_tracks_disappearances_and_blockers() {
+  local home fakebin json long_blocker blocked_before tail_before
+  home=$(make_home ahoy-observation-transitions)
+  fakebin=$(make_fakebin "$home")
+  write_fixture "$home"
+  run_captain "$home" "$fakebin" hold local-call --title "Choose local route" \
+    --reason "choose a route" >/dev/null || fail "create local call"
+  long_blocker="long-$(printf '%0130d' 0)"
+  "$ROOT/bin/fm-queue.py" add "$long_blocker" "Long blocker" --kind ship \
+    --file "$home/data/backlog.md" >/dev/null || fail "create long blocker"
+  "$ROOT/bin/fm-queue.py" add blocked-tail "Work with a late blocker" --kind ship \
+    --blocked-by "$long_blocker" --blocked-by ship-task --file "$home/data/backlog.md" \
+    >/dev/null || fail "create row with a late blocker"
+  run "$home" "$fakebin" --json --record-look >/dev/null || fail "record initial observations"
+  blocked_before=$(jq -r '.rows[] | select(.key == "next/(main)/live-gate") | .value' "$home/state/ahoy-last.json")
+  tail_before=$(jq -r '.rows[] | select(.key == "next/(main)/blocked-tail") | .value' "$home/state/ahoy-last.json")
+  "$ROOT/bin/fm-queue.py" add newly-queued "New work after the last look" --kind ship \
+    --file "$home/data/backlog.md" >/dev/null || fail "add new queue observation"
+  printf 'Use the short route.\n' > "$home/answer.txt"
+  run_captain "$home" "$fakebin" answer local-call --decision-file "$home/answer.txt" \
+    >/dev/null || fail "answer local call"
+  rm "$home/state/external-wait.meta"
+  "$ROOT/bin/fm-queue.py" "done" dead-gate --file "$home/data/backlog.md" >/dev/null || fail "close queued row without delivery"
+  "$ROOT/bin/fm-queue.py" unblock live-gate --by ship-task --file "$home/data/backlog.md" \
+    >/dev/null || fail "clear queue dependency"
+  "$ROOT/bin/fm-queue.py" unblock blocked-tail --by ship-task --file "$home/data/backlog.md" \
+    >/dev/null || fail "clear dependency beyond the old display bound"
+  json=$(run "$home" "$fakebin" --json --record-look) || fail "compare removed observations"
+  printf '%s' "$json" | jq -e --arg long_blocker "$long_blocker" --arg blocked_before "$blocked_before" --arg tail_before "$tail_before" '
+    (.since_last_look.changes | map(select(.current == "no longer observed"))) as $removed
+    | ($removed | any(.surface == "call" and .title == "Choose local route: choose a route"))
+      and ($removed | any(.surface == "moving" and .title == "external-wait"))
+      and ($removed | any(.surface == "next" and .title == "Old conditional work"))
+      and (.since_last_look.changes | any(.surface == "next" and .title == "Real queued work"
+        and .previous == $blocked_before and (.previous | fromjson)[1] == "ship-task"
+        and (.current | fromjson) == ["-", "-"]))
+      and (.since_last_look.changes | any(.surface == "next" and .title == "Work with a late blocker"
+        and .previous == $tail_before and (.previous | fromjson)[1] == ($long_blocker + ",ship-task")
+        and (.current | fromjson) == ["-", $long_blocker]))
+      and (.since_last_look.changes | any(.surface == "next" and .title == "New work after the last look"
+        and .previous == null))
+      and (.since_last_look.changes | all(.surface != "landed"))
+  ' >/dev/null || fail "disappearance or blocker clearing was lost or claimed as delivery: $json"
+  run "$home" "$fakebin" --json --record-look | jq -e '.since_last_look.changes == []' \
+    >/dev/null || fail "removed observations repeated on the next look"
+  jq -e 'keys == ["generated", "rows", "schema"] and all(.rows[];
+    keys == ["key", "label", "value"] and (.value | type) == "string")' \
+    "$home/state/ahoy-last.json" >/dev/null || fail "checkpoint no longer compact"
+  pass "Ahoy compares missing current rows and cleared blockers without inventing completion"
+}
+
+test_ahoy_delivery_titles_timing_and_conditional_hold() {
+  local home fakebin json
+  home=$(make_home ahoy-glance)
+  fakebin=$(make_fakebin "$home")
+  write_fixture "$home"
+  printf 'spawn_gen=s1783791900.123.4\n' >> "$home/state/ship-task.meta"
+  cat >> "$home/data/backlog.md" <<'EOF'
+- [x] folded - Folded idea (kind: idea) (done 2026-07-11)
+- [x] plain-closed - Closed without an artifact (done 2026-07-11)
+EOF
+  "$ROOT/bin/fm-queue.py" add conditional "Revisit integration with a complete task title that exceeds the old sixty-character cutoff" --file "$home/data/backlog.md" >/dev/null || fail "add condition"
+  run_captain "$home" "$fakebin" hold conditional --reason "Choose integration" --when "the upstream API stabilizes" >/dev/null || fail "record condition"
+  json=$(run "$home" "$fakebin" --json --all-decisions --all-landed) || fail "ahoy glance snapshot"
+  printf '%s' "$json" | jq -e '
+    (.landed | all(.id != "folded" and .id != "plain-closed" and .artifact != "-"))
+    and (.decisions_open | all(.id != "conditional"))
+    and (.gates | any(.id == "conditional" and .deferred == true and .reason == "when the upstream API stabilizes: Choose integration"
+      and .title == "Revisit integration with a complete task title that exceeds the old sixty-character cutoff"))
+    and (.in_flight | any(.id == "ship-task" and .stage == "implementing" and .elapsed_seconds == 900))
+  ' >/dev/null || fail "Ahoy lost delivery, condition, title, or timing evidence: $json"
+  pass "Ahoy excludes closures and defers conditional calls while preserving titles and elapsed time"
+}
+
+test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue
+test_ahoy_completion_does_not_infer_pr_readiness
+test_ahoy_checkpoint_tracks_disappearances_and_blockers
+test_ahoy_delivery_titles_timing_and_conditional_hold
 test_task_teardown_during_metadata_capture_does_not_abort_snapshot
 test_current_state_uses_captured_status_observation
 test_relaunched_task_does_not_inherit_reused_endpoint_state

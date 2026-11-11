@@ -198,8 +198,8 @@ The nudge payload has three parts:
 - It carries the current `session-start` protocol kind.
 - It retains exactly ``Run `bin/fm-session-start.sh` now, exactly once, before executing any other instructions.`` as its body.
 
-The Ahoy skill owns the rule that this marked operational input is never a captain-authored session boundary, including its narrow legacy compatibility cases.
-The Ahoy skill's own step 0 helm check is the fallback that protects a nudge-tier harness whose first command is a skill.
+[`bin/fm-operational-input.sh`](../bin/fm-operational-input.sh) owns operational-input classification and legacy compatibility.
+[`AGENTS.md` section 3](../AGENTS.md#3-session-start-run-once-at-every-session-start) owns the fallback when the digest is absent, including when the first command is a skill.
 
 ### Nudge wrapper lock check
 
@@ -277,7 +277,7 @@ Each mapped session generation starts one native prerequisite.
 #### Pi message delivery
 
 Pi is the only adapter that injects a message rather than hook stdout.
-So whatever it injects must carry operational provenance, or the Ahoy skill would have to guess whether it was captain-authored.
+Its injected messages follow the [operational-input protocol](../bin/fm-operational-input.sh).
 
 For `session_start`, the extension does the following:
 
@@ -431,7 +431,7 @@ It uses a TERM-resistant digest that exceeds its budget and proves that the dige
 
 ### Native startup and Ahoy tests
 
-`tests/fm-pi-primary-live-e2e.test.sh` and `tests/fm-opencode-primary-live-e2e.test.sh` exercise native startup paths with first-message and later-message Ahoy regressions.
+The [verification record](verification/supervision.md#native-session-start-delivery) scopes the Ahoy coverage in `tests/fm-pi-primary-live-e2e.test.sh` and `tests/fm-opencode-primary-live-e2e.test.sh`.
 
 ### Cursor tests
 

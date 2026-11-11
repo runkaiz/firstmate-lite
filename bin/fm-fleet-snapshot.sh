@@ -20,7 +20,7 @@
 #     Canonical Markdown queue rows are structured; free-form non-empty lines in
 #     those sections are preserved as unstructured records.
 #     Structured rows preserve captain-hold metadata such as hold_kind,
-#     hold_reason, and hold_until when present. They also carry
+#     hold_reason, hold_until, and hold_when when present. They also carry
 #     normalized current_role, requires_child_metadata, blocked_by_ids,
 #     unresolved_blocker_ids, captain_actionable, hold_set, hold_age_days,
 #     and hold_bucket fields.
@@ -30,12 +30,12 @@
 #     There is no separate decision type: any captain-held task is the same
 #     primitive, whatever kind its row carries.
 #     hold_bucket is the single classification for every captain hold, decided
-#     only from structured fields - state, hold_kind, hold_until,
+#     only from structured fields - state, hold_kind, hold_until, hold_when,
 #     unresolved_blocker_ids, and the machine-written hold-set timestamp. No
 #     hold reason or body prose is ever matched. The buckets are total and
 #     mutually exclusive, so every captain hold lands in exactly one and none
-#     can fall through: "blocked" when any blocker is unresolved, else "dated"
-#     when hold_until is still in the future, else "aged" when an undated hold
+#     can fall through: "blocked" when any blocker is unresolved, else "conditional" for an explicit
+#     hold_when revisit condition, else "dated" when hold_until is in the future, else "aged" when an undated hold
 #     is at least FM_SNAPSHOT_UNDATED_HOLD_AGE_DAYS old (default 14; legacy
 #     unstamped holds fall back to `since`), else "live". A non-captain or Done
 #     row carries null.
@@ -43,11 +43,9 @@
 #     hold_bucket == "live".
 #     hold_age_days is the hold's age when computable, else null.
 #     Aging is a projection safety net only: the durable deferral remains
-#     re-holding with --until.
-#     Renderers keep every non-live bucket out of the default Captain's Call,
-#     project it as a Charted Next gate stating why, and disclose it in
-#     omitted[]; --all-decisions reveals every captain hold available within the
-#     bounded snapshot.
+#     re-holding with --until or --when.
+#     bin/fm-bearings-snapshot.sh owns the bounded Ahoy projection and reveal
+#     behavior. .agents/skills/ahoy/SKILL.md owns its chat presentation.
 #   tasks[]: one row per task metadata record captured at snapshot start, sorted
 #     by id. A record removed before capture is omitted. If a captured task's
 #     generation changes while observations run, its selected metadata remains
@@ -75,8 +73,8 @@
 #     main-home current-inventory checks shared with secondmate_home_summary_json
 #     (orphan structured in-flight ids with no state/<id>.meta, and unstructured
 #     current backlog rows). Does not invent live tasks; meta remains truth for
-#     workers. Bearings maps failures into omitted[] disclosure (and a Charted
-#     Next gate line) rather than silent empty Underway.
+#     workers. The Ahoy projection maps failures into omitted[] disclosure
+#     and an action-free inventory warning gate.
 #   secondmate_current: {records[],total,shown,truncated} - bounded current summaries
 #     for registered secondmates, selected from validated structured state inside
 #     each home with explicit provenance, freshness, endpoint evidence, and unknown
@@ -256,10 +254,11 @@ kind=secondmate meta records are not child inventory for unowned_current or
 terminal_in_flight; they never have backlog rows.
 Its invalidity object names the normalized failure kind and affected ids.
 Actionable tasks-axi captain holds appear as decisions_open and stay visible in
-queued with hold_reason, hold_kind, hold_until,
+queued with hold_reason, hold_kind, hold_until, hold_when,
 hold_bucket, hold_age_days, and plural blocker fields for downstream
 projections. A captain hold is actionable only when every blocker is Done, any
-hold-until date has arrived, and an undated hold remains below the aging threshold.
+hold-until date has arrived, no hold-when condition remains, and an undated hold
+remains below the aging threshold.
 Cross-home collection uses FM_SNAPSHOT_SECONDMATES (default 20, 0 lifts the
 count bound) and FM_SNAPSHOT_SECONDMATE_MAX_BYTES.
 Every sampled remote home's state/home-summary.json is fetched concurrently
@@ -284,7 +283,7 @@ The registered secondmate table uses FM_SNAPSHOT_REGISTRY_LINES,
 FM_SNAPSHOT_REGISTRY_BYTES, FM_SNAPSHOT_REGISTRY_RECORDS, and
 FM_SNAPSHOT_REGISTRY_TIMEOUT, with unavailability and truncation disclosed.
 Every captain hold carries hold_bucket, decided only from structured fields and
-never from hold reason or body prose: "blocked", "dated", "aged", or "live".
+never from hold reason or body prose: "blocked", "conditional", "dated", "aged", or "live".
 An undated hold ages once its hold-set timestamp is at least
 FM_SNAPSHOT_UNDATED_HOLD_AGE_DAYS old (default 14; 0 ages every hold with a
 non-negative computed age); legacy holds without a stamp fall back to their
@@ -455,7 +454,7 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
     def links($rest): [$rest | scan(url_pattern)];
     def strip_trailing_metadata:
       reduce range(0; 20) as $_ (.;
-        sub("[[:space:]]*\\([[:space:]]*(?:(?:repo|kind|priority|hold|hold-kind|hold-until):[[:space:]]*[^)]*|(?:since|merged|reported|done)[[:space:]]+[^)]*)[[:space:]]*\\)[[:space:]]*$"; ""));
+        sub("[[:space:]]*\\([[:space:]]*(?:(?:repo|kind|priority|hold|hold-kind|hold-until|hold-when):[[:space:]]*[^)]*|(?:since|merged|reported|done)[[:space:]]+[^)]*)[[:space:]]*\\)[[:space:]]*$"; ""));
     def strip_title_artifacts:
       sub("[[:space:]]+-[[:space:]]+data/[^[:space:])]+/report\\.md$"; "")
       | sub("[[:space:]]+data/[^[:space:])]+/report\\.md$"; "")
@@ -516,6 +515,7 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
              hold_reason:hold_metadata($rest),
              hold_kind:metadata($rest; "hold-kind"),
              hold_until:metadata($rest; "hold-until"),
+             hold_when:metadata($rest; "hold-when"),
              hold_set:null,
              blocked_by:cap($rest; ".*blocked-by:[[:space:]]*(?<v>[^[:space:])]+).*"),
              blocked_by_ids:blocked_by_ids($rest),
@@ -587,6 +587,7 @@ backlog_json() (  # [<backlog-path>] - defaults to this home's $BACKLOG
           | .hold_bucket =
               (if .hold_kind != "captain" or .hold_reason == null or .state == "done" then null
                elif (.unresolved_blocker_ids | length) > 0 then "blocked"
+               elif .hold_when != null then "conditional"
                elif .hold_until != null and .hold_until > $today then "dated"
                elif .hold_until == null and .hold_age_days != null
                     and .hold_age_days >= $age_days then "aged"

@@ -28,15 +28,9 @@
 # The retained hold-kind alone keeps answered calls out of the section.
 # Merged PRs and reported scouts remain distinct.
 #
-# The backlog-selection compatibility fallback keeps a structured Done row
-# whose three parsed artifact fields are absent when it does not retain
-# hold-kind captain.
-# That preserves kindless rows closed before artifact-aware selection without
-# admitting answered captain calls or explicit reportless scouts.
-# Already-selected v1 secondmate landed rows may omit kind. For those rows,
-# landed_artifact preserves a report_path with a reported completion; this
-# display compatibility does not admit kindless reports from raw backlog rows.
-# tests/fm-bearings-snapshot.test.sh covers both fresh and cached v1 summaries.
+# Closed rows without a delivery artifact are omitted, including folded ideas.
+# Cached v1 scout rows may omit kind; their reported completion preserves the
+# report artifact after selection by their owning home.
 
 # shellcheck disable=SC2034 # Output global, read by the sourcing caller.
 FM_LANDED_JQ_DEFS='
@@ -49,12 +43,6 @@ FM_LANDED_JQ_DEFS='
     elif .completion.verb == "done" then (.local_note // null)
     else null
     end;
-  # The kind-is-not-scout guards below and in the fallback are LOAD-BEARING:
-  # they keep an explicit scout that recorded no report out of Recently Landed.
-  # Without them such a row has none of the three artifacts, satisfies the
-  # compatibility fallback and renders as shipped work with an empty artifact.
-  # Pinned by tests/fm-captain-hold-lifecycle.test.sh on "released, retained, or
-  # rejected deliveries were misclassified".
   def landed_delivery:
     scout_report
     or (.kind != "scout"
@@ -69,11 +57,5 @@ FM_LANDED_JQ_DEFS='
       and (.local_note // null) != null);
   def landed_record:
     .state == "done" and .structured
-    and (landed_delivery
-      or (.kind != "scout"
-        and .kind != "captain"
-        and .hold_kind != "captain"
-        and (.pr_url // null) == null
-        and (.report_path // null) == null
-        and (.local_note // null) == null));
+    and landed_delivery;
 '

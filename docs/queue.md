@@ -46,7 +46,7 @@ The existing intake and supervision paths reconsider candidates at startup, hear
 Existing dispatch/completion owners still pair queue state with real worker metadata and evidence.
 Worker exit alone never closes a task, and capacity refusal leaves it queued.
 Real human choices continue through `fm-captain-hold.sh`, preserving the actual answer and the distinction between releasing work and completing it.
-A captain hold's date controls deferral, not authorization: it remains held until answered/released, while an ordinary authorized time gate can expire normally.
+A captain hold's date or explicit revisit condition controls deferral, not authorization: it remains held until answered/released; Firstmate verifies a condition before resurfacing its call, while an ordinary authorized time gate can expire normally.
 The away-return human-decision group excludes parked context using the hold-kind field.
 
 ## Existing homes and reversibility

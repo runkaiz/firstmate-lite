@@ -174,7 +174,7 @@ Handle actionable wakes:
 3. `check:` - act on the named result; acknowledge a handled captain inbox note with `bin/fm-inbox.sh drain --ack <id>` and publish a needed durable answer with `bin/fm-inbox.sh reply <id>`.
 4. `heartbeat:` - review the whole fleet, reconcile suspicious tasks and PR state, update the backlog, and never report an unchanged fleet as progress.
 
-Load `ahoy` on a contributions check wake or when filing work linked to an upstream issue.
+Load `contribution-follow-up` on a contributions check wake or when filing work linked to an upstream issue.
 When a wake reports a merged PR for a project cloned here, refresh that clone through guarded fleet sync.
 Waiting on a healthy cycle is silent.
 Never broadly kill watchers, especially never `pkill -f bin/fm-watch.sh`; a forced repair uses the home-scoped path the supervision instructions emit.

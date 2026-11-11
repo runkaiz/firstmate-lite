@@ -1064,6 +1064,22 @@ fm_backlog_dispatch_transition "$2/state/stable.meta" "$2/data" stable "$2/state
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(json.loads(result.stdout)["task"]["archived"])
 
+    def test_conditional_captain_hold_round_trip_and_release(self):
+        self.call("add", "conditional", "Revisit integration")
+        self.call("hold", "conditional", "--kind", "captain", "--reason", "Integration choice", "--when", "the upstream API stabilizes")
+        task = self.task("conditional")
+        self.assertEqual(task["hold_when"], "the upstream API stabilizes")
+        self.assertTrue(task["held"])
+        self.assertNotIn("conditional", self.ready())
+        snapshot = json.loads(self.call("snapshot", "--json").stdout)
+        self.assertEqual(snapshot["metadata"]["conditional"]["hold_when"], task["hold_when"])
+        before = self.file.read_bytes()
+        self.call("hold", "conditional", "--kind", "captain", "--reason", "Both", "--when", "condition", "--until", "2099-01-01", good=False)
+        self.assertEqual(self.file.read_bytes(), before)
+        self.call("unhold", "conditional")
+        self.assertIsNone(self.task("conditional")["hold_when"])
+        self.assertIn("conditional", self.ready())
+
     def test_fleet_snapshot_resolves_archived_prerequisite(self):
         self.call("add", "a", "Prerequisite")
         self.call("add", "b", "Dependent", "--blocked-by", "a")

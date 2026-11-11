@@ -246,9 +246,10 @@ FM_OPENCODE_LIVE_E2E=1 tests/fm-opencode-primary-live-e2e.test.sh
 It reports an absent adapter explicitly, asserts Pi compaction rather than noting it, and refuses to pass when none of those three adapters was installed.
 Cursor's refresh command is `FM_CURSOR_PRIMARY_LIVE_E2E=1 tests/fm-cursor-primary-live-e2e.test.sh`, recorded under [Cursor primary park](#cursor-primary-park-2026-08-13).
 
-The Ahoy first-message boundary was reverified on 2026-07-22 with Pi 0.81.1 and OpenCode 1.17.18.
-Marked current operational input and the two exact legacy compatibility shapes selected Bearings, while genuine near-miss captain messages remained real boundaries.
-The detailed reconciliation and task chronology stay in the private audit report and PR evidence.
+`tests/fm-pi-primary-live-e2e.test.sh` and `tests/fm-opencode-primary-live-e2e.test.sh` load the [current Ahoy skill](../../.agents/skills/ahoy/SKILL.md) with its snapshot executable for first-message and later-message catch-ups.
+Their shared `tests/ahoy-live-helpers.sh` fixture checks the delivery artifact, the existing queued follow-up becoming unblocked, empty-inventory and contribution-count omission, queue preservation, and a fresh observation checkpoint.
+The native cases also assert that session start runs exactly once.
+Refresh live evidence for this contract with the two native live entry points above.
 
 ### Per-task endpoint reads cannot truncate the digest
 
