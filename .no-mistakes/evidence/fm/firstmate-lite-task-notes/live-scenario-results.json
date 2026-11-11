@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Long notes remain outside the compact queue, readable through the CLI, preserved on replacement and archive/reopen",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Oversized and multiline inline body/note inputs refuse with file guidance and no persisted changes",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Migration merges existing CRLF notes with inline notes, archives original bytes, leaves dry-run unchanged and repeats without changes",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Migrated, imported and externally edited CRLF notes complete, prune, replace and reopen with normalized text and raw history retained",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "An interrupted multi-task migration recovers all notes through the next normal queue command",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Backup captures every referenced active notes file with hashes, restores without the source home, and supports continued edits",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Symlinked task folders and missing note targets fail clearly without changing unrelated files",
+    "result": "pass",
+    "live": true
+  }
+]

@@ -1,0 +1,67 @@
+test_notes_files_keep_queue_short_and_archive_replacements (__main__.QueueTests.test_notes_files_keep_queue_short_and_archive_replacements) ... ok
+test_inline_limits_refuse_without_mutation (__main__.QueueTests.test_inline_limits_refuse_without_mutation) ... ok
+test_note_migration_is_lossless_idempotent_and_recoverable (__main__.QueueTests.test_note_migration_is_lossless_idempotent_and_recoverable) ... ok
+test_crlf_migration_keeps_raw_history_and_round_trips (__main__.QueueTests.test_crlf_migration_keeps_raw_history_and_round_trips) ... ok
+test_crlf_external_notes_and_replacements_keep_raw_history (__main__.QueueTests.test_crlf_external_notes_and_replacements_keep_raw_history) ... ok
+test_crlf_body_import_and_move_keep_raw_history (__main__.QueueTests.test_crlf_body_import_and_move_keep_raw_history) ... ok
+test_note_path_refusals_and_relocated_data (__main__.QueueTests.test_note_path_refusals_and_relocated_data) ... ok
+test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) ... 
+  test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) (layout='data/backlog.md') ... FAIL
+  test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) (layout='records/queue.md') ... FAIL
+
+======================================================================
+FAIL: test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) (layout='data/backlog.md')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/tests/fm-queue.test.py", line 517, in test_backup_restores_referenced_notes_in_a_clean_home
+    self.assertEqual({Path(entry["source"]) for entry in manifest}, expected_paths)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the first set but not the second:
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/note-archive.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/empty/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/backlog.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/running/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/queued/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/held/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/retained/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/history/finished.md')
+Items in the second set but not the first:
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/running/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/history/finished.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/note-archive.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/queued/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/backlog.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/held/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/empty/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/data/data/retained/notes.md')
+
+======================================================================
+FAIL: test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) (layout='records/queue.md')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/tests/fm-queue.test.py", line 517, in test_backup_restores_referenced_notes_in_a_clean_home
+    self.assertEqual({Path(entry["source"]) for entry in manifest}, expected_paths)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the first set but not the second:
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/retained/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/note-archive.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/running/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/held/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/queue.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/queued/notes.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/history/finished.md')
+PosixPath('/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/empty/notes.md')
+Items in the second set but not the first:
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/running/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/queue.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/retained/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/held/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/note-archive.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/history/finished.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/queued/notes.md')
+PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpxws2cncq/records/records/empty/notes.md')
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.437s
+
+FAILED (failures=2)

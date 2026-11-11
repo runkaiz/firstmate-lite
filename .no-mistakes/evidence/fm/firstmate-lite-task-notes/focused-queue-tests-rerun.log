@@ -1,0 +1,13 @@
+test_notes_files_keep_queue_short_and_archive_replacements (__main__.QueueTests.test_notes_files_keep_queue_short_and_archive_replacements) ... ok
+test_inline_limits_refuse_without_mutation (__main__.QueueTests.test_inline_limits_refuse_without_mutation) ... ok
+test_note_migration_is_lossless_idempotent_and_recoverable (__main__.QueueTests.test_note_migration_is_lossless_idempotent_and_recoverable) ... ok
+test_crlf_migration_keeps_raw_history_and_round_trips (__main__.QueueTests.test_crlf_migration_keeps_raw_history_and_round_trips) ... ok
+test_crlf_external_notes_and_replacements_keep_raw_history (__main__.QueueTests.test_crlf_external_notes_and_replacements_keep_raw_history) ... ok
+test_crlf_body_import_and_move_keep_raw_history (__main__.QueueTests.test_crlf_body_import_and_move_keep_raw_history) ... ok
+test_note_path_refusals_and_relocated_data (__main__.QueueTests.test_note_path_refusals_and_relocated_data) ... ok
+test_backup_restores_referenced_notes_in_a_clean_home (__main__.QueueTests.test_backup_restores_referenced_notes_in_a_clean_home) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 5.079s
+
+OK

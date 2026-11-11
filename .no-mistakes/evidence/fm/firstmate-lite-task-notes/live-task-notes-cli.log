@@ -1,0 +1,1015 @@
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add delivery 'Deliver accepted work' --kind ship --repo demo --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes/input.md
+ok: add delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "## Accepted intent\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\n\n- [ ] nested - This is note text\n"
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+PERSISTED BACKLOG:
+## In flight
+
+## Queued
+
+- [ ] delivery - Deliver accepted work (repo: demo) (kind: ship) (since 2026-11-11)
+  notes: delivery/notes.md
+## Done
+
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh list
+tasks[1]{id,title,state,kind,repo,notes_file}:
+  delivery,Deliver accepted work,queued,ship,demo,delivery/notes.md
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show delivery --full
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "## Accepted intent\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\n\n- [ ] nested - This is note text\n"
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show delivery --json
+{"ok": true, "task": {"id": "delivery", "title": "Deliver accepted work", "state": "queued", "kind": "ship", "repo": "demo", "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "## Accepted intent\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\nLong scope with Unicode 雪 and indentation\n\n- [ ] nested - This is note text\n", "notes_file": "delivery/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh snapshot
+{"text": "## In flight\n\n## Queued\n\n- [ ] delivery - Deliver accepted work (repo: demo) (kind: ship) (since 2026-11-11)\n  ## Accepted intent\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  Long scope with Unicode 雪 and indentation\n  \n  - [ ] nested - This is note text\n  \n## Done\n", "closed_ids": [], "metadata": {"delivery": {"repo": "demo", "kind": "ship", "priority": null, "since": "2026-11-11", "merged": null, "reported": null, "done": null, "state": "queued", "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked_by_ids": [], "blocked_by": null, "blocked_reason": null, "completion": {"verb": null, "date": null}}}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes/input.md
+ok: update delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Replacement intent\n\nRetained detail\n"
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+PERSISTED NOTE HISTORY:
+
+## delivery - Body replaced - 2026-11-11T07:37:46.522842+00:00
+
+- [ ] delivery - Deliver accepted work (repo: demo) (kind: ship) (since 2026-11-11)
+  ## Accepted intent
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  Long scope with Unicode 雪 and indentation
+  
+  - [ ] nested - This is note text
+  
+
+
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh start delivery
+ok: start delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: in_flight
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Replacement intent\n\nRetained detail\n"
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show delivery --json
+{"ok": true, "task": {"id": "delivery", "title": "Deliver accepted work", "state": "in_flight", "kind": "ship", "repo": "demo", "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Replacement intent\n\nRetained detail\n", "notes_file": "delivery/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done delivery --keep 0 --note 'Validated delivery'
+ok: done delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: done
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: 2026-11-11
+  links: none
+  body: "Replacement intent\n\nRetained detail\n\n\nValidated delivery"
+  notes_file: delivery/notes.md
+  archived: yes
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show delivery --json
+{"ok": true, "task": {"id": "delivery", "title": "Deliver accepted work", "state": "done", "kind": "ship", "repo": "demo", "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": "2026-11-11", "links": [], "body": "Replacement intent\n\nRetained detail\n\n\nValidated delivery", "notes_file": null, "archived": true}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh reopen delivery
+ok: reopen delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Replacement intent\n\nRetained detail\n\n\nValidated delivery"
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show delivery --json
+{"ok": true, "task": {"id": "delivery", "title": "Deliver accepted work", "state": "queued", "kind": "ship", "repo": "demo", "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Replacement intent\n\nRetained detail\n\n\nValidated delivery", "notes_file": "delivery/notes.md", "archived": false}}
+exit: 0
+
+PROVEN: Long notes remain outside the compact queue, readable through the CLI, preserved on replacement and archive/reopen
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --body xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok: update delivery
+task:
+  id: delivery
+  title: Deliver accepted work
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  notes_file: delivery/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --body xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+error: inline --body must be one short line (at most 240 characters); use --body-file for task notes
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --body 'First
+Second'
+error: inline --body must be one short line (at most 240 characters); use --body-file for task notes
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --body 'FirstSecond'
+error: inline --body must be one short line (at most 240 characters); use --body-file for task notes
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --note xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+error: inline --note must be one short line (at most 240 characters); use update --body-file for task notes
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --note 'First
+Second'
+error: inline --note must be one short line (at most 240 characters); use update --body-file for task notes
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/notes bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update delivery --note 'FirstSecond'
+error: inline --note must be one short line (at most 240 characters); use update --body-file for task notes
+exit: 1
+
+PROVEN: Oversized and multiline inline body/note inputs refuse with file guidance and no persisted changes
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate-notes --dry-run
+{"ok": true, "migrated": ["migrated"], "dry_run": true}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate-notes
+{"ok": true, "migrated": ["migrated"], "dry_run": false}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show migrated --json
+{"ok": true, "task": {"id": "migrated", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "Prior\n  Indented 雪\nFinal\nTail detail\n\n\nInline scope", "notes_file": "migrated/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate-notes
+{"ok": true, "migrated": [], "dry_run": false}
+exit: 0
+
+RAW HISTORY BYTE REPRESENTATION: b'\n## migrated - Inline notes relocated - 2026-11-11T07:37:48.107973+00:00\n\n- [ ] migrated - Accepted work\r\n  Inline scope\r\n\n\n## migrated - Original note line endings retained - 2026-11-11T07:37:48.108081+00:00\n\n- [ ] migrated - Accepted work\n  Prior\r\n    Indented \xe9\x9b\xaa\r\n  Final\rTail\xe2\x80\xa8detail\r\n  \n  \n  Inline scope\n\n'
+
+PROVEN: Migration merges existing CRLF notes with inline notes, archives original bytes, leaves dry-run unchanged and repeats without changes
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done migrated --no-prune
+ok: done migrated
+task:
+  id: migrated
+  title: Accepted work
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-11
+  links: none
+  body: "Prior\n  Indented 雪\nFinal\nTail detail\n\n\nInline scope"
+  notes_file: migrated/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh prune --keep 0
+ok: archived completed records; identities retained
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show migrated --json
+{"ok": true, "task": {"id": "migrated", "title": "Accepted work", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": "2026-11-11", "links": [], "body": "Prior\n  Indented 雪\nFinal\nTail detail\n\n\nInline scope", "notes_file": null, "archived": true}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh reopen migrated
+ok: reopen migrated
+task:
+  id: migrated
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: "Prior\n  Indented 雪\nFinal\nTail detail\n\n\nInline scope"
+  notes_file: migrated/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show migrated --json
+{"ok": true, "task": {"id": "migrated", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "Prior\n  Indented 雪\nFinal\nTail detail\n\n\nInline scope", "notes_file": "migrated/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update migrated --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration/replacement.md
+ok: update migrated
+task:
+  id: migrated
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: "Replacement\nNext\nStep\n"
+  notes_file: migrated/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show migrated --json
+{"ok": true, "task": {"id": "migrated", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "External\nCurrent scope\n", "notes_file": "migrated/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done migrated --keep 0
+ok: done migrated
+task:
+  id: migrated
+  title: Accepted work
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-11
+  links: none
+  body: "External\nCurrent scope\n"
+  notes_file: migrated/notes.md
+  archived: yes
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh reopen migrated
+ok: reopen migrated
+task:
+  id: migrated
+  title: Accepted work
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: "External\nCurrent scope\n"
+  notes_file: migrated/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/migration bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show migrated --json
+{"ok": true, "task": {"id": "migrated", "title": "Accepted work", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "External\nCurrent scope\n", "notes_file": "migrated/notes.md", "archived": false}}
+exit: 0
+
+PROVEN: Migrated, imported and externally edited CRLF notes complete, prune, replace and reopen with normalized text and raw history retained
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate-notes
+exit: 91
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh list
+tasks[8]{id,title,state,kind,repo,notes_file}:
+  item-0,Accepted 0,queued,task,"-",item-0/notes.md
+  item-1,Accepted 1,queued,task,"-",item-1/notes.md
+  item-2,Accepted 2,queued,task,"-",item-2/notes.md
+  item-3,Accepted 3,queued,task,"-",item-3/notes.md
+  item-4,Accepted 4,queued,task,"-",item-4/notes.md
+  item-5,Accepted 5,queued,task,"-",item-5/notes.md
+  item-6,Accepted 6,queued,task,"-",item-6/notes.md
+  item-7,Accepted 7,queued,task,"-",item-7/notes.md
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-0 --json
+{"ok": true, "task": {"id": "item-0", "title": "Accepted 0", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-0/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-1 --json
+{"ok": true, "task": {"id": "item-1", "title": "Accepted 1", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-1/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-2 --json
+{"ok": true, "task": {"id": "item-2", "title": "Accepted 2", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-2/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-3 --json
+{"ok": true, "task": {"id": "item-3", "title": "Accepted 3", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-3/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-4 --json
+{"ok": true, "task": {"id": "item-4", "title": "Accepted 4", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-4/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-5 --json
+{"ok": true, "task": {"id": "item-5", "title": "Accepted 5", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-5/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-6 --json
+{"ok": true, "task": {"id": "item-6", "title": "Accepted 6", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-6/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show item-7 --json
+{"ok": true, "task": {"id": "item-7", "title": "Accepted 7", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": null, "closed": null, "links": [], "body": "First\nSecond", "notes_file": "item-7/notes.md", "archived": false}}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/recovery bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate-notes
+{"ok": true, "migrated": [], "dry_run": false}
+exit: 0
+
+PROVEN: An interrupted multi-task migration recovers all notes through the next normal queue command
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add queued queued --body 'Original scope'
+ok: add queued
+task:
+  id: queued
+  title: queued
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: queued/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update queued --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update queued
+task:
+  id: queued
+  title: queued
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current queued scope\n雪\n"
+  notes_file: queued/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add running running --body 'Original scope'
+ok: add running
+task:
+  id: running
+  title: running
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: running/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update running --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update running
+task:
+  id: running
+  title: running
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current running scope\n雪\n"
+  notes_file: running/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add held held --body 'Original scope'
+ok: add held
+task:
+  id: held
+  title: held
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: held/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update held --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update held
+task:
+  id: held
+  title: held
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current held scope\n雪\n"
+  notes_file: held/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add retained retained --body 'Original scope'
+ok: add retained
+task:
+  id: retained
+  title: retained
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: retained/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update retained --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update retained
+task:
+  id: retained
+  title: retained
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current retained scope\n雪\n"
+  notes_file: retained/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add archived archived --body 'Original scope'
+ok: add archived
+task:
+  id: archived
+  title: archived
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: archived/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update archived --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update archived
+task:
+  id: archived
+  title: archived
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current archived scope\n雪\n"
+  notes_file: archived/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add empty empty --body 'Original scope'
+ok: add empty
+task:
+  id: empty
+  title: empty
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Original scope
+  notes_file: empty/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update empty --body-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/input.md
+ok: update empty
+task:
+  id: empty
+  title: empty
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: empty/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh start running
+ok: start running
+task:
+  id: running
+  title: running
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current running scope\n雪\n"
+  notes_file: running/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh hold held --kind captain --reason 'Choose scope'
+ok: hold held
+task:
+  id: held
+  title: held
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: yes
+  hold_reason: "Choose scope"
+  hold_kind: captain
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Current held scope\n雪\n"
+  notes_file: held/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done archived --keep 0
+ok: done archived
+task:
+  id: archived
+  title: archived
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: 2026-11-11
+  links: none
+  body: "Current archived scope\n雪\n"
+  notes_file: archived/notes.md
+  archived: yes
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done retained --no-prune
+ok: done retained
+task:
+  id: retained
+  title: retained
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: 2026-11-11
+  links: none
+  body: "Current retained scope\n雪\n"
+  notes_file: retained/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh list --json
+{"tasks": [{"id": "running", "title": "running", "state": "in_flight", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current running scope\n雪\n", "notes_file": "running/notes.md", "archived": false}, {"id": "queued", "title": "queued", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current queued scope\n雪\n", "notes_file": "queued/notes.md", "archived": false}, {"id": "held", "title": "held", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": true, "hold_reason": "Choose scope", "hold_kind": "captain", "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current held scope\n雪\n", "notes_file": "held/notes.md", "archived": false}, {"id": "empty", "title": "empty", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "", "notes_file": "empty/notes.md", "archived": false}, {"id": "retained", "title": "retained", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": "2026-11-11", "links": [], "body": "Current retained scope\n雪\n", "notes_file": "retained/notes.md", "archived": false}]}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show archived --history --json
+{"ok": true, "id": "archived", "ambiguous": null, "records": [{"id": "archived", "title": "archived", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": "2026-11-11", "links": [], "body": "Current archived scope\n雪\n", "notes_file": null, "archived": true, "location": "done-archive.md:3 (Archived 2026-11-11, kind task, done 2026-11-11)", "digest": "sha256:d9db496292711e37cdfe7b3ef34cbfa97f3cd269f3ebd32e15af622397bfec5b#1"}]}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh migrate --backup-dir /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup
+{"ok": true, "records": 6, "identities": 6, "ambiguous_histories": [], "format": "compatible-markdown", "rewrite_required": false, "activated": false}
+exit: 0
+
+BACKUP MANIFEST:
+[
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/backlog.md",
+    "backup": "0-backlog.md",
+    "sha256": "ae546333dfc78880b9cf95ae5c0c556399886946df8cc0d9e81514b9ba9ec858"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/done-archive.md",
+    "backup": "1-done-archive.md",
+    "sha256": "4e3660bee27172d08fc6ccbd99a3f0d3f6c07ceac1501465f2049be48d3f1fb7"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/note-archive.md",
+    "backup": "2-note-archive.md",
+    "sha256": "997e7c9cc2cc71f95fdfc59d551e22ed46c73389b7a22ba16f0c40360ae6c9ca"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/running/notes.md",
+    "backup": "3-notes.md",
+    "sha256": "8514ca968f967d9ee193d399496e94215cdb1941e84aba722253fc372cedf962"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/queued/notes.md",
+    "backup": "4-notes.md",
+    "sha256": "3718192f31ec8288ad1345a88b172f08caaf64a6c622192f2038520f48638dd8"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/held/notes.md",
+    "backup": "5-notes.md",
+    "sha256": "071ac2e9ce16a4a88c8de616cc1c0b393ec91a8f2566042c5e7f1925382869ee"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/empty/notes.md",
+    "backup": "6-notes.md",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/backup-source/data/retained/notes.md",
+    "backup": "7-notes.md",
+    "sha256": "958171264382eadc522661c383426a9c83cba5aa2a9d1330ff7c2fe4c34326ff"
+  }
+]
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/restored bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh list --json
+{"tasks": [{"id": "running", "title": "running", "state": "in_flight", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current running scope\n雪\n", "notes_file": "running/notes.md", "archived": false}, {"id": "queued", "title": "queued", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current queued scope\n雪\n", "notes_file": "queued/notes.md", "archived": false}, {"id": "held", "title": "held", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": true, "hold_reason": "Choose scope", "hold_kind": "captain", "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Current held scope\n雪\n", "notes_file": "held/notes.md", "archived": false}, {"id": "empty", "title": "empty", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "", "notes_file": "empty/notes.md", "archived": false}, {"id": "retained", "title": "retained", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": "2026-11-11", "links": [], "body": "Current retained scope\n雪\n", "notes_file": "retained/notes.md", "archived": false}]}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/restored bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show archived --history --json
+{"ok": true, "id": "archived", "ambiguous": null, "records": [{"id": "archived", "title": "archived", "state": "done", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": "2026-11-11", "links": [], "body": "Current archived scope\n雪\n", "notes_file": null, "archived": true, "location": "done-archive.md:3 (Archived 2026-11-11, kind task, done 2026-11-11)", "digest": "sha256:d9db496292711e37cdfe7b3ef34cbfa97f3cd269f3ebd32e15af622397bfec5b#1"}]}
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/restored bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh update queued --body 'Continued after restore'
+ok: update queued
+task:
+  id: queued
+  title: queued
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Continued after restore
+  notes_file: queued/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/restored bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show queued --json
+{"ok": true, "task": {"id": "queued", "title": "queued", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "Continued after restore", "notes_file": "queued/notes.md", "archived": false}}
+exit: 0
+
+PROVEN: Backup captures every referenced active notes file with hashes, restores without the source home, and supports continued edits
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/safety bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add unsafe 'Unsafe task' --body Scope
+error: refusing symlink: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/safety/data/unsafe
+exit: 1
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/safety bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add missing 'Missing notes guard' --body Scope
+ok: add missing
+task:
+  id: missing
+  title: Missing notes guard
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: Scope
+  notes_file: missing/notes.md
+  archived: no
+exit: 0
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/safety bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show missing
+error: missing task notes: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmp796vcr36/safety/data/missing/notes.md
+exit: 1
+
+PROVEN: Symlinked task folders and missing note targets fail clearly without changing unrelated files
+
+All disposable homes removed. Scenario results: [{"name": "Long notes remain outside the compact queue, readable through the CLI, preserved on replacement and archive/reopen", "result": "pass", "live": true}, {"name": "Oversized and multiline inline body/note inputs refuse with file guidance and no persisted changes", "result": "pass", "live": true}, {"name": "Migration merges existing CRLF notes with inline notes, archives original bytes, leaves dry-run unchanged and repeats without changes", "result": "pass", "live": true}, {"name": "Migrated, imported and externally edited CRLF notes complete, prune, replace and reopen with normalized text and raw history retained", "result": "pass", "live": true}, {"name": "An interrupted multi-task migration recovers all notes through the next normal queue command", "result": "pass", "live": true}, {"name": "Backup captures every referenced active notes file with hashes, restores without the source home, and supports continued edits", "result": "pass", "live": true}, {"name": "Symlinked task folders and missing note targets fail clearly without changing unrelated files", "result": "pass", "live": true}]

@@ -1,0 +1,96 @@
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh add movable 'Move the notes' --body-file ./input.md
+ok: add movable
+task:
+  id: movable
+  title: Move the notes
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "Move accepted scope\nIndented detail\n"
+  notes_file: movable/notes.md
+  archived: no
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh mv movable --to ./target/data/backlog.md
+{"ok": true, "moved": ["movable"]}
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/source bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh list --json
+{"tasks": []}
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/target bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show movable --json
+{"ok": true, "task": {"id": "movable", "title": "Move the notes", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "External progress\nRetained scope\n", "notes_file": "movable/notes.md", "archived": false}}
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/target bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh done movable --keep 0
+ok: done movable
+task:
+  id: movable
+  title: Move the notes
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: 2026-11-11
+  links: none
+  body: "External progress\nRetained scope\n"
+  notes_file: movable/notes.md
+  archived: yes
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/target bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh reopen movable
+ok: reopen movable
+task:
+  id: movable
+  title: Move the notes
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: "External progress\nRetained scope\n"
+  notes_file: movable/notes.md
+  archived: no
+
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/.test-notes-live/tmpi2i9n_m4/target bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74QH32GCR2CZ6HW0N75KFEK/bin/fm-queue.sh show movable --json
+{"ok": true, "task": {"id": "movable", "title": "Move the notes", "state": "queued", "kind": "task", "repo": null, "priority": null, "held": false, "hold_reason": null, "hold_kind": null, "hold_until": null, "hold_when": null, "blocked": false, "blocked_by": [], "deps": [], "created": "2026-11-11", "closed": null, "links": [], "body": "External progress\nRetained scope\n", "notes_file": "movable/notes.md", "archived": false}}
+
+PERSISTED DESTINATION BACKLOG:
+## In flight
+
+## Queued
+
+- [ ] movable - Move the notes (since 2026-11-11)
+  notes: movable/notes.md
+## Done
+
+PERSISTED DESTINATION NOTES: b'External progress\nRetained scope\n'
+PROVEN: Relative-path move carries CRLF notes to the destination; destination completion/reopen retains the content. Disposable homes removed.
