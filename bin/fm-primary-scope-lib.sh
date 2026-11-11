@@ -20,11 +20,13 @@ fm_root_is_secondmate_home() {
 }
 
 # Return 0 when $1 is a genuine primary root, regardless of whether its state
-# dir exists yet. A valid secondmate marker force-includes a linked secondmate
-# home. Otherwise only a plain checkout is primary, never a linked task
-# worktree.
+# dir exists yet. A worker can inherit its supervisor's split-home environment,
+# so its task marker takes precedence over the root. A valid secondmate marker
+# force-includes a linked secondmate home. Otherwise only a plain checkout
+# is primary, never a linked task worktree.
 fm_primary_root_matches() {
   local root=$1 git_dir git_common_dir
+  [ -z "${FM_TASK_ID:-}" ] || return 1
   if ! fm_root_is_secondmate_home "$root"; then
     git_dir=$(git -C "$root" rev-parse --git-dir 2>/dev/null) || return 1
     git_common_dir=$(git -C "$root" rev-parse --git-common-dir 2>/dev/null) || return 1

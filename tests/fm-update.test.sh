@@ -75,6 +75,7 @@ SH
 
   printf 'v1\n' > "$w/seed/AGENTS.md"
   printf 'r1\n' > "$w/seed/README.md"
+  printf '/state/\n' > "$w/seed/.gitignore"
   mkdir -p "$w/seed/bin" "$w/seed/.agents/skills"
   printf 'echo a\n' > "$w/seed/bin/tool.sh"
   printf '#!/usr/bin/env bash\nexit 0\n' > "$w/seed/bin/fm-remote-secondmate-control.sh"
@@ -269,10 +270,10 @@ test_primary_update_rebinds_local_watch() {
   git -C "$w/seed" push -q origin main
   git -C "$w/main" pull -q origin main
 
-  FM_ROOT_OVERRIDE="$w/main" FM_HOME="$w/home" "$ROOT/bin/fm-procevent-when.sh" \
+  FM_ROOT_OVERRIDE="$w/main" FM_HOME="$w/main" "$ROOT/bin/fm-procevent-when.sh" \
     arm rebind-primary --interval 60 --stable 1 \
     --condition true --action "$w/main/bin/watched-action.sh" "$w/rebind.log" >/dev/null
-  spec="$w/home/state/when/when-rebind-primary.spec"
+  spec="$w/main/state/when/when-rebind-primary.spec"
   before_hash=$(grep '^action_sha256=' "$spec")
 
   printf "#!/usr/bin/env bash\necho v2 >> \"\$1\"\n" > "$w/seed/bin/watched-action.sh"
@@ -280,7 +281,7 @@ test_primary_update_rebinds_local_watch() {
   git -C "$w/seed" commit -qm bump-watched-action
   git -C "$w/seed" push -q origin main
 
-  out=$(run_update "$w")
+  out=$(FM_ROOT_OVERRIDE="$w/main" FM_HOME="$w/main" "$UPDATE")
 
   assert_contains "$out" "firstmate: updated " "the primary still advanced"
   assert_contains "$out" "rebound: when-rebind-primary" "the primary self-update rebound its own locally armed watch"

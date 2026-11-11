@@ -167,6 +167,11 @@ fm_watcher_lock_unheld() {
 }
 
 FM_WATCHER_MATCHED_IDENTITY=
+# Home links and the shared installation can name the same executable.
+fm_watcher_paths_match() {
+  [ "$1" = "$2" ] || [ "$1" -ef "$2" ]
+}
+
 fm_watcher_lock_matches_pid() {
   local state=$1 watch_path=$2 pid=$3 home=${4:-$FM_HOME} lockdir lock_home lock_path lock_identity current_identity
   FM_WATCHER_MATCHED_IDENTITY=
@@ -175,7 +180,7 @@ fm_watcher_lock_matches_pid() {
   lock_path=$(cat "$lockdir/watcher-path" 2>/dev/null || true)
   lock_identity=$(cat "$lockdir/pid-identity" 2>/dev/null || true)
   [ "$lock_home" = "$home" ] || return 1
-  [ "$lock_path" = "$watch_path" ] || return 1
+  fm_watcher_paths_match "$lock_path" "$watch_path" || return 1
   [ -n "$lock_identity" ] || return 1
   current_identity=$(fm_pid_identity "$pid") || return 1
   [ "$current_identity" = "$lock_identity" ] || return 1

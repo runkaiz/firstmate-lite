@@ -8,6 +8,9 @@ metadata:
 
 # Operational home layout
 
+Tracked paths belong to the code root and private paths belong to `FM_HOME`.
+The [installation reference](../../../docs/configuration.md#installing-a-separate-home) owns separate-home launch and migration.
+
 ```
 AGENTS.md            this file (CLAUDE.md is a real @AGENTS.md pointer to it)
 CONTRIBUTING.md      contributor workflow and repo conventions

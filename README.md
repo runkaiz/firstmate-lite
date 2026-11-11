@@ -19,9 +19,7 @@ You talk to exactly one agent, the first mate.
 The first mate sends each job to its own worker (a separate coding agent) in its own isolated copy of the project, keeps an eye on all of them, and only comes back to you with finished work or a real decision.
 No more juggling five terminals and forgetting which one had the failing test.
 
-The distro itself needs no separate install or build step.
 This repository *is* the first mate: a set of instructions, skills, and small scripts that turn the coding agent you already use (Claude Code, Pi, and friends) into a crew boss.
-Open your agent inside this folder and it reads `AGENTS.md` and takes the job.
 
 ## Get going
 
@@ -40,14 +38,15 @@ On its first start the first mate checks what is missing, prints install command
 Local-only work needs neither GitHub login nor `no-mistakes`; plain PRs need GitHub tooling without the validation pipeline.
 The full list per workflow lives in [the toolchain reference](docs/configuration.md#toolchain).
 
-### 2. Clone it
+### 2. Install it
 
 ```sh
-git clone https://github.com/runkaiz/firstmate-lite.git
-cd firstmate-lite
+curl -fsSL https://raw.githubusercontent.com/runkaiz/firstmate-lite/main/bin/fm-install.sh | bash
+cd ~/firstmate
 ```
 
-By default, your own records (backlog, notes, project clones, settings) live in this folder's [git-ignored home paths](docs/configuration.md#operational-home-layout-and-state).
+The installer keeps shared code in `~/.local/share/firstmate` and private records in `~/firstmate`.
+Existing clone-and-run setups still work, with [optional migration and alternate paths](docs/configuration.md#installing-a-separate-home).
 
 ### 3. Launch your first mate
 
@@ -55,12 +54,13 @@ Start Herdr so you can watch the workers appear as tabs, then start your agent i
 
 ```sh
 herdr
-claude
+bin/fm-start.sh claude
 ```
 
-Without Herdr, use tmux instead: run `tmux new -s firstmate`, then `claude`; workers appear as tmux windows.
+Without Herdr, run `tmux new -s firstmate` before starting the agent.
 
-Other supported agents launch the same way from this folder:
+For a separate home, use `bin/fm-start.sh codex` or `bin/fm-start.sh pi` to switch agents.
+From a combined checkout, launch the agent directly:
 
 | Agent | Launch | First-time note |
 | --- | --- | --- |
