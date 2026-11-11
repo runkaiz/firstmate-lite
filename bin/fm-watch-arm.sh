@@ -291,7 +291,7 @@ clear_stale_recorded_watcher_lock() {
   lock_path=$(cat "$WATCH_LOCK/watcher-path" 2>/dev/null || true)
   lock_identity=$(cat "$WATCH_LOCK/pid-identity" 2>/dev/null || true)
   [ "$lock_home" = "$FM_HOME" ] || return 0
-  [ "$lock_path" = "$WATCH" ] || return 0
+  fm_watcher_paths_match "$lock_path" "$WATCH" || return 0
   [ -n "$lock_identity" ] || return 0
   fm_recovery_transition "$STATE/.watcher-down" clear-stale-lock "$WATCH_LOCK" downtime
 }

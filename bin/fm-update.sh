@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
-# Guardedly fast-forward this home's tracked checkout from origin.
+# Guardedly fast-forward the tracked code checkout from origin.
 # Usage: fm-update.sh [--help]
 # bin/fm-ff-lib.sh owns the clean-worktree, default-branch, and ancestry guards.
 # No force, merge, stash, supervisor-home convergence, or agent restart occurs.
-# After an update, rebind this home's registered condition/action watches to
-# the new tracked bytes. A rebind failure is reported without undoing the update.
+# Combined checkouts keep their local condition/action watch rebind. A shared
+# code update does not write to any of the separate homes using it.
 # Print reread-firstmate: yes only when the update changed instruction files.
 set -eu
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 # shellcheck source=bin/fm-ff-lib.sh
 . "$SCRIPT_DIR/fm-ff-lib.sh"
 
-"$SCRIPT_DIR/fm-guard.sh" || true
+combined=0
+if [ "$FM_HOME" -ef "$FM_ROOT" ]; then
+  combined=1
+  "$SCRIPT_DIR/fm-guard.sh" || true
+fi
 
 usage() { echo "usage: fm-update.sh [--help]" >&2; }
 
@@ -40,7 +44,9 @@ if [ "$FF_STATUS" = "updated" ]; then
   # process's own FM_ROOT is the repo that was just updated, which is not
   # always where this very script file happens to live (FM_ROOT_OVERRIDE, as
   # this test suite uses to point fm-update.sh at a fixture checkout).
-  FM_HOME="$FM_HOME" FM_ROOT_OVERRIDE="$FM_ROOT" "$SCRIPT_DIR/fm-procevent-when.sh" rebind-all || true
+  if [ "$combined" -eq 1 ]; then
+    FM_HOME="$FM_HOME" FM_ROOT_OVERRIDE="$FM_ROOT" "$SCRIPT_DIR/fm-procevent-when.sh" rebind-all || true
+  fi
 fi
 
 echo "reread-firstmate: $reread_firstmate"

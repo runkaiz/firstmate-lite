@@ -8,7 +8,7 @@ metadata:
 
 # firstmate-self-repo
 
-Every firstmate home clones the same public repository and runs from it, which makes firstmate's own upstream the one repository a running home can always reach.
+Firstmate homes run code from a checkout of the same public repository, which may be shared by several homes.
 Most homes belong to people who simply use firstmate, not to the people who maintain it, and a running agent that treats "I can see the repo" as "I may publish to it" is how a user's firstmate opens surprise pull requests upstream.
 This skill owns the boundary between the two relationships.
 

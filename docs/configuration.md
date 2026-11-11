@@ -28,6 +28,24 @@ Start with the directory layout, then use the setting reference for the behavior
 When `FM_HOME` is unset, most scripts use the repo root as the home.
 When it is set, scripts still run from this repo's `bin/`, while `state/`, `data/`, `config/`, and `projects/` come from `$FM_HOME`.
 
+### Installing a separate home
+
+The [installer in the README](../README.md#2-install-it) clones the shared code into `${XDG_DATA_HOME:-$HOME/.local/share}/firstmate`.
+It creates `~/firstmate` by default, or takes a home path as its only argument (`bash fm-install.sh /path/to/home`).
+Run it again with a different home path to share the same installation.
+
+From a separate home, run `bin/fm-start.sh claude`, `bin/fm-start.sh codex`, or `bin/fm-start.sh pi` in the terminal workspace you want Firstmate to use.
+The launcher passes through agent arguments and sets `FM_HOME` and `FM_ROOT_OVERRIDE` while the agent works from the home.
+The home contains the four private directories and links for commands, instructions, skills, and project hooks.
+Approve the agent's workspace and hook prompts when it asks.
+From outside a session, use `FM_HOME=/path/to/home /path/to/install/bin/fm-<command>.sh`.
+Self-update advances the shared checkout, and every linked home sees the new code.
+
+For optional migration, finish active work and close the agent before renaming the old checkout to a backup.
+Run the installer with the original home path, then restore the contents of `data/`, `state/`, `config/`, and `projects/` from the backup to keep existing absolute paths valid.
+If you used `.env`, supply its settings in the launch environment.
+Keep the backup until you have verified the new session.
+
 ### Root and directory overrides
 
 `FM_ROOT_OVERRIDE` overrides the firstmate repo root used by scripts, including the primary checkout watched by the worktree-tangle guard.
@@ -1644,6 +1662,8 @@ One terminal outcome is then durably captured and published as a wake, which rem
 
 The (condition, action) spec is stored privately under `state/when/` and hash-bound by a trust record the same way `bin/fm-check-register.sh` binds a custom check, while the spec separately binds the resolved action executable's bytes; a mutated or unregistered spec or a changed action executable is refused before the action runs, and that binding is reloaded from disk immediately before each fire rather than trusted from when polling started.
 A repo update that fast-forwards an in-repo action's bytes in place would otherwise desync every already-armed watch's trust binding with no tampering involved; `bin/fm-procevent-when.sh rebind-all` re-hashes and republishes the binding for every registered watch whose action lives under `FM_ROOT`, including one already polling, so it keeps firing across such an update instead of being refused on its next fire.
+Combined checkout updates rebind local watches automatically.
+For a separate home with watches that run updated Firstmate scripts, run `bin/fm-procevent-when.sh rebind-all` from its session after the shared code update.
 
 Every failure path - a mutated spec or action executable, a condition error past its budget, an expired deadline, a failed action, or an earlier fire whose outcome was never captured - produces a terminal captured outcome that wakes firstmate rather than a silent retry, and a durable single-fire marker claimed before the action makes restarts and re-polls unable to fire it twice.
 The adapter automates only the exact deterministic subset: anything needing judgment, and anything destructive, irreversible, or security-sensitive, keeps the ordinary check-fires-then-firstmate-decides flow, and the adapter's header and `--help` own its commands, flags, and outcome document.

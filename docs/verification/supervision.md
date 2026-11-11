@@ -55,6 +55,32 @@ No harness mechanics or runtime-backend classification changed.
 
 ## Native session-start delivery
 
+### Separate homes
+
+On 2026-11-11 UTC, Claude Code 2.1.322, codex-cli 0.167.1, and Pi 1.5.2 each launched in a separate Git-free home initialized by `bin/fm-install.sh` from one shared checkout.
+With isolated harness settings and a loopback provider, the following commands submitted the linked `AGENTS.md` content, a probe skill description, and the `SESSION START - <home>` digest containing that home's private test note in their first provider request.
+Each home had a populated `state/.session-start-complete` before the request reached the provider.
+
+```sh
+bin/fm-start.sh claude -p --strict-mcp-config --setting-sources project probe
+bin/fm-start.sh codex --dangerously-bypass-hook-trust exec --skip-git-repo-check probe
+bin/fm-start.sh pi --offline --no-session --model split-probe/probe -p probe
+```
+
+Captured-request assertions printed:
+
+```text
+claude: linked instructions, skill, native startup digest, and home session lock verified
+codex: linked instructions, skill, native startup digest, and home session lock verified
+pi: linked instructions, skill, native startup digest, and home session lock verified
+```
+
+The fixture used Claude's linked project settings, a trusted Codex project with the test-only hook prompt bypass above, and Pi's trusted project extension auto-discovery.
+The loopback provider rejected the requests after capture, so this verifies native discovery and startup delivery without a model response or external API.
+`bash bin/fm-test-run.sh tests/fm-split-home.test.sh` verifies the installer, shared update, and task lifecycle with local Git and stubbed tmux.
+
+### Combined checkout transport
+
 The cross-harness transport pass ran on 2026-07-17 with Codex 0.144.4, Grok 0.2.103, OpenCode 1.17.18, Pi 0.80.10, and the tracked Claude hook wiring.
 
 Codex command shape:

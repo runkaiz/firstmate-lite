@@ -353,7 +353,7 @@ Memory writes use inspect-then-update rather than blind append; the internal [`s
 The same pass also persists open-work record state the session is holding - filing a thread that was never recorded and correcting one the session knows went stale - bounded to the open work that session is actually holding.
 The same skill owns the separate underway-work reconciliation against repository and PR evidence, using read-only proposals from [`bin/fm-reconcile-underway.sh`](../bin/fm-reconcile-underway.sh).
 Task-scoped notes use `bin/fm-queue.sh show <id> --full` followed by `bin/fm-queue.sh update <id> --body-file <path>`; the native queue automatically preserves the superseded body in its existing note history.
-The stow pass never writes a skill, but a separately executed, captain-approved migration may move conditional knowledge into a user-owned local skill excluded from the Firstmate clone; changes to Firstmate's tracked skills remain deliberate repository work through the normal PR pipeline.
+The stow pass never writes a skill; the [offload destinations contract](../.agents/skills/stow/SKILL.md#destinations) owns where a separately approved migration may put conditional knowledge.
 
 ## Local clones stay fresh
 

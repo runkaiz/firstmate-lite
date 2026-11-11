@@ -347,7 +347,7 @@ family_for_basename() {
       ;;
     fm-backlog-atomicity.test.sh|\
     fm-bootstrap.test.sh|fm-bootstrap-network-parallel.test.sh|fm-fleet-sync.test.sh|fm-gate-refuse.test.sh|fm-gotmp.test.sh|\
-    fm-session-start.test.sh|fm-sessionstart-nudge.test.sh|fm-startup-network.test.sh|\
+    fm-session-start.test.sh|fm-sessionstart-nudge.test.sh|fm-split-home.test.sh|fm-startup-network.test.sh|\
     fm-tangle-guard.test.sh|fm-update.test.sh)
       printf '%s\n' session-bootstrap
       ;;
@@ -1482,6 +1482,12 @@ families_for_changed_path() {
     bin/fm-gate-refuse*|bin/fm-lock*)
       printf '%s\n' session-bootstrap
       ;;
+    bin/fm-install.sh|bin/fm-start.sh)
+      printf '%s\n' "__script__:fm-split-home.test.sh"
+      ;;
+    bin/fm-primary-scope-lib.sh)
+      printf '%s\n' session-bootstrap pure-contract-unit
+      ;;
     bin/fm-bootstrap.sh)
       printf '%s\n' session-bootstrap
       printf '%s\n' "__script__:fm-brief.test.sh"
@@ -1636,7 +1642,7 @@ families_for_changed_path() {
     bin/fm-captain-hold.sh|bin/fm-hold-reason-lib.sh|bin/fm-decision-hold.sh|bin/fm-supervision*|bin/fm-transition-lib.sh|\
     bin/fm-tmux-lib.sh|bin/fm-marker-lib.sh|bin/fm-operational-input.sh|bin/fm-tasks-axi-lib.sh|\
     bin/fm-vendor-auth-probe.sh|\
-    bin/fm-primary-scope-lib.sh|bin/fm-project-mode.sh|bin/fm-forge-detect.sh|bin/fm-promote.sh|\
+    bin/fm-project-mode.sh|bin/fm-forge-detect.sh|bin/fm-promote.sh|\
     bin/fm-ff-lib.sh|bin/fm-gotmp*|bin/*pretool*)
       printf '%s\n' pure-contract-unit
       ;;

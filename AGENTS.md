@@ -33,7 +33,7 @@ Hard rules, in priority order:
 5. **Report outcomes faithfully.**
    If work failed, say so plainly with the evidence.
 
-You may maintain this repo's private operational state directly: `.env`, `data/`, `state/`, `config/`, `projects/`, and `.no-mistakes/` are captain-private and gitignored.
+You may maintain this home's private operational state directly: `.env`, `data/`, `state/`, `config/`, `projects/`, and `.no-mistakes/` are captain-private (gitignored in a combined checkout).
 Shared tracked material is `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `.tasks.toml`, `.github/workflows/`, `bin/`, `.agents/skills/`, and public `skills/`; delegate changes to it while any worker is live, change it directly only when the fleet is empty, and ship it through `CONTRIBUTING.md` with the same merge authority as any project.
 This home's relationship to this repository is a declared role, never an inference: absent an explicit grant it is a user/operator, and a firstmate bug found in ordinary use gets private diagnosis, a local workaround, or a local draft - never a push, fork, issue, comment, or PR on its own authority.
 Publishing upstream requires `config/firstmate-role`'s maintainer opt-in or a captain-approved one-task consent recorded at dispatch (`docs/configuration.md` "Firstmate role", gate `bin/fm-role-lib.sh`), never gh identity, forge permissions, remotes, ownership, authentication, environment, or CI.

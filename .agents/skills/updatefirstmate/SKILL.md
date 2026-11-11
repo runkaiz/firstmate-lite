@@ -13,7 +13,8 @@ metadata:
 Run `bin/fm-update.sh` for the current Firstmate code root only.
 Updating consumes upstream changes and grants no publication authority; it does not update project clones or manage other agents.
 The helper and `bin/fm-ff-lib.sh` own the clean-tree, default-branch, ancestry, and fetch checks; never force, stash, reset, or merge around a refusal.
-Private operational directories remain untouched.
+Separate homes remain untouched during the update.
+The [condition/action watch contract](../../../docs/configuration.md#process-to-event-sources-stateprocevent) covers watch rebinds after an update.
 
 Read the helper's result faithfully, including skipped or failed updates.
 When it prints `reread-firstmate: yes`, read the updated `AGENTS.md` before continuing and refresh any loaded skill whose instructions the new surface changes.
