@@ -1,0 +1,331 @@
+
+SCENARIO: Install and reinstall two private homes using one shared checkout
+$ tar -xf /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/target.tar -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin commit -qm 'target installation'
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home'
+Cloning into '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate'...
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private\ home && bin/fm-start.sh claude
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home'
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second\ home && bin/fm-start.sh claude
+[exit 0]
+OBSERVED: private home: no independent checkout
+OBSERVED: private home/data: private directory mode 700
+OBSERVED: private home/state: private directory mode 700
+OBSERVED: private home/config: private directory mode 700
+OBSERVED: private home/projects: private directory mode 700
+OBSERVED: private home/bin: shared installed file
+OBSERVED: private home/docs: shared installed file
+OBSERVED: private home/.agents/skills: shared installed file
+OBSERVED: private home/.claude/skills: shared installed file
+OBSERVED: private home/.claude/settings.json: shared installed file
+OBSERVED: private home/.codex/hooks.json: shared installed file
+OBSERVED: private home/.pi/extensions: shared installed file
+OBSERVED: private home/AGENTS.md: shared installed file
+OBSERVED: private home: Claude has direct shared instructions
+OBSERVED: second home: no independent checkout
+OBSERVED: second home/data: private directory mode 700
+OBSERVED: second home/state: private directory mode 700
+OBSERVED: second home/config: private directory mode 700
+OBSERVED: second home/projects: private directory mode 700
+OBSERVED: second home/bin: shared installed file
+OBSERVED: second home/docs: shared installed file
+OBSERVED: second home/.agents/skills: shared installed file
+OBSERVED: second home/.claude/skills: shared installed file
+OBSERVED: second home/.claude/settings.json: shared installed file
+OBSERVED: second home/.codex/hooks.json: shared installed file
+OBSERVED: second home/.pi/extensions: shared installed file
+OBSERVED: second home/AGENTS.md: shared installed file
+OBSERVED: second home: Claude has direct shared instructions
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home'
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private\ home && bin/fm-start.sh claude
+[exit 0]
+OBSERVED: reinstall preserves every private file and mode
+OBSERVED: shared checkout has no private directories
+RESULT: pass
+
+SCENARIO: Launch real commands and keep identical queue ids isolated by home
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' python3 -c 'import os,sys,json;print(json.dumps(dict(cwd=os.getcwd(),home=os.environ["FM_HOME"],code=os.environ["FM_ROOT_OVERRIDE"],args=sys.argv[1:])))' 'two words' '; literal $HOME'
+{"cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home", "home": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home", "code": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate", "args": ["two words", "; literal $HOME"]}
+[exit 0]
+OBSERVED: launcher scopes cwd and FM_HOME to selected private home, FM_ROOT_OVERRIDE to shared code
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate/bin/fm-start.sh' python3 -c 'import os,sys,json;print(json.dumps(dict(cwd=os.getcwd(),home=os.environ["FM_HOME"],code=os.environ["FM_ROOT_OVERRIDE"],args=sys.argv[1:])))' outside
+{"cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home", "home": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home", "code": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate", "args": ["outside"]}
+[exit 0]
+OBSERVED: explicit FM_HOME works from outside the home
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' codex --version
+codex-cli 0.167.1
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' bin/fm-queue.sh add same-id 'First private queue' --kind ship --repo sample
+ok: add same-id
+task:
+  id: same-id
+  title: First private queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home/bin/fm-start.sh' bin/fm-queue.sh add same-id 'Second private queue' --kind ship --repo sample
+ok: add same-id
+task:
+  id: same-id
+  title: Second private queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' bin/fm-queue.sh show same-id
+task:
+  id: same-id
+  title: First private queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home/bin/fm-start.sh' bin/fm-queue.sh show same-id
+task:
+  id: same-id
+  title: Second private queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+OBSERVED: identical task ids retain independent private queue records
+RESULT: pass
+
+SCENARIO: Keep combined checkout commands working without a separate home
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin/bin/fm-queue.sh add legacy-id 'Combined checkout queue' --kind ship --repo sample
+ok: add legacy-id
+task:
+  id: legacy-id
+  title: Combined checkout queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin/bin/fm-queue.sh show legacy-id
+task:
+  id: legacy-id
+  title: Combined checkout queue
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+OBSERVED: combined checkout still stores records under its own data directory without FM_HOME
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin/bin/fm-start.sh python3 -c 'import os; print(os.getcwd()); print(os.environ["FM_HOME"]); print(os.environ["FM_ROOT_OVERRIDE"])'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+[exit 0]
+OBSERVED: combined checkout launcher scopes code and home to the checkout
+RESULT: pass
+
+SCENARIO: Refuse collisions, symlinked private data, nested roots, and unrelated homes
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/collision
+fm-install: would overwrite /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/collision/bin
+[exit 1]
+OBSERVED: collision is refused before initializing private directories
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/linked-private
+fm-install: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/linked-private/data must be a directory
+[exit 1]
+OBSERVED: symlinked private directory is refused and destination unchanged
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate/nested-home'
+fm-install: home must be outside /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world
+fm-install: code must be outside /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin
+fm-install: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin is already a checkout; use it as-is or choose a separate home
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/unused-home
+fm-install: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/unmanaged-data/firstmate is not the Firstmate-lite installation
+[exit 1]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate/bin/fm-start.sh' python3 -c 'raise SystemExit(99)'
+fm-start: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/unlinked-home is not a home linked to /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate
+[exit 1]
+OBSERVED: nested roots, existing checkout, unmanaged installation, and unrelated launch cwd all refused
+RESULT: pass
+
+SCENARIO: Update shared code once without touching either private home
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin add /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin/bin/split-live-version.sh
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/origin commit -qm 'publish new shared executable'
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home/bin/fm-start.sh' bin/fm-update.sh
+firstmate: updated 467e8e6..f012bfc (instructions changed: bin)
+reread-firstmate: yes
+[exit 0]
+OBSERVED: update advances shared checkout and reports changed instruction surface
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' bin/split-live-version.sh
+shared version two
+[exit 0]
+OBSERVED: private home immediately runs updated shared executable
+OBSERVED: private home private files and modes unchanged by update
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/second home/bin/fm-start.sh' bin/split-live-version.sh
+shared version two
+[exit 0]
+OBSERVED: second home immediately runs updated shared executable
+OBSERVED: second home private files and modes unchanged by update
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' bin/fm-update.sh
+firstmate: already current
+reread-firstmate: no
+[exit 0]
+$ git -C '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate' rev-parse HEAD
+f012bfce41748637611a0e95a847871c1da6f77a
+[exit 0]
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/private home/bin/fm-start.sh' bin/fm-update.sh
+firstmate: skipped: dirty working tree
+reread-firstmate: no
+[exit 0]
+$ git -C '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate' rev-parse HEAD
+f012bfce41748637611a0e95a847871c1da6f77a
+[exit 0]
+OBSERVED: dirty shared checkout is skipped without losing local edits
+OBSERVED: private home private data unchanged after no-op and guarded update
+OBSERVED: second home private data unchanged after no-op and guarded update
+RESULT: pass
+
+SCENARIO: Attach and stop one real watcher through installation and home paths
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-lab-home.sh create '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home'
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home'
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch\ home && bin/fm-start.sh claude
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-lab-home.sh tmux-dir '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home'
+/tmp/fml.mTu0ed
+[exit 0]
+$ tmux -L fm-lab new-session -d -s watch-fixture -x 120 -y 40 sleep 180
+[exit 0]
+$ tmux -L fm-lab display-message -p -t watch-fixture '#{socket_path},#{pid},0'
+/tmp/fml.mTu0ed/tmux-1000/fm-lab,2556656,0
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/install data/firstmate/bin/fm-watch-arm.sh [real background process 2556660; output watcher-physical.log]
+watcher: started pid=2556680 (beacon fresh)
+OBSERVED: physical arm starts a real watcher
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home/bin/fm-watch-arm.sh [real background process 2557031; output watcher-linked.log]
+watcher: attached pid=2556680 (beacon 0s)
+OBSERVED: linked arm attaches to same watcher through home symlink
+OBSERVED: linked arm preserves physical watcher pid, avoiding a duplicate
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-lab-home.sh create '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling watch home'
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling watch home
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-install.sh '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling watch home'
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling\ watch\ home && bin/fm-start.sh claude
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling watch home/bin/fm-watch-arm.sh [real background process 2557128]
+watcher: started pid=2557147 (beacon fresh)
+OBSERVED: second home starts its own watcher using the same installation
+OBSERVED: separate homes use distinct watcher processes
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home/bin/fm-watch-arm.sh' --stop
+watcher: stopped pid=2556680
+[exit 0]
+OBSERVED: linked home stop removes physical watcher lock
+OBSERVED: stopping one home leaves the sibling watcher alive and locked
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/sibling watch home/bin/fm-watch-arm.sh' --stop
+watcher: stopped pid=2557147
+[exit 0]
+OBSERVED: shared installation still contains no private directories after runtime operations
+$ tmux -L fm-lab kill-server
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/bin/fm-lab-home.sh teardown '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/world/watch home'
+[exit 0]
+RESULT: pass
+
+CLEANUP: all disposable code, homes, Git fixture and private tmux server removed.

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Install and reinstall two private homes using one shared checkout",
+    "result": "pass"
+  },
+  {
+    "name": "Launch real commands and keep identical queue ids isolated by home",
+    "result": "pass"
+  },
+  {
+    "name": "Keep combined checkout commands working without a separate home",
+    "result": "pass"
+  },
+  {
+    "name": "Refuse collisions, symlinked private data, nested roots, and unrelated homes",
+    "result": "pass"
+  },
+  {
+    "name": "Update shared code once without touching either private home",
+    "result": "pass"
+  },
+  {
+    "name": "Attach and stop one real watcher through installation and home paths",
+    "result": "pass"
+  }
+]

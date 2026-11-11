@@ -1,0 +1,4 @@
+Cloning into '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74J2FXRW0T19K2EBYP5W0HC/.phase-live/tmp/fm-split-home.X6h7Np/install data/firstmate'...
+ok - installer shares one checkout across homes and preserves existing files
+ok - shared update leaves both homes and registered watch bindings untouched
+ok - startup, spawn, steer, interrupt, local merge and teardown use the installed home
