@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Install two private homes and reinstall safely",
+    "result": "pass",
+    "detail": "Both homes share the same code and native instruction/skill links; no private directories in code; reinstall preserves all private bytes and timestamps."
+  },
+  {
+    "name": "Refuse collisions and overlapping code/home paths",
+    "result": "pass",
+    "detail": "Existing instructions, checkout, symlinked private directory, equal roots and both nesting directions were refused without overwriting private files."
+  },
+  {
+    "name": "Launch from a home or select a home explicitly",
+    "result": "pass",
+    "detail": "Actual child process sees selected cwd and FM_HOME, shared FM_ROOT_OVERRIDE, exact argv and exit status; invalid home refuses before executing child."
+  },
+  {
+    "name": "Use the same queue command in two homes",
+    "result": "pass",
+    "detail": "Identically named items are stored independently in each private backlog; shared code has no data directory."
+  },
+  {
+    "name": "Update shared code without changing either private home",
+    "result": "pass",
+    "detail": "A real Git fast-forward makes the new executable visible in both homes; all private content, file modes and timestamps remain identical."
+  },
+  {
+    "name": "Preserve local code edits and branches during update",
+    "result": "pass",
+    "detail": "Shared update refuses dirty code and a non-default branch rather than overwriting or switching them."
+  }
+]

@@ -1,0 +1,5 @@
+codex: emitted request contains linked instructions, unique installed skill NATIVE_SPLIT_SKILL_7B3A, private-home SESSION START; native session completion recorded.
+claude: emitted request contains linked instructions, unique installed skill NATIVE_SPLIT_SKILL_7B3A, private-home SESSION START; native session completion recorded.
+pi: emitted request contains linked instructions, unique installed skill NATIVE_SPLIT_SKILL_7B3A, private-home SESSION START; native session completion recorded.
+Local probe returns HTTP 400 deliberately after capture; this proves discovery and startup delivery, not model behavior or provider authentication.
+After all native starts, shared code contains none of these private directories: data, state, config, projects.

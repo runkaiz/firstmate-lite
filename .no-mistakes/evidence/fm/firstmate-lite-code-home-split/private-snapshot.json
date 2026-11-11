@@ -1,0 +1,254 @@
+{
+  "before": [
+    {
+      "data": {
+        "mode": 16877,
+        "mtime_ns": 1794373082440274868,
+        "sha256": null,
+        "link": null
+      },
+      "data/backlog.md": {
+        "mode": 33152,
+        "mtime_ns": 1794373082432356143,
+        "sha256": "8fdc984eefafc0c187e5f172eb3d51678217cd1022d65462a9824e8bb7d4e75a",
+        "link": null
+      },
+      "data/backlog.md.lock": {
+        "mode": 33188,
+        "mtime_ns": 1794373082425938440,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link": null
+      },
+      "data/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362821534,
+        "sha256": "f6996e5a10f3dbe9f778683b40ce579739dde53569b702f7bf341338761944b1",
+        "link": null
+      },
+      "state": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362821534,
+        "sha256": null,
+        "link": null
+      },
+      "state/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362882214,
+        "sha256": "9325375023009ca119c8c9907a5de47fd7d25101cbdbbdf7ecb69b4aa00af941",
+        "link": null
+      },
+      "config": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362882214,
+        "sha256": null,
+        "link": null
+      },
+      "config/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362917665,
+        "sha256": "cee9d6b1c70a61e224568f9fabb8e1143769d6188106577a535e8ca57752970c",
+        "link": null
+      },
+      "projects": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362935775,
+        "sha256": null,
+        "link": null
+      },
+      "projects/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362947935,
+        "sha256": "1baebdffc07924153a6732ab46c936a5dd709fc76988ea717be9a8c56ec360da",
+        "link": null
+      }
+    },
+    {
+      "data": {
+        "mode": 16832,
+        "mtime_ns": 1794373082897942598,
+        "sha256": null,
+        "link": null
+      },
+      "data/backlog.md": {
+        "mode": 33152,
+        "mtime_ns": 1794373082890820289,
+        "sha256": "e720797465678f124fb6b4a9be139698b299a390c5659a2982cd801392bf023f",
+        "link": null
+      },
+      "data/backlog.md.lock": {
+        "mode": 33188,
+        "mtime_ns": 1794373082886092006,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link": null
+      },
+      "data/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362975866,
+        "sha256": "8d182bff238548352daff3cb993f42ee773c5a3dcc84768d9f7d859a56fb8d54",
+        "link": null
+      },
+      "state": {
+        "mode": 16832,
+        "mtime_ns": 1794373081362975866,
+        "sha256": null,
+        "link": null
+      },
+      "state/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362998776,
+        "sha256": "fac5d0405c855eb6b2b37e48e0b27a8b7fa82858139ad66791b76ce0cea36a5f",
+        "link": null
+      },
+      "config": {
+        "mode": 16832,
+        "mtime_ns": 1794373081362998776,
+        "sha256": null,
+        "link": null
+      },
+      "config/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081363023606,
+        "sha256": "240326bbdb9fc403b91a52ebb88988d233b25ad8f8cd0d7b15d2a3fc531e1976",
+        "link": null
+      },
+      "projects": {
+        "mode": 16832,
+        "mtime_ns": 1794373081363023606,
+        "sha256": null,
+        "link": null
+      },
+      "projects/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081363052697,
+        "sha256": "cfc2b36a6e811834bff6b67633c287dc21ba4bc163b27152267cbbe038dde880",
+        "link": null
+      }
+    }
+  ],
+  "after": [
+    {
+      "data": {
+        "mode": 16877,
+        "mtime_ns": 1794373082440274868,
+        "sha256": null,
+        "link": null
+      },
+      "data/backlog.md": {
+        "mode": 33152,
+        "mtime_ns": 1794373082432356143,
+        "sha256": "8fdc984eefafc0c187e5f172eb3d51678217cd1022d65462a9824e8bb7d4e75a",
+        "link": null
+      },
+      "data/backlog.md.lock": {
+        "mode": 33188,
+        "mtime_ns": 1794373082425938440,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link": null
+      },
+      "data/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362821534,
+        "sha256": "f6996e5a10f3dbe9f778683b40ce579739dde53569b702f7bf341338761944b1",
+        "link": null
+      },
+      "state": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362821534,
+        "sha256": null,
+        "link": null
+      },
+      "state/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362882214,
+        "sha256": "9325375023009ca119c8c9907a5de47fd7d25101cbdbbdf7ecb69b4aa00af941",
+        "link": null
+      },
+      "config": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362882214,
+        "sha256": null,
+        "link": null
+      },
+      "config/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362917665,
+        "sha256": "cee9d6b1c70a61e224568f9fabb8e1143769d6188106577a535e8ca57752970c",
+        "link": null
+      },
+      "projects": {
+        "mode": 16877,
+        "mtime_ns": 1794373081362935775,
+        "sha256": null,
+        "link": null
+      },
+      "projects/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362947935,
+        "sha256": "1baebdffc07924153a6732ab46c936a5dd709fc76988ea717be9a8c56ec360da",
+        "link": null
+      }
+    },
+    {
+      "data": {
+        "mode": 16832,
+        "mtime_ns": 1794373082897942598,
+        "sha256": null,
+        "link": null
+      },
+      "data/backlog.md": {
+        "mode": 33152,
+        "mtime_ns": 1794373082890820289,
+        "sha256": "e720797465678f124fb6b4a9be139698b299a390c5659a2982cd801392bf023f",
+        "link": null
+      },
+      "data/backlog.md.lock": {
+        "mode": 33188,
+        "mtime_ns": 1794373082886092006,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link": null
+      },
+      "data/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362975866,
+        "sha256": "8d182bff238548352daff3cb993f42ee773c5a3dcc84768d9f7d859a56fb8d54",
+        "link": null
+      },
+      "state": {
+        "mode": 16832,
+        "mtime_ns": 1794373081362975866,
+        "sha256": null,
+        "link": null
+      },
+      "state/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081362998776,
+        "sha256": "fac5d0405c855eb6b2b37e48e0b27a8b7fa82858139ad66791b76ce0cea36a5f",
+        "link": null
+      },
+      "config": {
+        "mode": 16832,
+        "mtime_ns": 1794373081362998776,
+        "sha256": null,
+        "link": null
+      },
+      "config/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081363023606,
+        "sha256": "240326bbdb9fc403b91a52ebb88988d233b25ad8f8cd0d7b15d2a3fc531e1976",
+        "link": null
+      },
+      "projects": {
+        "mode": 16832,
+        "mtime_ns": 1794373081363023606,
+        "sha256": null,
+        "link": null
+      },
+      "projects/keep": {
+        "mode": 33188,
+        "mtime_ns": 1794373081363052697,
+        "sha256": "cfc2b36a6e811834bff6b67633c287dc21ba4bc163b27152267cbbe038dde880",
+        "link": null
+      }
+    }
+  ]
+}

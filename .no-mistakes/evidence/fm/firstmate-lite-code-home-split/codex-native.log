@@ -1,0 +1,20 @@
+OpenAI Codex v0.167.1
+--------
+workdir: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l
+model: probe
+provider: local-probe
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: none
+reasoning summaries: none
+session id: 01a1c8fb-03c5-7390-87e0-d837e730dce2
+--------
+user
+$lab-discovery-probe
+warning: `--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.
+warning: `--dangerously-bypass-hook-trust` is enabled. Enabled hooks may run without review for this invocation.
+warning: Model metadata for `probe` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.
+hook: SessionStart
+hook: SessionStart Completed
+ERROR: {"error":{"type":"invalid_request_error","message":"Local discovery probe captured; model responses are intentionally unavailable"}}
+ERROR: {"error":{"type":"invalid_request_error","message":"Local discovery probe captured; model responses are intentionally unavailable"}}

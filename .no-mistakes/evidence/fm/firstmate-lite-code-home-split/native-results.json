@@ -1,0 +1,26 @@
+[
+  {
+    "cli": "codex",
+    "requests": 1,
+    "linked_instructions": true,
+    "linked_skill": true,
+    "startup_digest": true,
+    "completion_record": true
+  },
+  {
+    "cli": "claude",
+    "requests": 6,
+    "linked_instructions": true,
+    "linked_skill": true,
+    "startup_digest": true,
+    "completion_record": true
+  },
+  {
+    "cli": "pi",
+    "requests": 1,
+    "linked_instructions": true,
+    "linked_skill": true,
+    "startup_digest": true,
+    "completion_record": true
+  }
+]

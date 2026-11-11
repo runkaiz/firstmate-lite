@@ -1,0 +1,17 @@
+$ '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home/bin/fm-start.sh' bin/fm-sessionstart-run.sh --source startup
+[exit 0]
+
+OBSERVED: A worker marker suppresses primary startup in a linked home; no digest and no private state writes. Tested in the other home to exclude asynchronous cleanup from native primary startup.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh
+Cloning into '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/user/.local/share/firstmate'...
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/user/firstmate && bin/fm-start.sh claude
+[exit 0]
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/user/firstmate/bin/fm-start.sh python3 -c 'import os; print("default home cwd:",os.getcwd()); print("code:",os.environ["FM_ROOT_OVERRIDE"])'
+default home cwd: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/user/firstmate
+code: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/user/.local/share/firstmate
+[exit 0]
+
+OBSERVED: No-argument installer uses $HOME/.local/share/firstmate and $HOME/firstmate; the resulting default home launches correctly.

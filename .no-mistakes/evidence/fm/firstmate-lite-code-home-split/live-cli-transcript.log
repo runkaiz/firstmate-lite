@@ -1,0 +1,229 @@
+$ git init -q -b main /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin add .
+ok 613 files changed, 318965 insertions(+)
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin commit -qm 'target fixture'
+ok
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l
+Cloning into '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate'...
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l && bin/fm-start.sh claude
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home'
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second\ home && bin/fm-start.sh claude
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l && bin/fm-start.sh claude
+[exit 0]
+
+HOME LINKS {
+  "AGENTS.md": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/AGENTS.md",
+  "CLAUDE.md": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/AGENTS.md",
+  "bin": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/bin",
+  ".agents/skills": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/.agents/skills",
+  ".claude/settings.json": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/.claude/settings.json",
+  ".codex/hooks.json": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/.codex/hooks.json",
+  ".pi/extensions": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/.pi/extensions"
+}
+
+OBSERVED Install two private homes and reinstall safely: Both homes share the same code and native instruction/skill links; no private directories in code; reinstall preserves all private bytes and timestamps.
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/collision
+fm-install: would overwrite /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/collision/AGENTS.md
+[exit 1]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate
+fm-install: home must be outside /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate
+[exit 1]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/nested
+fm-install: home must be outside /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate
+[exit 1]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share
+fm-install: code must be outside /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share
+[exit 1]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/linked-home
+fm-install: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/linked-home/data must be a directory
+[exit 1]
+
+$ git init -q /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/checkout
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/checkout
+fm-install: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/checkout is already a checkout; use it as-is or choose a separate home
+[exit 1]
+
+OBSERVED Refuse collisions and overlapping code/home paths: Existing instructions, checkout, symlinked private directory, equal roots and both nesting directions were refused without overwriting private files.
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh python3 -c 'import os,sys,json; print(json.dumps(dict(cwd=os.getcwd(),home=os.environ["FM_HOME"],code=os.environ["FM_ROOT_OVERRIDE"],args=sys.argv[1:])))' 'space argument' '--literal=$()'
+{"cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l", "home": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l", "code": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate", "args": ["space argument", "--literal=$()"]}
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/bin/fm-start.sh python3 -c 'import os,sys,json; print(json.dumps(dict(cwd=os.getcwd(),home=os.environ["FM_HOME"],code=os.environ["FM_ROOT_OVERRIDE"],args=sys.argv[1:])))' 'space argument' '--literal=$()'
+{"cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home", "home": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home", "code": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate", "args": ["space argument", "--literal=$()"]}
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/bin/fm-start.sh python3 -c 'raise SystemExit(23)'
+[exit 23]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/bin/fm-start.sh python3 -c 'print("SHOULD NOT RUN")'
+fm-start: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv is not a home linked to /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate
+[exit 1]
+
+OBSERVED Launch from a home or select a home explicitly: Actual child process sees selected cwd and FM_HOME, shared FM_ROOT_OVERRIDE, exact argv and exit status; invalid home refuses before executing child.
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh bin/fm-queue.sh add isolated-row 'Only l' --kind ship --repo sample
+ok: add isolated-row
+task:
+  id: isolated-row
+  title: Only l
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh bin/fm-queue.sh show isolated-row
+task:
+  id: isolated-row
+  title: Only l
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home/bin/fm-start.sh' bin/fm-queue.sh add isolated-row 'Only second home' --kind ship --repo sample
+ok: add isolated-row
+task:
+  id: isolated-row
+  title: Only second home
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+$ '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home/bin/fm-start.sh' bin/fm-queue.sh show isolated-row
+task:
+  id: isolated-row
+  title: Only second home
+  state: queued
+  kind: ship
+  repo: sample
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-11
+  closed: "-"
+  links: none
+  body: ""
+  archived: no
+[exit 0]
+
+OBSERVED Use the same queue command in two homes: Identically named items are stored independently in each private backlog; shared code has no data directory.
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin add /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin/bin/live-update-proof.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin/.agents/skills/ahoy/SKILL.md
+ok 2 files changed, 4 insertions(+)
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/origin commit -qm 'shared version two'
+ok
+[exit 0]
+
+$ '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home/bin/fm-start.sh' bin/fm-update.sh
+firstmate: updated d37e273..ace64e9 (instructions changed: bin, .agents/skills)
+reread-firstmate: yes
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/live-update-proof.sh
+shared version two
+[exit 0]
+
+$ '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/second home/bin/live-update-proof.sh'
+shared version two
+[exit 0]
+
+OBSERVED Update shared code without changing either private home: A real Git fast-forward makes the new executable visible in both homes; all private content, file modes and timestamps remain identical.
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh bin/fm-update.sh
+firstmate: skipped: dirty working tree
+reread-firstmate: no
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate restore README.md
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate switch -q -c local-work
+[exit 0]
+
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh bin/fm-update.sh
+firstmate: skipped: on local-work, expected main
+reread-firstmate: no
+[exit 0]
+
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate switch -q main
+[exit 0]
+
+OBSERVED Preserve local code edits and branches during update: Shared update refuses dirty code and a non-default branch rather than overwriting or switching them.

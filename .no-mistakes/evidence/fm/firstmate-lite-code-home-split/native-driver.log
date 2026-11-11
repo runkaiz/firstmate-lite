@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.native-validation.py", line 58, in <module>
+    assert before==after
+           ^^^^^^^^^^^^^
+AssertionError
+
+SETUP RESOLVED: The broad worker-state snapshot raced asynchronous cleanup from the preceding native primary. Repeated against the independent second home: no stdout and no state changes; see worker-and-default-transcript.log. All corrected native discovery checks pass in native-results.json.

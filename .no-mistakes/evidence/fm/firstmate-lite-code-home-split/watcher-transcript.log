@@ -1,0 +1,31 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w1
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w1
+[exit 0]
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w1
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w1 && bin/fm-start.sh claude
+[exit 0]
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w2
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w2
+[exit 0]
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/bin/fm-install.sh /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w2
+Start in your terminal workspace with:
+  cd /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w2 && bin/fm-start.sh claude
+[exit 0]
+
+INITIAL OWNERS ["1865723", "1866141"]
+
+OBSERVED: the installed-code arm attached to the existing home-link watcher; both original watcher PIDs retained ownership.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/.lv/share/firstmate/bin/fm-watch-arm.sh --stop
+watcher: stopped pid=1865723
+[exit 0]
+
+OBSERVED: stop via installed code ended only the selected home watcher; the other home watcher remains alive with the same lock PID.
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/w2/bin/fm-watch-arm.sh --stop
+watcher: stopped pid=1866141
+[exit 0]

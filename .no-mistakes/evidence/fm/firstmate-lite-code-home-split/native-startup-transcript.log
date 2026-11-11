@@ -1,0 +1,83 @@
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83 -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh codex --no-daemon --dangerously-bypass-hook-trust exec --ephemeral --skip-git-repo-check '"'"'$lab-discovery-probe'"'"' > /home/runkai/.no-mistakes/evidence/01M74F8VZ5BTPW2N5AC6ZD1V83/codex-native.log 2>&1'
+[exit 0]
+
+$ tmux -L fm-lab capture-pane -p -t primary
+no server running on /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/tmux/tmux-1000/fm-lab
+[exit 1]
+
+$ tmux -L fm-lab kill-server
+no server running on /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/tmux/tmux-1000/fm-lab
+[exit 1]
+
+NATIVE OBSERVATIONS {"cli": "codex", "requests": 1, "linked_instructions": true, "linked_skill": true, "startup_digest": true, "completion_record": true}
+
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83 -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh claude --setting-sources project --strict-mcp-config --no-session-persistence --tools default --verbose --output-format stream-json --include-hook-events -p /lab-discovery-probe > /home/runkai/.no-mistakes/evidence/01M74F8VZ5BTPW2N5AC6ZD1V83/claude-native.log 2>&1'
+[exit 0]
+
+$ tmux -L fm-lab capture-pane -p -t primary
+no server running on /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/tmux/tmux-1000/fm-lab
+[exit 1]
+
+$ tmux -L fm-lab kill-server
+no server running on /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/tmux/tmux-1000/fm-lab
+[exit 1]
+
+NATIVE OBSERVATIONS {"cli": "claude", "requests": 6, "linked_instructions": true, "linked_skill": true, "startup_digest": true, "completion_record": true}
+
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83 -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh pi --offline --approve --no-session --no-mcp --model local-probe/probe -p /skill:lab-discovery-probe > /home/runkai/.no-mistakes/evidence/01M74F8VZ5BTPW2N5AC6ZD1V83/pi-native.log 2>&1'
+[exit 0]
+
+$ tmux -L fm-lab capture-pane -p -t primary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+
+$ tmux -L fm-lab kill-server
+[exit 0]
+
+NATIVE OBSERVATIONS {"cli": "pi", "requests": 1, "linked_instructions": true, "linked_skill": true, "startup_digest": true, "completion_record": true}
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/bin/fm-start.sh bin/fm-sessionstart-run.sh --source startup
+[exit 0]
+
+$ tmux -L fm-lab kill-server
+no server running on /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M74F8VZ5BTPW2N5AC6ZD1V83/l/tmux/tmux-1000/fm-lab
+[exit 1]
