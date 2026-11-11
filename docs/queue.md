@@ -7,8 +7,8 @@ The storage executable's header and help own exact command and file mechanics.
 
 ## One authority and preserved identity
 
-The native queue retains the existing Markdown task representation, configured active file, completed-task archive and note history.
-The archive and note history are parts of that queue, not independent writable planning lists.
+The native queue retains the existing Markdown task representation, configured active file, completed-task archive and note history, with task notes stored separately.
+Task notes, the archive and note history are parts of that queue, not independent writable planning lists.
 Normal reads, identity checks and mutations share locking; multi-file writes have a recoverable transaction so interruption does not silently lose a task.
 Malformed records, duplicate active identities, unproven active/archive collisions, conflicting recovery data and unsupported adapters fail with a diagnostic before a new mutation is committed.
 
@@ -49,7 +49,7 @@ Real human choices continue through `fm-captain-hold.sh`, preserving the actual 
 A captain hold's date or explicit revisit condition controls deferral, not authorization: it remains held until answered/released; Firstmate verifies a condition before resurfacing its call, while an ordinary authorized time gate can expire normally.
 The away-return human-decision group excludes parked context using the hold-kind field.
 
-Active rows keep a one-line pointer to task notes; the storage executable's help owns note paths, inline limits and the one-time `migrate-notes` command.
+New or updated active rows keep a one-line pointer to task notes; the storage executable's help owns note paths, inline limits and the one-time `migrate-notes` command.
 Migration preserves old rows in note history and retains any existing notes; completed archive records stay immutable.
 
 ## Existing homes and reversibility
@@ -58,10 +58,10 @@ Compatibility does not authorize activation or a live-home rewrite.
 The current operating backend remains authoritative until an operator explicitly chooses to activate the validated native replacement.
 Never run native and external writers concurrently against the same files: their lock protocols differ.
 
-Run pre-cutover compatibility checks and proposed-link previews only on copies of the selected home's queue, archive, note history and configuration, with paths explicitly pinned to those copies.
+Run pre-cutover compatibility checks and proposed-link previews only on copies of the selected home's queue, referenced task notes, archive, note history and configuration, with paths explicitly pinned to those copies and task-note placement preserved relative to the queue.
 The supported Markdown format requires no rewrite.
 The migration check reports record and identity counts and lists ambiguous histories without failing solely because they exist; a successful compatibility check does not resolve those histories for single-task operations.
-With writers stopped, use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing active, archive and note files plus their hashes before an approved activation.
+With writers stopped, use `migrate --backup-dir <new-directory>` to save byte-for-byte copies of existing queue files, including referenced task notes, plus their hashes before an approved activation.
 The backup refuses an existing destination and does not switch configuration, install a CLI, start a home or import data into another store.
 If rollback is necessary, stop native writers first, then delete the empty `<backlog>.lock` file the native queue leaves behind, because the earlier writer treats any existing lock file as held; restore those original files and the original backend/configuration from the preserved backup under the operator's authority.
 Keep any subsequent native work separately preserved before restoring an older snapshot.

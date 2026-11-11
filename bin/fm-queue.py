@@ -9,9 +9,12 @@ Only the Markdown backend is supported. Other adapters fail before mutation.
 
 Rows retain the existing Markdown representation. Active/archive/note files
 are one authority, protected by a queue lock and a recoverable transaction.
-Task notes live beside this queue in <id>/notes.md; active rows contain only
-`notes: <id>/notes.md`. --body accepts at most 240 characters on one line;
-use --body-file for longer notes. show/view return content, list includes its path.
+Task notes live beside this queue in <id>/notes.md; new or updated active note
+bodies contain only `notes: <id>/notes.md`.
+--body and --note accept at most 240 characters on one line; use --body-file
+for longer notes. show/view return content, list includes its path.
+CRLF and lone CR become LF in note content; writes retain the original text
+in note history before committing normalized notes.
 Every body replacement archives its predecessor. Archived IDs stay reserved.
 `migrate-notes [--dry-run]` moves active inline notes, archiving their old rows;
 existing different notes are retained before the inline text. Repeating is a no-op.
@@ -20,6 +23,8 @@ See docs/queue.md for archive preservation, identity resolution and move limits.
 `--history` shows locations, states, completion dates and titles only.
 Migration needs no rewrite: `migrate --dry-run` validates existing records;
 `migrate --backup-dir DIR` also creates an exclusive byte-for-byte backup.
+Its manifest maps saved files to source paths and SHA-256 hashes, including
+every referenced active task notes file; restore their relative placement.
 Neither command activates a home or installs anything. Never run two writers
 using different lock protocols against the same queue during activation.
 """
