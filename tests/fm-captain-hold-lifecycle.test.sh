@@ -897,7 +897,7 @@ EOF
 #!/usr/bin/env bash
 if [ "${1:-}" = done ] && [ "${2:-}" = sample-interrupted-call ] \
   && [ ! -e "$FM_HOME/close-failed-once" ]; then
-  cp "$FM_HOME/data/backlog.md" "$FM_HOME/at-close/backlog.md" || exit 93
+  cp -R "$FM_HOME/data/." "$FM_HOME/at-close/" || exit 93
   : > "$FM_HOME/close-failed-once"
   exit 92
 fi
@@ -3839,12 +3839,12 @@ test_retained_body_keeps_its_utf8_bytes() {
   # explicit: U+00E9 is the latin-1-representable case, U+2014 the wider one.
   accented=$(printf 'caf\xc3\xa9')
   wide=$(printf '\xe2\x80\x94')
-  stored="$home/data/backlog.md"
 
   # A body whose characters are all at or below U+00FF.
   narrow_id=sample-utf8-narrow
   retain_row_with_body "$home" "$narrow_id" "Serve the $accented black, no sugar."
-  # data/backlog.md is the markdown backend's own persisted artifact, read here
+  stored="$home/data/$narrow_id/notes.md"
+  # notes.md is the queue's persisted task body, read here
   # for its bytes because the shown field re-encodes them.
   assert_grep "Deliverable of the finished work: report data/$narrow_id/report.md" "$stored" \
     "cleanup did not rewrite the retained body, so nothing decoded it"
@@ -3856,6 +3856,7 @@ test_retained_body_keeps_its_utf8_bytes() {
   # A body carrying a character above U+00FF keeps its bytes and stays quiet.
   wide_id=sample-utf8-wide
   retain_row_with_body "$home" "$wide_id" "Serve it $wide black, no sugar."
+  stored="$home/data/$wide_id/notes.md"
   LC_ALL=C grep -qF "$wide" "$stored" \
     || fail "the retained body lost the UTF-8 bytes of a character above U+00FF"
   assert_no_grep "Wide character" "$home/$wide_id.err" \

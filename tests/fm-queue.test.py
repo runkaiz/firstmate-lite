@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import tempfile
@@ -38,7 +39,7 @@ class QueueTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("FM_QUEUE_TEST_ROOT"))
         self.addCleanup(self.tmp.cleanup)
-        self.home = Path(self.tmp.name)
+        self.home = Path(self.tmp.name).resolve()
         (self.home / "data").mkdir()
         (self.home / ".tasks.toml").write_text('backend = "markdown"\n[markdown]\npath = "data/backlog.md"\narchive = "data/done-archive.md"\ndone_keep = 100\n')
         self.file = self.home / "data/backlog.md"
@@ -68,6 +69,155 @@ class QueueTests(unittest.TestCase):
         self.file.write_text(active)
         self.archive.write_text(archive)
         return self.file.read_bytes(), self.archive.read_bytes()
+
+    def test_notes_files_keep_queue_short_and_archive_replacements(self):
+        notes = self.home / "input.md"
+        original = "## Intent\n" + "Long accepted scope\n" * 40 + "\n"
+        notes.write_text(original)
+        self.call("add", "notes", "Accepted work", "--body-file", str(notes))
+        target = self.file.parent / "notes/notes.md"
+        self.assertEqual(target.read_text(), original)
+        self.assertIn("  notes: notes/notes.md\n", self.file.read_text())
+        self.assertNotIn("Long accepted scope", self.file.read_text())
+        self.assertEqual(self.task("notes")["body"], original)
+        self.assertIn("notes/notes.md", self.call("list").stdout)
+        self.assertIn("Long accepted scope", json.loads(self.call("snapshot").stdout)["text"])
+        notes.write_text("Replacement\n")
+        self.call("update", "notes", "--body-file", str(notes))
+        self.assertEqual(target.read_text(), "Replacement\n")
+        history = (self.file.parent / "note-archive.md").read_text()
+        self.assertIn("Long accepted scope", history)
+        self.call("done", "notes", "--keep", "0")
+        self.assertEqual(self.task("notes")["body"], "Replacement\n")
+        self.call("reopen", "notes")
+        self.call("update", "notes", "--body", "Another scope")
+        self.assertEqual(self.history("notes")["records"][0]["body"], "Replacement\n")
+
+    def test_inline_limits_refuse_without_mutation(self):
+        self.call("add", "stable", "Accepted", "--body", "Original")
+        before = self.file.read_bytes()
+        for flag in ("--body", "--note"):
+            for text in ("x" * 241, "First\nSecond", "First\rSecond"):
+                result = self.call("update", "stable", flag, text, good=False)
+                self.assertIn("one short line", result.stderr)
+                self.assertIn("--body-file", result.stderr)
+                self.assertEqual(self.file.read_bytes(), before)
+                self.assertEqual(self.task("stable")["body"], "Original")
+
+    def test_note_migration_is_lossless_idempotent_and_recoverable(self):
+        for index in range(8):
+            folder = self.file.parent / f"task-{index}"
+            folder.mkdir()
+            (folder / "notes.md").write_text("Already recorded\n")
+        old = "## Queued\n" + "".join(
+            f"- [ ] task-{i} - Task {i}\n  First line\n  Second line\n" for i in range(8))
+        self.file.write_text(old)
+        self.call("migrate-notes", "--dry-run")
+        self.assertEqual(self.file.read_text(), old)
+        result = self.call("migrate-notes", extra_env={"FM_QUEUE_TEST_CRASH_AFTER_WRITES": "2"}, good=False)
+        self.assertEqual(result.returncode, 91)
+        self.call("list")  # Recover through the public read interface.
+        for i in range(8):
+            self.assertEqual(self.task(f"task-{i}")["body"], "Already recorded\n\n\nFirst line\nSecond line")
+        history = self.file.parent / "note-archive.md"
+        self.assertIn(old.split("\n", 1)[1].split("- [ ] task-1", 1)[0], history.read_text())
+        before = self.file.read_bytes(), history.read_bytes()
+        self.assertEqual(json.loads(self.call("migrate-notes").stdout)["migrated"], [])
+        self.assertEqual((self.file.read_bytes(), history.read_bytes()), before)
+
+    def test_crlf_migration_keeps_raw_history_and_round_trips(self):
+        folder = self.file.parent / "migrated"
+        folder.mkdir()
+        notes = folder / "notes.md"
+        original = "Prior\r\n  Indented 雪\r\nFinal\rTail\u2028detail\r\n"
+        notes.write_bytes(original.encode())
+        backlog = b"## Queued\r\n- [ ] migrated - Accepted work\r\n  Inline scope\r\n"
+        self.file.write_bytes(backlog)
+        self.call("migrate-notes", "--dry-run")
+        self.assertEqual(self.file.read_bytes(), backlog)
+        self.assertEqual(notes.read_bytes(), original.encode())
+        self.call("migrate-notes")
+        expected = "Prior\n  Indented 雪\nFinal\nTail\u2028detail\n\n\nInline scope"
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.assertEqual(notes.read_bytes(), expected.encode())
+        history = self.file.parent / "note-archive.md"
+        raw_history = "  Prior\r\n    Indented 雪\r\n  Final\rTail\u2028detail\r\n".encode()
+        self.assertIn(raw_history, history.read_bytes())
+        self.assertIn(backlog.split(b"\r\n", 1)[1], history.read_bytes())
+        before = self.file.read_bytes(), notes.read_bytes(), history.read_bytes()
+        self.call("migrate-notes")
+        self.assertEqual((self.file.read_bytes(), notes.read_bytes(), history.read_bytes()), before)
+        self.call("done", "migrated", "--no-prune")
+        self.call("prune", "--keep", "0")
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.call("reopen", "migrated")
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.call("done", "migrated", "--no-prune")
+        self.call("rm", "migrated")
+        self.assertEqual([record["body"] for record in self.history("migrated")["records"]], [expected, expected])
+        self.assertEqual(history.read_bytes().count(raw_history), 1)
+
+    def test_crlf_external_notes_and_replacements_keep_raw_history(self):
+        self.call("add", "external", "Accepted work", "--body", "Initial scope")
+        notes = self.file.parent / "external/notes.md"
+        original = b"Prior\r\nSecond line\r\n"
+        notes.write_bytes(original)
+        self.assertEqual(self.task("external")["body"], "Prior\nSecond line\n")
+        self.assertEqual(notes.read_bytes(), original)
+        history = self.file.parent / "note-archive.md"
+        self.assertFalse(history.exists())
+        replacement = self.home / "input.md"
+        replacement.write_bytes(b"Replacement\r\nNext\rStep\r\n")
+        self.call("update", "external", "--body-file", str(replacement))
+        self.assertEqual(self.task("external")["body"], "Replacement\nNext\nStep\n")
+        self.assertEqual(notes.read_bytes(), b"Replacement\nNext\nStep\n")
+        self.assertIn(b"  Prior\r\n  Second line\r\n", history.read_bytes())
+        self.assertIn(b"  Replacement\r\n  Next\rStep\r\n", history.read_bytes())
+        self.call("done", "external", "--keep", "0")
+        replacement.write_bytes(b"Archived revision\r\nRetained detail\r\n")
+        self.call("update", "external", "--body-file", str(replacement))
+        expected = "Archived revision\nRetained detail\n"
+        self.assertEqual(self.task("external")["body"], expected)
+        self.assertIn(b"  Archived revision\r\n  Retained detail\r\n", history.read_bytes())
+        self.call("reopen", "external")
+        self.assertEqual(self.task("external")["body"], expected)
+        self.assertEqual(notes.read_bytes(), expected.encode())
+        self.assertEqual([record["body"] for record in self.history("external")["records"]],
+                         ["Replacement\nNext\nStep\n", expected, expected])
+
+    def test_crlf_body_import_and_move_keep_raw_history(self):
+        body_file = self.home / "input.md"
+        body_file.write_bytes(b"Imported\r\nScope\r\n")
+        self.call("add", "imported", "Accepted work", "--body-file", str(body_file))
+        self.assertEqual(self.task("imported")["body"], "Imported\nScope\n")
+        history = self.file.parent / "note-archive.md"
+        self.assertIn(b"  Imported\r\n  Scope\r\n", history.read_bytes())
+        notes = self.file.parent / "imported/notes.md"
+        notes.write_bytes(b"Updated externally\r\nScope\r\n")
+        target = self.home / "other/data/backlog.md"
+        self.call("mv", "imported", "--to", str(target))
+        moved = json.loads(self.call("show", "imported", "--json", path=target).stdout)["task"]
+        self.assertEqual(moved["body"], "Updated externally\nScope\n")
+        self.assertIn(b"  Updated externally\r\n  Scope\r\n", history.read_bytes())
+        self.call("done", "imported", "--keep", "0", path=target)
+        self.call("reopen", "imported", path=target)
+        self.assertEqual((target.parent / "imported/notes.md").read_bytes(), b"Updated externally\nScope\n")
+
+    def test_note_path_refusals_and_relocated_data(self):
+        outside = self.home / "outside"
+        outside.mkdir()
+        (self.file.parent / "unsafe").symlink_to(outside, target_is_directory=True)
+        self.call("add", "unsafe", "Do not follow", "--body", "Scope", good=False)
+        self.assertEqual(list(outside.iterdir()), [])
+        folder = self.file.parent / "leaf"
+        folder.mkdir()
+        (folder / "notes.md").symlink_to(outside / "missing")
+        self.call("add", "leaf", "Do not follow", "--body", "Scope", good=False)
+        relocated = self.home / "other/records/queue.md"
+        self.call("add", "safe", "Relocated", "--body", "Accepted", path=relocated)
+        self.assertEqual((relocated.parent / "safe/notes.md").read_text(), "Accepted")
+        (relocated.parent / "safe/notes.md").unlink()
+        self.assertIn("missing task notes", self.call("show", "safe", path=relocated, good=False).stderr)
 
     def test_add_usage_error_shows_full_form_and_names_misused_title_flag(self):
         result = self.call("add", "fix-login", "--kind", "ship", "--title", "Fix it", good=False)
@@ -103,7 +253,7 @@ class QueueTests(unittest.TestCase):
         for existing in (True, False):
             if not existing:
                 for path in (self.home / "data").iterdir():
-                    path.unlink()
+                    shutil.rmtree(path) if path.is_dir() else path.unlink()
             before = {str(path.relative_to(self.home)): path.read_bytes()
                       for path in self.home.rglob("*") if path.is_file()}
             for command in commands:
@@ -254,7 +404,9 @@ class QueueTests(unittest.TestCase):
 
     def test_unicode_body_survives_mutations_history_and_archive(self):
         body = "\nFirst\u0085second\u2028third\u2029fourth\n  Indented 雪 🧭\n\n"
-        self.call("add", "unicode", "Unicode intent", "--body", body)
+        body_file = self.home / "intent.txt"
+        body_file.write_text(body)
+        self.call("add", "unicode", "Unicode intent", "--body-file", str(body_file))
         self.assertEqual(self.task("unicode")["body"], body)
         self.call("hold", "unicode", "--kind", "captain", "--reason", "Choose scope")
         self.assertEqual(self.task("unicode")["body"], body)
@@ -280,7 +432,7 @@ class QueueTests(unittest.TestCase):
         self.call("mv", "unicode", "--to", str(target), good=False)
         self.assertEqual(self.task("unicode")["body"], replacement)
         self.assertEqual(len(self.history("unicode")["records"]), 2)
-        self.call("add", "movable", "Unicode intent", "--body", replacement, "--pr", "https://example.test/pull/1")
+        self.call("add", "movable", "Unicode intent", "--body-file", str(body_file), "--pr", "https://example.test/pull/1")
         self.call("mv", "movable", "--to", str(target))
         moved = json.loads(self.call("show", "movable", "--json", path=target).stdout)["task"]
         self.assertEqual(moved["body"], replacement)
@@ -333,6 +485,59 @@ class QueueTests(unittest.TestCase):
         self.assertIn("Retained scope", (self.home / "data/note-archive.md").read_text())
         self.call("authorize", "outcome", "--body", "Cannot execute an umbrella", good=False)
         self.assertNotIn("outcome", self.ready())
+
+    def test_backup_restores_referenced_notes_in_a_clean_home(self):
+        for layout in ("data/backlog.md", "records/queue.md"):
+            with self.subTest(layout=layout):
+                source = self.home / layout.split("/")[0]
+                source.mkdir(exist_ok=True)
+                config = source / ".tasks.toml"
+                config.write_text(f'backend = "markdown"\n[markdown]\npath = "{layout}"\narchive = "history/finished.md"\n')
+                queue = source / layout
+                self.call("add", "archived", "Archived task", "--body", "Completed scope", path=queue)
+                self.call("done", "archived", "--keep", "0", path=queue)
+                bodies = {"queued": "Accepted scope\n" * 40 + "Unicode: 雪\n\n",
+                          "running": "Current progress\n", "held": "Decision context\n",
+                          "retained": "Completion evidence\n", "empty": ""}
+                body_file = source / "input.md"
+                for identifier, body in bodies.items():
+                    self.call("add", identifier, identifier, "--body", "Old scope", path=queue)
+                    body_file.write_text(body)
+                    self.call("update", identifier, "--body-file", str(body_file), path=queue)
+                self.call("start", "running", path=queue)
+                self.call("hold", "held", "--kind", "captain", "--reason", "Choose scope", path=queue)
+                self.call("done", "retained", "--no-prune", path=queue)
+                before = json.loads(self.call("list", "--json", path=queue).stdout)
+                history = json.loads(self.call("show", "archived", "--history", "--json", path=queue).stdout)
+                backup = source / "backup"
+                self.call("migrate", "--backup-dir", str(backup), path=queue)
+                manifest = json.loads((backup / "manifest.json").read_text())
+                expected_paths = {queue, source / "history/finished.md", queue.parent / "note-archive.md"}
+                expected_paths.update(queue.parent / identifier / "notes.md" for identifier in bodies)
+                self.assertEqual({Path(entry["source"]) for entry in manifest}, expected_paths)
+                self.assertEqual(len({entry["backup"] for entry in manifest}), len(expected_paths))
+                self.assertEqual([entry["backup"] for entry in manifest[:3]],
+                                 [f"0-{queue.name}", "1-finished.md", "2-note-archive.md"])
+                restored = source / "restored"
+                restored.mkdir()
+                shutil.copy2(config, restored / ".tasks.toml")
+                for entry in manifest:
+                    saved = backup / entry["backup"]
+                    self.assertEqual(saved.read_bytes(), Path(entry["source"]).read_bytes())
+                    self.assertEqual(hashlib.sha256(saved.read_bytes()).hexdigest(), entry["sha256"])
+                    target = restored / Path(entry["source"]).relative_to(source)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(saved, target)
+                shutil.rmtree(queue.parent)
+                (source / "history/finished.md").unlink()
+                restored_queue = restored / layout
+                self.assertEqual(json.loads(self.call("list", "--json", path=restored_queue).stdout), before)
+                self.assertEqual(json.loads(self.call("show", "archived", "--history", "--json", path=restored_queue).stdout), history)
+                for identifier, body in bodies.items():
+                    task = json.loads(self.call("show", identifier, "--json", path=restored_queue).stdout)["task"]
+                    self.assertEqual(task["body"], body)
+                self.call("update", "queued", "--body", "Continued after restore", path=restored_queue)
+                self.assertEqual((restored_queue.parent / "queued/notes.md").read_text(), "Continued after restore")
 
     def test_relative_backup_destination_uses_caller_directory(self):
         self.call("add", "stable", "Original", "--body", "Accepted scope")
@@ -543,7 +748,7 @@ class QueueTests(unittest.TestCase):
             ("unblock", "gamma", "--by", "beta"),
             ("close", "gamma", "--pr", "https://example.test/project/pull/2"),
             ("done", "gamma", "--report", "data/gamma/report.md"),
-            ("done", "gamma", "--note", "First line\nSecond line"),
+            ("done", "gamma", "--note", "First line; second line"),
             ("rm", "gamma", "--note", "local main"),
         ]
         for command in commands:
@@ -563,7 +768,7 @@ class QueueTests(unittest.TestCase):
                 self.assertEqual(self.snapshot(), after)
         gamma = self.task("gamma")
         self.assertEqual((gamma["title"], gamma["repo"], gamma["priority"], gamma["kind"]), ("Revised title", "project", "1", "ship"))
-        self.assertEqual(gamma["body"], "Retained scope\n\nFirst line\nSecond line")
+        self.assertEqual(gamma["body"], "Retained scope\n\nFirst line; second line")
         self.assertEqual(gamma["links"], ["https://example.test/project/pull/2", "data/gamma/report.md", "local main"])
         self.assertEqual(gamma["blocked_by"], [])
         self.assertIsNone(gamma["hold_reason"])
@@ -608,7 +813,7 @@ class QueueTests(unittest.TestCase):
                 self.call("done", "alpha", "--keep", "0")
                 before = self.snapshot()
                 records = self.history("alpha")["records"]
-                command = ("done", "alpha", "--pr", f"https://example.test/project/pull/{crash_after}", "--report", f"data/alpha/report-{crash_after}.md", "--note", f"Evidence {crash_after}\nRetained detail")
+                command = ("done", "alpha", "--pr", f"https://example.test/project/pull/{crash_after}", "--report", f"data/alpha/report-{crash_after}.md", "--note", f"Evidence {crash_after}; retained detail")
                 result = self.call(*command, extra_env={"FM_QUEUE_TEST_CRASH_AFTER_WRITES": crash_after}, good=False)
                 self.assertEqual(result.returncode, 91)
                 journal = Path(str(self.file) + ".transaction")
@@ -827,7 +1032,7 @@ class QueueTests(unittest.TestCase):
         body.write_text("Final scope\nwith detail\n")
         self.call("update", "scope", "--body-file", str(body))
         task = self.task("scope")
-        self.assertEqual(task["body"], "Final scope\nwith detail")
+        self.assertEqual(task["body"], "Final scope\nwith detail\n")
         history = (self.home / "data/note-archive.md").read_text()
         self.assertIn("Original scope", history)
         self.assertIn("Revised scope", history)

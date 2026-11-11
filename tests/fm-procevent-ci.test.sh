@@ -235,10 +235,12 @@ check 'recovered pending listener emits zero supervisor dispatch events' test ! 
 check 'listener recovery dispatches no models' test ! -e "$LAB/model-dispatches"
 # The poll is blocked on a fixture clock event; advance it once into green.
 touch "$LAB/release"
-# Waiting on a real process-event write, with a bounded fixture-only deadline.
+# Publication precedes retirement; wait for both before acknowledging and
+# reconciling the completed listener, with a bounded fixture-only deadline.
 for ((i=0; i<200; i++)); do
   results=("$FM_STATE_OVERRIDE/procevent-inbox/ci-run1."*.result)
-  [ -f "${results[0]}" ] && [ -s "$FM_STATE_OVERRIDE/.wake-queue" ] && break
+  [ -f "${results[0]}" ] && [ -s "$FM_STATE_OVERRIDE/.wake-queue" ] \
+    && not_waiting "$FM_STATE_OVERRIDE" task "$ROOT" && break
   /bin/sleep .05
 done
 check 'action captured durably and queued' test -f "${results[0]}"
