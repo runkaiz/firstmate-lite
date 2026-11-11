@@ -408,6 +408,59 @@ class QueueTests(unittest.TestCase):
         self.call("authorize", "outcome", "--body", "Cannot execute an umbrella", good=False)
         self.assertNotIn("outcome", self.ready())
 
+    def test_backup_restores_referenced_notes_in_a_clean_home(self):
+        for layout in ("data/backlog.md", "records/queue.md"):
+            with self.subTest(layout=layout):
+                source = self.home / layout.split("/")[0]
+                source.mkdir(exist_ok=True)
+                config = source / ".tasks.toml"
+                config.write_text(f'backend = "markdown"\n[markdown]\npath = "{layout}"\narchive = "history/finished.md"\n')
+                queue = source / layout
+                self.call("add", "archived", "Archived task", "--body", "Completed scope", path=queue)
+                self.call("done", "archived", "--keep", "0", path=queue)
+                bodies = {"queued": "Accepted scope\n" * 40 + "Unicode: 雪\n\n",
+                          "running": "Current progress\n", "held": "Decision context\n",
+                          "retained": "Completion evidence\n", "empty": ""}
+                body_file = source / "input.md"
+                for identifier, body in bodies.items():
+                    self.call("add", identifier, identifier, "--body", "Old scope", path=queue)
+                    body_file.write_text(body)
+                    self.call("update", identifier, "--body-file", str(body_file), path=queue)
+                self.call("start", "running", path=queue)
+                self.call("hold", "held", "--kind", "captain", "--reason", "Choose scope", path=queue)
+                self.call("done", "retained", "--no-prune", path=queue)
+                before = json.loads(self.call("list", "--json", path=queue).stdout)
+                history = json.loads(self.call("show", "archived", "--history", "--json", path=queue).stdout)
+                backup = source / "backup"
+                self.call("migrate", "--backup-dir", str(backup), path=queue)
+                manifest = json.loads((backup / "manifest.json").read_text())
+                expected_paths = {queue, source / "history/finished.md", queue.parent / "note-archive.md"}
+                expected_paths.update(queue.parent / identifier / "notes.md" for identifier in bodies)
+                self.assertEqual({Path(entry["source"]) for entry in manifest}, expected_paths)
+                self.assertEqual(len({entry["backup"] for entry in manifest}), len(expected_paths))
+                self.assertEqual([entry["backup"] for entry in manifest[:3]],
+                                 [f"0-{queue.name}", "1-finished.md", "2-note-archive.md"])
+                restored = source / "restored"
+                restored.mkdir()
+                shutil.copy2(config, restored / ".tasks.toml")
+                for entry in manifest:
+                    saved = backup / entry["backup"]
+                    self.assertEqual(saved.read_bytes(), Path(entry["source"]).read_bytes())
+                    self.assertEqual(hashlib.sha256(saved.read_bytes()).hexdigest(), entry["sha256"])
+                    target = restored / Path(entry["source"]).relative_to(source)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(saved, target)
+                shutil.rmtree(queue.parent)
+                (source / "history/finished.md").unlink()
+                restored_queue = restored / layout
+                self.assertEqual(json.loads(self.call("list", "--json", path=restored_queue).stdout), before)
+                self.assertEqual(json.loads(self.call("show", "archived", "--history", "--json", path=restored_queue).stdout), history)
+                for identifier, body in bodies.items():
+                    task = json.loads(self.call("show", identifier, "--json", path=restored_queue).stdout)["task"]
+                    self.assertEqual(task["body"], body)
+                self.call("update", "queued", "--body", "Continued after restore", path=restored_queue)
+                self.assertEqual((restored_queue.parent / "queued/notes.md").read_text(), "Continued after restore")
+
     def test_relative_backup_destination_uses_caller_directory(self):
         self.call("add", "stable", "Original", "--body", "Accepted scope")
         caller = self.home / "caller"

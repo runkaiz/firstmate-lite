@@ -825,7 +825,9 @@ def execute(options, stores):
             require(not backup.exists(), "backup directory already exists")
             backup.mkdir(parents=True, mode=0o700)
             manifest = []
-            for index, path in enumerate((store.path, store.archive, store.notes)):
+            paths = [store.path, store.archive, store.notes]
+            paths.extend(store.task_notes(task.id) for task in store.active.tasks() if task.notes_path)
+            for index, path in enumerate(paths):
                 regular(path)
                 if path.exists():
                     target = backup / f"{index}-{path.name}"
