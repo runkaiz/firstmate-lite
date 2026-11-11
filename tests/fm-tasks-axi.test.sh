@@ -155,8 +155,9 @@ test_wrapper_writes_through_to_home() {
   [ "$dir/code/data/backlog.md" -ef "$dir/home/data/backlog.md" ] \
     || fail "the code-root link no longer names the home's backlog"
   assert_grep "call-1" "$dir/home/data/backlog.md" "the held row did not land in the home"
-  assert_grep "RELATIVE-BODY-MARKER" "$dir/home/data/backlog.md" \
+  assert_grep "RELATIVE-BODY-MARKER" "$dir/home/data/call-1/notes.md" \
     "a caller-relative --body-file was not read from the caller's directory"
+  assert_absent "$dir/code/data/call-1/notes.md" "task notes wrote to the code root"
   assert_present "$dir/home/data/done-archive.md" "archiving did not reach the home"
   assert_grep "ship-1" "$dir/home/data/done-archive.md" "the oldest closed row was not archived in the home"
   assert_absent "$dir/code/data/done-archive.md" "archiving wrote a code-root archive"

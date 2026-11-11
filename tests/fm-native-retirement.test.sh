@@ -75,7 +75,7 @@ assert_closed_note() {
   local out
   out=$(env FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-queue.sh" show "$ID") || fail "queue read failed: $out"
   assert_contains "$out" 'state: done' 'retirement did not close the queue row'
-  assert_contains "$(cat "$HOME_DIR/data/backlog.md")" "$1" 'completion lost the exact delivery note'
+  assert_contains "$out" "$1" 'completion lost the exact delivery note'
   [ ! -e "$HOME_DIR/state/$ID.backlog-close" ] || fail 'completion left a pending close'
 }
 
