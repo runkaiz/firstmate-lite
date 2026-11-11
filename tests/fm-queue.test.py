@@ -125,6 +125,84 @@ class QueueTests(unittest.TestCase):
         self.assertEqual(json.loads(self.call("migrate-notes").stdout)["migrated"], [])
         self.assertEqual((self.file.read_bytes(), history.read_bytes()), before)
 
+    def test_crlf_migration_keeps_raw_history_and_round_trips(self):
+        folder = self.file.parent / "migrated"
+        folder.mkdir()
+        notes = folder / "notes.md"
+        original = "Prior\r\n  Indented 雪\r\nFinal\rTail\u2028detail\r\n"
+        notes.write_bytes(original.encode())
+        backlog = b"## Queued\r\n- [ ] migrated - Accepted work\r\n  Inline scope\r\n"
+        self.file.write_bytes(backlog)
+        self.call("migrate-notes", "--dry-run")
+        self.assertEqual(self.file.read_bytes(), backlog)
+        self.assertEqual(notes.read_bytes(), original.encode())
+        self.call("migrate-notes")
+        expected = "Prior\n  Indented 雪\nFinal\nTail\u2028detail\n\n\nInline scope"
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.assertEqual(notes.read_bytes(), expected.encode())
+        history = self.file.parent / "note-archive.md"
+        raw_history = "  Prior\r\n    Indented 雪\r\n  Final\rTail\u2028detail\r\n".encode()
+        self.assertIn(raw_history, history.read_bytes())
+        self.assertIn(backlog.split(b"\r\n", 1)[1], history.read_bytes())
+        before = self.file.read_bytes(), notes.read_bytes(), history.read_bytes()
+        self.call("migrate-notes")
+        self.assertEqual((self.file.read_bytes(), notes.read_bytes(), history.read_bytes()), before)
+        self.call("done", "migrated", "--no-prune")
+        self.call("prune", "--keep", "0")
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.call("reopen", "migrated")
+        self.assertEqual(self.task("migrated")["body"], expected)
+        self.call("done", "migrated", "--no-prune")
+        self.call("rm", "migrated")
+        self.assertEqual([record["body"] for record in self.history("migrated")["records"]], [expected, expected])
+        self.assertEqual(history.read_bytes().count(raw_history), 1)
+
+    def test_crlf_external_notes_and_replacements_keep_raw_history(self):
+        self.call("add", "external", "Accepted work", "--body", "Initial scope")
+        notes = self.file.parent / "external/notes.md"
+        original = b"Prior\r\nSecond line\r\n"
+        notes.write_bytes(original)
+        self.assertEqual(self.task("external")["body"], "Prior\nSecond line\n")
+        self.assertEqual(notes.read_bytes(), original)
+        history = self.file.parent / "note-archive.md"
+        self.assertFalse(history.exists())
+        replacement = self.home / "input.md"
+        replacement.write_bytes(b"Replacement\r\nNext\rStep\r\n")
+        self.call("update", "external", "--body-file", str(replacement))
+        self.assertEqual(self.task("external")["body"], "Replacement\nNext\nStep\n")
+        self.assertEqual(notes.read_bytes(), b"Replacement\nNext\nStep\n")
+        self.assertIn(b"  Prior\r\n  Second line\r\n", history.read_bytes())
+        self.assertIn(b"  Replacement\r\n  Next\rStep\r\n", history.read_bytes())
+        self.call("done", "external", "--keep", "0")
+        replacement.write_bytes(b"Archived revision\r\nRetained detail\r\n")
+        self.call("update", "external", "--body-file", str(replacement))
+        expected = "Archived revision\nRetained detail\n"
+        self.assertEqual(self.task("external")["body"], expected)
+        self.assertIn(b"  Archived revision\r\n  Retained detail\r\n", history.read_bytes())
+        self.call("reopen", "external")
+        self.assertEqual(self.task("external")["body"], expected)
+        self.assertEqual(notes.read_bytes(), expected.encode())
+        self.assertEqual([record["body"] for record in self.history("external")["records"]],
+                         ["Replacement\nNext\nStep\n", expected, expected])
+
+    def test_crlf_body_import_and_move_keep_raw_history(self):
+        body_file = self.home / "input.md"
+        body_file.write_bytes(b"Imported\r\nScope\r\n")
+        self.call("add", "imported", "Accepted work", "--body-file", str(body_file))
+        self.assertEqual(self.task("imported")["body"], "Imported\nScope\n")
+        history = self.file.parent / "note-archive.md"
+        self.assertIn(b"  Imported\r\n  Scope\r\n", history.read_bytes())
+        notes = self.file.parent / "imported/notes.md"
+        notes.write_bytes(b"Updated externally\r\nScope\r\n")
+        target = self.home / "other/data/backlog.md"
+        self.call("mv", "imported", "--to", str(target))
+        moved = json.loads(self.call("show", "imported", "--json", path=target).stdout)["task"]
+        self.assertEqual(moved["body"], "Updated externally\nScope\n")
+        self.assertIn(b"  Updated externally\r\n  Scope\r\n", history.read_bytes())
+        self.call("done", "imported", "--keep", "0", path=target)
+        self.call("reopen", "imported", path=target)
+        self.assertEqual((target.parent / "imported/notes.md").read_bytes(), b"Updated externally\nScope\n")
+
     def test_note_path_refusals_and_relocated_data(self):
         outside = self.home / "outside"
         outside.mkdir()

@@ -476,6 +476,8 @@ class Store:
                 content = read(path)
                 require(content is not None, f"missing task notes: {path}")
                 task.notes_path, task.body = pointer, content
+                if "\r" in content:
+                    self.stage_notes(task)
 
     def task_notes(self, identifier):
         path = self.path.parent / identifier / "notes.md"
@@ -483,6 +485,14 @@ class Store:
         require(path not in (self.path, self.archive, self.notes, self.journal, self.lock), "task notes collide with queue storage")
         regular(path)
         return path
+
+    def normalize_notes(self, task):
+        body = task.body.replace("\r\n", "\n").replace("\r", "\n")
+        if body != task.body:
+            previous = copy.deepcopy(task)
+            previous.notes_path, previous.dirty = None, True
+            self.history(previous, "Original note line endings retained")
+            task.body = body
 
     def stage_notes(self, task, preserve_existing=False):
         path = self.task_notes(task.id)
@@ -497,6 +507,7 @@ class Store:
                 previous.body = self.original[path]
                 previous.notes_path, previous.dirty = None, True
                 self.history(previous, "Existing task notes retained")
+        self.normalize_notes(task)
         task.notes_path = f"{task.id}/notes.md"
         self.note_files[path] = task.body
         task.dirty = True
@@ -797,7 +808,8 @@ def execute(options, stores):
         require(len(options.body) <= 240 and not any(c in options.body for c in "\r\n"), "inline --body must be one short line (at most 240 characters); use --body-file for task notes")
     if options.body_file:
         require(options.body is None, "choose --body or --body-file")
-        options.body = Path(options.body_file).read_text(encoding="utf-8")
+        with Path(options.body_file).open(encoding="utf-8", newline="") as stream:
+            options.body = stream.read()
     if options.body is not None:
         require(not any(ord(c) < 32 and c not in "\t\r\n" for c in options.body), "task notes contain a control byte")
     if verb == "migrate-notes":
@@ -1063,6 +1075,7 @@ def execute(options, stores):
             store.history(task, "Completion note added")
             task.body = task.body + "\n\n" + options.note if task.body else options.note
         task.dirty = True
+    store.normalize_notes(task)
     if task.archived:
         if predecessor is None or task.snapshot_metadata() != predecessor.snapshot_metadata() or any(getattr(task, field) != getattr(predecessor, field) for field in ("title", "body", "links")):
             store.archive_tasks([task])
