@@ -60,6 +60,8 @@ The mid-turn pull warning in `bin/fm-guard.sh` judges watcher health differently
 ### Primary scope
 
 The guard first calls the shared primary scope.
+An inherited non-empty `FM_TASK_ID` excludes a worker before any root check, even when its environment points at the supervisor's shared code checkout.
+The root checks below apply to the code root, while the effective state directory belongs to the operational home.
 A secondmate home runs its own primary Firstmate session, so a genuine `.fm-secondmate-home` marker includes it whether the home is a linked worktree or plain clone.
 The marker must meet both of these conditions:
 
@@ -68,7 +70,7 @@ The marker must meet both of these conditions:
 
 An unmarked checkout or invalid marker falls through to the git-dir check.
 That check keeps crewmate and scout linked worktrees inert because their git dir differs from their git common dir.
-It also requires `AGENTS.md`, `bin/`, and the effective state directory.
+The code root must also contain `AGENTS.md` and `bin/`, and the effective state directory must exist.
 
 ### Supervision need
 

@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/runkaiz/firstmate-lite/main/bin/fm-
 cd ~/firstmate
 ```
 
-The installer keeps shared code in `~/.local/share/firstmate` and private records in `~/firstmate`.
+By default, the installer keeps shared code in `~/.local/share/firstmate` and private records in `~/firstmate`.
 Existing clone-and-run setups still work, with [optional migration and alternate paths](docs/configuration.md#installing-a-separate-home).
 
 ### 3. Launch your first mate
