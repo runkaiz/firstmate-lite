@@ -8,7 +8,7 @@
 # report links remain relative to the backlog root. Caller --file is refused.
 # add/create --start is refused: fm-spawn owns worker bindings and dispatch.
 # show/view/list decode hold reasons through fm-hold-reason-lib.sh.
-# Body history, archived identity and transaction recovery belong to fm-queue.py.
+# Task notes, migration, body history, archived identity and transaction recovery belong to fm-queue.py.
 # fm-tasks-axi.sh is a deprecated alias, not an external executable dependency.
 set -u
 

@@ -9,7 +9,12 @@ Only the Markdown backend is supported. Other adapters fail before mutation.
 
 Rows retain the existing Markdown representation. Active/archive/note files
 are one authority, protected by a queue lock and a recoverable transaction.
+Task notes live beside this queue in <id>/notes.md; active rows contain only
+`notes: <id>/notes.md`. --body accepts at most 240 characters on one line;
+use --body-file for longer notes. show/view return content, list includes its path.
 Every body replacement archives its predecessor. Archived IDs stay reserved.
+`migrate-notes [--dry-run]` moves active inline notes, archiving their old rows;
+existing different notes are retained before the inline text. Repeating is a no-op.
 See docs/queue.md for archive preservation, identity resolution and move limits.
 `show <id> --history --json` exposes record digests for `link`; plain
 `--history` shows locations, states, completion dates and titles only.
@@ -207,6 +212,7 @@ class Task:
         require(ID.fullmatch(identifier) is not None, f"invalid task ID: {identifier!r}")
         self.id, self.title, self.state = identifier, title, state
         self.raw, self.body = raw, body
+        self.notes_path = None
         self.meta = metadata or {}
         if "kind" not in self.meta:
             prefix = re.match(r"^(SCOUT|SHIP)(?![A-Za-z0-9_])", title)
@@ -282,8 +288,9 @@ class Task:
         if self.deps and self.block_reason:
             title += " - " + self.block_reason
         result = f"- [{'x' if self.state == 'done' else ' '}] {self.id} - {title}\n"
-        if self.body:
-            result += "".join("  " + line + "\n" for line in self.body.split("\n"))
+        body = f"notes: {self.notes_path}" if self.notes_path and not self.archived else self.body
+        if body:
+            result += "".join("  " + line + "\n" for line in body.split("\n"))
         return result
 
     def held(self):
@@ -313,7 +320,7 @@ class Task:
                 "hold_reason": self.meta.get("hold"), "hold_kind": self.meta.get("hold-kind"), "hold_until": self.meta.get("hold-until"), "hold_when": self.meta.get("hold-when"),
                 "blocked": bool(self.blocked(all_tasks)), "blocked_by": self.deps, "deps": self.deps,
                 "created": self.meta.get("since"), "closed": self.completion()["date"],
-                "links": self.links, "body": self.body, "archived": self.archived}
+                "links": self.links, "body": self.body, "notes_file": self.notes_path, "archived": self.archived}
 
 
 class Document:
@@ -459,8 +466,40 @@ class Store:
         self.active = Document(read(self.path))
         self.past = Document(read(self.archive), archive=True)
         self.note_text = read(self.notes) or ""
+        self.note_files = {}
         self.original = {path: read(path) for path in (self.path, self.archive, self.notes)}
         self.index()
+        for task in self.active.tasks():
+            pointer = f"{task.id}/notes.md"
+            if task.body == f"notes: {pointer}":
+                path = self.task_notes(task.id)
+                content = read(path)
+                require(content is not None, f"missing task notes: {path}")
+                task.notes_path, task.body = pointer, content
+
+    def task_notes(self, identifier):
+        path = self.path.parent / identifier / "notes.md"
+        require(not path.parent.is_symlink(), f"refusing symlink: {path.parent}")
+        require(path not in (self.path, self.archive, self.notes, self.journal, self.lock), "task notes collide with queue storage")
+        regular(path)
+        return path
+
+    def stage_notes(self, task, preserve_existing=False):
+        path = self.task_notes(task.id)
+        if path not in self.original:
+            self.original[path] = read(path)
+        if not task.notes_path and self.original[path] not in (None, "", task.body):
+            # An interrupted/manual migration may already have independent notes.
+            if preserve_existing:
+                task.body = self.original[path] + "\n\n" + task.body
+            else:
+                previous = copy.deepcopy(task)
+                previous.body = self.original[path]
+                previous.notes_path, previous.dirty = None, True
+                self.history(previous, "Existing task notes retained")
+        task.notes_path = f"{task.id}/notes.md"
+        self.note_files[path] = task.body
+        task.dirty = True
 
     def index(self):
         # Records are never merged or dropped: `all` names each identity's
@@ -513,7 +552,14 @@ class Store:
         (self.past if task.archived else self.active).parts.remove(task)
 
     def history(self, task, reason="Body replaced"):
-        self.note_text += f"\n## {task.id} - {reason} - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n" + task.render() + "\n"
+        self.note_text += f"\n## {task.id} - {reason} - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n" + self.history_row(task) + "\n"
+
+    def history_row(self, task):
+        if not task.notes_path:
+            return task.render()
+        record = copy.deepcopy(task)
+        record.notes_path, record.dirty = None, True
+        return record.render()
 
     def link(self, identifier, predecessor, successor):
         self.note_text += f"\n## {identifier} - Completion history link - {dt.datetime.now(dt.timezone.utc).isoformat()}\n\n  predecessor: {predecessor}\n  successor: {successor}\n"
@@ -532,11 +578,12 @@ class Store:
         for task in done[keep:]:
             self.active.parts.remove(task)
             task.archived = True
+            task.dirty = True
         if done[keep:]:
             self.archive_tasks(done[keep:])
 
     def changes(self):
-        result = {self.path: self.active.render(), self.archive: self.past.render(), self.notes: self.note_text}
+        result = {self.path: self.active.render(), self.archive: self.past.render(), self.notes: self.note_text, **self.note_files}
         if self.original[self.archive] is None and not self.past.tasks():
             result.pop(self.archive)
         return {path: text for path, text in result.items() if text != (self.original[path] or "")}
@@ -568,10 +615,20 @@ def journal_read(path):
         require(data["version"] == 1 and isinstance(data["roots"], list) and 1 <= len(data["roots"]) <= 2, "invalid transaction roots")
         require(all(isinstance(root, str) and Path(root).is_absolute() for root in data["roots"]), "invalid transaction root path")
         require(len(set(data["roots"])) == len(data["roots"]) and all(str(canonical(root)) == root for root in data["roots"]), "ambiguous transaction roots")
-        require(isinstance(data["files"], list) and 1 <= len(data["files"]) <= 6, "invalid transaction files")
+        require(isinstance(data["files"], list) and 1 <= len(data["files"]), "invalid transaction files")
         return data
     except (ValueError, KeyError, TypeError) as error:
         raise QueueError(f"corrupt transaction {path}: {error}") from error
+
+
+def task_note_owned(value, stores):
+    if not isinstance(value, str):
+        return False
+    path = Path(value)
+    for store in stores:
+        if path.parent.parent == store.path.parent and path.name == "notes.md" and ID.fullmatch(path.parent.name):
+            return path == store.task_notes(path.parent.name)
+    return False
 
 
 def recover(data, stores):
@@ -582,7 +639,7 @@ def recover(data, stores):
         if store.journal.exists():
             require(journal_read(store.journal) == data, "conflicting participant transaction")
     for entry in data["files"]:
-        require(isinstance(entry, dict) and entry.get("path") in allowed and entry["path"] not in seen, "unsafe or duplicate transaction file")
+        require(isinstance(entry, dict) and (entry.get("path") in allowed or task_note_owned(entry.get("path"), stores)) and entry["path"] not in seen, "unsafe or duplicate transaction file")
         require(isinstance(entry.get("after"), str) and (entry.get("before") is None or isinstance(entry.get("before"), str)), "invalid transaction payload")
         seen.add(entry["path"])
         require(read(Path(entry["path"])) in (entry["before"], entry["after"]), f"transaction conflicts with changed file: {entry['path']}")
@@ -598,6 +655,11 @@ def recover(data, stores):
 def commit(stores):
     files = []
     for store in stores:
+        for task in store.active.tasks():
+            if task.dirty and (task.body or task.notes_path):
+                if not task.notes_path and task.raw and not task.archived:
+                    store.history(task, "Inline notes relocated")
+                store.stage_notes(task)
         # An input must not serialize into metadata or a second task identity.
         # Validate before publishing a transaction, including unchanged siblings.
         for archive, document in ((False, store.active), (True, store.past)):
@@ -610,8 +672,10 @@ def commit(stores):
             require([task.id for task in parsed] == [task.id for task in tasks], "task identity does not round-trip; ambiguous queue representation")
             for task, reparsed in zip(tasks, parsed):
                 if task.dirty:
+                    expected_body = f"notes: {task.notes_path}" if task.notes_path and not task.archived else task.body
+                    require(reparsed.body == expected_body, "body does not round-trip; ambiguous queue representation")
                     require(reparsed.meta == task.meta, "metadata does not round-trip; use the encoded hold owner for literal reasons")
-                    require(all(getattr(reparsed, field) == getattr(task, field) for field in ("title", "body", "links", "deps", "state")), "task content does not round-trip; ambiguous queue representation")
+                    require(all(getattr(reparsed, field) == getattr(task, field) for field in ("title", "links", "deps", "state")), "task content does not round-trip; ambiguous queue representation")
         previous = set(store.ambiguous)
         store.index()
         require(set(store.ambiguous) <= previous, "change would make an archived identity history ambiguous: " + ", ".join(sorted(set(store.ambiguous) - previous)))
@@ -698,6 +762,7 @@ def parser():
   prune [--keep N]    rm <completed-id>
   mv <id> [<id>...] --to <queue-file-or-directory> (single-record identities only)
   link <id> --predecessor sha256:...#N --successor sha256:...#N [--dry-run]
+  migrate-notes [--dry-run]
   snapshot    check    migrate --dry-run    migrate --backup-dir <new-directory>
 
 Dates are UTC. Captain holds require an answer/release even after their date.
@@ -726,14 +791,31 @@ def execute(options, stores):
     store = stores[0]
     verb = {"create": "add", "view": "show", "edit": "update", "close": "done"}.get(options.command, options.command)
     items = options.items
+    if options.note is not None:
+        require(len(options.note) <= 240 and not any(c in options.note for c in "\r\n"), "inline --note must be one short line (at most 240 characters); use update --body-file for task notes")
+    if options.body is not None:
+        require(len(options.body) <= 240 and not any(c in options.body for c in "\r\n"), "inline --body must be one short line (at most 240 characters); use --body-file for task notes")
     if options.body_file:
         require(options.body is None, "choose --body or --body-file")
-        options.body = Path(options.body_file).read_text(encoding="utf-8").rstrip("\n")
+        options.body = Path(options.body_file).read_text(encoding="utf-8")
+    if options.body is not None:
+        require(not any(ord(c) < 32 and c not in "\t\r\n" for c in options.body), "task notes contain a control byte")
+    if verb == "migrate-notes":
+        require(not items, "migrate-notes takes no task IDs")
+        moving = [task for task in store.active.tasks() if task.body and not task.notes_path]
+        if not options.dry_run:
+            for task in moving:
+                store.history(task, "Inline notes relocated")
+                store.stage_notes(task, preserve_existing=True)
+            commit(stores)
+        print(json.dumps({"ok": True, "migrated": [task.id for task in moving], "dry_run": options.dry_run}))
+        return
     if verb == "snapshot":
         require(not items, "snapshot takes no task IDs")
         # One locked observation for existing projections, including archive
         # prerequisite facts without publishing every historical task body.
-        print(json.dumps({"text": store.active.render(), "closed_ids": [task.id for task in store.all.values() if task.state == "done"], "metadata": {task.id: task.snapshot_metadata() for task in store.active.tasks()}}, ensure_ascii=False))
+        text = "".join(store.history_row(part) if isinstance(part, Task) else part for part in store.active.parts)
+        print(json.dumps({"text": text, "closed_ids": [task.id for task in store.all.values() if task.state == "done"], "metadata": {task.id: task.snapshot_metadata() for task in store.active.tasks()}}, ensure_ascii=False))
         return
     if verb in ("check", "migrate"):
         require(not items, "unexpected check arguments")
@@ -774,7 +856,7 @@ def execute(options, stores):
         if options.json:
             print(json.dumps({"tasks": [task.data(store.all) for task in tasks]}, ensure_ascii=False))
         else:
-            fields = list(dict.fromkeys(["id", "title", "state", "kind", "repo"] + (options.fields.split(",") if options.fields else [])))
+            fields = list(dict.fromkeys(["id", "title", "state", "kind", "repo", "notes_file"] + (options.fields.split(",") if options.fields else [])))
             table("ready" if verb == "ready" else "tasks", tasks, fields, store.all)
             if verb == "ready" and options.include_held:
                 table("held", held, fields, store.all)
@@ -802,6 +884,8 @@ def execute(options, stores):
         for task in moving:
             store.remove(task)
             if not task.archived:
+                task.notes_path = None
+                task.dirty = True
                 destination.active.insert(task)
             destination.all[task.id] = task
             del store.all[task.id]

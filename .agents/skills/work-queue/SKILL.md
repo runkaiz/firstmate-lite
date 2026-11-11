@@ -16,10 +16,10 @@ Its current help and the shipped storage interface own syntax; [Native work queu
 The old `fm-tasks-axi.sh` spelling is a native alias, never a reason to run or install external tasks-axi.
 
 Resolve the project and inspect matching records before creating work.
-Read the selected record with `show <id> --full`, including archived records, rather than loading every body/report.
-Preserve accepted intent, its authorization source/scope, and the next useful step or evidence in that body.
+Read the selected record with `show <id> --full`, including archived records, rather than loading every note/report.
+Preserve accepted intent, its authorization source/scope, and the next useful step or evidence in its task notes via `--body-file`.
 Keep priority, actual dependencies, hold conditions and artifact links in their existing structured fields.
-Use `update|edit` for follow-ups on the same ID; native storage archives the previous body automatically.
+Use `update|edit` for follow-ups on the same ID; native storage archives the previous notes automatically.
 For executing work, also append actual new intent to its brief and steer through the current `fm-send` inbox path.
 
 Capture an idea with `add <id> <title> --idea`; this atomically creates indefinite parked context, not an unanswered human decision.
@@ -28,7 +28,7 @@ Neither time, priority, readiness nor roadmap membership grants authority.
 Capture already-authorized upcoming work as an ordinary queued task under existing intake; do not impose another planning approval.
 Reconcile legacy work against available accepted-intent evidence instead of blanket reapproval.
 
-For a real multi-task outcome, use `add <id> <title> --outcome` and put purpose and constituent IDs in its body.
+For a real multi-task outcome, use `add <id> <title> --outcome` and put purpose and constituent IDs in its task notes.
 The outcome is non-executing context, not a second writable roadmap list.
 Membership never implies dependency or permission; use dependencies only for genuine prerequisites.
 A small task needs no umbrella, and a broad outcome needs no speculative subtask inventory.

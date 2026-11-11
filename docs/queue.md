@@ -25,7 +25,7 @@ Reopening any archived task, including a single record, keeps every archived rec
 Archiving the continuation's completion appends and links its new record to the previous latest one.
 Edits to an archived completion, including late PR, report or note evidence, append a linked revision that preserves the original completion date and verb and every predecessor; repeating identical evidence adds no revision.
 Creation refuses identities found in either active storage or the archive, including conflicts between them.
-Replacing a body automatically archives the superseded record in the existing note history.
+Replacing task notes automatically archives the superseded text and record in the existing note history.
 `rm` archives only already-complete work and retains its identity; unfinished work stays in the queue and can be parked without implying that its dependents are unblocked.
 
 Cross-queue `mv` supports single-record identities only; linked completion histories, including reopened tasks and revised archived completions, are unsupported and refuse before either queue's records change, including in a multi-ID request.
@@ -34,7 +34,7 @@ This native backend does not provide complete external tasks-axi API parity; the
 
 ## Capture and pickup
 
-An ordinary queued task represents accepted work whose scope is retained in its body.
+An ordinary queued task represents accepted work whose scope is retained in its task notes.
 `add --idea` atomically parks an idea indefinitely; `authorize` requires the accepted instruction before making that same record executable.
 An outcome created with `add --outcome` is indefinitely parked context linking existing task IDs, not an executable parent job.
 Neither an outcome link, a priority nor time passing authorizes an idea or creates a dependency.
@@ -48,6 +48,9 @@ Worker exit alone never closes a task, and capacity refusal leaves it queued.
 Real human choices continue through `fm-captain-hold.sh`, preserving the actual answer and the distinction between releasing work and completing it.
 A captain hold's date or explicit revisit condition controls deferral, not authorization: it remains held until answered/released; Firstmate verifies a condition before resurfacing its call, while an ordinary authorized time gate can expire normally.
 The away-return human-decision group excludes parked context using the hold-kind field.
+
+Active rows keep a one-line pointer to task notes; the storage executable's help owns note paths, inline limits and the one-time `migrate-notes` command.
+Migration preserves old rows in note history and retains any existing notes; completed archive records stay immutable.
 
 ## Existing homes and reversibility
 
