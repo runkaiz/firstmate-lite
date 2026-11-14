@@ -1,0 +1,606 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+exit=0
+$ git init -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+Initialized empty Git repository in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project/.git/
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project add README.md
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project -c user.name=Validation -c user.email=validation@example.invalid commit -m fixture
+[main (root-commit) c64b0d7] fixture
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+exit=0
+$ tmux -L fm-lab new-session -d -x 120 -y 40 -s primary -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l codex --disable hooks
+exit=0
+$ tmux -L fm-lab capture-pane -p -t primary
+
+  Update available · 0.167.1 → 0.169.0
+  Release notes: https://github.com/openai/codex/releases/latest
+
+› 1. Update now (runs `sh -c 's=$(curl -fsSL https://chatgpt.com/codex/install.sh) && CODEX_NON_INTERACTIVE=1 eval
+     "$s"'`)
+  2. Skip
+  3. Skip until next version
+
+  enter continue · esc skip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit=0
+$ tmux -L fm-lab display-message -p -t primary #{socket_path},#{pid},0
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/tmux/tmux-1000/fm-lab,968460,0
+exit=0
+$ tmux -L fm-lab display-message -p -t primary #{pane_id}
+%0
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh add idle-a Idle admission proof idle-a --kind ship
+ok: add idle-a
+task:
+  id: idle-a
+  title: Idle admission proof idle-a
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh idle-a project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/idle-a/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh idle-a /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project --mode local-only --yolo off --harness codex --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+Preparing worktree (detached HEAD c64b0d7)
+HEAD is now at c64b0d7 fixture
+native allocation task=idle-a source_ref=refs/heads/main base=c64b0d7747c8532139cc6b44e70174675929fcee worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-a/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned idle-a harness=codex kind=ship mode=local-only yolo=off window=primary:fm-idle-a worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-a/worktree
+exit=0
+PUBLISHED TASK RECORD
+window=primary:fm-idle-a
+endpoint_task_id=idle-a
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-a/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/idle-a
+tasktmp=/tmp/fm-idle-a
+model=default
+effort=default
+launch_model_control=default
+launch_effort_control=default
+launch_service_control=codex-default
+effective_profile=unverified
+spawn_gen=s1794699087.971273.4061
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh show idle-a
+task:
+  id: idle-a
+  title: Idle admission proof idle-a
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh add idle-b Idle admission proof idle-b --kind ship
+ok: add idle-b
+task:
+  id: idle-b
+  title: Idle admission proof idle-b
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh idle-b project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/idle-b/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh idle-b /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project --mode local-only --yolo off --harness codex --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+Preparing worktree (detached HEAD c64b0d7)
+HEAD is now at c64b0d7 fixture
+native allocation task=idle-b source_ref=refs/heads/main base=c64b0d7747c8532139cc6b44e70174675929fcee worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-b/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned idle-b harness=codex kind=ship mode=local-only yolo=off window=primary:fm-idle-b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-b/worktree
+exit=0
+PUBLISHED TASK RECORD
+window=primary:fm-idle-b
+endpoint_task_id=idle-b
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-b/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/idle-b
+tasktmp=/tmp/fm-idle-b
+model=default
+effort=default
+launch_model_control=default
+launch_effort_control=default
+launch_service_control=codex-default
+effective_profile=unverified
+spawn_gen=s1794699090.974559.20920
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh show idle-b
+task:
+  id: idle-b
+  title: Idle admission proof idle-b
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh add light-c Idle admission proof light-c --kind ship
+ok: add light-c
+task:
+  id: light-c
+  title: Idle admission proof light-c
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh light-c project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/light-c/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh light-c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project --mode local-only --yolo off --harness codex --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+Preparing worktree (detached HEAD c64b0d7)
+HEAD is now at c64b0d7 fixture
+native allocation task=light-c source_ref=refs/heads/main base=c64b0d7747c8532139cc6b44e70174675929fcee worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/light-c/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned light-c harness=codex kind=ship mode=local-only yolo=off window=primary:fm-light-c worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/light-c/worktree
+exit=0
+PUBLISHED TASK RECORD
+window=primary:fm-light-c
+endpoint_task_id=light-c
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/light-c/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/light-c
+tasktmp=/tmp/fm-light-c
+model=default
+effort=default
+launch_model_control=default
+launch_effort_control=default
+launch_service_control=codex-default
+effective_profile=unverified
+spawn_gen=s1794699093.976790.32295
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh show light-c
+task:
+  id: light-c
+  title: Idle admission proof light-c
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh add malformed-d Idle admission proof malformed-d --kind ship
+ok: add malformed-d
+task:
+  id: malformed-d
+  title: Idle admission proof malformed-d
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh malformed-d project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/malformed-d/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh malformed-d /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project --mode local-only --yolo off --harness codex --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+Preparing worktree (detached HEAD c64b0d7)
+HEAD is now at c64b0d7 fixture
+native allocation task=malformed-d source_ref=refs/heads/main base=c64b0d7747c8532139cc6b44e70174675929fcee worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/malformed-d/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned malformed-d harness=codex kind=ship mode=local-only yolo=off window=primary:fm-malformed-d worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/malformed-d/worktree
+exit=0
+PUBLISHED TASK RECORD
+window=primary:fm-malformed-d
+endpoint_task_id=malformed-d
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/malformed-d/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/malformed-d
+tasktmp=/tmp/fm-malformed-d
+model=default
+effort=default
+launch_model_control=default
+launch_effort_control=default
+launch_service_control=codex-default
+effective_profile=unverified
+spawn_gen=s1794699096.980356.6585
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh show malformed-d
+task:
+  id: malformed-d
+  title: Idle admission proof malformed-d
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh add directory-e Idle admission proof directory-e --kind ship
+ok: add directory-e
+task:
+  id: directory-e
+  title: Idle admission proof directory-e
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh directory-e project --mode local-only --project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/directory-e/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh directory-e /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project --mode local-only --yolo off --harness codex --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+Preparing worktree (detached HEAD c64b0d7)
+HEAD is now at c64b0d7 fixture
+native allocation task=directory-e source_ref=refs/heads/main base=c64b0d7747c8532139cc6b44e70174675929fcee worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/directory-e/worktree
+launch-profile: requested_model=default requested_effort=default model_control=default effort_control=default service_control=codex-default effective_model=unverified effective_effort=unverified effective_service=unverified
+spawned directory-e harness=codex kind=ship mode=local-only yolo=off window=primary:fm-directory-e worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/directory-e/worktree
+exit=0
+PUBLISHED TASK RECORD
+window=primary:fm-directory-e
+endpoint_task_id=directory-e
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/directory-e/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/directory-e
+tasktmp=/tmp/fm-directory-e
+model=default
+effort=default
+launch_model_control=default
+launch_effort_control=default
+launch_service_control=codex-default
+effective_profile=unverified
+spawn_gen=s1794699099.983362.13151
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh show directory-e
+task:
+  id: directory-e
+  title: Idle admission proof directory-e
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+exit=0
+$ tmux -L fm-lab list-windows -t primary -F #{window_name} #{pane_current_command} #{pane_current_path}
+codex codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ
+fm-idle-a codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-a/worktree
+fm-idle-b codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-b/worktree
+fm-light-c codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/light-c/worktree
+fm-malformed-d codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/malformed-d/worktree
+fm-directory-e codex /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/directory-e/worktree
+exit=0
+$ tmux -L fm-lab capture-pane -p -t primary:fm-idle-a
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-a/worktr
+  ee
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit=0
+$ tmux -L fm-lab capture-pane -p -t primary:fm-idle-b
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/idle-b/worktr
+  ee
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit=0
+$ tmux -L fm-lab capture-pane -p -t primary:fm-light-c
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.validation-tmp/copies/light-c/workt
+  ree
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/projects/project
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit=0
+OBSERVED: three real terminal workers launched for a project declaring legacy capacity=1; all three records and In flight queue rows exist; the declaration bytes remain unchanged. A malformed legacy declaration and a legacy path that is a directory also allow real launches without modification. No directory trust was granted and no model request was needed for this admission proof.
+$ tmux -L fm-lab kill-server
+exit=0
+Removed disposable lab, its private terminal server, task copies, and project.

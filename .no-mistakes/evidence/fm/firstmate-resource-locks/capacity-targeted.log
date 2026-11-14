@@ -1,0 +1,3 @@
+ok - a retired declaration no longer caps dispatch, is reported in one notice, and is left untouched
+ok - a malformed or unreadable retired declaration never refuses a spawn
+ok - a home without the retired declaration dispatches uncapped with no notice

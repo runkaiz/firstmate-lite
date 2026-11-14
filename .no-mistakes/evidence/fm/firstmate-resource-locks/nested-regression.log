@@ -1,0 +1,20 @@
+before-306472b: nested GPU command is still running; competing suite entered=True
+before-306472b: after nested exit, competitor has run.
+nested.log
+resource-lock: holding suite slot 1
+resource-lock: holding gpu slot 1
+
+competitor.log
+resource-lock: holding suite slot 1
+
+after-3a5df1d: nested GPU command is still running; competing suite entered=False
+after-3a5df1d: after nested exit, competitor has run.
+nested.log
+resource-lock: holding suite slot 1
+resource-lock: holding gpu slot 1
+
+competitor.log
+resource-lock: waiting for suite (1 slot(s) at this hour, none free)
+resource-lock: holding suite slot 1
+
+Reproduced premature outer-lock release before the fix; the target retains the outer lock until nested execution finishes.
