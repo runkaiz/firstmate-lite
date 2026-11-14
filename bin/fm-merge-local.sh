@@ -17,6 +17,11 @@
 # docs/captain-hold-lifecycle.md owns the accepted merge-to-cleanup residual.
 # While away, only an existing yolo=on task with a reconciled done declaration,
 # a clean worker copy at the exact ship head, and no captain hold may land.
+# That recorded task posture is the one standing-authority record this gate
+# reads: bin/fm-spawn.sh writes it at dispatch and bin/fm-task-yolo.sh lets main
+# re-record it while the captain is present. The registry posture, notes, and
+# the away words never substitute for it; a refusal names a registered +yolo
+# that the task record contradicts so main can correct the record.
 # The supervisor still verifies the task's validation evidence and scope, as
 # attended: a done declaration is not a machine attestation of passing tests.
 # The away record lock spans the final authority read and synchronous merge.
@@ -148,7 +153,14 @@ fi
 fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
 if fm_afk_contract_away_present "$STATE"; then
   [ "$(awk '/^yolo=/{n++; value=substr($0,6)} END{if(n==1) print value}' "$META")" = on ] || {
-    echo "error: local merge while away requires existing task yolo=on authority" >&2
+    # The task record stays the authority, but a registered +yolo beside it is
+    # worth naming: it is the divergence main corrects, not a captain refusal.
+    STANDING_YOLO=$(FM_HOME="$FM_HOME" "$SCRIPT_DIR/fm-project-mode.sh" "$(basename "$PROJ")" 2>/dev/null | cut -d' ' -f2) || STANDING_YOLO=
+    if [ "$STANDING_YOLO" = on ]; then
+      echo "error: local merge while away requires existing task yolo=on authority; task $ID records yolo=off although $(basename "$PROJ") is registered +yolo, so this landing waits for the captain's return - when their standing approval covers this task, main re-records it with bin/fm-task-yolo.sh $ID on" >&2
+    else
+      echo "error: local merge while away requires existing task yolo=on authority" >&2
+    fi
     exit 1
   }
   READY_LINE=$(status_current_line "$STATE/$ID.status" ship)

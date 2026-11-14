@@ -212,7 +212,7 @@ While the away-posture record `state/.afk-contract` exists:
 [docs/pi-supervision-branch.md](pi-supervision-branch.md#postures) defines that posture.
 [`bin/fm-afk-contract.sh`](../bin/fm-afk-contract.sh) owns away entry, read-back, and record compatibility.
 
-While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision.
+While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision other than a registered [house decision](#house-decisions-confighouse-decisions).
 These are the bounds set by the captain-approved architecture.
 Every existing captain gate remains unchanged in either posture.
 Homes on other primary harnesses do not load the Pi branch extension; shared per-task lease behavior is owned by `bin/fm-lease-lib.sh`.
@@ -955,6 +955,21 @@ Unsupported runtimes and launches without pins receive an explicit notice in the
 An independently configured session can still expose browser tools; otherwise workers report the limitation without installing tools.
 The same launch construction covers ships, scouts, relaunches, and each backend; existing supervisor sessions require their own MCP registration.
 [Runtime verification](verification/runtime-backends.md#pinned-browser-mcp-server) records capability evidence and live-check limits.
+
+## House decisions (config/house-decisions)
+
+The optional local, gitignored `config/house-decisions` registers the keyed worker asks that firstmate answers itself, each with the rule that settles it.
+A worker files anything above its own authority as a keyed `needs-decision`, and some of those asks are the home's own routine, such as who gets the next full-test-suite slot or GPU window, rather than the captain's.
+Each line is `<key>: <rule>`, where the key is the one workers use in `needs-decision [key=<key>]`:
+
+```text
+test-slot: at most two full suites at once, one overnight; grant in request order
+```
+
+The supervision session answers a registered key in every posture, attended or away, and the open-decisions listing prints the rule beside the ask.
+The record grants nothing else: no merge, landing, dispatch, or captain decision reads it, and an unregistered key keeps its ordinary handling.
+An absent file changes nothing, and a malformed one registers no key at all.
+`bin/fm-house-decisions-lib.sh` owns the format and its refusals.
 
 ## Home brief include (config/brief-include.md)
 

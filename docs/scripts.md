@@ -65,6 +65,7 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `backends/tmux.sh`       | Verified tmux session-provider adapter, the fallback backend                         |
 | `fm-project-mode.sh`     | Resolve a project's registered delivery posture, forge binding, or ship-branch prefix from `data/projects.md`, or check its clone's origin for CI workflows, for fleet sync, home seeding, and the forge agreement a ship spawn or scout promotion applies |
 | `fm-merge-local.sh`      | Fast-forward a `local-only` project's local default branch after approval            |
+| `fm-task-yolo.sh`        | Re-record a live ship task's merge posture when the captain's standing word changes; main-only, and never raised while away |
 | `fm-review-diff.sh`      | Review a crewmate branch or resolved PR head against the authoritative base          |
 | `fm-marker-lib.sh`       | Compatibility entry point for the from-firstmate carrier owned by `fm-operational-input.sh` |
 | `fm-task-inbox-lib.sh`   | Single owner of durable steering-inbox records, acknowledgement, doorbells, and the delivery-attempt ladder |
@@ -114,6 +115,7 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-branch-outcome.sh`   | Own the supervision branch's append-only outcome store, cursors, bounded status-coverage indexes, and session-start replay |
 | `fm-lease.sh`            | Claim, release, inspect, and sweep per-task supervision leases                       |
 | `fm-lease-lib.sh`        | One owner of the supervision lease contract and the main-only role-partition guards  |
+| `fm-house-decisions-lib.sh` | One owner of the home's house-decision record: keyed worker asks firstmate answers itself under a registered rule |
 | `fm-control.sh`          | Agent lifecycle control plane: allowlisted `interrupt`, `exit`, and transactional `relaunch` verbs for an exact task id ([agent-control.md](agent-control.md)) |
 | `fm-control-lib.sh`      | One executable owner of the control-plane verb allowlist, per-harness interrupt/exit mechanics, per-backend capability, and the endpoint-absence proof both `exit` and `relaunch` read |
 | `fm-busy-lib.sh`         | Single owner of the semantic busy-state contract: verdicts, source attribution, and per-harness sources |

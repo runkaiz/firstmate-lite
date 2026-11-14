@@ -95,6 +95,7 @@ Route durable knowledge to its most specific owner:
 
 - A `Memory layering` section in the captain-preference files may declare authoritative external memory tiers ([`docs/configuration.md`](docs/configuration.md)); a declared tier owns its named classes, `data/` is then only a cache, capture to the tier is never skipped, corrections follow the tier's rule, and firstmate captures for workers that cannot reach it.
 - Captain preferences go in `data/captain.md` after inspect-then-update; other fleet-local operational facts go in `data/learnings.md`.
+- A rule firstmate applies to a recurring keyed worker ask without the captain, such as a test-slot or GPU-window grant, goes in `config/house-decisions` ([`docs/configuration.md`](docs/configuration.md) "House decisions"), the one place the supervision session reads it.
 - Task notes go with the backlog item, and investigation findings in the scout report.
 - Knowledge useful to almost every contributor to one project belongs in that project's committed `AGENTS.md`, which only deliberate human edits extend; knowledge general to every firstmate user belongs in this repo's shared surface via an authorized contribution, otherwise in `data/learnings.md` or a local draft.
 
@@ -121,6 +122,7 @@ Consult existing reports and evidence before commissioning an investigation, and
 Resolve every ship task's delivery mode and `yolo` merge posture at intake and pass them explicitly, since each command refuses to guess:
 
 - A current explicit captain instruction wins; otherwise the project's registry entry stands, and dropping below its rigor needs a stated reason.
+  A standing captain approval is such an instruction: record it as `--yolo on` on each task it covers, since that record, never prose, is what lands work while the captain is away (`ship-landing` owns re-recording a live task).
 - Pass the registered ship-branch prefix (`bin/fm-project-mode.sh --branch-prefix <project>`) as `--branch-prefix` to the ship brief, spawn, and promotion; pass a non-default start and target branch as `--base-branch` to the ship or scout brief and spawn, with promotion retaining the recorded base.
 - For this firstmate repository, pass the project directory to the brief as `--project` and any captain-approved one-task consent as `--upstream-consent <host>/<owner>/<repo>` to the brief, spawn, and promotion.
 - On a `no-mistakes-prod-only` project, pass `--delivery-surface internal-only|product-facing|mixed|unknown`; only internal tooling, automation, process, and release work ships `direct-PR`, and never infer internal-only from location or name.

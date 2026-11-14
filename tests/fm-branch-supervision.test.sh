@@ -69,6 +69,18 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
     *"A second mate's status log is a relay channel for its child work"*"retiring a second mate is MAIN's alone"*"Report a second mate's signal wake from the status lines that wake newly presents"*"A second mate's stale wake is a liveness event: report it even when it presents no new status lines."*) ;;
     *) fail "branch prompt lost the second-mate relay, signal-span, or stale-liveness rule" ;;
   esac
+  # The overnight stall: routine slot asks and a validated local branch were
+  # held for the captain because the prompt offered only the away words or the
+  # finding policy for a keyed ask, and never said which record carries
+  # landing authority or that queued work needs no words.
+  case "$out_a" in
+    *"# House decisions"*"A house decision is yours to answer in every posture, attended or away, whatever the away words say"*"a rule that says wait is still your answer, never a hold for the captain"*"every unregistered key keep their ordinary handling"*"a house decision is answered under its registered rule as in any posture"*) ;;
+    *) fail "branch prompt lost the house-decision rule" ;;
+  esac
+  case "$out_a" in
+    *"a queued backlog item that is unheld and unblocked is already-approved work"*"the script refuses you a \`--yolo on\` the registry does not carry"*"That authority is one record, the task's own recorded merge posture"*"run the script and let its gate decide rather than concluding from memory that you cannot land"*"A task recorded yolo off, a real decision wait, or failed validation holds for the return"*) ;;
+    *) fail "branch prompt lost the recorded-posture landing or queued-dispatch rule" ;;
+  esac
   # This checks the generated agent interface, not whether a model follows it.
   case "$out_a" in
     *"\`bin/fm-tasks-axi.sh show <refused-handoff-task> --full\`"*'Keep the resolved hold target separate from the wake/report task id'*'re-resolve the refused handoff in the existing backlog'*"never add \`--title\` or create a surrogate producer task"*'report unresolved handoff identity'*) ;;
@@ -1565,6 +1577,16 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   sed -e 's/{TASK}/Continue approved task B after A./' -e 's/{FIRSTMATE_SPEC}/Fixture worker start./' "$home/data/task-b/brief.md" > "$home/data/task-b/next"
   mv "$home/data/task-b/next" "$home/data/task-b/brief.md"
   printf 'pi\n' > "$home/config/crew-harness"
+  # Away never approves more: the branch cannot record a merge posture the
+  # project's registered standing posture does not carry.
+  if FM_BACKEND=tmux FM_FAKE_LAUNCH_LOG="$home/b-launch.log" FM_SUPERVISION_ACTOR=branch \
+    fm_test_run_spawn "$home" "$bcopy" "$fakebin" task-b "$project" --mode local-only --yolo on > "$home/b.out" 2>&1; then
+    fail 'the away branch recorded yolo=on for a project that is not registered +yolo'
+  fi
+  assert_contains "$(cat "$home/b.out")" 'never approves more than the captain'"'"'s standing merge posture' \
+    'the over-permissive away dispatch lost its refusal reason'
+  [ ! -e "$home/state/task-b.meta" ] || fail 'a refused away dispatch still published a task record'
+  printf '# Projects\n\n- demo [local-only +yolo] - fixture project\n' > "$home/data/projects.md"
   FM_BACKEND=tmux FM_FAKE_LAUNCH_LOG="$home/b-launch.log" FM_SUPERVISION_ACTOR=branch \
     fm_test_run_spawn "$home" "$bcopy" "$fakebin" task-b "$project" --mode local-only --yolo on > "$home/b.out" \
     || fail "eligible B failed to start: $(cat "$home/b.out")"
@@ -1577,7 +1599,99 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   pass 'away A lands and records completion, eligible B starts, independent hold persists; missing authority, failed validation, dirty copy and decisions refuse'
 }
 
+# The overnight stall: a validated local-only branch waited for the captain's
+# return although the project was registered +yolo and the captain had approved
+# such landings, because each task record said yolo=off and the away gate reads
+# only that record. The record stays the authority; this pins that the refusal
+# names the divergence, that main can re-record the posture only while the
+# captain is present, that the branch never can, and that the corrected record
+# lands away while an uncorrected or unregistered one still does not.
+test_away_landing_follows_the_re_recorded_task_posture() {
+  local home project worker other otherw out initial rc
+  home="$TMP_ROOT/posture/home"
+  project="$home/projects/demo"
+  worker="$TMP_ROOT/posture/worker-a"
+  other="$home/projects/plain"
+  otherw="$TMP_ROOT/posture/worker-n"
+  mkdir -p "$home/state" "$home/config" "$home/data" "$project" "$other"
+  fm_git_identity fmtest fmtest@example.invalid
+  for out in "$project:$worker:task-a" "$other:$otherw:task-n"; do
+    initial=${out%%:*}; rc=${out#*:}; rc=${rc%%:*}
+    git init -q -b main "$initial"
+    git -C "$initial" commit -q --allow-empty -m initial
+    git clone -q "$initial" "$rc"
+    git -C "$rc" checkout -q -b "fm/${out##*:}"
+    git -C "$rc" commit -q --allow-empty -m 'validated work'
+    git -C "$initial" fetch -q "$rc" "fm/${out##*:}:fm/${out##*:}"
+  done
+  initial=$(git -C "$project" rev-parse HEAD)
+  printf '# Projects\n\n- demo [local-only +yolo] - registered with standing merge authority\n- plain [local-only] - no standing merge authority\n' \
+    > "$home/data/projects.md"
+  fm_write_meta "$home/state/task-a.meta" "project=$project" "worktree=$worker" \
+    "kind=ship" "mode=local-only" "yolo=off" "branch=fm/task-a"
+  fm_write_meta "$home/state/task-n.meta" "project=$other" "worktree=$otherw" \
+    "kind=ship" "mode=local-only" "yolo=off" "branch=fm/task-n"
+  fm_write_meta "$home/state/scout-s.meta" "project=$project" "kind=scout"
+  printf 'done: full suite and live check passed on fm/task-a\n' > "$home/state/task-a.status"
+  printf 'done: full suite passed on fm/task-n\n' > "$home/state/task-n.status"
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'strange, I did not touch the desktop this time' >/dev/null \
+    || fail 'away entry'
+
+  # Away, uncorrected: refused, and the refusal names the divergence and remedy.
+  if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a 2>&1); then
+    fail 'a task recorded yolo=off landed while away'
+  fi
+  assert_contains "$out" 'task-a records yolo=off although demo is registered +yolo' \
+    'the away refusal did not name the record that contradicts the registered posture'
+  assert_contains "$out" 'bin/fm-task-yolo.sh task-a on' 'the away refusal did not name the correction'
+  # No standing record at all: the plain refusal, no divergence claimed.
+  if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-n 2>&1); then
+    fail 'a task with no standing authority landed while away'
+  fi
+  assert_contains "$out" 'requires existing task yolo=on authority' 'missing authority diagnostic'
+  case "$out" in *'registered +yolo'*) fail "an unregistered posture was reported as a divergence: $out" ;; esac
+
+  # Nobody grows merge authority while the captain is away, and the branch never writes it.
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-task-yolo.sh" task-a on 2>&1); rc=$?
+  [ "$rc" -eq 6 ] || fail "the away branch was not refused the posture change (rc=$rc): $out"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" task-a on 2>&1); rc=$?
+  [ "$rc" -eq 1 ] || fail "main raised a merge posture while away (rc=$rc): $out"
+  assert_contains "$out" 'grows only while the captain is present' 'the away refusal lost its reason'
+  assert_contains "$(cat "$home/state/task-a.meta")" 'yolo=off' 'a refused posture change still rewrote the record'
+  [ "$(git -C "$project" rev-parse HEAD)" = "$initial" ] || fail 'a refused landing advanced main'
+
+  # The captain is back: main records their standing approval on the live task.
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail 'archive away'
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-task-yolo.sh" task-a on 2>&1); rc=$?
+  [ "$rc" -eq 6 ] || fail "the attended branch was not refused the posture change (rc=$rc): $out"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" scout-s on 2>&1); rc=$?
+  [ "$rc" -eq 1 ] || fail "a scout record accepted a merge posture (rc=$rc): $out"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" task-a maybe 2>&1); rc=$?
+  [ "$rc" -eq 2 ] || fail "an invalid posture value was not a usage error (rc=$rc): $out"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" task-a on 2>/dev/null) || fail 'main could not record the standing approval'
+  [ "$out" = 'recorded task-a yolo=on (was off)' ] || fail "unexpected posture change report: $out"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" task-a on 2>/dev/null) || fail 'a repeated posture change failed'
+  [ "$out" = 'unchanged task-a yolo=on' ] || fail "a repeated posture change was not idempotent: $out"
+  assert_contains "$(cat "$home/state/task-a.meta")" "worktree=$worker" 'the posture change lost another record field'
+
+  # Away again: the corrected record lands, the uncorrected one still waits.
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'strange, I did not touch the desktop this time' >/dev/null \
+    || fail 'second away entry'
+  FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a >/dev/null \
+    || fail 'the re-recorded standing authority did not land while away'
+  [ "$(git -C "$project" rev-parse HEAD)" = "$(git -C "$worker" rev-parse HEAD)" ] || fail 'the validated head did not land'
+  if FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-n >/dev/null 2>&1; then
+    fail 'a task with no recorded standing authority landed while away'
+  fi
+  # Restricting is always allowed, so a withdrawn approval takes effect at once.
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-task-yolo.sh" task-a off 2>/dev/null) || fail 'main could not restrict a posture while away'
+  [ "$out" = 'recorded task-a yolo=off (was on)' ] || fail "unexpected restriction report: $out"
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail 'final archive'
+  pass 'away landing follows the task record: a contradicted +yolo is named, only a present main re-records it, the branch never does, and no record means no landing'
+}
+
 test_delivery_hold_is_independent_of_the_producer_report_scope
+test_away_landing_follows_the_re_recorded_task_posture
 test_branch_prompt_is_byte_stable_and_above_cache_floor
 test_outcome_store_is_append_only_with_cursor_reads
 test_outcome_append_keeps_a_bounded_display_tail

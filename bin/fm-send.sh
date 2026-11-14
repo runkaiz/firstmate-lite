@@ -55,6 +55,9 @@
 # the away-posture record exists main is parked and that one refusal relocates
 # to the branch (contract: bin/fm-lease-lib.sh); which findings firstmate may
 # decide at all remains ask-user-authority's judgment for either actor.
+# A needs-decision key the home registered as a house decision
+# (bin/fm-house-decisions-lib.sh) is firstmate's own rather than the captain's,
+# so it takes no partition guard in any posture.
 #
 # Chat is also a channel that carries keyed captain answers, so the same flag
 # feeds bin/fm-captain-hold.sh's one keyed-answer intake for any key that names
@@ -317,6 +320,8 @@ shift
 # untouched (contract: bin/fm-lease-lib.sh).
 # shellcheck source=bin/fm-lease-lib.sh
 . "$SCRIPT_DIR/fm-lease-lib.sh"
+# shellcheck source=bin/fm-house-decisions-lib.sh
+. "$SCRIPT_DIR/fm-house-decisions-lib.sh"
 if [ -n "$TARGET_META" ]; then
   LEASE_GUARD_TASK=$(fm_send_id_from_meta "$TARGET_META")
   if [ -n "$LEASE_GUARD_TASK" ]; then
@@ -509,10 +514,18 @@ if [ -n "$RESOLVE_KEYS" ]; then
   # away-posture record the guard passes the branch instead (relocation:
   # bin/fm-lease-lib.sh); which findings firstmate may decide at all stays
   # ask-user-authority's judgment, for either actor.
+  # A house decision (bin/fm-house-decisions-lib.sh) is firstmate's own in
+  # every posture, so a needs-decision key the home registered there meets no
+  # partition guard. A captain-held task is never one, and an unreadable record
+  # registers nothing, so both keep the guard.
   RESOLVE_IS_DECISION=0
   [ -z "$RESOLVE_HOLD_KEYS" ] || RESOLVE_IS_DECISION=1
   for k in $RESOLVE_STATUS_KEYS; do
-    [ "$(_fm_open_set_verb "$resolve_open_set" "$k")" = needs-decision ] && RESOLVE_IS_DECISION=1
+    [ "$(_fm_open_set_verb "$resolve_open_set" "$k")" = needs-decision ] || continue
+    if fm_house_decision_rule "${FM_CONFIG_OVERRIDE:-$FM_HOME/config}" "$k" >/dev/null; then
+      continue
+    fi
+    RESOLVE_IS_DECISION=1
   done
   if [ "$RESOLVE_IS_DECISION" -eq 1 ]; then
     fm_lease_forbid_branch "decision answer (fm-send --resolve-key)" --away-relocated

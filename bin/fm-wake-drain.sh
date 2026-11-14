@@ -30,6 +30,8 @@ SCRIPT_DIR="$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd
 . "$SCRIPT_DIR/fm-classify-lib.sh"
 # shellcheck source=bin/fm-line-cap-lib.sh
 . "$SCRIPT_DIR/fm-line-cap-lib.sh"
+# shellcheck source=bin/fm-house-decisions-lib.sh
+. "$SCRIPT_DIR/fm-house-decisions-lib.sh"
 # shellcheck source=bin/fm-timeout-lib.sh
 . "$SCRIPT_DIR/fm-timeout-lib.sh"
 # shellcheck source=bin/fm-lease-lib.sh
@@ -504,10 +506,11 @@ EOF
 # lifetime, while still never dropping an old buried decision (see
 # fm-classify-lib.sh's "incremental (cursor-backed) open-decisions fold").
 # Bounded and silent: prints nothing when no decision is open, which is the
-# common case.
+# common case. A needs-decision whose key the home registered as a house
+# decision (bin/fm-house-decisions-lib.sh) also gets that rule, once per key.
 print_open_decisions_section() {
   local snapshot=${1:-} open task key verb note line item_bytes=220 global_bytes=4000
-  local output='' used=0 shown=0 omitted=0 bytes
+  local output='' used=0 shown=0 omitted=0 bytes house_keys=' ' house_rule house_lines='' house_status
 
   if [ -n "$snapshot" ]; then
     open=$(scan_open_decisions_snapshot "$STATE" "$snapshot") || return 1
@@ -535,6 +538,23 @@ print_open_decisions_section() {
 "
     used=$((used + bytes))
     shown=$((shown + 1))
+    # A shown needs-decision whose key the home registered as a house decision
+    # gets its rule printed once below, so the reader sees firstmate owns it.
+    # A malformed record registers nothing; say so once instead of guessing.
+    [ "$verb" = needs-decision ] || continue
+    case "$house_keys" in *" $key "*) continue ;; esac
+    house_keys="$house_keys$key "
+    house_status=0
+    house_rule=$(fm_house_decision_rule "${FM_CONFIG_OVERRIDE:-$FM_HOME/config}" "$key" 2>/dev/null) || house_status=$?
+    if [ "$house_status" -eq 2 ]; then
+      house_lines='OPEN DECISIONS: the house-decision record (config/house-decisions) is malformed, so no key is treated as a house decision
+'
+      continue
+    fi
+    [ "$house_status" -eq 0 ] || continue
+    fm_cap_line_var "OPEN DECISIONS: [key=$key] is a house decision, firstmate's to answer in every posture under the home's rule: $house_rule" 400
+    house_lines="$house_lines$FM_LINE_CAP_LINE
+"
   done <<EOF
 $open
 EOF
@@ -545,6 +565,7 @@ EOF
   if [ "$omitted" -gt 0 ]; then
     printf 'OPEN DECISIONS: %d more omitted (byte cap)\n' "$omitted" || return 1
   fi
+  printf '%s' "$house_lines" || return 1
   # Answerer-closes hint, printed at exactly the moment an answer gets written:
   # the send that answers a listed decision also closes it, so closure never
   # depends on the busy worker writing a matching resolved line (contract:
