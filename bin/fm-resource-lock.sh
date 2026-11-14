@@ -4,7 +4,7 @@
 # A machine has a few resources that only so many jobs can use at once: memory
 # for a full test suite, a GPU, a device. A worker that needs one takes a slot
 # itself, by running the heavy command through this script, instead of asking
-# firstmate; idle and waiting workers cost nothing and are never counted.
+# firstmate; resource admission counts heavy jobs rather than workers.
 #
 # Usage:
 #   fm-resource-lock.sh run [--file <declaration>] <resource> -- <command> [arg...]
@@ -13,8 +13,8 @@
 # run    Wait until <resource> has a free slot, then replace this process with
 #        <command> while holding it. The exit status is the command's own. One
 #        `resource-lock:` line on stderr reports a wait, and one the slot taken.
-#        The slot frees when the command and every process it left running have
-#        exited. A command its harness cut off mid-wait is simply run again.
+#        The slot frees when the command and any child processes retaining the
+#        lock have exited. A command cut off mid-wait is simply run again.
 # brief  Print the brief section that tells a worker which commands to wrap and
 #        how, or nothing when no resource is declared. bin/fm-brief.sh appends it
 #        to every ship and scout scaffold.

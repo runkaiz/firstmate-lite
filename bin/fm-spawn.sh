@@ -174,8 +174,9 @@
 #   fm_firstmate_root_home resolves, so a home seeded from another machine anchors
 #   that lock itself rather than failing to resolve one;
 #   contention refuses rather than waits.
-#   Workers are never counted or capped: heavy commands serialize themselves on
-#   the machine's declared resource locks (bin/fm-resource-lock.sh). A home that
+#   Workers have no per-project cap; finite away-mode caps still apply
+#   (bin/fm-afk-capacity-lib.sh). Heavy commands serialize themselves on the
+#   machine's declared resource locks (bin/fm-resource-lock.sh). A home that
 #   still has the retired config/project-capacity keeps spawning; a fresh ship
 #   or scout spawn prints one `notice:` line saying the file is no longer read
 #   and never changes it.

@@ -1074,7 +1074,8 @@ Per-machine Cursor `cli-config.json` attribution-off is not this contract: it do
 ## Resource locks (config/resource-locks)
 
 The optional local, gitignored `config/resource-locks` names the machine resources that only a few heavy jobs can use at once - memory for a full test suite, a GPU, a device - and how many jobs each one serves.
-Firstmate never counts or caps workers, because an idle or waiting worker costs almost nothing; a worker instead takes a slot itself for the heavy command and waits its turn without asking Firstmate.
+Firstmate no longer caps workers per project, because an idle or waiting worker costs almost nothing; a worker instead takes a slot itself for the heavy command and waits its turn without asking Firstmate.
+Finite away-mode worker caps still apply as described in [agent-control.md](agent-control.md#afk-worker-occupancy).
 The file lives in this machine's root Firstmate home, so every home on the machine reads the same slots, and holds one line per resource:
 
 ```text
@@ -1093,14 +1094,13 @@ When the file declares a resource, `bin/fm-brief.sh` adds a `# Heavy commands (r
 bin/fm-resource-lock.sh run suite -- <command>
 ```
 
-The wrapper waits for a free slot, runs the command while holding it, and frees the slot when the command exits.
+The wrapper waits for a free slot and holds it until the command and any child processes retaining the lock have exited.
 Nest wrappers when a command needs several resources; each outer slot stays held while the inner wrapper waits and runs.
-Slots are exclusive `flock` locks on files under `$XDG_RUNTIME_DIR`: `<name>.lock` for a one-slot resource, and `<name>-slot-1.lock` onward for any other.
-A job that takes the same file with plain `flock` is therefore an ordinary holder, so a lock already in use by hand, such as `$XDG_RUNTIME_DIR/gpu.lock`, keeps working unchanged whether or not the resource is declared here.
+A job that takes the same file with plain `flock` is an ordinary holder, so a lock already in use by hand, such as `$XDG_RUNTIME_DIR/gpu.lock`, keeps working unchanged whether or not the resource is declared here; the script header below owns slot-file naming.
 A malformed or unreadable file stops every ship and scout scaffold and every wrapped command until it is fixed, rather than guessing the intended limit, and the wrapper refuses to run a command unlocked where `flock` or `$XDG_RUNTIME_DIR` is missing.
 [`bin/fm-resource-lock.sh`](../bin/fm-resource-lock.sh) owns the file format, the lock files, and the admission rule.
 
-The retired `config/project-capacity` worker limit is no longer read: a home that still has the file keeps dispatching, and each fresh spawn prints one notice until the file is removed.
+The retired `config/project-capacity` worker limit is no longer read: a home that still has the file keeps dispatching, and each fresh ship or scout spawn in that home prints one notice until the file is removed.
 
 ## Crew dispatch profiles (config/crew-dispatch.json)
 
