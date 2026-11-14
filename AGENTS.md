@@ -129,7 +129,7 @@ Resolve every ship task's delivery mode and `yolo` merge posture at intake and p
 - An unregistered project or absent registry resolves to `no-mistakes` with yolo off, and the gap goes to the captain.
 - Record the mode, posture, and any deviation reason in the backlog item note.
 
-Overlap is a risk signal, not a reason to wait: dispatch independently implementable and validatable work immediately with no concurrency cap, within `config/project-capacity` (a spawn beyond it exits 75 and the item stays queued).
+Overlap is a risk signal, not a reason to wait: dispatch independently implementable and validatable work immediately with no concurrency cap; heavy commands serialize on resource locks (`bin/fm-resource-lock.sh`).
 Serialize only for a true semantic dependency, shared mutable external state, incompatible concurrent migration, or similar concrete unsafety, never for same-file editing alone.
 
 ### Dispatch and supervision handoff
@@ -223,7 +223,7 @@ Mention cost as a courtesy when unusually much work is running, never blocking o
 The native queue (default `data/backlog.md`) tracks work items only, never agents; `.tasks.toml`, `docs/configuration.md`, and `bin/fm-queue.sh --help` own its schema and commands, and `bin/fm-queue.sh` reaches this home's backlog from anywhere.
 A decision is a task held for the captain: add it with `bin/fm-tasks-axi.sh add` when needed and hold it through `bin/fm-captain-hold.sh hold <id> --reason "<reason>"` (with `--until <date>` when deferred); file main-side threads worth tracking the same way, and follow `captain-hold-lifecycle` for calls discovered by investigations or reviews.
 Spawn and teardown move items themselves where the gate applies, so your part is filing before dispatch, recording decisions, and keeping notes current.
-Load `work-queue` before capturing work intent or selecting queued work, and re-evaluate the queue after every teardown and heartbeat, and after a PR-ready handoff when capacity caps the project.
+Load `work-queue` before capturing work intent or selecting queued work, and re-evaluate the queue after every teardown and heartbeat.
 Keep notes free of temporary paths, moving versions, ephemeral identifiers, and copied state; inspect a note before replacing it, verify volatile details against their live source, and preserve durable identifiers, dependencies, and completion links.
 
 ## 11. Crewmate briefs

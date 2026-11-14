@@ -2,8 +2,8 @@
 name: work-queue
 description: >-
   Load before capturing or revising work/outcome intent, selecting queued work,
-  and reconsidering eligibility at startup, heartbeat, completion/teardown,
-  or a capacity-bound PR-ready handoff. Uses the native queue and existing lifecycle owners.
+  and reconsidering eligibility at startup, heartbeat, or completion/teardown.
+  Uses the native queue and existing lifecycle owners.
 user-invocable: false
 metadata:
   internal: true
@@ -35,12 +35,12 @@ A small task needs no umbrella, and a broad outcome needs no speculative subtask
 Use the existing human hold/answer owner on the actual task for a genuine choice; never substitute idea authorization for its recorded answer.
 
 At startup, reconcile the one digest's recovery facts before selection.
-At heartbeat, completion/teardown and a capacity-bound PR-ready handoff, obtain `ready` candidates and the existing bounded fleet snapshot in the current supervision turn.
+At heartbeat and completion/teardown, obtain `ready` candidates and the existing bounded fleet snapshot in the current supervision turn.
 Inspect bodies only for selected or reconciled work, and retain existing priority and tie ordering.
 Check accepted scope and existing metadata/status/inbox ownership before dispatch; readiness is not evidence that no worker owns the ID.
 Recover an interrupted worker/queue transition through bootstrap/current-state owners under that same stable ID instead of duplicating dispatch.
 Use normal brief, dispatch-profile and spawn paths with the selected delivery mode.
-Capacity exit 75 keeps work queued; retain its refusal context and reconsider at the next existing relevant opportunity.
+A spawn deferred with exit 75 keeps work queued; retain its refusal context and reconsider at the next existing relevant opportunity.
 
 Use `fm-crew-state.sh` and the existing lifecycle evidence to distinguish running, paused, blocked and retained-dead workers.
 Endpoint death never proves completion.

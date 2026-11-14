@@ -8,7 +8,7 @@ metadata:
 
 # Ship landing
 
-After completion/teardown or a capacity-bound PR-ready handoff, use `work-queue` to reconsider eligible work through the native queue and existing intake path.
+After completion/teardown, use `work-queue` to reconsider eligible work through the native queue and existing intake path.
 
 For PR-based ship tasks, the ready signal depends on mode: `no-mistakes` reports `done [at=<epoch>]: PR <url> checks green` after CI is green, while `direct-PR` reports `done [at=<epoch>]: PR <url>` after opening the PR, each only for a non-draft PR; a lane that deliberately holds a draft declares a wait instead, and `bin/fm-pr-check.sh` refuses to arm merge monitoring on a draft.
 If a delegated CI wait remains registered, follow [`validation-supervision`](../validation-supervision/SKILL.md) before arming merge monitoring.

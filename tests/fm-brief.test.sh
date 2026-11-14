@@ -997,6 +997,47 @@ test_home_brief_include_is_appended_last() {
   pass "fm-brief.sh: the home brief include lands last on ship and scout, verbatim, and fails closed"
 }
 
+# A machine that declares resource locks tells every ship and scout worker which
+# heavy commands to wrap. The section sits above the home include, is absent
+# without a declaration, and an unreadable declaration stops the scaffold
+# before anything is written, so a limit is never dropped silently.
+test_resource_locks_section_is_briefed() {
+  local home config brief kind out rc locks_line include_line
+  home="$TMP_ROOT/resource-locks-home"
+  config="$home/config"
+  mkdir -p "$config"
+
+  FM_HOME="$home" "$ROOT/bin/fm-brief.sh" locks-absent some-proj --scout >/dev/null || fail "scout scaffold failed without a declaration"
+  assert_no_grep '# Heavy commands (resource locks)' "$home/data/locks-absent/brief.md" "an absent declaration still added a section"
+
+  printf '%s\n' '# heavy suite' 'suite 2 22:00-09:00=1 full test-suite runs' > "$config/resource-locks"
+  printf '%s\n' 'Prefer small commits.' > "$config/brief-include.md"
+  for kind in ship scout; do
+    if [ "$kind" = scout ]; then
+      FM_HOME="$home" "$ROOT/bin/fm-brief.sh" "locks-$kind" some-proj --scout >/dev/null || fail "scout scaffold failed with a declaration"
+    else
+      FM_HOME="$home" "$ROOT/bin/fm-brief.sh" "locks-$kind" some-proj --mode no-mistakes >/dev/null || fail "ship scaffold failed with a declaration"
+    fi
+    brief="$home/data/locks-$kind/brief.md"
+    assert_grep 'take a slot yourself instead of asking firstmate' "$brief" "$kind brief does not tell the worker to self-serve"
+    # shellcheck disable=SC2016 # Literal brief text.
+    assert_grep '- `suite` (2 at once, 1 during 22:00-09:00) - full test-suite runs: `' "$brief" "$kind brief does not name the resource"
+    assert_grep "bin/fm-resource-lock.sh run --file $config/resource-locks suite -- <command>" "$brief" \
+      "$kind brief does not give the wrapper for this home's declaration"
+    locks_line=$(grep -n -x '# Heavy commands (resource locks)' "$brief" | cut -d: -f1)
+    include_line=$(grep -n -x '# Home brief additions' "$brief" | cut -d: -f1)
+    [ -n "$locks_line" ] && [ -n "$include_line" ] && [ "$locks_line" -lt "$include_line" ] \
+      || fail "$kind brief did not place the resource-lock section above the home include"
+  done
+
+  printf '%s\n' 'suite 0 nothing may run' > "$config/resource-locks"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-brief.sh" locks-unreadable some-proj --mode no-mistakes 2>&1); rc=$?
+  expect_code 1 "$rc" "an unreadable declaration must stop the scaffold"
+  assert_contains "$out" "the resource-lock declaration is unreadable" "the refusal did not name the declaration"
+  assert_absent "$home/data/locks-unreadable" "an unreadable declaration left a partial scaffold behind"
+  pass "fm-brief.sh: declared resource locks are briefed to ship and scout workers above the home include, and fail closed"
+}
+
 # --base-branch names the branch a task starts from and a ship's PR targets. It is
 # recorded as a Base branch line under # Setup, which fm-spawn reads back, and is
 # refused where no pull request carries the work.
@@ -1304,6 +1345,7 @@ test_scout_lavish_line_follows_presentation_floor
 test_workers_wait_without_spending_turns
 test_wait_no_turns_absent_keeps_the_previous_brief
 test_home_brief_include_is_appended_last
+test_resource_locks_section_is_briefed
 test_base_branch_is_rendered_and_bounded
 test_ship_branch_prefix_defaults_to_legacy_fm
 test_ship_branch_prefix_override_is_consistent_across_modes

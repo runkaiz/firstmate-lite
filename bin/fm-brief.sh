@@ -109,6 +109,11 @@
 # regular file, or text carrying its own "Delivery contract: mode=" line (which
 # a later scout promotion could not outrank), stops the scaffold before
 # anything is written.
+# When the machine declares resource locks, ship and scout scaffolds also carry
+# "# Heavy commands (resource locks)" just above that include, telling the
+# worker which commands to run through bin/fm-resource-lock.sh; that script owns
+# the declaration and the section text, and an unreadable declaration stops the
+# scaffold before anything is written.
 # Refuses to overwrite an existing brief.
 set -eu
 
@@ -376,6 +381,21 @@ append_brief_include() {
     "$BRIEF_INCLUDE_BODY" >> "$BRIEF"
 }
 
+# The resource-lock section is rendered before anything is written as well, so
+# an unreadable declaration never drops a limit from a brief silently.
+RESOURCE_LOCKS_SECTION=
+if [ "$KIND" != secondmate ]; then
+  RESOURCE_LOCKS_SECTION=$(FM_HOME="$FM_HOME" FM_CONFIG_OVERRIDE="$CONFIG" "$SCRIPT_DIR/fm-resource-lock.sh" brief) || {
+    echo "error: the resource-lock declaration is unreadable; fix it so workers are told this machine's limits (docs/configuration.md \"Resource locks\")" >&2
+    exit 1
+  }
+fi
+
+append_resource_locks() {
+  [ -n "$RESOURCE_LOCKS_SECTION" ] || return 0
+  printf '\n%s\n' "$RESOURCE_LOCKS_SECTION" >> "$BRIEF"
+}
+
 BRIEF="$DATA/$ID/brief.md"
 [ -e "$BRIEF" ] && { echo "error: $BRIEF already exists" >&2; exit 1; }
 mkdir -p "$DATA/$ID"
@@ -581,6 +601,7 @@ Before reporting done, read and follow \`$FM_ROOT/.agents/skills/captain-hold-li
 When the report is complete, append \`done [at=<epoch>]: {one-line conclusion}\` to the status file and stop.
 If your findings reveal work that should ship (e.g. you reproduced a bug and the fix is clear), say so in the report; firstmate may promote this task in place, and you would then receive mode-specific ship instructions as a follow-up message.
 EOF
+append_resource_locks
 append_brief_include
 echo "scaffolded: $BRIEF (scout; replace {TASK} and {FIRSTMATE_SPEC})"
 exit 0
@@ -660,6 +681,7 @@ A correction edits only the wrong text: do not run \`$FM_ROOT/bin/fm-ensure-agen
 
 $DOD
 EOF
+append_resource_locks
 append_brief_include
 if [ "$FORGE" = none ]; then
   echo "scaffolded: $BRIEF (ship, mode=$MODE; replace {TASK} and {FIRSTMATE_SPEC})"

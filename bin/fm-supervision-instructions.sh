@@ -246,7 +246,7 @@ fi
 ordinary_wake_line
 "$SCRIPT_DIR/fm-proactive.sh" instructions
 if [ "$READ_ONLY" -eq 0 ]; then
-  printf '%s\n' '- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat, completion/teardown or a capacity-bound PR-ready handoff.'
+  printf '%s\n' '- Load work-queue for native queue capture/pickup, startup reconciliation, and reconsideration on heartbeat or completion/teardown.'
 fi
 printf '\n'
 render_snippet

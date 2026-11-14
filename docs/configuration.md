@@ -1071,28 +1071,35 @@ A repository whose config sets `core.hooksPath` to the empty string runs no proj
 When stripping is enabled, the hooks directory is read-only, so a hook manager run inside a fleet pane (lefthook's npm postinstall, `pre-commit install`) fails instead of displacing the strip; install a project's hooks from outside the pane, where the wrappers chain them.
 Per-machine Cursor `cli-config.json` attribution-off is not this contract: it does not travel with Firstmate, defaults back to on when unset, and only feeds the CLI's request to the server, so it suppresses the trailer rather than preventing it.
 
-## Project capacity (config/project-capacity)
+## Resource locks (config/resource-locks)
 
-The optional local, gitignored `config/project-capacity` tells Firstmate how many workers a project can run at once on this machine, for a project whose machine-local resource - a heavy test suite, a local editor stack, a device - only serves a few workers at a time.
-Without it, dispatch stays uncapped as `AGENTS.md` section 7 describes, and a surplus worker is launched only to spend full-context turns waiting for the resource.
-The file lives in this machine's root Firstmate home and holds one line per project:
+The optional local, gitignored `config/resource-locks` names the machine resources that only a few heavy jobs can use at once - memory for a full test suite, a GPU, a device - and how many jobs each one serves.
+Firstmate never counts or caps workers, because an idle or waiting worker costs almost nothing; a worker instead takes a slot itself for the heavy command and waits its turn without asking Firstmate.
+The file lives in this machine's root Firstmate home, so every home on the machine reads the same slots, and holds one line per resource:
 
 ```text
-# heavy suite serves two workers
-my-project 2
+# <name> <slots> [<HH:MM>-<HH:MM>=<slots>]... <what it covers>
+suite 2 22:00-09:00=1 full test-suite runs in my-project
+gpu 1 any GPU use
 ```
 
-The name is the project's registered name, which is its clone directory name and may contain spaces, and the number, the last field on the line, is a positive integer.
-A line that is only `#`, or that begins with `#` followed by whitespace, is a comment, as is a `#` line whose last field is not an integer.
-A project name may begin with `#` when that `#` is written immediately against the rest of the name and the line ends with the project's capacity.
-A name that is `#`, or that begins with `#` and a space, cannot be declared, because that line is a comment.
-A place is held by every ship or scout on that project in the root home or any retained historical local home registered under it, including one working in a separate clone of the same origin, until its ready PR is recorded or it is cleaned up; a local-only ship or a scout holds its place until cleanup.
-The declaration is matched by the spawning clone's directory name, so clones of the same origin share the cap only when they use that same directory name.
-A clone of that origin under a different directory name finds no declaration and is not capped, though its workers are still counted as holders for a same-origin clone that is capped.
-When every place is held, `bin/fm-spawn.sh` launches nothing, creates no record, leaves the backlog item queued, prints one `deferred:` line naming the holders, and exits 75, so Firstmate dispatches the item again once a place frees.
-A malformed or unreadable file refuses every fresh ship or scout spawn until it is fixed, rather than guessing the intended limit, and so does a local home's state directory or task record that cannot be read while counting a capped project's holders.
-Firstmate cannot see which part of a worker's life uses the resource, so the number bounds whole workers from launch to handoff, and the tightest resource every worker needs should decide it.
-[`bin/fm-project-capacity-lib.sh`](../bin/fm-project-capacity-lib.sh) owns the file format, what holds a place, and why concurrent spawns cannot both take the last one.
+`<slots>` is how many jobs may hold the resource at once.
+Each optional window gives a different count between two local times, may cross midnight, and may be `0` to stop new jobs for those hours; a job already running when a window lowers the count keeps its slot.
+The rest of the line says which commands must hold the resource and is required, because it is what a worker is told.
+
+When the file declares a resource, `bin/fm-brief.sh` adds a `# Heavy commands (resource locks)` section to every ship and scout brief, giving the worker the exact wrapper for each resource:
+
+```sh
+bin/fm-resource-lock.sh run suite -- <command>
+```
+
+The wrapper waits for a free slot, runs the command while holding it, and frees the slot when the command exits; `bin/fm-resource-lock.sh list` shows each resource's slots now and how many are held.
+Slots are exclusive `flock` locks on files under `$XDG_RUNTIME_DIR`: `<name>.lock` for a one-slot resource, and `<name>-slot-1.lock` onward for any other.
+A job that takes the same file with plain `flock` is therefore an ordinary holder, so a lock already in use by hand, such as `$XDG_RUNTIME_DIR/gpu.lock`, keeps working unchanged whether or not the resource is declared here.
+A malformed or unreadable file stops every ship and scout scaffold and every wrapped command until it is fixed, rather than guessing the intended limit, and the wrapper refuses to run a command unlocked where `flock` or `$XDG_RUNTIME_DIR` is missing.
+[`bin/fm-resource-lock.sh`](../bin/fm-resource-lock.sh) owns the file format, the lock files, and the admission rule.
+
+The retired `config/project-capacity` worker limit is no longer read: a home that still has the file keeps dispatching, and each fresh spawn prints one notice until the file is removed.
 
 ## Crew dispatch profiles (config/crew-dispatch.json)
 

@@ -69,8 +69,7 @@ Completion status alone does not prove a worker stopped; generic missing or unve
 Typed steering to that preserved worker refuses until `relaunch` clears its stop receipt; ordinary inbox messages remain queued for recovery.
 Unknown worker liveness remains counted, and arbitrary background jobs keep their existing controls rather than counting as AI workers.
 `bin/fm-afk-capacity-lib.sh` owns the receipt, fresh liveness validation, reservation, and locking contract.
-The optional per-project capacity declaration remains independent.
-`bin/fm-branch-prompt.sh` "Capacity recovery while away" owns safe progress or one concrete escalation after a project-capacity refusal.
+`bin/fm-branch-prompt.sh` "Handoff recovery while away" owns safe progress or one concrete escalation after a dispatch refusal.
 
 ## Transactional relaunch
 
