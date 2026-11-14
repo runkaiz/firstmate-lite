@@ -1,0 +1,126 @@
+$ fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+
+exit=0
+
+$ fm-afk-contract.sh enter --words Continue approved queued work.
+Away posture recorded at 2026-11-14T22:57:59Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T22:57:59Z
+  your words (verbatim):
+    Continue approved queued work.
+
+exit=0
+
+Persisted pre-upgrade record:
+version: 2
+entered: 2026-11-14T22:57:59Z
+entered_epoch: 1794697079
+confirmed: 2026-11-14T22:57:59Z
+confirmed_epoch: 1794697079
+expected_return: 2000-01-01T00:00:00Z
+reach_channels: none
+reach_announced: No phone channel is configured.
+spend_max_concurrent_workers: 1
+words: |-
+  Continue approved queued work.
+
+Retained workers: existing-a, existing-b (2); retired cap: 1.
+$ fm-spawn.sh probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/missing-project --mode local-only --yolo off --backend tmux --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/bin/fm-spawn.sh: line 2692: cd: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/missing-project: No such file or directory
+
+exit=1
+
+Fresh MAIN spawn response is above; now probe the branch with no queued task.
+$ fm-spawn.sh probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/missing-project --mode local-only --yolo off --backend tmux --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: spawn refused - the supervision branch under the away-posture record may dispatch only queued unblocked work (already queued, or filed by the branch from the captain's away words); task probe has no dispatchable backlog item in this home
+
+exit=1
+
+$ fm-tasks-axi.sh add probe Budget removal dispatch probe
+ok: add probe
+task:
+  id: probe
+  title: Budget removal dispatch probe
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+exit=0
+
+$ fm-spawn.sh probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/missing-project --mode local-only --yolo off --backend tmux --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/bin/fm-spawn.sh: line 2692: cd: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/missing-project: No such file or directory
+
+exit=1
+
+$ fm-spawn.sh probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/projects/probe-project --mode local-only --yolo off --backend tmux --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+deferred: project probe-project admits 1 worker(s) at once on this machine (/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/config/project-capacity) and 2 already hold a place (existing-a, existing-b); task probe was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+
+exit=75
+
+$ fm-spawn.sh probe /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/projects/probe-project --mode local-only --yolo off --backend tmux --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: task probe has no brief at inaccessible data path /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/admission-home/data/probe/brief.md
+
+exit=1
+
+$ fm-tasks-axi.sh show probe --full
+task:
+  id: probe
+  title: Budget removal dispatch probe
+  state: queued
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+exit=0
+
+Observed: the retired full budget did not block dispatch; queued-work permission and missing-project validation remained active. No worker was launched.

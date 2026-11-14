@@ -1,0 +1,199 @@
+$ fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home
+
+exit=0
+
+$ fm-afk-launch.sh enter --words-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/words.txt
+Away posture recorded at 2026-11-14T22:56:44Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T22:56:44Z
+  your words (verbatim):
+    Continue approved work.
+    Keep this line exactly.
+
+exit=0
+
+$ fm-afk-contract.sh words
+Continue approved work.
+Keep this line exactly.
+
+exit=0
+
+$ fm-afk-contract.sh validate
+
+exit=0
+
+$ fm-afk-launch.sh enter
+fm-afk-contract: away posture already recorded at 2026-11-14T22:56:44Z; a refresh leaves it untouched
+Away posture recorded at 2026-11-14T22:56:44Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T22:56:44Z
+  your words (verbatim):
+    Continue approved work.
+    Keep this line exactly.
+
+exit=0
+
+$ fm-afk-return.sh begin
+fm-afk-launch: away-posture record archived at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794697004.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+=== Return brief (away 2026-11-14T22:56:44Z -> 2026-11-14T22:56:44Z, 0s) ===
+Supervisor health:
+  - GAP: watcher downtime was detected during the away window (recovery marker present)
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+Your instructions:
+  your words at entry:
+    Continue approved work.
+    Keep this line exactly.
+  the away session took no action under them.
+Waiting on you:
+  (nothing)
+Tried and failed, or could not be fixed:
+  (nothing)
+Landed, cleanup due:
+  (nothing)
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 0 AI worker slot(s) occupied or unconfirmed at return.
+catch-up health: GAP: watcher downtime was detected during the away window (recovery marker present)
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+catch-up wake: 1794697004 2 check away-entry-review check: away-entry-review
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3244078.1794697004.QZPpTF
+fm-afk-return: catch-up clear; ordinary captain work may proceed
+
+exit=0
+
+$ fm-afk-return.sh guard
+
+exit=0
+
+$ fm-afk-launch.sh enter --expected-return 2026-11-14T10:00:00Z
+fm-afk-contract: unknown option '--expected-return'
+
+exit=2
+
+$ fm-afk-launch.sh enter --spend 1
+fm-afk-contract: unknown option '--spend'
+
+exit=2
+
+$ fm-afk-launch.sh enter --reach phone
+fm-afk-contract: unknown option '--reach'
+
+exit=2
+
+$ fm-afk-contract.sh enter --words Standing instructions
+Away posture recorded at 2026-11-14T22:56:45Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T22:56:45Z
+  your words (verbatim):
+    Standing instructions
+
+exit=0
+
+$ fm-afk-launch.sh enter --expected-return 2026-11-14T10:00:00Z
+fm-afk-contract: unknown option '--expected-return'
+
+exit=2
+
+$ fm-afk-launch.sh enter --spend 1
+fm-afk-contract: unknown option '--spend'
+
+exit=2
+
+$ fm-afk-contract.sh archive
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794697005.afk-contract
+
+exit=0
+
+$ fm-afk-contract.sh validate
+
+exit=0
+
+$ fm-afk-contract.sh words
+Continue approved work.
+exit=0
+
+$ fm-afk-contract.sh readback
+Away posture (recorded):
+  entered: 2026-11-14T01:00:00Z
+  your words (verbatim):
+    Continue approved work.
+
+exit=0
+
+$ fm-afk-launch.sh enter
+fm-afk-contract: away posture already recorded at 2026-11-14T01:00:00Z; a refresh leaves it untouched
+Away posture recorded at 2026-11-14T01:00:00Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T01:00:00Z
+  your words (verbatim):
+    Continue approved work.
+
+exit=0
+
+$ fm-afk-contract.sh archive
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794618000.afk-contract
+
+exit=0
+
+$ fm-afk-contract.sh validate --path /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794618000.afk-contract
+
+exit=0
+
+$ fm-afk-contract.sh validate
+
+exit=0
+
+$ fm-afk-contract.sh words
+Continue approved work.
+exit=0
+
+$ fm-afk-contract.sh readback
+Away posture (recorded):
+  entered: 2026-11-14T01:00:00Z
+  your words (verbatim):
+    Continue approved work.
+
+exit=0
+
+$ fm-afk-launch.sh enter
+fm-afk-contract: away posture already recorded at 2026-11-14T01:00:00Z; a refresh leaves it untouched
+Away posture recorded at 2026-11-14T01:00:00Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-14T01:00:00Z
+  your words (verbatim):
+    Continue approved work.
+
+exit=0
+
+$ fm-afk-contract.sh archive
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794618000.afk-contract
+
+exit=0
+
+$ fm-afk-contract.sh validate --path /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794618000.afk-contract
+
+exit=0
+
+$ fm-afk-contract.sh enter
+Quiet mode recorded at 2026-11-14T22:56:45Z: you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation. Only an explicit /quiet off ends it.
+Quiet mode (recorded):
+  entered: 2026-11-14T22:56:45Z
+  holds: none - you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.
+  your words: (none)
+
+exit=0
+
+$ fm-afk-contract.sh mode
+quiet
+
+exit=0
+
+$ fm-afk-contract.sh archive
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E481GYSFK0PPVV3M8EZBS6/.test-phase/live-home/state/afk-contracts/1794697005.afk-contract
+
+exit=0

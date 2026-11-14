@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Enter, refresh, and return from away mode with verbatim words and no channel, return-time, or budget fields",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Retired return-time, budget, and channel options fail without creating or changing an away record",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Existing v1 and v2 away records ignore even malformed retired fields while refresh and archive preserve their bytes",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Quiet mode still records a present captain and holds nothing for return",
+    "result": "pass",
+    "live": true
+  }
+]
