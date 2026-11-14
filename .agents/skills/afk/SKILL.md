@@ -58,7 +58,7 @@ Typing `/afk` is itself the go: the captain may not look at the screen again, so
 ## While away
 
 For the return brief's worker count and preserving finished task evidence after a verified stop, follow `bin/fm-afk-capacity-lib.sh` and the lifecycle control plane in `docs/agent-control.md`.
-For a capacity-blocked authorized handoff, follow `bin/fm-branch-prompt.sh` "Capacity recovery while away", including safe remediation or one concrete escalation rather than unchanged-wait churn.
+For a blocked authorized handoff, follow `bin/fm-branch-prompt.sh` "Handoff recovery while away", including safe remediation or one concrete escalation rather than unchanged-wait churn.
 
 - The record exists, so the watcher never rechecks an item held for the captain, in either supervision shape; the return brief lists it instead.
   Declared external waits keep their condition-aware, hours-long recheck cadence (`bin/fm-watch.sh`, `bin/fm-classify-lib.sh`).

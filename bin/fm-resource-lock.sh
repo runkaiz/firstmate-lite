@@ -320,7 +320,7 @@ cmd_brief() {
   printf '%s\n' \
     '# Heavy commands (resource locks)' \
     'This machine runs only a few of the heavy jobs named below at once, so take a slot yourself instead of asking firstmate.' \
-    'Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command exits.' \
+    'Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command and any child processes retaining the lock have exited.' \
     "Never run one of these commands outside its wrapper and never preempt another holder; a wait for a slot needs no \`needs-decision\`, and when your shell's command limit ends the wait, run the same wrapped command again."
   while [ "$i" -lt "$RL_COUNT" ]; do
     counts="${RL_SLOTS[$i]} at once"

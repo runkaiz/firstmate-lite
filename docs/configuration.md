@@ -1075,7 +1075,6 @@ Per-machine Cursor `cli-config.json` attribution-off is not this contract: it do
 
 The optional local, gitignored `config/resource-locks` names the machine resources that only a few heavy jobs can use at once - memory for a full test suite, a GPU, a device - and how many jobs each one serves.
 Firstmate no longer caps workers per project, because an idle or waiting worker costs almost nothing; a worker instead takes a slot itself for the heavy command and waits its turn without asking Firstmate.
-Finite away-mode worker caps still apply as described in [agent-control.md](agent-control.md#afk-worker-occupancy).
 The file lives in this machine's root Firstmate home, so every home on the machine reads the same slots, and holds one line per resource:
 
 ```text
