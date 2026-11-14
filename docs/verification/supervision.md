@@ -27,31 +27,30 @@ No endpoint or backend lifecycle mechanism changed, so tmux and Herdr use the sa
 These are executable-interface and package-contract fixtures, not proof of model obedience, live forge merging, or measured turn/token/latency improvement.
 The policy owner remains the [conditional proactive policy](../../.agents/skills/proactive/policy.md).
 
-## Away capacity handoffs
+## Away records and worker return counts
 
-The 2026-10-27 Firstmate-lite check uses the version 2 away-record interface, with version 1 compatibility, and synthetic provider fixtures rather than live agents.
-Refresh the checks with:
+The version 2 away-record interface retains version 1 compatibility while ignoring retired channel, expected-return, and spend fields.
+The record owner and current operator references remain `bin/fm-afk-contract.sh` and [configuration](../configuration.md#attended-and-away-authority).
+On 2026-11-14, GNU Bash 5.3.15 on Linux passed these deterministic checks:
 
 ```sh
-bash bin/fm-test-run.sh --jobs 1 tests/fm-afk-contract.test.sh tests/fm-control.test.sh tests/fm-control-relaunch.test.sh
-bash bin/fm-test-run.sh --jobs 1 tests/fm-branch-supervision.test.sh
+bash bin/fm-test-run.sh tests/fm-afk-contract.test.sh
+bash bin/fm-test-run.sh tests/fm-branch-supervision.test.sh
+bash bin/fm-test-run.sh tests/fm-control.test.sh tests/fm-afk-return.test.sh
 ```
 
-The cap-selection regression verifies an unspecified cap, explicit finite limits, and preservation of both current and legacy finite limits when replacing mandate words.
-The staged-handoff regression reproduces `caps concurrent workers at 4; 16 AI worker slot(s)` with five staged contexts, ten unreconciled deferred workers, and a validated repair awaiting delivery.
-Verified exit turns the ten deferred workers into parked historical records with receipts, leaving six occupied slots; parking three staged contexts then passes the AFK admission guard while preserving continuation evidence, unmerged bytes, task identity, and deferred status.
-An unattributed record restores a concrete admission refusal.
-The relaunch regression then verifies actual replacement launch through the lifecycle interface after parking another holder, without deleting that holder's record.
-The Herdr regression reproduces verified `endpoint-gone` exit retaining a slot, then checks fresh exact-absence admission and replacement launch with preserved work through the canned provider.
-It also checks that counting never starts a server and retains occupancy for stopped-server, unreadable, malformed, mismatched-pane, live-agent, stale-receipt, foreign-owner, inconsistent-session, and missing-receipt cases.
-Existing lifecycle cases retain conservative treatment of late agents, uncertain endpoints, stale receipts, and unsupported liveness.
+The first two commands each reported `FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0`; the third reported `FM_TEST_SUMMARY total=2 failed=0 skipped_gate=0`.
+`tests/fm-control-relaunch.test.sh`, `tests/fm-afk-launch.test.sh`, `tests/fm-session-start.test.sh`, and `tests/fm-pi-branch-extension.test.sh` also passed in the canonical runner; the relaunch guard exercises canned providers rather than live agents.
+
+Record tests verify verbatim words, same-turn entry, byte-preserving refresh/archive of older records, and rejection of removed options without writing a record.
+The return-count checks distinguish stopped workers from retained reports and history, while preserving continuation evidence, unmerged bytes, identity, and deferred status.
+The Herdr fixture checks exact endpoint absence, stop receipts, and replacement launch without starting a server to count workers; stopped-server, unreadable, malformed, mismatched-pane, live-agent, stale-receipt, foreign-owner, inconsistent-session, and missing-receipt evidence remains counted.
+Typed steering still refuses a stopped worker until lifecycle relaunch clears its receipt.
+These counts serve return reporting, not away-mode admission.
 The distinct producer/delivery regression in `tests/fm-branch-supervision.test.sh` checks caller-selected backlog lookup and a durable hold on existing delivery while reporting under the producer's wake scope, without creating a surrogate task.
 Its generated-prompt check verifies the emitted decision interface, not autonomous target selection.
-The focused capacity-fix check, `bash bin/fm-test-run.sh --jobs 1 --per-script-timeout-secs 170 tests/fm-control.test.sh tests/fm-control-relaunch.test.sh`, reported `total=2 failed=0 skipped_gate=0`; temporary read-only hook directories required separate cleanup after the relaunch script.
-
-The decision procedure is owned by `bin/fm-branch-prompt.sh` "Capacity recovery while away", shared by the Pi branch and supervision host; the AFK skill points other primaries to that same owner.
-These deterministic checks prove the supported recovery path and refusal boundaries, not model compliance with the prompt or a live vendor lifecycle interaction.
-No harness mechanics or runtime-backend classification changed.
+[Project capacity](../configuration.md#project-capacity-configproject-capacity) remains independent, and `bin/fm-branch-prompt.sh` "Capacity recovery while away" owns handoff escalation.
+These deterministic checks do not prove model compliance or live vendor lifecycle behavior; no harness mechanics or runtime-backend classification changed.
 
 ## Native session-start delivery
 

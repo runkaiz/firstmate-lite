@@ -163,17 +163,15 @@ unit_enter_records_the_posture_in_one_step_without_a_daemon() {
   st=$(mktemp -d "${TMPDIR:-/tmp}/fm-afk-enter.XXXXXX")
   mkdir -p "$st/state"
   out=$(FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" "$LAUNCH" enter \
-    --words 'merge the windows fix when green' --expected-return 2026-09-08T08:00Z --spend 2 2>&1)
+    --words 'merge the windows fix when green' 2>&1)
   rc=$?
   if [ "$rc" -eq 0 ] && [ -f "$st/state/.afk-contract" ] && [ ! -e "$st/state/.afk-contract.proposed" ] \
     && [ "$(FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" "$CONTRACT" words)" = 'merge the windows fix when green' ] \
-    && [ "$(FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" "$CONTRACT" field expected_return)" = 2026-09-08T08:00Z ] \
-    && [ "$(FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" "$CONTRACT" field spend_max_concurrent_workers)" = 2 ] \
     && [ ! -e "$st/state/.afk" ] && [ ! -e "$st/state/.afk-daemon-terminal" ] \
-    && printf '%s' "$out" | grep -F 'hold-for-return only. No phone channel is configured; anything that needs you waits for your return.' >/dev/null \
+    && printf '%s' "$out" | grep -F 'anything it is unsure of, or that needs you, waits for your return.' >/dev/null \
     && printf '%s' "$out" | grep -F '    merge the windows fix when green' >/dev/null \
     && ! printf '%s' "$out" | grep -iE 'say go|to confirm|not yet confirmed' >/dev/null; then
-    pass "enter: one call writes the record with the words, expected return, and spend cap, reads it back without asking for a go, and launches no daemon"
+    pass "enter: one call writes the record with the words, reads it back without asking for a go, and launches no daemon"
   else
     fail "enter: record, read-back, or daemon state wrong (rc=$rc): $out"
   fi
@@ -1179,7 +1177,7 @@ unit_daemon_quiet_entry_holds_nothing_for_a_return() {
   rc=$?
   if [ "$rc" -eq 0 ] \
     && [ "$(FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" "$CONTRACT" mode)" = away ] \
-    && printf '%s' "$out" | grep -F 'hold-for-return only' >/dev/null; then
+    && printf '%s' "$out" | grep -F 'waits for your return' >/dev/null; then
     pass "quiet entry: a later /afk entry turns the quiet record into the away posture, which holds for the return"
   else
     fail "quiet entry: /afk over quiet mode did not record away (rc=$rc): $out"

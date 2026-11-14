@@ -356,7 +356,7 @@ fm_task_inbox_doorbell_line() {  # <record-path>
 fm_task_inbox_ring() {  # <backend> <target> <record-path> [expected-label]
   local backend=$1 target=$2 rec=$3 label=${4:-} line cstate verdict dir task meta
   # Preserve queued instructions without waking a lifecycle-stopped worker.
-  # Relaunch consumes the receipt only after serialized capacity admission.
+  # Relaunch consumes the receipt under the lifecycle and task-set locks.
   dir=${rec%/*}; dir=${dir%/handled}
   task=${dir##*/}; task=${task%.inbox}
   meta=${dir%/*}/$task.meta

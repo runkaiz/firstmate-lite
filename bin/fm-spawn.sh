@@ -1334,8 +1334,7 @@ fi
 # this same entrypoint), so only a fresh spawn refuses the branch actor
 # (contract: bin/fm-lease-lib.sh; no-op in homes without a branch actor). While
 # the away-posture record exists main is parked and a fresh spawn of queued
-# work relocates to the branch, under the record's spend cap below - the same
-# cap main meets in that posture. Queued means a dispatchable backlog item:
+# work relocates to the branch. Queued means a dispatchable backlog item:
 # one already queued at entry, or one the branch filed itself because the
 # captain's away words explicitly call for that work (its backlog note cites
 # the words); filing the item the captain asked for is not inventing work.
@@ -1346,14 +1345,6 @@ if [ "$RELAUNCH" -ne 1 ]; then
 fi
 # shellcheck source=bin/fm-afk-capacity-lib.sh
 . "$SCRIPT_DIR/fm-afk-capacity-lib.sh"
-spawn_refuse_if_away_spend_cap() {
-  local action=fresh
-  [ "$RELAUNCH" -ne 1 ] || action=relaunch
-  fm_afk_capacity_check "$STATE" "$ID" "$action" || exit 1
-}
-# The early check avoids work on a denied launch; the authoritative check is
-# repeated under the task-set lock, including a stopped worker's relaunch.
-spawn_refuse_if_away_spend_cap
 spawn_require_relocated_queued_work() {
   local actor
   [ "$RELAUNCH" -ne 1 ] || return 0
@@ -1433,7 +1424,6 @@ if ! fm_lock_set_role "$SPAWN_TASK_SET_LOCK" task-spawn; then
   exit 1
 fi
 SPAWN_TASK_SET_LOCK_HELD=1
-spawn_refuse_if_away_spend_cap
 spawn_require_relocated_queued_work
 
 # Backend selection (data/fm-backend-design-d7): explicit --backend, else

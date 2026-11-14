@@ -2555,9 +2555,7 @@ ok - under the away-posture record every actionable row is offered to the branch
 ok - under the away-posture record the wake carries the verbatim read-back tail, claims every row, opens no processing turn, cancels a pending request, and presents the accumulated rows after archive
 ok - an accepted away-only wake rejects after archive, while a drained task-local wake stays a quiet no-op
 ok - a claimed heartbeat row on a non-heartbeat away wake lifts task scoping for the fleet report
-ok - the away-posture record relocates the PR merge and a spawn under the spend cap to the branch, never local landing, and only while confirmed and valid
 ok - relocated branch spawn admits only already-queued dispatchable work, including on a manual-backend home
-ok - the away spend cap is rechecked under the task-set lock so concurrent spawns cannot both publish
 ok - fm-send --resolve-key: a decision answer refuses the attended branch before sending, a blocked: key stays steering, and the away-posture record relocates the answer
 ok - under the away-posture record the branch merges a granted green task, is held without a grant, cannot waive a red check, and is refused at the partition while attended
 ok - real Pi SDK 0.81.1 accepts the branch session construction and preserves an unpromptable wake
@@ -2607,6 +2605,8 @@ Live first-worker execution remains outside that fixture's proof.
 
 ### 2026-09-20 the away words execute
 
+The channel, expected-return, and spend settings from the older record have since been retired; [supervision verification](supervision.md#away-records-and-worker-return-counts) owns the current record and return-count checks.
+
 The away-record owner, launch, return, merge, branch-supervision, contributions, merge-poll security, and Pi branch extension suites were run on macOS 26.6.2 arm64 (Darwin 25.6.0), Node v24.14.1, after the away record became the captain's words alone (version 2, with version 1 still readable) and the per-task merge-grant list retired.
 No model was selected or prompted, no provider call was made, and the captain's own Pi session was not changed.
 The 2026-09-18 entry above records the retired grant model's merge matrix; the lines below supersede it for the merge gate.
@@ -2616,8 +2616,6 @@ bin/fm-test-run.sh tests/fm-afk-contract.test.sh tests/fm-afk-launch.test.sh tes
 ```
 
 ```text
-ok - the read-back renders the words verbatim beside the expected return, spend cap, and reach line
-ok - one enter call writes a version 2 record, announces hold-for-return only, reads it back without asking for a go, and every read subcommand reflects it
 ok - the retired propose, confirm, and --proposal inputs are refused by name and write nothing
 ok - retired clause fields, --grant, and the clause and grant subcommands are refused by name
 ok - a version 1 record validates, reads its words and scalars with the clause and grant sections ignored, refreshes untouched, and archives

@@ -102,14 +102,6 @@ case "${1:-}" in
           [ -z "${FM_FAKE_EXIT_TRANSPORT_FAIL_AFTER_STOP:-}" ] || exit 1
           ;;
         *'encode launch-brief'* | *'Firstmate operational input waiting: read'*)
-          if [ -f "$D/afk-hold-launch" ]; then
-            : > "$D/afk-launch-reached"
-            for ((i=0; i<1000; i++)); do
-              [ ! -f "$D/afk-hold-launch" ] && break
-              /bin/sleep 0.01
-            done
-            [ ! -f "$D/afk-hold-launch" ] || exit 1
-          fi
           cat "$D/becomes" > "$D/command"
           [ -z "${FM_FAKE_LAUNCH_TRANSPORT_FAIL_AFTER_START:-}" ] || exit 1
           ;;
@@ -1079,21 +1071,12 @@ test_turnend_auth_paths_are_owned_by_the_control_adapter() {
   pass "fm-control-lib: one owner resolves each harness's turn-end registry entry, and refuses a malformed token"
 }
 
-
-
-
-
-
-
 # muse is a verified adapter, but only for crewmates and scouts: it has no
 # primary supervision protocol, so bin/fm-spawn.sh refuses it for a secondmate.
 # That refusal alone is not enough here, because the launch owner is reached
 # only AFTER the running agent has been stopped - a secondmate would be left
 # with no agent at all. The control plane asks the same capability question
 # before it touches anything, so the refusal lands while the agent is still up.
-
-
-
 
 test_ship_relaunch_ignores_the_crew_harness_config() {
   local dir out
@@ -1482,14 +1465,6 @@ test_journal_records_the_checkpoint_it_proved() {
 }
 
 # --- secondmate child-work safety -------------------------------------------
-
-
-
-
-
-
-
-
 
 test_concurrent_relaunch_is_refused() {
   local dir out rc lock holder i
@@ -2217,8 +2192,6 @@ test_herdr_rebind_failure_from_a_plain_shell_names_the_real_cause() {
   pass "reclaim: a rebind refused from a plain shell reports the real cause, not a fabricated session mismatch"
 }
 
-
-
 test_relaunch_reverifies_an_already_in_flight_item_instead_of_rewriting_it() {
   local dir out rc=0
   command -v tasks-axi >/dev/null 2>&1 || {
@@ -2311,34 +2284,29 @@ SH
   pass "fm-control exit removes the dialog file before it releases the control lock"
 }
 
-afk_relaunch_fixture() {  # <case-dir> [cap]
-  cat > "$1/home/state/.afk-contract" <<EOF
-version: 2
-entered: 2026-10-24T00:00:00Z
-entered_epoch: 1792800000
-expected_return: -
-reach_channels: none
-reach_announced: Fixture only.
-spend_max_concurrent_workers: ${2:-1}
-confirmed: 2026-10-24T00:00:00Z
-confirmed_epoch: 1792800000
-words: -
-EOF
+# shellcheck disable=SC2016 # Variables expand in the child Bash process.
+worker_count() {  # <case-dir>; return-brief population through the shared library
+  env PATH="$1/fakebin:$PATH" FM_HOME="$1/home" FM_FAKE_DIR="$1/fake" \
+    bash -c '
+      . "$1/bin/fm-backend.sh"
+      . "$1/bin/fm-wake-lib.sh"
+      . "$1/bin/fm-afk-capacity-lib.sh"
+      fm_afk_capacity_count "$2/state"
+      printf "%s\n" "$FM_AFK_CAPACITY_COUNT"
+    ' _ "$ROOT" "$1/home"
 }
 
-test_afk_verified_gone_herdr_worker_releases_capacity() {
+test_verified_gone_herdr_worker_is_excluded_from_return_count() {
   local dir out rc before receipt scenario
   herdr_case_or_skip afk-gone afk-gone fmlab '%none' || {
-    echo 'skip - Herdr capacity regression needs jq'
+    echo 'skip - Herdr return-count regression needs jq'
     return 0
   }
   dir=$HERDR_CASE_DIR
-  afk_relaunch_fixture "$dir" 1
   printf 'spawn_gen=original\n' >> "$dir/home/state/afk-gone.meta"
   printf 'preserve unmerged bytes\n' > "$dir/wt/unmerged.txt"
   before=$(cat "$dir/home/state/afk-gone.meta")
-  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
-  assert_contains "$out" 'caps concurrent workers at 1' 'absence without a stop receipt released capacity'
+  [ "$(worker_count "$dir")" = 1 ] || fail "absence without stop receipt changed count"
   out=$(run_control "$dir" afk-gone exit) || fail "verified exit failed: $out"
   assert_contains "$out" endpoint-gone 'exit did not prove the exact endpoint gone'
   [ "$(meta_field "$dir" afk-gone afk_worker_stopped)" = original ] || fail 'matching owner receipt absent'
@@ -2346,20 +2314,15 @@ test_afk_verified_gone_herdr_worker_releases_capacity() {
 
   # One-variable counterfactual: the same receipt with a visible, agent-free pane.
   printf '%%7' > "$dir/fake/herdr-pane"
-  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
-  assert_not_contains "$out" 'caps concurrent workers' 'visible agent-free pane retained its slot'
+  [ "$(worker_count "$dir")" = 0 ] || fail "visible agent-free pane retained its count"
   printf '%%none' > "$dir/fake/herdr-pane"
   : > "$dir/fake/herdr-log"
-  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off); rc=$?
-  expect_code 1 "$rc" 'admission probe must stop at missing project validation'
-  assert_not_contains "$out" 'caps concurrent workers' 'verified gone worker retained its slot'
-  assert_contains "$out" 'project' 'probe did not reach ordinary argument validation'
-  assert_not_contains "$(cat "$dir/fake/herdr-log")" 'server ' 'capacity counting started a server'
+  [ "$(worker_count "$dir")" = 0 ] || fail "verified gone worker retained its count"
+  assert_not_contains "$(cat "$dir/fake/herdr-log")" 'server ' 'return counting started a server'
   assert_contains "$(cat "$dir/fake/herdr-log")" 'pane get %7 --session fmlab' 'absence proof did not address the recorded session and pane'
   [ "$(cat "$dir/home/state/afk-gone.meta")" = "$receipt" ] || fail 'admission changed the receipt'
   [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/afk-gone.meta")" = "$before" ] || fail 'exit changed task identity'
   [ "$(cat "$dir/wt/unmerged.txt")" = 'preserve unmerged bytes' ] || fail 'unmerged work changed'
-  [ ! -e "$dir/home/state/newcomer.meta" ] || fail 'admission probe published a task'
 
   for scenario in stopped unreadable malformed wrong-pane live stale foreign session no-receipt; do
     case "$scenario" in
@@ -2377,9 +2340,7 @@ test_afk_verified_gone_herdr_worker_releases_capacity() {
       no-receipt) printf '%s\n' "$before" > "$dir/home/state/afk-gone.meta" ;;
     esac
     : > "$dir/fake/herdr-log"
-    out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off); rc=$?
-    expect_code 1 "$rc" "unsafe admission succeeded: $scenario"
-    assert_contains "$out" 'caps concurrent workers at 1' "unsafe evidence released capacity: $scenario"
+    [ "$(worker_count "$dir")" = 1 ] || fail "unsafe evidence released count: $scenario"
     assert_not_contains "$(cat "$dir/fake/herdr-log")" 'server ' "counting started a server: $scenario"
     if [ "$scenario" = stopped ]; then
       [ -f "$dir/fake/herdr-stopped" ] || fail 'counting restarted the stopped server'
@@ -2389,77 +2350,14 @@ test_afk_verified_gone_herdr_worker_releases_capacity() {
     printf '%s\n' "$receipt" > "$dir/home/state/afk-gone.meta"
   done
   out=$(run_control "$dir" afk-gone relaunch --note 'Continue preserved delivery'); rc=$?
-  expect_code 0 "$rc" "verified gone worker could not reacquire capacity: $out"
+  expect_code 0 "$rc" "verified gone worker could not relaunch: $out"
   [ -z "$(meta_field "$dir" afk-gone afk_worker_stopped)" ] || fail 'relaunch retained stop receipt'
   [ -f "$dir/fake/herdr-agent-live" ] || fail 'replacement never launched'
   [ "$(meta_field "$dir" afk-gone worktree)" = "$dir/wt" ] || fail 'relaunch changed preserved worktree'
   [ "$(cat "$dir/wt/unmerged.txt")" = 'preserve unmerged bytes' ] || fail 'relaunch changed unmerged work'
   assert_contains "$(cat "$dir/home/data/afk-gone/brief.md")" 'Continue preserved delivery' 'continuation note lost'
-  out=$(run_spawn "$dir" newcomer "$dir/missing-project" --harness claude --mode local-only --yolo off) || :
-  assert_contains "$out" 'caps concurrent workers at 1' 'replacement failed to occupy its slot'
-  pass 'AFK: owner-verified exact Herdr absence releases capacity without deleting preserved work'
-}
-
-test_afk_relaunch_reacquires_a_released_slot() {
-  local dir out rc
-  dir=$(new_case afk-resume)
-  add_ship_task "$dir" afk-resume
-  afk_relaunch_fixture "$dir"
-  out=$(run_control "$dir" afk-resume exit) || fail "initial stop failed: $out"
-  sed -e 's/^window=.*/window=fmses:fm-other/' -e 's/^endpoint_task_id=.*/endpoint_task_id=other/' \
-    -e '/^afk_worker_stopped=/d' "$dir/home/state/afk-resume.meta" > "$dir/home/state/other.meta"
-  [ "$(meta_field "$dir" other worktree)" = "$dir/wt" ] || fail 'holder fixture changed worktree path'
-  [ "$(meta_field "$dir" other project)" = "$dir/proj" ] || fail 'holder fixture changed project path'
-  printf 'fm-other\n' >> "$dir/fake/windows"
-  out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
-  expect_code 1 "$rc" 'released worker must reacquire a full AFK slot'
-  assert_contains "$out" 'caps concurrent workers at 1' 'relaunch bypassed full cap'
-  [ "$(cat "$dir/fake/command")" = zsh ] || fail 'denied relaunch started an agent'
-  [ -n "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'denial lost stopped receipt'
-  # Free the holder through the real lifecycle interface, preserving its record.
-  out=$(run_control "$dir" other exit) || fail "parking holder failed: $out"
-  [ -f "$dir/home/state/other.meta" ] || fail 'parking removed historical record'
-  out=$(run_control "$dir" afk-resume relaunch --note 'Continue preserved work'); rc=$?
-  expect_code 0 "$rc" 'relaunch with an available slot must succeed'
-  [ -z "$(meta_field "$dir" afk-resume afk_worker_stopped)" ] || fail 'relaunch retained released occupancy'
-  [ "$(cat "$dir/fake/command")" = claude ] || fail 'replacement agent not started'
-  out=$(run_spawn "$dir" newcomer --mode local-only --yolo off) || :
-  assert_contains "$out" 'caps concurrent workers at 1' 'resumed worker did not occupy its slot'
-  # An unconfirmed replacement remains reserved even before it is visible.
-  printf zsh > "$dir/fake/command"
-  out=$(run_spawn "$dir" newcomer --mode local-only --yolo off) || :
-  assert_contains "$out" 'caps concurrent workers at 1' 'unconfirmed launch was excluded as stopped'
-  pass 'AFK: stopped-worker relaunch reacquires capacity and replacement boot retains its reservation'
-}
-
-test_afk_relaunch_serializes_with_fresh_admission() {
-  local dir out rc worker attempt
-  dir=$(new_case afk-race)
-  add_ship_task "$dir" afk-race
-  afk_relaunch_fixture "$dir"
-  out=$(run_control "$dir" afk-race exit) || fail "initial stop failed: $out"
-  : > "$dir/fake/afk-hold-launch"
-  run_control "$dir" afk-race relaunch --note 'Concurrent launch fixture' > "$dir/relaunch.log" &
-  # This PID is set by the launch immediately above, in this shell.
-  # shellcheck disable=SC2031
-  worker=$!
-  for ((attempt=0; attempt<1000; attempt++)); do
-    [ -f "$dir/fake/afk-launch-reached" ] && break
-    kill -0 "$worker" 2>/dev/null || break
-    /bin/sleep 0.01
-  done
-  if [ ! -f "$dir/fake/afk-launch-reached" ]; then
-    rm -f "$dir/fake/afk-hold-launch"
-    wait "$worker" || :
-    fail "relaunch did not reach fake-provider barrier: $(cat "$dir/relaunch.log")"
-  fi
-  out=$(run_spawn "$dir" newcomer --mode local-only --yolo off); rc=$?
-  rm -f "$dir/fake/afk-hold-launch"
-  wait "$worker" || fail "relaunch failed: $(cat "$dir/relaunch.log")"
-  expect_code 1 "$rc" 'concurrent fresh launch must not claim a reserved slot'
-  assert_contains "$out" 'caps concurrent workers at 1' 'in-flight relaunch reservation was invisible'
-  [ ! -e "$dir/home/state/newcomer.meta" ] || fail 'concurrent fresh task was published'
-  pass 'AFK: concurrent admission cannot pass a relaunch while its provider is still starting'
+  [ "$(worker_count "$dir")" = 1 ] || fail "replacement absent from count"
+  pass 'AFK: owner-verified exact Herdr absence updates the return count without deleting preserved work'
 }
 
 test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in() {
@@ -2505,9 +2403,7 @@ fi
 
 test_relaunch_recomputes_fast_mode_from_current_quota_and_opt_in
 
-test_afk_verified_gone_herdr_worker_releases_capacity
-test_afk_relaunch_reacquires_a_released_slot
-test_afk_relaunch_serializes_with_fresh_admission
+test_verified_gone_herdr_worker_is_excluded_from_return_count
 test_exit_and_relaunch_remove_the_dialog_file
 test_exit_removes_the_dialog_file_before_releasing_the_lock
 test_two_project_recovery_preserves_independent_approval_and_work

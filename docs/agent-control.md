@@ -62,16 +62,15 @@ It is not deterministic across the verified adapters: codex, grok, gemini, and d
 `relaunch` uses the brief on disk - not a harness-private session - as the durable instruction when the backend can prove the old agent stopped and the composer is empty; Devin on Herdr currently fails that composer check and refuses.
 A relaunch does take one session reference when the endpoint's own runtime recorded it - see [the relaunch transaction](#transactional-relaunch) - but that is a relaunch input, not a caller-facing verb.
 
-## AFK worker occupancy
+## Worker stop receipts and return reporting
 
-A confirmed `exit` preserves the task and records evidence that can release its AFK AI-worker slot while a fresh supported liveness read still proves the agent stopped.
+A confirmed `exit` preserves the task and records evidence that excludes it from the return brief's AI-worker count while a fresh supported liveness read still proves the agent stopped.
 Completion status alone does not prove a worker stopped; generic missing or unverified endpoints retain occupancy (exact Herdr absence follows the receipt contract below).
-Typed steering to that preserved worker refuses until `relaunch` reacquires capacity; ordinary inbox messages remain queued for recovery.
-Unknown worker liveness retains occupancy, and arbitrary background jobs keep their existing controls rather than counting as AI workers.
+Typed steering to that preserved worker refuses until `relaunch` clears its stop receipt; ordinary inbox messages remain queued for recovery.
+Unknown worker liveness remains counted, and arbitrary background jobs keep their existing controls rather than counting as AI workers.
 `bin/fm-afk-capacity-lib.sh` owns the receipt, fresh liveness validation, reservation, and locking contract.
 The optional per-project capacity declaration remains independent.
-Away entry adds no extra concurrency limit unless supplied with `--spend`; existing finite records keep their cap, including legacy defaults.
-`bin/fm-afk-contract.sh` owns cap selection and representation; `bin/fm-branch-prompt.sh` "Capacity recovery while away" owns safe progress or one concrete escalation after a refusal.
+`bin/fm-branch-prompt.sh` "Capacity recovery while away" owns safe progress or one concrete escalation after a project-capacity refusal.
 
 ## Transactional relaunch
 

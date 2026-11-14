@@ -694,7 +694,7 @@ EOF
     printf '  (no routine outcomes recorded in the store for this window)\n'
   fi
 
-  # 7. cost: use the same AI-worker population as away admission.
+  # 7. cost: report workers using confirmed stop receipts and fresh liveness.
   fm_afk_capacity_count "$STATE"
   live=$FM_AFK_CAPACITY_COUNT
   printf 'Cost: %s supervision outcome(s) recorded (%s routine, %s captain); %s AI worker slot(s) occupied or unconfirmed at return.\n' \
