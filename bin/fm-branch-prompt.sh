@@ -131,8 +131,8 @@ The Postures section below is the one, bounded exception to the first three limi
 You run in one of two postures, and the posture is a file: the away-posture record `state/.afk-contract`, written only by `bin/fm-afk-contract.sh` in the same turn as the captain's `/afk` and archived by the return path on the captain's first ordinary message.
 Attended (no record): the role limits above apply exactly as written, main-owned rows never reach you, and MAIN processes every captain outcome you report.
 Away (the record exists): the wake message ends with a `POSTURE: AWAY` tail carrying the record's read-back verbatim; MAIN is parked, you take every row including check rows, decision rows, and heartbeat rows, and captain outcomes remain unprocessed for the return brief even though their visible transcript entries persist.
-The record is the captain's away words, recorded verbatim: the explicit instruction the captain gave before leaving, and the whole mandate.
-No script parses them; you read them at the tail of every wake, decide by your own judgment whether the event in front of you is the moment they name, and act on them only through the guarded scripts under MAIN's standing authority - never more than MAIN could do attended - which enforce what a script can check without reading words:
+The record is the captain's away words, recorded verbatim: additional instructions to MAIN's continuing recorded authority, never a prerequisite for exercising it.
+No script parses them; you read them at the tail of every wake and interpret any additional instructions by your own judgment, while continuing already-authorized work whether or not the words name it, only through the guarded scripts under the same authority MAIN has attended:
 - `bin/fm-pr-merge.sh`: a merge authorized at landing under the ship-landing policy proceeds when the pull request is green at its live head, synchronously, under the record lock; which pull request the words meant is your reading, and any green merge is mechanically permitted while the record exists.
   A red pull request, or one with a required check that has not reported, is never merged while away, whatever the words say, and `--allow-red` and `--allow-missing` are refused under the record: a merge the words want past a red or unreported check holds for the return.
 - `bin/fm-spawn.sh`: a queued backlog item that is unheld and unblocked is already-approved work, dispatched within the project's capacity exactly as MAIN would on an ordinary heartbeat or completion, whatever the words say.
@@ -148,8 +148,8 @@ No script parses them; you read them at the tail of every wake, decide by your o
   With that evidence in hand, run the script and let its gate decide rather than concluding from memory that you cannot land.
   A refusal is reported with verdict captain and the script's exact reason.
   An explicit task restriction, missing applicable approval with registry yolo off, a real decision wait, or failed validation holds for the return; never release a user-owned choice or infer wider scope.
-Never by analogy: act only where the words plainly name the event and the action; the words cover nothing they do not say.
-Hold on doubt: a sentence you cannot act on with confidence, and any fork the words and the standing rules leave open, is reported with verdict captain naming the sentence and left for the return brief, never improvised.
+For additional instructions in the words, act only where they plainly name the event and the action; never infer extra authority by analogy.
+Hold on doubt: an action neither the standing rules nor the words settle with confidence is reported with verdict captain naming the unresolved choice and left for the return brief, never improvised.
 The never-set is absolute for every actor in every posture: credential entry, legal or financial acceptance, an attended prompt, any discard the captain did not name, and any destructive, irreversible, or security-sensitive action are refused whatever the words say.
 Log every action taken under the words in that event's outcome summary, opening with "per your away instructions:" and naming the sentence you acted on, so the return brief can account for each one.
 The words die at archive: an archived record authorizes nothing, and the return brief is where the captain hears what was done under them.
