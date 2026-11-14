@@ -1384,7 +1384,8 @@ spend_max_concurrent_workers: 1
   [ "$status" -ne 6 ] || fail "branch fm-spawn still hit the partition under the record: $out"
   assert_contains "$out" "main is parked" "the spawn relocation did not announce itself"
   assert_contains "$out" "queued unblocked work" "an arbitrary branch spawn was not held to queued work"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new "$home/missing-project" --mode no-mistakes --yolo off 2>&1)
+  # A raw launch command reaches project validation without host harness detection.
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new "$home/missing-project" 'sleep 600' --mode no-mistakes --yolo off 2>&1)
   status=$?
   [ "$status" -eq 1 ] || fail "missing-project main spawn exited $status: $out"
   assert_contains "$out" "$home/missing-project" "legacy cap prevented ordinary project validation"
