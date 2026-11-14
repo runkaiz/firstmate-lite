@@ -210,7 +210,7 @@ While the away-posture record `state/.afk-contract` exists:
 - Main's standing authority moves to the branch through the guarded scripts, each retaining its own gate.
 
 [docs/pi-supervision-branch.md](pi-supervision-branch.md#postures) defines that posture.
-`bin/fm-afk-contract.sh` owns away entry, read-back, and record compatibility; retired channel, expected-return, and spend fields in older records are ignored.
+[`bin/fm-afk-contract.sh`](../bin/fm-afk-contract.sh) owns away entry, read-back, and record compatibility.
 
 While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision.
 These are the bounds set by the captain-approved architecture.
