@@ -19,8 +19,10 @@ A direct-PR worker pushes that commit to its PR branch, and a local-only worker 
 A no-mistakes worker re-validates it with /no-mistakes so the pipeline stays the one publisher; it never pushes from its copy.
 When the generated no-mistakes handoff calls for an implementation-only `done [at=<epoch>]: {summary}`, that signal is not gated; `bin/fm-dod-lib.sh` owns when this handoff is used.
 Tell the captain the PR's full `https://...` URL copied from the worker's ready line, the resolved checks-green crew-state line, or the task's `pr=` metadata, a concise outcome summary, and the no-mistakes risk level when applicable.
-A captain instruction to merge is explicit authority; standing routine merge authority comes from `yolo` or the active [proactive policy](../proactive/policy.md).
-That `yolo` is the task's own recorded posture, the one record the away session can act on, so when the captain grants or withdraws standing approval that covers a live task, re-record it with `bin/fm-task-yolo.sh <id> on|off` in the same turn and note their words on the backlog item; approval kept only in prose lands nothing while they are away.
+At landing time, MAIN and the away session evaluate merge authority in the same order: an explicit task restriction recorded in the brief or backlog notes wins; otherwise applicable recorded standing approval in `data/captain.md` applies; the project's current registry posture is only the fallback.
+A dispatch-time `yolo` snapshot alone does not establish an explicit restriction, and neither actor rewrites it when approval changes.
+Read those records and verify the approval covers the validated head and scope before invoking `bin/fm-merge-local.sh` or `bin/fm-pr-merge.sh`; uncertainty or an explicit restriction holds for the captain, and an existing captain hold must be answered and released through its owner.
+A current captain instruction to merge is explicit authority; the active [proactive policy](../proactive/policy.md) governs its additional PR merge authority within task restrictions.
 For any custom `state/<id>.check.sh` you write yourself, keep it an ordinary single-link mode-`0700` file, print one line only when firstmate should wake, print nothing otherwise, finish before `FM_CHECK_TIMEOUT`, then bind its current bytes with `bin/fm-check-register.sh <id>` before the watcher may execute it.
 Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm-teardown.sh` for a spawned task); never hand-compose an `rm` with `$STATE`/`$ID`.
 

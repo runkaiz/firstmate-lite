@@ -122,7 +122,7 @@ Consult existing reports and evidence before commissioning an investigation, and
 Resolve every ship task's delivery mode and `yolo` merge posture at intake and pass them explicitly, since each command refuses to guess:
 
 - A current explicit captain instruction wins; otherwise the project's registry entry stands, and dropping below its rigor needs a stated reason.
-  A standing captain approval is such an instruction: record it as `--yolo on` on each task it covers, since that record, never prose, is what lands work while the captain is away (`ship-landing` owns re-recording a live task).
+  `ship-landing` resolves effective merge authority at landing from current recorded instructions; a dispatch-time `yolo` snapshot does not override it.
 - Pass the registered ship-branch prefix (`bin/fm-project-mode.sh --branch-prefix <project>`) as `--branch-prefix` to the ship brief, spawn, and promotion; pass a non-default start and target branch as `--base-branch` to the ship or scout brief and spawn, with promotion retaining the recorded base.
 - For this firstmate repository, pass the project directory to the brief as `--project` and any captain-approved one-task consent as `--upstream-consent <host>/<owner>/<repo>` to the brief, spawn, and promotion.
 - On a `no-mistakes-prod-only` project, pass `--delivery-surface internal-only|product-facing|mixed|unknown`; only internal tooling, automation, process, and release work ships `direct-PR`, and never infer internal-only from location or name.

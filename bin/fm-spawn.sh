@@ -2901,17 +2901,6 @@ if [ "$KIND" = ship ]; then
   if [ "$BRANCH" != "$STANDING_BRANCH$ID" ]; then
     echo "notice: $ID ships branch=$BRANCH while $PROJ_NAME registers the ship-branch prefix '$STANDING_BRANCH' (branch $STANDING_BRANCH$ID) - the task's branch and PR will read as firstmate-authored; proceed only on a current explicit captain instruction or an intake judgment you can state" >&2
   fi
-  # This task's recorded yolo is the one record the away landing gate reads
-  # (bin/fm-merge-local.sh), so it must not drift from the captain's standing
-  # merge posture unnoticed in either direction. Restricting below a registered
-  # +yolo is allowed (a current explicit captain instruction wins) but never
-  # silent, because every landing of this task then waits for the captain.
-  if [ "$RELAUNCH" -ne 1 ]; then
-    STANDING_YOLO=$("$FM_ROOT/bin/fm-project-mode.sh" "$PROJ_NAME" 2>/dev/null | cut -d' ' -f2) || STANDING_YOLO=
-    if [ "$YOLO" = off ] && [ "$STANDING_YOLO" = on ]; then
-      echo "notice: $ID records yolo=off while $PROJ_NAME is registered +yolo - every landing of this task will wait for the captain, including while away; pass --yolo on unless a current explicit captain instruction restricts this task, or correct a live task with bin/fm-task-yolo.sh" >&2
-    fi
-  fi
 fi
 
 BRIEF_DIR_REAL=$(cd "$(dirname "$BRIEF")" && pwd -P)

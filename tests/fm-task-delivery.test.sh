@@ -1150,33 +1150,6 @@ EOF
   pass "fm-spawn: a ship branch that deviates from the registered prefix is announced, never blocked"
 }
 
-# A task's recorded yolo is the one record the away landing gate reads, so a
-# dispatch that records less than the project's registered +yolo must not pass
-# unnoticed: every landing of that task then waits for the captain, attended or
-# away. Restricting is allowed on a captain instruction, so it is announced
-# with its consequence, never blocked, and a matching posture stays quiet.
-test_spawn_notices_a_merge_posture_below_the_registered_yolo() {
-  local rec home proj fakebin out
-  rec=$(make_home yolo-deviation "- proj [local-only +yolo] - fixture (added 2026-01-01)")
-  IFS='|' read -r home proj fakebin <<EOF
-$rec
-EOF
-
-  write_brief "$home" yolo-dev-a1 local-only
-  out=$(run_spawn "$home" "$fakebin" yolo-dev-a1 "$proj" claude --mode local-only --yolo off)
-  assert_contains "$out" "yolo-dev-a1 records yolo=off while proj is registered +yolo" \
-    "no notice for recording less than the registered merge posture"
-  assert_contains "$out" "every landing of this task will wait for the captain, including while away" \
-    "the posture notice did not name the cost of the drift"
-
-  write_brief "$home" yolo-dev-a2 local-only
-  out=$(run_spawn "$home" "$fakebin" yolo-dev-a2 "$proj" claude --mode local-only --yolo on)
-  assert_not_contains "$out" "is registered +yolo" \
-    "a spawn matching the registered merge posture was announced as a deviation"
-
-  pass "fm-spawn: a merge posture below the registered +yolo is announced with its cost, never blocked"
-}
-
 # The registry is hand-edited markdown, so a one-character typo in the forge token
 # is the likeliest way it goes wrong. Such an entry must stop the spawn with the
 # parser's own reason in front of the operator: resolving it to "no registered
@@ -1275,7 +1248,6 @@ test_project_mode_matches_whole_multiword_names
 test_project_mode_maps_the_conditional_policy
 test_spawn_requires_the_brief_to_carry_the_selected_branch
 test_spawn_notices_a_ship_branch_against_the_registry_prefix
-test_spawn_notices_a_merge_posture_below_the_registered_yolo
 test_spawn_and_promote_require_filled_task_subsections
 test_project_mode_resolves_branch_prefix
 test_proactive_validation_handoff() {

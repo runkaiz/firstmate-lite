@@ -65,7 +65,6 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `backends/tmux.sh`       | Verified tmux session-provider adapter, the fallback backend                         |
 | `fm-project-mode.sh`     | Resolve a project's registered delivery posture, forge binding, or ship-branch prefix from `data/projects.md`, or check its clone's origin for CI workflows, for fleet sync, home seeding, and the forge agreement a ship spawn or scout promotion applies |
 | `fm-merge-local.sh`      | Fast-forward a `local-only` project's local default branch after approval            |
-| `fm-task-yolo.sh`        | Re-record a live ship task's merge posture when the captain's standing word changes; main-only, and never raised while away |
 | `fm-review-diff.sh`      | Review a crewmate branch or resolved PR head against the authoritative base          |
 | `fm-marker-lib.sh`       | Compatibility entry point for the from-firstmate carrier owned by `fm-operational-input.sh` |
 | `fm-task-inbox-lib.sh`   | Single owner of durable steering-inbox records, acknowledgement, doorbells, and the delivery-attempt ladder |
