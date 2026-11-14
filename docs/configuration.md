@@ -212,7 +212,7 @@ While the away-posture record `state/.afk-contract` exists:
 [docs/pi-supervision-branch.md](pi-supervision-branch.md#postures) defines that posture.
 [`bin/fm-afk-contract.sh`](../bin/fm-afk-contract.sh) owns away entry, read-back, and record compatibility.
 
-While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision other than a registered [house decision](#house-decisions-confighouse-decisions).
+While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision, including a registered [house decision](#house-decisions-confighouse-decisions).
 These are the bounds set by the captain-approved architecture.
 Every existing captain gate remains unchanged in either posture.
 Homes on other primary harnesses do not load the Pi branch extension; shared per-task lease behavior is owned by `bin/fm-lease-lib.sh`.
@@ -966,7 +966,7 @@ Each line is `<key>: <rule>`, where the key is the one workers use in `needs-dec
 test-slot: at most two full suites at once, one overnight; grant in request order
 ```
 
-The supervision session answers a registered key in every posture, attended or away, and the open-decisions listing prints the rule beside the ask.
+MAIN alone answers a registered key while attended; the supervision session answers it while away with MAIN parked, and the open-decisions listing prints the rule beside the ask.
 The record grants nothing else: no merge, landing, dispatch, or captain decision reads it, and an unregistered key keeps its ordinary handling.
 An absent file changes nothing, and a malformed one registers no key at all.
 `bin/fm-house-decisions-lib.sh` owns the format and its refusals.

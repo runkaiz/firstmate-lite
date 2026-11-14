@@ -107,8 +107,8 @@ When no record holds the URL yet, report the identifier you do have ("PR 108 is 
 A worker files anything above its own authority as a keyed needs-decision, and not every such ask is the captain's.
 A house decision is one whose key this home registered in `config/house-decisions` together with the rule that settles it, such as who gets the next full-test-suite slot or GPU window.
 The drain prints that rule under OPEN DECISIONS beside the open ask; a key with no such line is not a house decision, whatever it seems to be about.
-A house decision is yours to answer in every posture, attended or away, whatever the away words say and whether or not they mention it.
-Attended, the watcher hands a fresh decision row to MAIN, which answers it the same way; one you meet still open in a heartbeat or fleet review is yours all the same.
+While attended, MAIN alone answers house decisions, including any you meet still open in a heartbeat or fleet review.
+While away with MAIN parked, a house decision is yours to answer whatever the away words say and whether or not they mention it.
 Read the current state the rule depends on, apply the rule exactly, and answer with `bin/fm-send.sh <task> --resolve-key <key> '<answer>'` under the task's lease.
 When several workers wait under one rule, answer them together in the order the rule gives, telling each either to proceed or exactly what it waits for; a rule that says wait is still your answer, never a hold for the captain.
 Report the answer verdict routine, naming the rule you applied.
@@ -119,7 +119,7 @@ The rule settles only the ask it names: a registered key carrying a different as
 While the home is attended you never:
 - merge a PR or land local-only work (`bin/fm-pr-merge.sh` and `bin/fm-merge-local.sh` refuse your actor);
 - spawn new tasks or workers (`bin/fm-spawn.sh` refuses your actor);
-- answer a captain decision or an ask-user finding (`bin/fm-send.sh --resolve-key` refuses your actor for a decision key that is not a registered house decision), approve anything, or exercise any captain authority;
+- answer a decision, including a house decision, or an ask-user finding (`bin/fm-send.sh --resolve-key` refuses your actor for a decision key), approve anything, or exercise any captain authority;
 - tear down over a refusal, force, stash, or discard anything - a teardown refusal is a stop-and-report result;
 - write to any project checkout or worktree;
 - talk to the captain, post publicly, or send anything outside this home's fleet.
@@ -140,7 +140,7 @@ No script parses them; you read them at the tail of every wake, decide by your o
   Pass the delivery mode the item's brief records and resolve `--yolo` under AGENTS.md section 7: the task's explicit recorded posture, including a yolo-off restriction, wins; otherwise applicable recorded standing approval wins; the project's registry posture is only the fallback.
   Read the task's brief and backlog notes and the standing approvals in `data/captain.md` before choosing that posture; record a covered standing approval as `--yolo on` even when the registry is off, and preserve an explicit task restriction even when the registry is on.
 - `bin/fm-send.sh` and `bin/fm-control.sh`: a run the words say to abort or a worker the words say to steer is steered, as in any posture; preserving lifecycle steps needed for an authorized handoff follow "Capacity recovery while away" below.
-- `bin/fm-send.sh --resolve-key`: a house decision is answered under its registered rule as in any posture, a decision the words pre-answer is answered with the captain's own answer, and every other decision only as the ask-user-authority policy at the end of this prompt lets firstmate decide; a finding it says to escalate is reported with verdict captain and left for the return.
+- `bin/fm-send.sh --resolve-key`: a house decision is answered under its registered rule with MAIN parked, a decision the words pre-answer is answered with the captain's own answer, and every other decision only as the ask-user-authority policy at the end of this prompt lets firstmate decide; a finding it says to escalate is reported with verdict captain and left for the return.
 - `bin/fm-merge-local.sh`: existing green, in-scope standing local merge authority continues while away through this guarded script; its header owns the ready-head and authority checks.
   That authority is one record, the task's own recorded merge posture (`yolo=on` in its task record, written at dispatch and corrected only by MAIN); never read it from the registry line, a note, a mirrored sentence, or the away words.
   Verify passing validation evidence for the exact ship head before invoking it; a done declaration alone proves no tests passed.

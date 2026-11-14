@@ -74,7 +74,7 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
   # finding policy for a keyed ask, and never said which record carries
   # landing authority or that queued work needs no words.
   case "$out_a" in
-    *"# House decisions"*"A house decision is yours to answer in every posture, attended or away, whatever the away words say"*"a rule that says wait is still your answer, never a hold for the captain"*"every unregistered key keep their ordinary handling"*"a house decision is answered under its registered rule as in any posture"*) ;;
+    *"# House decisions"*"While attended, MAIN alone answers house decisions"*"While away with MAIN parked, a house decision is yours to answer whatever the away words say"*"a rule that says wait is still your answer, never a hold for the captain"*"every unregistered key keep their ordinary handling"*"a house decision is answered under its registered rule with MAIN parked"*) ;;
     *) fail "branch prompt lost the house-decision rule" ;;
   esac
   case "$out_a" in

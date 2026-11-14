@@ -869,13 +869,7 @@ test_decision_answer_partition_relocates_under_the_record() {
   pass "fm-send --resolve-key: a decision answer refuses the attended branch before sending, a blocked: key stays steering, and the away-posture record relocates the answer"
 }
 
-# House decisions (bin/fm-house-decisions-lib.sh): a keyed ask the home
-# registered with its rule is firstmate's own, so the supervision branch answers
-# it in every posture, and the drain names the rule beside the open ask. This
-# reproduces the overnight stall where routine full-suite slot asks were held
-# for the captain: without the record the ask meets the decision partition and
-# stays open, and with it only the registered key moves.
-test_house_decision_is_answered_in_every_posture() {
+test_house_decision_has_one_answerer_per_posture() {
   local dir fb log home rc out
   dir="$TMP_ROOT/house"; mkdir -p "$dir"
   fb=$(make_stubs "$dir"); log="$dir/send.log"
@@ -900,7 +894,7 @@ test_house_decision_is_answered_in_every_posture() {
   printf '# rules firstmate applies without asking\ntest-slot: at most two full suites at once, one overnight; grant in request order\n' \
     > "$home/config/house-decisions"
   out=$(FM_HOME="$home" drain_out "$home")
-  assert_contains "$out" "[key=test-slot] is a house decision, firstmate's to answer in every posture under the home's rule: at most two full suites at once, one overnight; grant in request order" \
+  assert_contains "$out" "[key=test-slot] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: at most two full suites at once, one overnight; grant in request order" \
     "the drain did not present the registered rule beside the open ask"
   if printf '%s' "$out" | grep -F '[key=api-shape] is a house decision' >/dev/null; then
     fail "the drain presented an unregistered key as a house decision: $out"
@@ -912,10 +906,15 @@ test_house_decision_is_answered_in_every_posture() {
   expect_code 6 "$rc" "a send that also answers a captain decision must be refused at the partition"
   [ ! -e "$home/state/t1.inbox" ] || fail "a refused mixed answer still reached the worker's inbox"
 
-  # Attended branch: the registered key is answered and closed.
   out=$(env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
     FM_SUPERVISION_ACTOR=branch "$SEND" t1 --resolve-key test-slot "slot 1 is yours" 2>&1); rc=$?
-  expect_code 0 "$rc" "an attended branch must answer a registered house decision: $out"
+  expect_code 6 "$rc" "an attended branch must leave a registered house decision to MAIN: $out"
+  [ ! -e "$home/state/t1.inbox" ] || fail "a refused house answer still reached the worker's inbox"
+  [ ! -s "$log" ] || fail "a refused house answer still rang the doorbell"
+  out=$(FM_HOME="$home" drain_out "$home")
+  assert_contains "$out" '[key=test-slot]' 'the refused house answer closed the decision'
+  run_send "$fb" "$home" "$log" t1 --resolve-key test-slot "slot 1 is yours"; rc=$?
+  expect_code 0 "$rc" "MAIN must answer a registered house decision while attended"
   sed -E 's/ \[at=[0-9]+\]//' "$home/state/t1.status" | grep -qF 'resolved [key=test-slot]: answered: slot 1 is yours' \
     || fail "the house answer did not close the key:"$'\n'"$(cat "$home/state/t1.status")"
   grep -qF "slot 1 is yours" "$home/state/t1.inbox/001.msg" \
@@ -929,19 +928,43 @@ test_house_decision_is_answered_in_every_posture() {
   printf '%s' "$out" | grep -F '[key=api-shape]' >/dev/null \
     || fail "the captain decision did not stay open: $out"
 
-  # Away, with words that say nothing about slots: the registered key is
-  # answered the same way.
+  printf 'needs-decision [key=test-slot]: quiet run, need a slot\n' >> "$home/state/t1.status"
+  FM_AFK_MODE=quiet FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter >/dev/null || fail "quiet entry failed"
+  : > "$log"
+  out=$(env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
+    FM_SUPERVISION_ACTOR=branch "$SEND" t1 --resolve-key test-slot "quiet slot is yours" 2>&1); rc=$?
+  expect_code 6 "$rc" "quiet mode must keep house decisions owned by MAIN: $out"
+  [ ! -e "$home/state/t1.inbox/002.msg" ] || fail "a quiet branch answer reached the worker's inbox"
+  [ ! -s "$log" ] || fail "a quiet branch answer rang the doorbell"
+  out=$(FM_HOME="$home" drain_out "$home")
+  assert_contains "$out" '[key=test-slot]' 'the quiet branch answer closed the decision'
+  run_send "$fb" "$home" "$log" t1 --resolve-key test-slot "quiet slot is yours"; rc=$?
+  expect_code 0 "$rc" "MAIN must answer a house decision in quiet mode"
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail "quiet archive failed"
+
   printf 'needs-decision [key=test-slot]: rebased head, need a slot again\n' >> "$home/state/t1.status"
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'strange, I did not touch the desktop this time' >/dev/null \
     || fail "away entry failed"
   out=$(env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
     FM_SUPERVISION_ACTOR=branch "$SEND" t1 --resolve-key test-slot "overnight slot is yours" 2>&1); rc=$?
   expect_code 0 "$rc" "the away branch must answer a registered house decision: $out"
+  grep -qF 'overnight slot is yours' "$home/state/t1.inbox/003.msg" \
+    || fail "the away house answer did not reach the worker's inbox"
   out=$(FM_HOME="$home" drain_out "$home")
   if printf '%s' "$out" | grep -F '[key=test-slot]' >/dev/null; then
     fail "the away house answer left the ask open: $out"
   fi
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail "away archive failed"
+
+  printf 'needs-decision [key=test-slot]: returned run, need a slot\n' >> "$home/state/t1.status"
+  : > "$log"
+  out=$(env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
+    FM_SUPERVISION_ACTOR=branch "$SEND" t1 --resolve-key test-slot "returned slot is yours" 2>&1); rc=$?
+  expect_code 6 "$rc" "archiving the away record must return house decisions to MAIN: $out"
+  [ ! -e "$home/state/t1.inbox/004.msg" ] || fail "an archived branch answer reached the worker's inbox"
+  [ ! -s "$log" ] || fail "an archived branch answer rang the doorbell"
+  out=$(FM_HOME="$home" drain_out "$home")
+  assert_contains "$out" '[key=test-slot]' 'an archived branch answer closed the decision'
 
   # A malformed record registers nothing: the same ask is guarded again and
   # the drain says why instead of naming a rule.
@@ -950,15 +973,14 @@ test_house_decision_is_answered_in_every_posture() {
   out=$(env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
     FM_SUPERVISION_ACTOR=branch "$SEND" t1 --resolve-key test-slot "slot 2 is yours" 2>&1); rc=$?
   expect_code 6 "$rc" "a malformed house-decision record must register nothing"
-  assert_contains "$out" "registers key 'test-slot' twice" "the malformed record was not named"
   out=$(FM_HOME="$home" drain_out "$home")
   assert_contains "$out" "is malformed, so no key is treated as a house decision" \
     "the drain did not disclose the malformed record"
-  pass "fm-send --resolve-key: a registered house decision is answered by the branch attended and away, an unregistered decision still holds, and a malformed record registers nothing"
+  pass "fm-send --resolve-key: MAIN answers house decisions attended and quiet, the branch answers away, return restores MAIN ownership, and malformed rules register nothing"
 }
 
 test_answer_send_closes_open_decision
-test_house_decision_is_answered_in_every_posture
+test_house_decision_has_one_answerer_per_posture
 test_answer_close_is_self_announced
 test_separate_resolve_key_answers_do_not_rewake
 test_colon_first_key_position_is_answerable

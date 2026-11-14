@@ -552,7 +552,7 @@ print_open_decisions_section() {
       continue
     fi
     [ "$house_status" -eq 0 ] || continue
-    fm_cap_line_var "OPEN DECISIONS: [key=$key] is a house decision, firstmate's to answer in every posture under the home's rule: $house_rule" 400
+    fm_cap_line_var "OPEN DECISIONS: [key=$key] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: $house_rule" 400
     house_lines="$house_lines$FM_LINE_CAP_LINE
 "
   done <<EOF

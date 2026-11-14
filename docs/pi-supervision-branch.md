@@ -252,7 +252,6 @@ The guards are wired into these scripts:
 | --- | --- |
 | `fm-send.sh`, `fm-control.sh`, and `fm-teardown.sh` | Overlap, lease-checked, with claim serialization retained through the mutation. |
 | `fm-pr-merge.sh`, `fm-merge-local.sh`, `fm-spawn.sh`, `fm-send.sh --resolve-key` for a decision key, and `fm-teardown.sh` for a second mate | Main-owned while attended; branch refused. |
-| `fm-send.sh --resolve-key` for a key the home registered as a [house decision](configuration.md#house-decisions-confighouse-decisions) | Firstmate's own in every posture; lease-checked for either actor. |
 | `fm-task-yolo.sh` | Main-only in every posture; the branch acts on a task's merge posture and never writes it. |
 
 A relaunch through `fm-control` stays branch-legal recovery in both postures.
@@ -610,7 +609,7 @@ Each relocated script keeps its own gate, enforcing exactly what a script can ch
 | --- | --- |
 | `bin/fm-pr-merge.sh` | Merges any pull request green at its live head, synchronously, under the record lock, and refuses `--allow-red` and `--allow-missing` while away, so the green gate is absolute in this posture; which pull request the words meant is the branch's reading. |
 | `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, which needs no words because queued, unheld work is already approved, or filed by the branch because the words explicitly call for it - with delivery and merge authority resolved under `AGENTS.md` section 7, as MAIN would; [Project capacity](configuration.md#project-capacity-configproject-capacity) owns admission, and [worker stop receipts](agent-control.md#worker-stop-receipts-and-return-reporting) own return counting and relaunch safety. |
-| `bin/fm-send.sh --resolve-key` | Answers a registered house decision under its rule as in any posture, a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
+| `bin/fm-send.sh --resolve-key` | Answers a registered house decision under its rule with MAIN parked, a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
 | `bin/fm-merge-local.sh` | Relocated only through the script header's standing-authority and ready-head gate: the task's own recorded `yolo=on`, written at dispatch and re-recorded only by main, through `bin/fm-task-yolo.sh` while the captain is present. |
 
 The merge-authority record and the outcome row's summary are the audit trail.

@@ -17,22 +17,21 @@
 #     worker uses in `needs-decision [key=<key>]` (characters A-Z a-z 0-9 . _ -)
 #     and <rule> is the non-empty sentence firstmate applies. Blank lines and
 #     lines starting with "#" are ignored.
-#   - A registered key is firstmate's to answer in every posture, by either
-#     supervision actor, exactly as the rule says. It grants nothing else: no
-#     merge, landing, spawn, or captain authority reads this record, and a key
-#     that is not registered keeps its ordinary decision handling.
+#   - A registered key is MAIN's to answer while attended and the supervision
+#     session's while away with MAIN parked, exactly as the rule says. It grants
+#     nothing else: no merge, landing, spawn, or captain authority reads this
+#     record, and a key that is not registered keeps its ordinary decision handling.
 #   - `default` (the keyless decision) can never be registered, because a
 #     keyless ask cannot be told apart from any other keyless ask.
 #   - A malformed record (an invalid or reserved key, an empty rule, a line
 #     with no ": " separator, or a key registered twice) registers nothing at
 #     all: every lookup fails closed with status 2 and one diagnostic line.
 #
-# CONSUMERS. bin/fm-send.sh lets the supervision branch answer a registered
-# key while attended; bin/fm-wake-drain.sh prints the rule beside an open
+# CONSUMERS. bin/fm-wake-drain.sh prints the rule beside an open
 # decision that carries a registered key. bin/fm-branch-prompt.sh "House
 # decisions" owns how the supervision session applies a rule.
 #
-# Sourced by those scripts and by tests. No side effects on source.
+# Sourced by the drain and by tests. No side effects on source.
 
 # fm_house_decisions_file <config-dir>: the record's path.
 fm_house_decisions_file() {  # <config-dir>
