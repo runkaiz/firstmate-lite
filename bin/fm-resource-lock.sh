@@ -8,7 +8,6 @@
 #
 # Usage:
 #   fm-resource-lock.sh run [--file <declaration>] <resource> -- <command> [arg...]
-#   fm-resource-lock.sh list [--file <declaration>]
 #   fm-resource-lock.sh brief
 #
 # run    Wait until <resource> has a free slot, then replace this process with
@@ -16,8 +15,6 @@
 #        `resource-lock:` line on stderr reports a wait, and one the slot taken.
 #        The slot frees when the command and every process it left running have
 #        exited. A command its harness cut off mid-wait is simply run again.
-# list   Print one line per declared resource: its slots now, its most slots at
-#        any hour, how many are held, and what it covers.
 # brief  Print the brief section that tells a worker which commands to wrap and
 #        how, or nothing when no resource is declared. bin/fm-brief.sh appends it
 #        to every ship and scout scaffold.
@@ -35,9 +32,9 @@
 # and `-`, and may not contain `-slot-` followed by a digit, which is how slot
 # files are named. <slots> is how many jobs may hold the resource at once: a
 # positive integer of at most three digits. Each optional window gives a
-# different count between two local wall-clock times, may cross midnight, and
-# may be 0 to stop new jobs for those hours; the first window containing the
-# current time wins. The rest of the line says which commands must hold the
+# different positive count between two local wall-clock times and may cross
+# midnight; the first window containing the current time wins.
+# The rest of the line says which commands must hold the
 # resource and is required, because it is what the brief tells a worker. Blank
 # lines and lines starting with `#` are ignored. Any other shape, a resource
 # named twice, or an unreadable file makes the whole declaration unreadable:
@@ -113,11 +110,10 @@ valid_time() {  # <HH:MM>
   return 1
 }
 
-# A slot count: digits, at most three, no leading zero unless it is exactly 0.
+# A slot count: positive digits, at most three, no leading zero.
 valid_count() {  # <count>
   case "$1" in
     '' | *[!0-9]* | ????*) return 1 ;;
-    0) return 0 ;;
     0*) return 1 ;;
   esac
   return 0
@@ -158,7 +154,7 @@ EOF
       *"|$name|"*) die "$file line $lineno names $name a second time" ;;
     esac
     seen="$seen$name|"
-    { valid_count "$slots" && [ "$slots" != 0 ]; } ||
+    valid_count "$slots" ||
       die "$file line $lineno gives $name a slot count that is not a positive integer of at most three digits"
     windows=
     while [ -n "$rest" ]; do
@@ -176,7 +172,7 @@ EOF
       { [ "$range" = "$start-$end" ] && valid_time "$start" && valid_time "$end" && [ "$start" != "$end" ]; } ||
         die "$file line $lineno gives $name a window '$range' that is not two different HH:MM times"
       valid_count "$count" ||
-        die "$file line $lineno gives $name a window count '$count' that is not an integer of at most three digits"
+        die "$file line $lineno gives $name a window count '$count' that is not a positive integer of at most three digits"
       windows="${windows:+$windows }$token"
       rest=${rest#"$token"}
       rest=${rest#"${rest%%[![:space:]]*}"}
@@ -256,7 +252,7 @@ lock_support() {
 }
 
 cmd_run() {
-  local file='' name idx most limit slot held busy path waited=0 poll why
+  local file='' name idx most limit slot held busy path waited=0 poll why lock_fd=9
   if [ "${1:-}" = --file ]; then
     [ $# -ge 2 ] || die "--file needs a declaration path"
     file=$2
@@ -274,19 +270,22 @@ cmd_run() {
     die "cannot take the $name lock: $why; refusing to run the command unlocked"
   most=$(most_slots "$idx")
   poll=${FM_RESOURCE_LOCK_POLL_SECS:-5}
+  while { : >&"$lock_fd"; } 2>/dev/null; do
+    lock_fd=$((lock_fd + 1))
+  done
   while :; do
     limit=$(slots_now "$idx")
     held=0
     busy=0
     slot=1
-    while [ "$limit" -gt 0 ] && [ "$slot" -le "$most" ]; do
+    while [ "$slot" -le "$most" ]; do
       path=$(slot_file "$name" "$most" "$slot")
       if [ "$held" -eq 0 ]; then
-        exec 9>> "$path"
-        if flock -n 9; then
+        eval "exec $lock_fd>> \"\$path\""
+        if flock -n "$lock_fd"; then
           held=$slot
         else
-          exec 9>&-
+          eval "exec $lock_fd>&-"
           busy=$((busy + 1))
         fi
       elif ! flock -n "$path" true; then
@@ -296,7 +295,7 @@ cmd_run() {
     done
     if [ "$held" -gt 0 ]; then
       [ "$busy" -ge "$limit" ] || break
-      exec 9>&-
+      eval "exec $lock_fd>&-"
     fi
     if [ "$waited" -eq 0 ]; then
       echo "resource-lock: waiting for $name ($limit slot(s) at this hour, none free)" >&2
@@ -308,38 +307,6 @@ cmd_run() {
   done
   echo "resource-lock: holding $name slot $held" >&2
   exec "$@"
-}
-
-cmd_list() {
-  local file='' i=0 most slot path held name
-  if [ "${1:-}" = --file ]; then
-    [ $# -ge 2 ] || die "--file needs a declaration path"
-    file=$2
-    shift 2
-  fi
-  [ $# -eq 0 ] || die "usage: fm-resource-lock.sh list [--file <declaration>]"
-  [ -n "$file" ] || file=$(declaration_path)
-  load_declaration "$file"
-  while [ "$i" -lt "$RL_COUNT" ]; do
-    name=${RL_NAMES[$i]}
-    most=$(most_slots "$i")
-    held=unknown
-    if lock_support >/dev/null; then
-      held=0
-      slot=1
-      while [ "$slot" -le "$most" ]; do
-        path=$(slot_file "$name" "$most" "$slot")
-        # An absent file was never locked; probing must not create it.
-        if [ -e "$path" ] && ! flock -n "$path" true; then
-          held=$((held + 1))
-        fi
-        slot=$((slot + 1))
-      done
-    fi
-    printf '%s now=%s most=%s held=%s - %s\n' \
-      "$name" "$(slots_now "$i")" "$most" "$held" "${RL_WHAT[$i]}"
-    i=$((i + 1))
-  done
 }
 
 cmd_brief() {
@@ -370,7 +337,6 @@ cmd_brief() {
 case "${1:-}" in
   -h | --help) usage ;;
   run) shift; cmd_run "$@" ;;
-  list) shift; cmd_list "$@" ;;
   brief) shift; cmd_brief "$@" ;;
   *)
     usage >&2

@@ -1083,8 +1083,8 @@ suite 2 22:00-09:00=1 full test-suite runs in my-project
 gpu 1 any GPU use
 ```
 
-`<slots>` is how many jobs may hold the resource at once.
-Each optional window gives a different count between two local times, may cross midnight, and may be `0` to stop new jobs for those hours; a job already running when a window lowers the count keeps its slot.
+`<slots>` is how many jobs may hold the resource at once and must be a positive integer, including in windows.
+Each optional window gives a different count between two local times and may cross midnight; a job already running when a window lowers the count keeps its slot.
 The rest of the line says which commands must hold the resource and is required, because it is what a worker is told.
 
 When the file declares a resource, `bin/fm-brief.sh` adds a `# Heavy commands (resource locks)` section to every ship and scout brief, giving the worker the exact wrapper for each resource:
@@ -1093,7 +1093,8 @@ When the file declares a resource, `bin/fm-brief.sh` adds a `# Heavy commands (r
 bin/fm-resource-lock.sh run suite -- <command>
 ```
 
-The wrapper waits for a free slot, runs the command while holding it, and frees the slot when the command exits; `bin/fm-resource-lock.sh list` shows each resource's slots now and how many are held.
+The wrapper waits for a free slot, runs the command while holding it, and frees the slot when the command exits.
+Nest wrappers when a command needs several resources; each outer slot stays held while the inner wrapper waits and runs.
 Slots are exclusive `flock` locks on files under `$XDG_RUNTIME_DIR`: `<name>.lock` for a one-slot resource, and `<name>-slot-1.lock` onward for any other.
 A job that takes the same file with plain `flock` is therefore an ordinary holder, so a lock already in use by hand, such as `$XDG_RUNTIME_DIR/gpu.lock`, keeps working unchanged whether or not the resource is declared here.
 A malformed or unreadable file stops every ship and scout scaffold and every wrapped command until it is fixed, rather than guessing the intended limit, and the wrapper refuses to run a command unlocked where `flock` or `$XDG_RUNTIME_DIR` is missing.

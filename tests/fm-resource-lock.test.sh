@@ -88,36 +88,25 @@ start_job() {  # <case-dir> <HH:MM> <resource> <tag>
 
 # --- declaration ------------------------------------------------------------
 
-test_declaration_lists_slots_for_the_hour() {
+test_declaration_renders_resources_and_windows() {
   local case_dir out
   case_dir=$(make_case declared \
     '# heavy suite: two by day, one overnight' \
     '' \
     'suite 2 22:00-09:00=1 full test-suite runs' \
     'gpu 1 any GPU use' \
-    'quiet 3 12:00-13:00=0 13:00-14:00=5   lunchtime   builds')
-  out=$(lock "$case_dir" 12:30 list) || fail "list refused a valid declaration: $out"
-  assert_contains "$out" 'suite now=2 most=2 held=' "a daytime hour did not use the base count"
-  assert_contains "$out" 'gpu now=1 most=1 held=' "a one-slot resource was not listed"
-  assert_contains "$out" 'quiet now=0 most=5 held=' "the first matching window did not win"
+    'build 3 12:00-13:00=1 13:00-14:00=5   lunchtime   builds')
+  out=$(lock "$case_dir" 12:30 brief) || fail "brief refused a valid declaration: $out"
+  assert_contains "$out" '2 at once, 1 during 22:00-09:00' "the overnight window was not rendered"
+  assert_contains "$out" '1 at once) - any GPU use' "a one-slot resource was not rendered"
+  assert_contains "$out" '3 at once, 1 during 12:00-13:00, 5 during 13:00-14:00' "multiple windows were not rendered"
   assert_contains "$out" '- lunchtime   builds' "the description was not kept as written"
-  out=$(lock "$case_dir" 23:15 list) || fail "list refused at night: $out"
-  assert_contains "$out" 'suite now=1 most=2' "a window crossing midnight did not apply before midnight"
-  out=$(lock "$case_dir" 08:59 list) || fail "list refused in the morning: $out"
-  assert_contains "$out" 'suite now=1 most=2' "a window crossing midnight did not apply after midnight"
-  out=$(lock "$case_dir" 09:00 list) || fail "list refused at the window's end: $out"
-  assert_contains "$out" 'suite now=2 most=2' "a window did not end at its end time"
-  out=$(lock "$case_dir" 13:00 list) || fail "list refused in the second window: $out"
-  assert_contains "$out" 'quiet now=5 most=5' "a later window did not apply in its own hours"
-  pass "a declaration gives each resource its slots for the current hour"
+  pass "brief renders declared resources, multiple windows, and descriptions"
 }
 
 test_absent_declaration_declares_nothing() {
   local case_dir out rc=0
   case_dir=$(make_case absent)
-  out=$(lock "$case_dir" 12:00 list 2>&1) || rc=$?
-  expect_code 0 "$rc" "list failed without a declaration: $out"
-  assert_equals "" "$out" "an absent declaration listed something"
   out=$(lock "$case_dir" 12:00 brief 2>&1) || rc=$?
   expect_code 0 "$rc" "brief failed without a declaration: $out"
   assert_equals "" "$out" "an absent declaration added a brief section"
@@ -126,24 +115,23 @@ test_absent_declaration_declares_nothing() {
 
 # Each row: <label>|<expected refusal text>|<declaration line>[;<second line>]
 test_unreadable_declaration_refuses() {
-  local case_dir label expect lines out rc n=0 sub
+  local case_dir label expect lines out rc n=0
   while IFS='|' read -r label expect lines; do
     [ -n "$label" ] || continue
     n=$((n + 1))
     case_dir=$(make_case "bad-$n")
     printf '%s\n' "$lines" | tr ';' '\n' > "$case_dir/home/config/resource-locks"
-    for sub in list brief; do
-      rc=0
-      out=$(lock "$case_dir" 12:00 "$sub" 2>&1) || rc=$?
-      expect_code 1 "$rc" "$label: $sub accepted the declaration: $out"
-      assert_contains "$out" "$expect" "$label: the $sub refusal did not say what is wrong"
-    done
+    rc=0
+    out=$(lock "$case_dir" 12:00 brief 2>&1) || rc=$?
+    expect_code 1 "$rc" "$label: brief accepted the declaration: $out"
+    assert_contains "$out" "$expect" "$label: the brief refusal did not say what is wrong"
     rc=0
     out=$(lock "$case_dir" 12:00 run ok -- sh -c ": > '$case_dir/ran'" 2>&1) || rc=$?
     expect_code 1 "$rc" "$label: run accepted the declaration: $out"
     assert_absent "$case_dir/ran" "$label: the command ran under an unreadable declaration"
   done <<'EOF'
 zero slots|line 2 gives bad a slot count|ok 1 fine;bad 0 nothing may run
+leading zero slots|line 2 gives bad a slot count|ok 1 fine;bad 01 heavy runs
 slots not a number|line 2 gives bad a slot count|ok 1 fine;bad two heavy runs
 too many digits|line 2 gives bad a slot count|ok 1 fine;bad 1000 heavy runs
 no description|line 2 does not say which commands must hold bad|ok 1 fine;bad 2
@@ -155,6 +143,9 @@ mistyped window|line 2 gives bad a window '9:00-17:00'|ok 1 fine;bad 2 9:00-17:0
 impossible hour|line 2 gives bad a window '24:00-09:00'|ok 1 fine;bad 2 24:00-09:00=1 heavy runs
 empty window|line 2 gives bad a window '09:00-09:00'|ok 1 fine;bad 2 09:00-09:00=1 heavy runs
 bad window count|line 2 gives bad a window count 'x'|ok 1 fine;bad 2 22:00-09:00=x heavy runs
+zero window count|line 2 gives bad a window count '0'|ok 1 fine;bad 2 22:00-09:00=0 heavy runs
+leading zero window count|line 2 gives bad a window count '01'|ok 1 fine;bad 2 22:00-09:00=01 heavy runs
+window count too large|line 2 gives bad a window count '1000'|ok 1 fine;bad 2 22:00-09:00=1000 heavy runs
 EOF
   case_dir=$(make_case bad-dir)
   mkdir "$case_dir/home/config/resource-locks"
@@ -162,7 +153,7 @@ EOF
   out=$(lock "$case_dir" 12:00 brief 2>&1) || rc=$?
   expect_code 1 "$rc" "a declaration that is not a file was accepted: $out"
   assert_contains "$out" "is not a readable regular file" "the refusal did not name the unusable file"
-  pass "an unreadable declaration refuses list, brief, and run rather than guessing a limit"
+  pass "an unreadable declaration refuses brief and run rather than guessing a limit"
 }
 
 # --- brief ------------------------------------------------------------------
@@ -226,6 +217,83 @@ test_run_passes_the_command_through() {
   pass "run returns the command's own status and passes its arguments unchanged"
 }
 
+test_nested_wrappers_keep_outer_slots() {
+  local case_dir direction outer inner blocker nested_pid outer_pid inner_pid
+  for direction in suite-gpu gpu-suite; do
+    case_dir=$(make_case "nested-$direction" 'suite 2 22:00-09:00=1 full test-suite runs' 'gpu 1 any GPU use')
+    case "$direction" in
+      suite-gpu) outer=suite inner=gpu blocker=gpu.lock ;;
+      gpu-suite) outer=gpu inner=suite blocker=suite-slot-2.lock ;;
+    esac
+    hold_file "$case_dir/run/$blocker" "$case_dir/blocker"
+    # shellcheck disable=SC2016
+    lock "$case_dir" 23:00 run "$outer" -- "$LOCK" run "$inner" -- \
+      sh -c '
+        : > "$1.held"
+        i=0
+        while [ ! -e "$1.release" ] && [ "$i" -lt 300 ]; do
+          i=$((i + 1))
+          sleep 0.1
+        done
+      ' nested "$case_dir/nested" 2> "$case_dir/nested.err" &
+    nested_pid=$!
+    await_text "$case_dir/nested.err" "resource-lock: waiting for $inner" || fail "the nested wrapper did not wait for $inner"
+    start_job "$case_dir" 23:00 "$outer" "$case_dir/outer"
+    outer_pid=$!
+    await_text "$case_dir/outer.err" "resource-lock: waiting for $outer" || fail "the outer slot was released while waiting for $inner"
+    assert_absent "$case_dir/outer.ran" "another job ran under the nested wrapper's outer slot"
+    : > "$case_dir/blocker.release"
+    await_path "$case_dir/nested.held" || fail "the nested command did not run after $inner became free"
+    start_job "$case_dir" 23:00 "$inner" "$case_dir/inner"
+    inner_pid=$!
+    await_text "$case_dir/inner.err" "resource-lock: waiting for $inner" || fail "the nested command did not keep $inner held"
+    sleep 1.2
+    assert_absent "$case_dir/outer.ran" "the outer slot was released while the inner command ran"
+    assert_absent "$case_dir/inner.ran" "the inner slot was released while the command ran"
+    : > "$case_dir/nested.release"
+    wait "$nested_pid" || fail "the nested command failed"
+    await_path "$case_dir/outer.ran" || fail "the outer slot was not released when the nested command finished"
+    await_path "$case_dir/inner.ran" || fail "the inner slot was not released when the nested command finished"
+    wait "$outer_pid" "$inner_pid" || fail "a waiting command failed after the nested command finished"
+    wait
+  done
+  pass "nested wrappers retain both locks while waiting and running, then release both"
+}
+
+test_windows_select_slot_counts_for_the_hour() {
+  local case_dir now limit slot tag
+  while read -r now limit; do
+    case_dir=$(make_case "hour-${now/:/-}" 'suite 2 22:00-09:00=1 08:00-10:00=3 full test-suite runs')
+    slot=3
+    while [ "$slot" -gt "$((4 - limit))" ]; do
+      hold_file "$case_dir/run/suite-slot-$slot.lock" "$case_dir/h$slot"
+      slot=$((slot - 1))
+    done
+    start_job "$case_dir" "$now" suite "$case_dir/free"
+    await_path "$case_dir/free.ran" || fail "$now did not admit a job within its $limit slots"
+    wait "$!" || fail "$now failed to run a job within its limit"
+    tag="$case_dir/h$slot"
+    hold_file "$case_dir/run/suite-slot-$slot.lock" "$tag"
+    start_job "$case_dir" "$now" suite "$case_dir/full"
+    await_text "$case_dir/full.err" "resource-lock: waiting for suite ($limit slot(s) at this hour" || fail "$now did not enforce its $limit slots"
+    assert_absent "$case_dir/full.ran" "$now exceeded its slot limit"
+    : > "$tag.release"
+    await_path "$case_dir/full.ran" || fail "$now did not admit a job after a slot was released"
+    for slot in 1 2 3; do
+      : > "$case_dir/h$slot.release"
+    done
+    wait
+  done <<'EOF'
+21:59 2
+22:00 1
+23:15 1
+08:59 1
+09:00 3
+10:00 2
+EOF
+  pass "run applies window boundaries, midnight crossing, first-match priority, and maximum slots"
+}
+
 # Four jobs on two slots: every job runs, and never more than two at once.
 test_no_more_jobs_than_slots_run_at_once() {
   local case_dir i peak=0 now=0 event
@@ -278,7 +346,7 @@ test_plain_flock_holders_share_the_same_slots() {
 # its slot, and a new job waits for it even though another slot file is free.
 test_window_lowers_the_count_for_new_jobs() {
   local case_dir
-  case_dir=$(make_case window 'suite 2 22:00-09:00=1 full test-suite runs' 'quiet 1 22:00-09:00=0 loud builds')
+  case_dir=$(make_case window 'suite 2 22:00-09:00=1 full test-suite runs')
   hold_file "$case_dir/run/suite-slot-2.lock" "$case_dir/day"
   start_job "$case_dir" 23:00 suite "$case_dir/night"
   await_text "$case_dir/night.err" 'resource-lock: waiting for suite (1 slot(s) at this hour' ||
@@ -287,17 +355,11 @@ test_window_lowers_the_count_for_new_jobs() {
   : > "$case_dir/day.release"
   await_path "$case_dir/night.ran" || fail "the night job did not run once the day job finished"
 
-  start_job "$case_dir" 23:00 quiet "$case_dir/zero"
-  await_text "$case_dir/zero.err" 'resource-lock: waiting for quiet (0 slot(s) at this hour' ||
-    fail "a job did not wait during hours with no slots"
-  sleep 0.5
-  assert_absent "$case_dir/zero.ran" "a job ran during hours with no slots"
-  kill "$!" 2>/dev/null || true
   wait
-  pass "a window lowers the count for new jobs, down to none, without evicting a running one"
+  pass "a window lowers the count for new jobs without evicting a running one"
 }
 
-test_declaration_lists_slots_for_the_hour
+test_declaration_renders_resources_and_windows
 test_absent_declaration_declares_nothing
 test_unreadable_declaration_refuses
 test_brief_gives_a_wrapper_that_runs
@@ -306,6 +368,8 @@ if [ "$HAVE_FLOCK" = 0 ]; then
 else
   test_run_refuses_rather_than_run_unlocked
   test_run_passes_the_command_through
+  test_nested_wrappers_keep_outer_slots
+  test_windows_select_slot_counts_for_the_hour
   test_no_more_jobs_than_slots_run_at_once
   test_plain_flock_holders_share_the_same_slots
   test_window_lowers_the_count_for_new_jobs
