@@ -2905,20 +2905,11 @@ if [ "$KIND" = ship ]; then
   # (bin/fm-merge-local.sh), so it must not drift from the captain's standing
   # merge posture unnoticed in either direction. Restricting below a registered
   # +yolo is allowed (a current explicit captain instruction wins) but never
-  # silent, because every landing of this task then waits for the captain. The
-  # supervision branch, which dispatches only under the away-posture record,
-  # may never record more than the registry carries: away never approves more.
+  # silent, because every landing of this task then waits for the captain.
   if [ "$RELAUNCH" -ne 1 ]; then
     STANDING_YOLO=$("$FM_ROOT/bin/fm-project-mode.sh" "$PROJ_NAME" 2>/dev/null | cut -d' ' -f2) || STANDING_YOLO=
     if [ "$YOLO" = off ] && [ "$STANDING_YOLO" = on ]; then
       echo "notice: $ID records yolo=off while $PROJ_NAME is registered +yolo - every landing of this task will wait for the captain, including while away; pass --yolo on unless a current explicit captain instruction restricts this task, or correct a live task with bin/fm-task-yolo.sh" >&2
-    fi
-    if [ "$YOLO" = on ] && [ "$STANDING_YOLO" != on ]; then
-      spawn_posture_actor=$(fm_lease_actor) || exit "$FM_LEASE_REFUSE_EXIT"
-      if [ "$spawn_posture_actor" = branch ]; then
-        echo "error: spawn refused - the supervision branch may not record yolo=on for $ID: $PROJ_NAME is not registered +yolo, and a dispatch under the away-posture record never approves more than the captain's standing merge posture; pass --yolo off" >&2
-        exit 1
-      fi
     fi
   fi
 fi

@@ -609,7 +609,7 @@ Each relocated script keeps its own gate, enforcing exactly what a script can ch
 | Script | Gate while away |
 | --- | --- |
 | `bin/fm-pr-merge.sh` | Merges any pull request green at its live head, synchronously, under the record lock, and refuses `--allow-red` and `--allow-missing` while away, so the green gate is absolute in this posture; which pull request the words meant is the branch's reading. |
-| `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, which needs no words because queued, unheld work is already approved, or filed by the branch because the words explicitly call for it - and refuses the branch a `--yolo on` the project's registered posture does not carry; [Project capacity](configuration.md#project-capacity-configproject-capacity) owns admission, and [worker stop receipts](agent-control.md#worker-stop-receipts-and-return-reporting) own return counting and relaunch safety. |
+| `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, which needs no words because queued, unheld work is already approved, or filed by the branch because the words explicitly call for it - with delivery and merge authority resolved under `AGENTS.md` section 7, as MAIN would; [Project capacity](configuration.md#project-capacity-configproject-capacity) owns admission, and [worker stop receipts](agent-control.md#worker-stop-receipts-and-return-reporting) own return counting and relaunch safety. |
 | `bin/fm-send.sh --resolve-key` | Answers a registered house decision under its rule as in any posture, a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
 | `bin/fm-merge-local.sh` | Relocated only through the script header's standing-authority and ready-head gate: the task's own recorded `yolo=on`, written at dispatch and re-recorded only by main, through `bin/fm-task-yolo.sh` while the captain is present. |
 
@@ -625,7 +625,7 @@ It sets these limits:
 - The never-set (credential entry, legal or financial acceptance, an attended prompt, an unnamed discard, a security-sensitive action) has no guarded entrypoint that accepts away authority for either actor.
 - A forced teardown stays refused for the branch.
 - A red merge is refused in this posture whatever the words say.
-- A task's merge posture is never raised while an away record exists, by either actor, and a branch dispatch never records more than the project's registered posture.
+- A live task's merge posture is never raised while an away record exists, by either actor; new dispatch follows `AGENTS.md` section 7's authority precedence, which the branch prompt's "Postures" section applies while away.
 - No relocation survives the return, because an archived record validates as absent and the words die with it.
 
 ### Cleanup after a landed pull request
