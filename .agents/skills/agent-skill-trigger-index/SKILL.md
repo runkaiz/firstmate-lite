@@ -10,7 +10,7 @@ metadata:
 
 These skills are not captain-invocable; load them only at their precise triggers.
 
-- `work-queue` - load before capturing or revising work/outcome intent, selecting queued work, or reconsidering eligibility at startup, heartbeat, completion/teardown or a capacity-bound PR-ready handoff.
+- `work-queue` - load before capturing or revising work/outcome intent, selecting queued work, or reconsidering eligibility at startup, heartbeat or completion/teardown.
 
 - `operational-home-layout` - load when locating, interpreting, or changing Firstmate home, config, data, state, project, or generated runtime paths.
 - `session-start-recovery` - load when the session-start digest reports unfinished checks, actionable diagnostics, recovery inputs, or output requiring interpretation.

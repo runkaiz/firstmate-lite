@@ -49,7 +49,7 @@ Typed steering still refuses a stopped worker until lifecycle relaunch clears it
 These counts serve return reporting, not away-mode admission.
 The distinct producer/delivery regression in `tests/fm-branch-supervision.test.sh` checks caller-selected backlog lookup and a durable hold on existing delivery while reporting under the producer's wake scope, without creating a surrogate task.
 Its generated-prompt check verifies the emitted decision interface, not autonomous target selection.
-[Project capacity](../configuration.md#project-capacity-configproject-capacity) remains independent, and `bin/fm-branch-prompt.sh` "Capacity recovery while away" owns handoff escalation.
+`bin/fm-branch-prompt.sh` "Handoff recovery while away" owns handoff escalation.
 These deterministic checks do not prove model compliance or live vendor lifecycle behavior; no harness mechanics or runtime-backend classification changed.
 
 ## Native session-start delivery
