@@ -32,7 +32,7 @@ bash bin/fm-test-run.sh tests/fm-task-delivery.test.sh tests/fm-branch-supervisi
 ```
 
 The result was `FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0`.
-The local landing fixture exercises MAIN attended and away, plus the away branch, with project and dispatch yolo off; proactive on lands the validated ship head, while off/malformed mode, a review-first restriction persisted as a captain hold, failed/missing readiness, and a dirty worker copy refuse without moving the default branch.
+The local landing fixture exercises MAIN attended and away, plus the away branch, with project and dispatch yolo off; proactive on fast-forwards to the declared ship head, while off/malformed mode, a review-first restriction persisted as a captain hold, failed/missing readiness, and a dirty worker copy refuse without moving the default branch.
 An attended branch still refuses, and the task's recorded yolo remains unchanged.
 The supervisor remains responsible for interpreting natural-language restrictions, scope, and validation evidence; these fixtures prove the executable guards, not that model judgment.
 The shared merge entrypoint and instruction delivery have no harness-specific or tmux/Herdr lifecycle change.
