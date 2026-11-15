@@ -6,8 +6,9 @@
 # This is firstmate's merge gate-action (the captain's merge authority applied
 # locally instead of via a GitHub PR). It is the one sanctioned exception to hard
 # rule #1 "never run state-changing git in projects/", and it is narrow: it only
-# runs for mode=local-only tasks, only after the captain approves (or yolo=on
-# auto-approves), and only as a clean fast-forward - it refuses a diverged branch
+# runs for mode=local-only tasks, after the supervisor evaluates current landing
+# authority under .agents/skills/ship-landing/SKILL.md, and only as a clean
+# fast-forward - it refuses a diverged branch
 # and tells you to have the crewmate rebase. See AGENTS.md prime directives,
 # project management, and task lifecycle.
 # The task's existing per-task control lock serializes the captain-hold check
@@ -19,7 +20,7 @@
 # a clean worker copy at the exact ship head, and no captain hold may land.
 # The supervisor still verifies the task's validation evidence and scope, as
 # attended: a done declaration is not a machine attestation of passing tests.
-# The away record lock spans the final authority read and synchronous merge.
+# The away record lock spans the final posture check and synchronous merge.
 # A task whose cleanup kept its branch (bin/fm-teardown.sh --retain-branch) has
 # no task record; its state/<id>.retained record stands in under the same
 # guards, and a successful landing removes it.
@@ -51,7 +52,7 @@ META="$STATE/$ID.meta"
 # Role partition: landing local-only work is MAIN-owned; the Pi supervision
 # branch reports readiness while attended (contract: bin/fm-lease-lib.sh;
 # no-op in homes without a branch actor). Away relocation reaches the narrow
-# standing-authority and ready-head gate below. This precedes reading the
+# ready-head and captain-hold checks below. This precedes reading the
 # task record, because the wrong
 # actor is refused for its role whatever it says.
 # shellcheck source=bin/fm-lease-lib.sh

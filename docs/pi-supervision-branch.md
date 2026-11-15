@@ -592,15 +592,7 @@ A leftover `state/.afk` flag declines nothing.
 It does so only while `bin/fm-afk-contract.sh validate` succeeds on a complete, readable, live away record (`mode` is not quiet).
 An archived, incomplete, invalid, or quiet record restores the attended refusal byte for byte.
 
-The captain's away words are the whole mandate:
-
-- The branch reads them at the tail.
-- It decides by its own judgment whether the event in front of it is the moment they name.
-- It acts on them only through the guarded scripts, never by analogy.
-- It holds with verdict captain on doubt.
-
-`bin/fm-branch-prompt.sh` "Postures" owns those execution rules.
-It requires every action taken under the words to open its outcome summary with "per your away instructions:".
+`bin/fm-branch-prompt.sh` "Postures" owns how the branch applies additional away instructions alongside MAIN's continuing recorded authority, including uncertainty and outcome reporting.
 
 Each relocated script keeps its own gate, enforcing exactly what a script can check without reading words:
 

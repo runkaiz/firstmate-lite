@@ -163,8 +163,8 @@ On every verified primary harness, tracked hook integration gives the primary se
 The guard covers the primary home, exempts child crewmate/scout worktrees, is loop-safe per harness, and is documented in [turnend-guard.md](turnend-guard.md).
 
 Away mode is a posture of the one supervision session, recorded in `state/.afk-contract` by `bin/fm-afk-contract.sh` in the same turn as `/afk` with no wait for a further go, read back in plain sentences only after entry, and announced at entry.
-The captain's away words are the whole mandate: the record owner's header is the single owner of the record schema, the words are recorded verbatim, and by the captain's mandate no parser, tokenizer, classifier, or grammar reads them anywhere.
-The supervision session reads the words at the tail of every wake and acts on them by its own judgment at the moment an event makes them relevant, only through the guarded scripts under standing authority, never by analogy, holding for the return on doubt; `bin/fm-branch-prompt.sh` "Postures" owns those execution rules.
+The record owner's header owns the verbatim record schema and its no-parsing contract.
+`bin/fm-branch-prompt.sh` "Postures" owns how the supervision session applies additional away instructions alongside MAIN's continuing recorded authority.
 What stays mechanical is exactly what a script can check without reading words: a merge green at its live head under the record lock, synchronous merges only, and the never-set; destructive, irreversible, and security-sensitive actions are never pre-authorizable whatever the words say.
 Daemon-backed quiet mode writes the same record marked quiet; `bin/fm-afk-contract.sh` owns the mode reading, and the supervision host treats a quiet record without a daemon as attended, delivering captain outcomes to the present captain.
 The watcher and daemon recheck captain-held work in quiet mode as they do while attended, rather than silencing it until a return.
