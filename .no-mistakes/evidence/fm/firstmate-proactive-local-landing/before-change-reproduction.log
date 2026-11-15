@@ -1,0 +1,4 @@
+Base commit executable: bin/fm-merge-local.sh task-local --proactive
+error: invalid local merge request
+exit=2
+The current executable accepts this option and lands prepared yolo-off tasks; see live-local-transcript.log.

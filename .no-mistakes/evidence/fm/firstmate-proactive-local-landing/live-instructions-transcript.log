@@ -1,0 +1,26 @@
+$ bin/fm-proactive.sh on
+PROACTIVE MODE: on
+
+$ bin/fm-supervision-instructions.sh --harness claude
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness codex
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness opencode
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness pi
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness pi-signed
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness grok
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness cursor
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness omp
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-supervision-instructions.sh --harness unknown
+Observed identical proactive authority for local-only, direct-PR and no-mistakes registries; explicit restrictions and validation remain in emitted instructions.
+$ bin/fm-proactive.sh off
+PROACTIVE MODE: off
+
+All harness renderers restored their original baseline after off.
+All disposable instruction labs removed on exit.

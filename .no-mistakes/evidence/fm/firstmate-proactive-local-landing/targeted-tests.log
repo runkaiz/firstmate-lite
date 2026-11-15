@@ -1,0 +1,113 @@
+FM_TEST_BEGIN 2026-11-15T08:20:48Z tests/fm-supervision-instructions.test.sh family=pure-contract-unit expected_gate_skip=none
+ok - renderer adds the supervision-host protocol on a claude home unless config/supervision-host-off opts it out, leaving the claude block intact
+ok - renderer gives each non-Pi arm owner the host protocol in its own terms, and grok arms the host
+ok - renderer prints exactly the selected harness block
+ok - renderer falls back to unknown.md for unverified harness names
+ok - renderer includes read-only, afk, and effective x-mode current-state stanzas
+ok - renderer's away/quiet stanzas are mode-aware, default to away, and fall back safely on garbage input
+ok - renderer repair-line mode is harness-aware and honors conditional state
+ok - renderer preserves every harness ordinary-continuation and missing-cycle repair path
+ok - pi-signed keeps its identity while sharing Pi's supervision protocol
+ok - grok supervision is Claude-shaped background notify with passive Stop-hook backstop
+ok - grok rendered command sources the effective x-mode config
+ok - pi supervision snippet renders the effective extension path
+proactive: invalid or unreadable preference at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-test-run.XrOfJb/w1/tmp/fm-supervision-instructions.9kBDpo/proactive-config/proactive; using off; repair with explicit on or off.
+ok - proactive preference persists, restores baseline, rejects malformed state, and reaches every supervision renderer
+FM_TEST_END 2026-11-15T08:20:49Z tests/fm-supervision-instructions.test.sh exit=0 duration_ms=1055 gate_skip=false
+FM_TEST_BEGIN 2026-11-15T08:20:49Z tests/fm-task-delivery.test.sh family=pure-contract-unit expected_gate_skip=none
+ok - fm-spawn/fm-promote: authorized intent preserves exact words and refuses operator-address lines
+ok - fm-spawn: every legacy worker receives scoped role instructions without changing project or primary instructions
+ok - fm-spawn: a ship spawn requires a valid explicit mode and yolo before anything is created
+ok - fm-spawn: scout and secondmate spawns refuse ship delivery flags
+ok - fm-spawn: the brief's recorded mode and the spawn's explicit mode must agree
+ok - fm-spawn: a rigor downgrade against the registered posture is announced, never blocked
+ok - fm-spawn: a scout spawn resolves no delivery posture from the registry
+ok - fm-promote: promotion requires the delivery contract and records it exactly once
+ok - fm-promote: a symlinked task record is refused and its target is left untouched
+ok - fm-promote: a promoted worker receives the same mode-specific delivery contract a briefed one does
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ok - fm-promote: a selected branch prefix reaches both worker instructions and durable task state
+not ok - a ref-format-valid metacharacter prefix should promote safely: error: --branch-prefix and task id must form a valid git branch (got '$(touch${IFS}/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-test-run.XrOfJb/w2/tmp/fm-task-delivery.kNPo57/promote-branch-shell-safe-marker)/promote-branch-safe-e3')
+FM_TEST_END 2026-11-15T08:20:58Z tests/fm-task-delivery.test.sh exit=1 duration_ms=8682 gate_skip=false
+FM_TEST_BEGIN 2026-11-15T08:20:58Z tests/fm-branch-supervision.test.sh family=standalone expected_gate_skip=none
+ok - CLI mechanics hold existing delivery while reporting its distinct producer; no surrogate is created
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+ok - the guarded landing path accepts approved live and retained tasks without rewriting stale dispatch yolo, for MAIN and the away branch
+ok - branch prompt is byte-stable across homes, cwd, timezone, and time, above the cache floor
+ok - outcome store is append-only and refuses sequence reuse after a torn tail
+ok - outcome append refreshes a bounded, verbatim display tail of the newest rows without moving the cursor
+ok - the display tail keeps only whole newest rows within its 1 MiB budget, never shortening one
+ok - outcome seed-tail writes an absent display tail from a valid store's newest rows without moving a marker, and leaves an existing one to append
+ok - seed-tail validates and publishes only a bounded newest window, not old malformed history
+ok - routine task and fleet no-change outcomes stay stored and silent captain outcomes are refused
+ok - startup replay cannot advance the cursor across an unrendered captain outcome
+ok - malformed and ahead-of-store cursor state fail closed before any outcome can be skipped
+ok - cursor advancement refuses to legitimize an ahead processed marker
+ok - middle sequence conflicts fail closed for every store read and append
+ok - outcome lookup returns exact sequence rows and distinguishes missing receipts
+ok - outcome stores require terminated single-line JSON records
+ok - the processed marker is sequence-bound, never ahead of the read cursor, never backwards, and never adopts delivered history
+ok - outcome store: present shows each routine row once and each captain row until it is acknowledged
+ok - outcome store: present and unprocessed name each captain row's recorded age without writing it
+ok - lease exclusivity, same-actor refresh, release, staleness, and sweep hold
+ok - fm-control and fm-teardown refuse the other actor's live lease and pass through otherwise
+ok - PR merge, local landing, and new-task spawn refuse the branch actor and spare main
+ok - a home without a live branch lease takes no lock and clears leftover leases in any calling context
+ok - an unmarked main honors a live branch lease across processes and ignores a previous session's
+ok - a lease file makes an unmarked guard exclude a concurrent claim for the complete mutation
+ok - a host home's unmarked main excludes the host's first claim for its whole mutation, and other homes take no lock
+ok - lease liveness requires an exact valid session-lock pid
+ok - concurrent stale-lease claims serialize so exactly one actor succeeds
+ok - guard stale cleanup cannot race with or delete a newer lease claim
+ok - lease guard excludes a concurrent actor for the complete mutation
+ok - a claim naming the other actor fails loudly instead of silently impersonating it
+ok - release commands authorize the caller and bulk release drops only that actor's leases
+ok - the branch cannot force a teardown or bypass fm-control for a relaunch
+ok - the away-posture record relocates the PR merge and a spawn to the branch, including guarded local landing, and only while confirmed, valid, and away
+ok - relocated branch spawn admits only already-queued dispatchable work, including on a manual-backend home
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+ok - away dispatch and landing preserve standing approval on registry off and task restrictions on registry on; independent holds and validation gates persist
+FM_TEST_END 2026-11-15T08:21:22Z tests/fm-branch-supervision.test.sh exit=0 duration_ms=23806 gate_skip=false
+FM_TEST_SUMMARY total=3 failed=1 skipped_gate=0 duration_ms=33646
+FM_TEST_SUMMARY_FAMILY family=pure-contract-unit count=2 duration_ms=9737 failed=1
+FM_TEST_SUMMARY_FAMILY family=standalone count=1 duration_ms=23806 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-branch-supervision.test.sh duration_ms=23806
+FM_TEST_SLOWEST rank=2 script=tests/fm-task-delivery.test.sh duration_ms=8682
+FM_TEST_SLOWEST rank=3 script=tests/fm-supervision-instructions.test.sh duration_ms=1055

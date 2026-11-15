@@ -1,0 +1,473 @@
+
+SCENARIO main-attended-green
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+merged fm/task-local into local main (2be41d9 -> cc57520) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/main-attended-green/projects/demo
+exit=0
+main_before=2be41d99b5eed978ff4f8b2ebd58454aa6eb5d90
+ship_head=cc57520cfe18923c6d06939c27a6126e77720c4f
+main_after=cc57520cfe18923c6d06939c27a6126e77720c4f
+dispatch_metadata_unchanged=true
+observed=landed validated head
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh instructions
+PROACTIVE MODE: on
+# Proactive orchestration policy (active only while the preference is on)
+
+Continue approved work through routine handoffs and already-approved next steps without a fresh permission question or a phase-by-phase chat report.
+New no-mistakes briefs generated while on use the worker's immediate validation handoff owned by `bin/fm-dod-lib.sh`, removing the implementation-done/firstmate-invocation round trip.
+Within that accepted task, an unambiguous bounded reversible defect repair is authorized by this mode: have the responsible worker fix it without asking whether it should be fixed.
+Approved landing includes wrap-up: carry worker, tab and copy retirement through, including [ship-landing](../ship-landing/SKILL.md)'s guarded preservation of task-owned generated leftovers, until cleanup succeeds or a genuine refusal needs the captain.
+Firstmate still delegates project changes, and an implementation worker still routes validation ask-user findings to firstmate under [ask-user-authority](../ask-user-authority/SKILL.md).
+That policy remains the authority for deciding findings; do not forward an unambiguous in-scope finding merely because the gate calls it ask-user.
+
+Reuse the current startup digest, presented wake records, and completed validation evidence instead of repeating their preflights at each handoff.
+Read again when evidence is missing, stale, contradictory, or the next action's owning guard requires a fresh check.
+Keep focused validation of affected behavior, the selected delivery pipeline, real required checks, truthful failures, and useful outcome reports.
+Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
+Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
+
+Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
+It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
+Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
+Read-only or lock-refused sessions remain read-only.
+Never toggle yolo, waive validation, or take over a worker-owned pipeline.
+
+For MAIN and the away session, ON supplies recorded standing approval under [ship-landing](../ship-landing/SKILL.md) for authorized in-scope ordinary GitHub PR merges and local-only landings even with project yolo off.
+Treat this as standing approval in that owner's existing authority order, never as a parallel override.
+Land only after validation for the exact current head passes, required PR checks and reviews pass where applicable, and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive` or `bin/fm-merge-local.sh <task-id> --proactive`; their headers own action-time preference and landing guards.
+Do not ask for another merge approval solely because yolo is off.
+Explicit review-first or do-not-merge instructions, explicit task restrictions, captain holds, failed or missing validation, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL or local landing outcome.
+OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
+Non-GitHub PR merges retain their baseline authority.
+
+The supervision branch applies this policy only inside its existing role and posture authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+`bin/fm-branch-prompt.sh` "Postures" owns continuing authority and additional away instructions; proactive mode never wakes parked MAIN.
+exit=0
+
+SCENARIO main-away-green
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-afk-contract.sh enter --words continue approved work
+Away posture recorded at 2026-11-15T08:21:55Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T08:21:55Z
+  your words (verbatim):
+    continue approved work
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+merged fm/task-local into local main (faaa11d -> 407ead2) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/main-away-green/projects/demo
+exit=0
+main_before=faaa11d113d77ae2711cc6a65c44cfef25d07002
+ship_head=407ead2b99e8340e3e7617d13117ebb6019a8a79
+main_after=407ead2b99e8340e3e7617d13117ebb6019a8a79
+dispatch_metadata_unchanged=true
+observed=landed validated head
+
+SCENARIO branch-away-green
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-afk-contract.sh enter --words continue approved work
+Away posture recorded at 2026-11-15T08:21:55Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T08:21:55Z
+  your words (verbatim):
+    continue approved work
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+merged fm/task-local into local main (faaa11d -> 407ead2) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/branch-away-green/projects/demo
+exit=0
+main_before=faaa11d113d77ae2711cc6a65c44cfef25d07002
+ship_head=407ead2b99e8340e3e7617d13117ebb6019a8a79
+main_after=407ead2b99e8340e3e7617d13117ebb6019a8a79
+dispatch_metadata_unchanged=true
+observed=landed validated head
+
+SCENARIO branch-attended-green
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+error: local-only landing (fm-merge-local) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+main_before=faaa11d113d77ae2711cc6a65c44cfef25d07002
+ship_head=407ead2b99e8340e3e7617d13117ebb6019a8a79
+main_after=faaa11d113d77ae2711cc6a65c44cfef25d07002
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-off
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh off
+PROACTIVE MODE: off
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=faaa11d113d77ae2711cc6a65c44cfef25d07002
+ship_head=407ead2b99e8340e3e7617d13117ebb6019a8a79
+main_after=faaa11d113d77ae2711cc6a65c44cfef25d07002
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-away-off
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-afk-contract.sh enter --words continue approved work
+Away posture recorded at 2026-11-15T08:21:56Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T08:21:56Z
+  your words (verbatim):
+    continue approved work
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh off
+PROACTIVE MODE: off
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=7172912b2b9fc4557484ca13238dd84cd06ab293
+ship_head=04e3853ef7bb82d9c09d423e47f540489af80bf0
+main_after=7172912b2b9fc4557484ca13238dd84cd06ab293
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO branch-away-off
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-afk-contract.sh enter --words continue approved work
+Away posture recorded at 2026-11-15T08:21:56Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T08:21:56Z
+  your words (verbatim):
+    continue approved work
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh off
+PROACTIVE MODE: off
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=7172912b2b9fc4557484ca13238dd84cd06ab293
+ship_head=04e3853ef7bb82d9c09d423e47f540489af80bf0
+main_after=7172912b2b9fc4557484ca13238dd84cd06ab293
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-malformed
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+proactive: invalid or unreadable preference at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/main-attended-malformed/config/proactive; using off; repair with explicit on or off.
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=7172912b2b9fc4557484ca13238dd84cd06ab293
+ship_head=04e3853ef7bb82d9c09d423e47f540489af80bf0
+main_after=7172912b2b9fc4557484ca13238dd84cd06ab293
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-missing-preference
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=12bf1bf41404fdf568e7829bb121ec46bc25a64b
+ship_head=6cabbe1578de762f714e4e68c7d9ec7b49e7c758
+main_after=12bf1bf41404fdf568e7829bb121ec46bc25a64b
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-restriction
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-captain-hold.sh hold task-local --title Review first --reason explicit review-first instruction
+task-local
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: task task-local is still held for the captain; release it before merging
+exit=1
+main_before=12bf1bf41404fdf568e7829bb121ec46bc25a64b
+ship_head=6cabbe1578de762f714e4e68c7d9ec7b49e7c758
+main_after=12bf1bf41404fdf568e7829bb121ec46bc25a64b
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO branch-away-restriction
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-afk-contract.sh enter --words continue approved work
+Away posture recorded at 2026-11-15T08:21:58Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T08:21:58Z
+  your words (verbatim):
+    continue approved work
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-captain-hold.sh hold task-local --title Review first --reason explicit review-first instruction
+task-local
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: task task-local is still held for the captain; release it before merging
+exit=1
+main_before=d2cfbaa56ce00a8a75f24a832b4fff8b100d2fe1
+ship_head=31f119239fb41871b0d92274747625f34f2844b6
+main_after=d2cfbaa56ce00a8a75f24a832b4fff8b100d2fe1
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-failed
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: local merge while away or proactive requires a reconciled done declaration; validation failures and decision waits must be resolved
+exit=1
+main_before=b346cd33b184b9b5ca48d480869b3bf265408715
+ship_head=b4c3e5dc5ca0a3a228fa139bb5cdaf3cb4a7715b
+main_after=b346cd33b184b9b5ca48d480869b3bf265408715
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-missing-ready
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: local merge while away or proactive requires a reconciled done declaration; validation failures and decision waits must be resolved
+exit=1
+main_before=b346cd33b184b9b5ca48d480869b3bf265408715
+ship_head=b4c3e5dc5ca0a3a228fa139bb5cdaf3cb4a7715b
+main_after=b346cd33b184b9b5ca48d480869b3bf265408715
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-decision
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: local merge while away or proactive requires a reconciled done declaration; validation failures and decision waits must be resolved
+exit=1
+main_before=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+ship_head=1ca9095add0729baba53ca27eb0497d5be38f2b3
+main_after=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-dirty
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: local merge while away or proactive requires a clean worker copy at the exact ship head
+exit=1
+main_before=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+ship_head=1ca9095add0729baba53ca27eb0497d5be38f2b3
+main_after=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-wrong-head
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: local merge while away or proactive requires a clean worker copy at the exact ship head
+exit=1
+main_before=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+ship_head=1ca9095add0729baba53ca27eb0497d5be38f2b3
+main_after=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-dirty-default
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/main-attended-dirty-default/projects/demo has a dirty working tree; refusing to merge into it
+exit=1
+main_before=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+ship_head=1ca9095add0729baba53ca27eb0497d5be38f2b3
+main_after=f708f4c359b89b4d41a62a1f5f1b92162b162f42
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-diverged
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: fm/task-local is not a fast-forward of main (it has diverged).
+Have the crewmate rebase fm/task-local onto main, then retry.
+exit=1
+main_before=e00885b7132ddb7925e4cb503c7acf0fc8bcce7d
+ship_head=25e3295276e5235810ca711f8efe58a518727088
+main_after=e00885b7132ddb7925e4cb503c7acf0fc8bcce7d
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-off-at-lock
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local --proactive [mode changed to off while waiting for preference lock]
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: proactive local merge refused: mode is off at action time
+exit=1
+main_before=8c35e1be2b032f0320c3182ba7e847309e61dba8
+ship_head=25e3295276e5235810ca711f8efe58a518727088
+main_after=8c35e1be2b032f0320c3182ba7e847309e61dba8
+dispatch_metadata_unchanged=true
+observed=refused without moving main
+
+SCENARIO main-attended-baseline-off
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-proactive.sh off
+PROACTIVE MODE: off
+exit=0
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/bin/fm-merge-local.sh task-local
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+merged fm/task-local into local main (f0238e4 -> a67f407) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F4K27KVTN2XTQHXVC80K78/.live-validation-tmp/fm-live-foklamda/main-attended-baseline-off/projects/demo
+exit=0
+main_before=f0238e437ba1d99569e5df429e77cc2f84316a1c
+ship_head=a67f407d7854cd7a77b81f8fb3a19938019bbf48
+main_after=a67f407d7854cd7a77b81f8fb3a19938019bbf48
+dispatch_metadata_unchanged=true
+observed=landed validated head
+
+All disposable homes and fixture repositories removed on driver exit.

@@ -1,0 +1,182 @@
+[
+  {
+    "name": "main-attended-green",
+    "result": "pass",
+    "landed": true,
+    "returncode": 0,
+    "before": "2be41d99b5eed978ff4f8b2ebd58454aa6eb5d90",
+    "ship_head": "cc57520cfe18923c6d06939c27a6126e77720c4f",
+    "after": "cc57520cfe18923c6d06939c27a6126e77720c4f"
+  },
+  {
+    "name": "main-away-green",
+    "result": "pass",
+    "landed": true,
+    "returncode": 0,
+    "before": "faaa11d113d77ae2711cc6a65c44cfef25d07002",
+    "ship_head": "407ead2b99e8340e3e7617d13117ebb6019a8a79",
+    "after": "407ead2b99e8340e3e7617d13117ebb6019a8a79"
+  },
+  {
+    "name": "branch-away-green",
+    "result": "pass",
+    "landed": true,
+    "returncode": 0,
+    "before": "faaa11d113d77ae2711cc6a65c44cfef25d07002",
+    "ship_head": "407ead2b99e8340e3e7617d13117ebb6019a8a79",
+    "after": "407ead2b99e8340e3e7617d13117ebb6019a8a79"
+  },
+  {
+    "name": "branch-attended-green",
+    "result": "pass",
+    "landed": false,
+    "returncode": 6,
+    "before": "faaa11d113d77ae2711cc6a65c44cfef25d07002",
+    "ship_head": "407ead2b99e8340e3e7617d13117ebb6019a8a79",
+    "after": "faaa11d113d77ae2711cc6a65c44cfef25d07002"
+  },
+  {
+    "name": "main-attended-off",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "faaa11d113d77ae2711cc6a65c44cfef25d07002",
+    "ship_head": "407ead2b99e8340e3e7617d13117ebb6019a8a79",
+    "after": "faaa11d113d77ae2711cc6a65c44cfef25d07002"
+  },
+  {
+    "name": "main-away-off",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "7172912b2b9fc4557484ca13238dd84cd06ab293",
+    "ship_head": "04e3853ef7bb82d9c09d423e47f540489af80bf0",
+    "after": "7172912b2b9fc4557484ca13238dd84cd06ab293"
+  },
+  {
+    "name": "branch-away-off",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "7172912b2b9fc4557484ca13238dd84cd06ab293",
+    "ship_head": "04e3853ef7bb82d9c09d423e47f540489af80bf0",
+    "after": "7172912b2b9fc4557484ca13238dd84cd06ab293"
+  },
+  {
+    "name": "main-attended-malformed",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "7172912b2b9fc4557484ca13238dd84cd06ab293",
+    "ship_head": "04e3853ef7bb82d9c09d423e47f540489af80bf0",
+    "after": "7172912b2b9fc4557484ca13238dd84cd06ab293"
+  },
+  {
+    "name": "main-attended-missing-preference",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "12bf1bf41404fdf568e7829bb121ec46bc25a64b",
+    "ship_head": "6cabbe1578de762f714e4e68c7d9ec7b49e7c758",
+    "after": "12bf1bf41404fdf568e7829bb121ec46bc25a64b"
+  },
+  {
+    "name": "main-attended-restriction",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "12bf1bf41404fdf568e7829bb121ec46bc25a64b",
+    "ship_head": "6cabbe1578de762f714e4e68c7d9ec7b49e7c758",
+    "after": "12bf1bf41404fdf568e7829bb121ec46bc25a64b"
+  },
+  {
+    "name": "branch-away-restriction",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "d2cfbaa56ce00a8a75f24a832b4fff8b100d2fe1",
+    "ship_head": "31f119239fb41871b0d92274747625f34f2844b6",
+    "after": "d2cfbaa56ce00a8a75f24a832b4fff8b100d2fe1"
+  },
+  {
+    "name": "main-attended-failed",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "b346cd33b184b9b5ca48d480869b3bf265408715",
+    "ship_head": "b4c3e5dc5ca0a3a228fa139bb5cdaf3cb4a7715b",
+    "after": "b346cd33b184b9b5ca48d480869b3bf265408715"
+  },
+  {
+    "name": "main-attended-missing-ready",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "b346cd33b184b9b5ca48d480869b3bf265408715",
+    "ship_head": "b4c3e5dc5ca0a3a228fa139bb5cdaf3cb4a7715b",
+    "after": "b346cd33b184b9b5ca48d480869b3bf265408715"
+  },
+  {
+    "name": "main-attended-decision",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "f708f4c359b89b4d41a62a1f5f1b92162b162f42",
+    "ship_head": "1ca9095add0729baba53ca27eb0497d5be38f2b3",
+    "after": "f708f4c359b89b4d41a62a1f5f1b92162b162f42"
+  },
+  {
+    "name": "main-attended-dirty",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "f708f4c359b89b4d41a62a1f5f1b92162b162f42",
+    "ship_head": "1ca9095add0729baba53ca27eb0497d5be38f2b3",
+    "after": "f708f4c359b89b4d41a62a1f5f1b92162b162f42"
+  },
+  {
+    "name": "main-attended-wrong-head",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "f708f4c359b89b4d41a62a1f5f1b92162b162f42",
+    "ship_head": "1ca9095add0729baba53ca27eb0497d5be38f2b3",
+    "after": "f708f4c359b89b4d41a62a1f5f1b92162b162f42"
+  },
+  {
+    "name": "main-attended-dirty-default",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "f708f4c359b89b4d41a62a1f5f1b92162b162f42",
+    "ship_head": "1ca9095add0729baba53ca27eb0497d5be38f2b3",
+    "after": "f708f4c359b89b4d41a62a1f5f1b92162b162f42"
+  },
+  {
+    "name": "main-attended-diverged",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "e00885b7132ddb7925e4cb503c7acf0fc8bcce7d",
+    "ship_head": "25e3295276e5235810ca711f8efe58a518727088",
+    "after": "e00885b7132ddb7925e4cb503c7acf0fc8bcce7d"
+  },
+  {
+    "name": "main-attended-off-at-lock",
+    "result": "pass",
+    "landed": false,
+    "returncode": 1,
+    "before": "8c35e1be2b032f0320c3182ba7e847309e61dba8",
+    "ship_head": "25e3295276e5235810ca711f8efe58a518727088",
+    "after": "8c35e1be2b032f0320c3182ba7e847309e61dba8"
+  },
+  {
+    "name": "main-attended-baseline-off",
+    "result": "pass",
+    "landed": true,
+    "returncode": 0,
+    "before": "f0238e437ba1d99569e5df429e77cc2f84316a1c",
+    "ship_head": "a67f407d7854cd7a77b81f8fb3a19938019bbf48",
+    "after": "a67f407d7854cd7a77b81f8fb3a19938019bbf48"
+  }
+]
