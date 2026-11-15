@@ -224,7 +224,8 @@ A non-successor watcher start checks the durable queue and recovery marker under
 If an announced-but-unacknowledged episode has an empty queue, the arm leaves that generation announced, making repeated empty-queue arms idempotent while a long-poll source is merely alive.
 If a durable row arrived after the announcement, the arm opens a fresh pending downtime generation so buried work still resurfaces once.
 A Codex foreground checkpoint skips the announced-episode reopen transition, so an already-announced generation stays announced while the checkpoint continues its bounded supervision.
-Its ordinary arm check still announces a never-announced generation with queued work, including one made pending by a durable queue append during the checkpoint.
+The fresh cycle of a confirmed take-over (see [Generation reuse](#generation-reuse)) skips it for the same reason: it continues the cycle it stopped rather than re-arming after a gap, so a turn end that takes a cycle over never announces work main was already told about.
+In both, the ordinary arm check still announces a never-announced generation with queued work, including one made pending by a durable queue append while that cycle runs.
 
 ### Generation reuse
 
@@ -235,8 +236,10 @@ A downtime republication of a pending episode reuses its generation.
 A watcher close leaves an announced downtime episode announced, while a successful durable append opens a fresh pending generation so a live watcher can recover the new work.
 An announced handling episode becomes pending downtime on the same generation because its handling turn may have been interrupted.
 While unacknowledged rows remain, that handling republication gives a successor exactly one recovery presentation without orphaning the acknowledgement already printed for that generation.
-A watcher stopped so an arm can take its cycle over (`bin/fm-watch-arm.sh --take-over`) publishes downtime like any close, but the taking arm restores an acknowledged episode that stop reopened only when the taken-over arm's cycle-ledger row for that exact arm and watcher records the watcher ending by the take-over's TERM and no wake was appended in between.
-The taking arm waits within a short bound for that row; a missing row or any other signal leaves downtime for the fresh cycle's ordinary arm check, while take-over still proceeds.
+A watcher stopped so an arm can take its cycle over (`bin/fm-watch-arm.sh --take-over`) publishes downtime like any close, but the taking arm restores the episode that stop reopened only when the taken-over arm's cycle-ledger row for that exact arm and watcher records the watcher ending by the take-over's TERM and no wake was appended in between.
+That restoration covers an acknowledged episode, which the stop reopened under a fresh generation, and an announced handling episode, which the stop republished as pending downtime on its own generation, so the take-over's own stop never presents an already-announced generation a second time.
+A handling episode that was never announced stays pending downtime, so the fresh cycle presents it once.
+The taking arm waits within a short bound for that row; a missing row or any other signal leaves downtime for the fresh cycle's ordinary arm check and reopen transition, while take-over still proceeds.
 Any other episode is left for the next cycle's arm check.
 
 ### What an acknowledgement retires
@@ -460,6 +463,8 @@ They also prove that a legacy or handoff-phase watcher marker from an absent rep
 - The already-acknowledged confirmation no-op for a matching generation, with its mismatched-generation, dead-pid, and lock-mismatch rejections preserved.
 - The manual-restart generation churn that makes a confirmation for the churned generation report a mismatch, which an arm check without a reopen leaves in place.
 - A take-over that stays quiet after a confirmed TERM, still surfaces queued work and self-exit downtime, and attaches without stopping a cycle the named arm does not own.
+- A take-over over announced or still-handled work that announces nothing again, keeps the printed acknowledgement valid, and still resurfaces a later append once.
+- A killed watcher's downtime that resurfaces exactly once across the following take-over.
 - The disposable-checkout arm refusal.
 - The home-gone and state-gone watcher exits, including state removal between the cycle's teardown check and queue-lock acquisition.
 - The test reaper that stops a watcher armed for a temporary home.

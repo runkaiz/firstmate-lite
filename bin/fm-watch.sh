@@ -2339,8 +2339,13 @@ WATCHER_RECOVERY_PENDING=0
 if [ -n "${FM_LOCK_RECOVERED_PID:-}" ]; then
   WATCHER_RECOVERY_PENDING=1
 fi
+# A cycle that continues one a confirmed take-over just stopped
+# (bin/fm-watch-arm.sh --take-over) is not a re-arm after a gap, so it leaves an
+# announced episode announced exactly as a foreground checkpoint does
+# (docs/watcher-continuity.md "Announcement").
 if [ "${FM_WATCH_HANDLING_SUCCESSOR:-0}" != 1 ] \
-  && [ "${FM_WATCH_FOREGROUND_CHECKPOINT:-0}" != 1 ]; then
+  && [ "${FM_WATCH_FOREGROUND_CHECKPOINT:-0}" != 1 ] \
+  && [ "${FM_WATCH_TAKEN_OVER_CYCLE:-0}" != 1 ]; then
   if ! fm_recovery_marker_reopen_announced "$WATCHER_DOWNTIME_MARKER"; then
     echo "watcher: recovery state could not be reopened safely; retaining stale lock evidence" >&2
     exit 1

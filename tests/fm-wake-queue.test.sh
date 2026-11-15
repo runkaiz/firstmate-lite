@@ -1028,10 +1028,10 @@ test_legacy_generationless_wake_is_adopted() {
 # Pin the recovery acknowledgement contract from docs/watcher-continuity.md at
 # the queue-library boundary.
 # A handover (bin/fm-watch-arm.sh --take-over) undoes only the downtime its own
-# watcher stop published over an acknowledged episode. A wake appended between
-# the snapshot and the stop, or an episode that was still open, is left for the
-# next watcher's arm check to surface.
-handover_case() {  # <state> <acked|handling> <append-between 0|1>
+# watcher stop published over an acknowledged episode or an announced handling
+# one. A wake appended between the snapshot and the stop, or a handling episode
+# that was never announced, is left for the next watcher's arm check to surface.
+handover_case() {  # <state> <acked|handling|announced-handling> <append-between 0|1>
   FM_STATE_OVERRIDE="$1" bash -c '
     # shellcheck disable=SC1090,SC1091
     . "$1/bin/fm-wake-lib.sh"
@@ -1041,6 +1041,11 @@ handover_case() {  # <state> <acked|handling> <append-between 0|1>
     case "$2" in
       acked) fm_recovery_marker_ack "$marker" "${FM_RECOVERY_MARKER_TOKEN##*:}" || exit 1 ;;
       handling) fm_recovery_marker_begin_handling "$marker" || exit 1 ;;
+      announced-handling)
+        fm_wake_append signal announced "signal: announced before the handover" || exit 1
+        fm_recovery_marker_arm_check "$marker" || exit 1
+        fm_recovery_marker_begin_handling "$marker" || exit 1
+        ;;
     esac
     fm_recovery_marker_read "$marker" || exit 1
     printf "before=%s\n" "$FM_RECOVERY_MARKER_TOKEN"
@@ -1075,7 +1080,20 @@ test_handover_restore_undoes_only_its_own_stop() {
   after=$(printf '%s\n' "$out" | sed -n 's/^after=//p')
   case "$before" in pending:handling:*) ;; *) fail "fixture: the episode was not being handled: $out" ;; esac
   [ "$after" = "pending:downtime:${before##*:}" ] || fail "a handover rewrote an episode main had not acknowledged: $out"
-  pass "a handover undoes only the downtime its own stop published over an acknowledged episode"
+
+  out=$(handover_case "$(make_case handover-announced-handling)/state" announced-handling 0) \
+    || fail "announced handling handover case failed: $out"
+  before=$(printf '%s\n' "$out" | sed -n 's/^before=//p')
+  after=$(printf '%s\n' "$out" | sed -n 's/^after=//p')
+  case "$before" in announced:handling:*) ;; *) fail "fixture: the handled episode was not announced: $out" ;; esac
+  [ "$after" = "$before" ] || fail "a handover left an announced handling episode to be presented again: $out"
+
+  out=$(handover_case "$(make_case handover-announced-handling-appended)/state" announced-handling 1) \
+    || fail "appended announced handling handover case failed: $out"
+  before=$(printf '%s\n' "$out" | sed -n 's/^before=//p')
+  after=$(printf '%s\n' "$out" | sed -n 's/^after=//p')
+  [ "$after" = "pending:downtime:${before##*:}" ] || fail "a handover hid a wake appended during open handling: $out"
+  pass "a handover undoes only the downtime its own stop published over an acknowledged or announced handling episode"
 }
 
 test_stale_recovery_generation_cannot_touch_a_newer_episode() {
