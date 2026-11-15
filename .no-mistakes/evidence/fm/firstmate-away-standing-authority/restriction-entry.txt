@@ -1,0 +1,8 @@
+Away posture recorded at 2026-11-14T23:34:01Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: not set (no additional away limit).
+Away posture (recorded):
+  entered: 2026-11-14T23:25:35Z
+  expected return: not given
+  spend cap: not set (no additional away limit)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    strange, I did not touch ssh or the desktop this time

@@ -1,0 +1,7 @@
+Real Claude primary on isolated tmux socket; 120 columns x 40 rows.
+primary:tmux 120x40 pid=1493168 command=claude
+primary:fm-approved 120x40 pid=1502394 command=bash
+primary:fm-restricted 120x40 pid=1502412 command=bash
+primary:fm-slot1 120x40 pid=1508642 command=bash
+primary:fm-slot2 120x40 pid=1508645 command=bash
+primary:fm-slot3 120x40 pid=1508648 command=bash

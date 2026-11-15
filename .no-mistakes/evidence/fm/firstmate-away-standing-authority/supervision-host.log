@@ -1,0 +1,15 @@
+1794698736	start	gen=host-742211-1794698735	primary=claude
+1794698769	to-main	the successor watcher cycle could not be verified before handling; this wake is yours
+1794698787	start	gen=host-774645-1794698787	primary=claude
+1794698810	handled	turn=host-774645-1794698787.1	posture=away	rc=0	reports=1	error=0 cost=0.112683 conversation_cost=0.112683 input=16 cache_read=143569 cache_write=20091 output=1793 turns=8	check: rearm-resurface
+1794698845	handled	turn=host-774645-1794698787.2	posture=away	rc=0	reports=1	error=0 cost=0.019699 conversation_cost=0.132382 input=8 cache_read=70014 cache_write=1888 output=513 turns=3	check: away-entry-review
+1794698890	to-main	the handling handoff to the successor watcher could not be confirmed; this wake is yours
+1794699006	start	gen=host-937474-1794699006	primary=claude
+1794699031	handled	turn=host-937474-1794699006.1	posture=away	rc=0	reports=2	error=0 cost=0.04151 conversation_cost=0.04151 input=14 cache_read=123120 cache_write=3260 output=1613 turns=7	check: rearm-resurface
+1794699051	handled	turn=host-937474-1794699006.2	posture=away	rc=0	reports=1	error=0 cost=0.019164 conversation_cost=0.060674 input=8 cache_read=61622 cache_write=1974 output=509 turns=3	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/state/approved.status
+1794699061	handled	turn=host-937474-1794699006.3	posture=away	rc=0	reports=1	error=0 cost=0.021753 conversation_cost=0.082427 input=8 cache_read=67468 cache_write=2040 output=683 turns=3	stale: primary:fm-slot3 (unread firstmate instruction: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/state/slot3.inbox/001.msg is unhandled and the worker's agent has exited or its endpoint is missing, so the doorbell was not typed; recover the worker)
+1794699093	handled	turn=host-937474-1794699006.4	posture=away	rc=0	reports=2	error=0 cost=0.02557 conversation_cost=0.107997 input=8 cache_read=74102 cache_write=2596 output=776 turns=3	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/state/approved.status /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/state/restricted.status
+1794699102	handled	turn=host-937474-1794699006.5	posture=away	rc=0	reports=1	error=0 cost=0.02053 conversation_cost=0.128527 input=8 cache_read=81063 cache_write=1762 output=536 turns=3	stale: primary:fm-approved
+1794699109	handled	turn=host-937474-1794699006.6	posture=away	rc=0	reports=1	error=0 cost=0.019058 conversation_cost=0.147585 input=8 cache_read=86040 cache_write=1502 output=443 turns=3	stale: primary:fm-restricted
+1794699149	handled	turn=host-937474-1794699006.7	posture=away	rc=0	reports=1	error=0 cost=0.039309 conversation_cost=0.186894 input=10 cache_read=125081 cache_write=3785 output=1164 turns=4	check: away-entry-review
+1794699242	boundary	after 236s

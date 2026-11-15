@@ -1,0 +1,58 @@
+$ fm-tasks-axi.sh add queued-fix 'Queued approved fix' --kind ship --repo demo --body 'Validated demo fixes already have standing approval.'
+ok: add queued-fix
+task:
+  id: queued-fix
+  title: Queued approved fix
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: Validated demo fixes already have standing approval.
+  notes_file: queued-fix/notes.md
+  archived: no
+exit=0
+
+$ fm-brief.sh queued-fix demo --mode local-only
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/data/queued-fix/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+
+$ fm-afk-contract.sh enter --words 'strange, I did not touch ssh or the desktop this time'
+Away posture recorded at 2026-11-14T23:53:58Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: not set (no additional away limit).
+Away posture (recorded):
+  entered: 2026-11-14T23:53:58Z
+  expected return: not given
+  spend cap: not set (no additional away limit)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    strange, I did not touch ssh or the desktop this time
+exit=0
+
+$ fm-spawn.sh queued-fix /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/projects/demo --mode local-only --yolo on --backend tmux --harness 'codex exec --disable hooks --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check "Write queued-proof.txt in the current directory containing exactly QUEUED-LIVE. Do not read other directories or change configuration. Report completion."'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: native worktree: root is inside project/primary/home
+exit=1
+
+Retry with native copies outside FM_HOME, still inside this worktree.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-spawn.sh queued-fix /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/projects/demo --mode local-only --yolo on --backend tmux --harness 'codex exec --disable hooks --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check "Write queued-proof.txt in the current directory containing exactly QUEUED-LIVE. Do not read other directories or change configuration. Report completion."'
+HEAD is now at 8b342ce validated fix
+native allocation task=queued-fix source_ref=refs/heads/main base=8b342ce0d9fa9abea90c0ad525eef976a5269692 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-fix/worktree
+spawned queued-fix harness=codex kind=ship mode=local-only yolo=on window=primary:fm-queued-fix worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-fix/worktree
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+Preparing worktree (detached HEAD 8b342ce)
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+exit=0

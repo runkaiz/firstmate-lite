@@ -1,0 +1,10 @@
+{
+  "loggedIn": false,
+  "authMethod": "none",
+  "apiProvider": "firstParty",
+  "analyticsDisabled": false,
+  "projectsDirectory": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/isolated-claude/projects",
+  "configDirectory": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/home/isolated-claude",
+  "loginExpiresAt": null,
+  "consoleProfileSignInOffered": true
+}

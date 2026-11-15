@@ -1,0 +1,5 @@
+{
+  "unapproved_initial": "ff9bc13bac7a10b0fa70fb8df706b6591ebf8434",
+  "unapproved_head": "973e077164ffccbaa86691f4802393013bc26c98",
+  "registry": "# Projects\n\n- demo [local-only +yolo] - registry on; task restriction still wins\n- other [local-only] - registry yolo off, no standing approval\n"
+}

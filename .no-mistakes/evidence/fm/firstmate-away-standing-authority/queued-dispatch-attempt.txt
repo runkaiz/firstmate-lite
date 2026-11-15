@@ -1,0 +1,35 @@
+ok: add queued-fix
+task:
+  id: queued-fix
+  title: Queued approved demo fix
+  state: queued
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: Already approved validated fix under the recorded standing approval.
+  notes_file: queued-fix/notes.md
+  archived: no
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/data/queued-fix/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+Away posture recorded at 2026-11-14T23:36:11Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: not set (no additional away limit).
+Away posture (recorded):
+  entered: 2026-11-14T23:36:11Z
+  expected return: not given
+  spend cap: not set (no additional away limit)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    strange, I did not touch the desktop this time
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: new-task spawn (fm-spawn) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: config/claude-account pins Claude workers to /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/isolated-claude, which is not signed in (claude auth status); sign in with CLAUDE_CONFIG_DIR=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/isolated-claude claude, then /login, or change the pin

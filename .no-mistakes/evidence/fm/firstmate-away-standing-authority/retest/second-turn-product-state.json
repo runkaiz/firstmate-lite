@@ -1,0 +1,12 @@
+{
+  "unapproved_main": "ff9bc13bac7a10b0fa70fb8df706b6591ebf8434",
+  "files": {
+    "state/unapproved.status": "done: validated ready at 973e077164ffccbaa86691f4802393013bc26c98; evidence data/unapproved/validation.txt\n",
+    "state/restricted.status": "done: validated fix ready at e749d3259d724d6aa0b63b39cddefebc10d44d97; evidence data/restricted/validation.txt\ndone: validated fix ready at e749d3259d724d6aa0b63b39cddefebc10d44d97; evidence data/restricted/validation.txt (live wake 1794700157225003684)\ndone: validated fix remains ready; registry now +yolo but explicit task restriction still applies (wake 1794700279538392605)\n",
+    "state/slot1.status": "needs-decision [key=test-slot] [at=1794650701]: request 1 full suite ready, need a slot\nneeds-decision [key=test-slot] [at=1794650701]: request 1 full suite ready, need a slot (live wake 1794700157225022965)\nresolved [key=test-slot] [at=1794700188]: answered: Proceed: you hold the full-suite slot now (first request). Release by reporting done.\nworking [key=full-suite]: full suite running in granted slot; do not grant another yet\n",
+    "state/slot2.status": "needs-decision [key=test-slot] [at=1794650702]: request 2 full suite ready, need a slot\nneeds-decision [key=test-slot] [at=1794650702]: request 2 full suite ready, need a slot (live wake 1794700157225036915)\nresolved [key=test-slot] [at=1794700188]: answered: Wait: slot is held by slot1; you are next in order. Do not start until told.\nneeds-decision [key=test-slot]: still waiting; can I start while slot1 is running?\nresolved [key=test-slot] [at=1794700383]: answered: Wait: slot1 still holds the full-suite slot and is running; you are next. Do not start until told.\n",
+    "data/projects.md": "# Projects\n\n- demo [local-only +yolo] - registry on; task restriction still wins\n- other [local-only] - registry yolo off, no standing approval\n",
+    "state/slot2.inbox/001.msg": "schema=fm-task-inbox.v1\nat=2026-11-14T23:49:48Z\n--\nWait: slot is held by slot1; you are next in order. Do not start until told.",
+    "state/slot2.inbox/002.msg": "schema=fm-task-inbox.v1\nat=2026-11-14T23:53:03Z\n--\nWait: slot1 still holds the full-suite slot and is running; you are next. Do not start until told."
+  }
+}

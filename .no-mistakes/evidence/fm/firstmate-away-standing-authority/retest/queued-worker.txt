@@ -1,0 +1,86 @@
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-f
+ix/worktree'
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/projects/demo$ cd -- '/
+var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-fix/workt
+ree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/
+queued-fix/worktree$ export GOTMPDIR=/tmp/fm-queued-fix/gotmp
+export COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/
+queued-fix/worktree$ export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=queued-fix
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/
+queued-fix/worktree$ export FM_TASK_ID=queued-fix
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/
+queued-fix/worktree$ . '/tmp/fm-queued-fix+250ee0534083c03f5eddff9165f854bbd3c8106a5dc6ca04a60ae4eecaae9573/launch.s1794
+700469.1699114.6290.sh'
+OpenAI Codex v0.167.1
+--------
+workdir: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued
+-fix/worktree
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a1dc7b-ee86-7ce1-b8f3-6f1f5a41f930
+--------
+user
+Write queued-proof.txt in the current directory containing exactly QUEUED-LIVE. Do not read other directories or change
+configuration. Report completion.
+codex
+I’ll write `queued-proof.txt` in the current directory with the exact content requested.
+
+exec
+/bin/bash -lc 'printf %s QUEUED-LIVE > queued-proof.txt' in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4E
+MMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-fix/worktree
+ succeeded in 0ms:
+codex
+Created `queued-proof.txt` containing exactly `QUEUED-LIVE`, with no trailing newline.
+tokens used
+4,106
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/
+queued-fix/worktree$
+
+task:
+  id: queued-fix
+  title: Queued approved fix
+  state: in_flight
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-14
+  closed: "-"
+  links: none
+  body: Validated demo fixes already have standing approval.
+  notes_file: queued-fix/notes.md
+  archived: no
+
+Queued worker output file: 'QUEUED-LIVE'
+window=primary:fm-queued-fix
+endpoint_task_id=queued-fix
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/native-copies/queued-fix/worktree
+allocator=git
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.live-test/edges/projects/demo
+harness=codex
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/queued-fix
+tasktmp=/tmp/fm-queued-fix
+model=default
+effort=default
+launch_model_control=unverified
+launch_effort_control=unverified
+launch_service_control=unverified
+effective_profile=unverified
+spawn_gen=s1794700469.1699114.6290
