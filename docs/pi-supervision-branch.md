@@ -254,8 +254,8 @@ The guards are wired into these scripts:
 | `fm-pr-merge.sh`, `fm-merge-local.sh`, `fm-spawn.sh`, `fm-send.sh --resolve-key` for a decision key, and `fm-teardown.sh` for a second mate | Main-owned while attended; branch refused. |
 
 A relaunch through `fm-control` stays branch-legal recovery in both postures.
-Under the away-posture record, the PR merge, a fresh spawn, and a decision answer relocate to the branch behind each script's own gate.
-Local-only landing and second-mate retirement never do ("Postures" below).
+Under the away-posture record, the PR merge, a fresh spawn, a decision answer, and a local-only landing relocate to the branch behind each script's own gate.
+Second-mate retirement never does ("Postures" below).
 
 ### Autonomy
 
@@ -592,26 +592,18 @@ A leftover `state/.afk` flag declines nothing.
 It does so only while `bin/fm-afk-contract.sh validate` succeeds on a complete, readable, live away record (`mode` is not quiet).
 An archived, incomplete, invalid, or quiet record restores the attended refusal byte for byte.
 
-The captain's away words are the whole mandate:
-
-- The branch reads them at the tail.
-- It decides by its own judgment whether the event in front of it is the moment they name.
-- It acts on them only through the guarded scripts, never by analogy.
-- It holds with verdict captain on doubt.
-
-`bin/fm-branch-prompt.sh` "Postures" owns those execution rules.
-It requires every action taken under the words to open its outcome summary with "per your away instructions:".
+`bin/fm-branch-prompt.sh` "Postures" owns how the branch applies additional away instructions alongside MAIN's continuing recorded authority, including uncertainty and outcome reporting.
 
 Each relocated script keeps its own gate, enforcing exactly what a script can check without reading words:
 
 | Script | Gate while away |
 | --- | --- |
-| `bin/fm-pr-merge.sh` | Merges any pull request green at its live head, synchronously, under the record lock, and refuses `--allow-red` and `--allow-missing` while away, so the green gate is absolute in this posture; which pull request the words meant is the branch's reading. |
-| `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, or filed by the branch because the words explicitly call for it; [Project capacity](configuration.md#project-capacity-configproject-capacity) owns admission, and [worker stop receipts](agent-control.md#worker-stop-receipts-and-return-reporting) own return counting and relaunch safety. |
-| `bin/fm-send.sh --resolve-key` | Answers a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
-| `bin/fm-merge-local.sh` | Relocated only through the script header's standing-authority and ready-head gate. |
+| `bin/fm-pr-merge.sh` | After authority is evaluated under [ship-landing](../.agents/skills/ship-landing/SKILL.md), merges a pull request green at its live head, synchronously, under the record lock, and refuses `--allow-red` and `--allow-missing` while away, so the green gate is absolute in this posture. |
+| `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, which needs no words because queued, unheld work is already approved, or filed by the branch because the words explicitly call for it - with delivery and merge authority resolved under `AGENTS.md` section 7, as MAIN would; [Project capacity](configuration.md#project-capacity-configproject-capacity) owns admission, and [worker stop receipts](agent-control.md#worker-stop-receipts-and-return-reporting) own return counting and relaunch safety. |
+| `bin/fm-send.sh --resolve-key` | Answers a registered house decision under its rule with MAIN parked, a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
+| `bin/fm-merge-local.sh` | MAIN and the away session evaluate landing authority under `ship-landing`, then use the same guarded landing path; the script retains its ready-head, clean-copy, captain-hold, and fast-forward checks. |
 
-The merge-authority record and the outcome row's summary are the audit trail.
+The recorded approval and the outcome row's summary are the audit trail.
 The return brief renders the words verbatim beside that account.
 
 ### The authority invariant
@@ -623,6 +615,7 @@ It sets these limits:
 - The never-set (credential entry, legal or financial acceptance, an attended prompt, an unnamed discard, a security-sensitive action) has no guarded entrypoint that accepts away authority for either actor.
 - A forced teardown stays refused for the branch.
 - A red merge is refused in this posture whatever the words say.
+- Landing authority is evaluated under `ship-landing` in either posture without rewriting dispatch metadata; new dispatch follows `AGENTS.md` section 7's authority precedence.
 - No relocation survives the return, because an archived record validates as absent and the words die with it.
 
 ### Cleanup after a landed pull request

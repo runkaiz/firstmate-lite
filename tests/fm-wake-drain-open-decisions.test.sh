@@ -215,6 +215,38 @@ test_over_long_decision_note_is_capped_with_a_marker() {
   pass "an over-long open decision is cut to its per-item budget with the shared truncation marker"
 }
 
+test_house_rules_are_presented_completely() {
+  local dir state out rule short_rule expected actual mode
+  dir=$(make_case complete-house-rules)
+  state="$dir/state"
+  out="$dir/drain.out"
+  mkdir -p "$dir/config"
+  rule=$(awk 'BEGIN { for (i=1; i<=120; i++) printf "Check CPU, memory, disk and existing suite leases before granting request %d; ", i; printf "at most two full suites at once, one overnight." }')
+  short_rule='grant the GPU window only when its current owner releases it'
+  printf 'test-slot: %s\ngpu-window: %s\n' "$rule" "$short_rule" > "$dir/config/house-decisions"
+  printf 'needs-decision [key=test-slot]: first suite needs a slot\n' > "$state/task1.status"
+  printf 'needs-decision [key=test-slot]: second suite needs a slot\n' > "$state/task2.status"
+  printf 'needs-decision [key=gpu-window]: need a GPU window\n' > "$state/task3.status"
+  [ "${#rule}" -gt 4000 ] || fail 'the long-rule fixture must exceed both the line and decision-summary budgets'
+
+  for mode in empty queued; do
+    if [ "$mode" = queued ]; then
+      printf 'working: continuing unrelated work\n' > "$state/task4.status"
+      append_wake "$state" signal task4.status 'working: continuing unrelated work' || fail 'queueing the unrelated wake failed'
+    fi
+    FM_HOME="$dir" FM_CONFIG_OVERRIDE="$dir/config" FM_STATE_OVERRIDE="$state" "$DRAIN" > "$out" \
+      || fail "$mode drain failed with complete house rules"
+    expected="OPEN DECISIONS: [key=test-slot] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: $rule"
+    actual=$(sed -n '/^OPEN DECISIONS: \[key=test-slot\] is a house decision,/p' "$out")
+    [ "$actual" = "$expected" ] || fail "$mode drain shortened or duplicated the scheduling rule, including its overnight limit"
+    expected="OPEN DECISIONS: [key=gpu-window] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: $short_rule"
+    actual=$(sed -n '/^OPEN DECISIONS: \[key=gpu-window\] is a house decision,/p' "$out")
+    [ "$actual" = "$expected" ] || fail "$mode drain changed or omitted the sibling house rule"
+  done
+  pass 'queued and empty drains present complete long and short house rules once per key'
+}
+
+test_house_rules_are_presented_completely
 test_buried_decision_still_surfaces
 test_over_long_decision_note_is_capped_with_a_marker
 test_explicit_resolution_closes_it

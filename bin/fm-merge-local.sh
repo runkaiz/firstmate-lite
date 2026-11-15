@@ -6,8 +6,9 @@
 # This is firstmate's merge gate-action (the captain's merge authority applied
 # locally instead of via a GitHub PR). It is the one sanctioned exception to hard
 # rule #1 "never run state-changing git in projects/", and it is narrow: it only
-# runs for mode=local-only tasks, only after the captain approves (or yolo=on
-# auto-approves), and only as a clean fast-forward - it refuses a diverged branch
+# runs for mode=local-only tasks, after the supervisor evaluates current landing
+# authority under .agents/skills/ship-landing/SKILL.md, and only as a clean
+# fast-forward - it refuses a diverged branch
 # and tells you to have the crewmate rebase. See AGENTS.md prime directives,
 # project management, and task lifecycle.
 # The task's existing per-task control lock serializes the captain-hold check
@@ -15,11 +16,11 @@
 # merge, so a captain approval must be recorded as an `answer --release` before
 # this entrypoint is invoked. The lock ends when the fast-forward returns;
 # docs/captain-hold-lifecycle.md owns the accepted merge-to-cleanup residual.
-# While away, only an existing yolo=on task with a reconciled done declaration,
+# While away, only an approved task with a reconciled done declaration,
 # a clean worker copy at the exact ship head, and no captain hold may land.
 # The supervisor still verifies the task's validation evidence and scope, as
 # attended: a done declaration is not a machine attestation of passing tests.
-# The away record lock spans the final authority read and synchronous merge.
+# The away record lock spans the final posture check and synchronous merge.
 # A task whose cleanup kept its branch (bin/fm-teardown.sh --retain-branch) has
 # no task record; its state/<id>.retained record stands in under the same
 # guards, and a successful landing removes it.
@@ -51,7 +52,7 @@ META="$STATE/$ID.meta"
 # Role partition: landing local-only work is MAIN-owned; the Pi supervision
 # branch reports readiness while attended (contract: bin/fm-lease-lib.sh;
 # no-op in homes without a branch actor). Away relocation reaches the narrow
-# standing-authority and ready-head gate below. This precedes reading the
+# ready-head and captain-hold checks below. This precedes reading the
 # task record, because the wrong
 # actor is refused for its role whatever it says.
 # shellcheck source=bin/fm-lease-lib.sh
@@ -147,10 +148,6 @@ fi
 # Archive/refresh may have occurred since the early actor check.
 fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
 if fm_afk_contract_away_present "$STATE"; then
-  [ "$(awk '/^yolo=/{n++; value=substr($0,6)} END{if(n==1) print value}' "$META")" = on ] || {
-    echo "error: local merge while away requires existing task yolo=on authority" >&2
-    exit 1
-  }
   READY_LINE=$(status_current_line "$STATE/$ID.status" ship)
   [ "$(status_line_verb "$READY_LINE")" = 'done' ] || {
     echo "error: local merge while away requires a reconciled done declaration; validation failures and decision waits must be resolved" >&2

@@ -69,6 +69,18 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
     *"A second mate's status log is a relay channel for its child work"*"retiring a second mate is MAIN's alone"*"Report a second mate's signal wake from the status lines that wake newly presents"*"A second mate's stale wake is a liveness event: report it even when it presents no new status lines."*) ;;
     *) fail "branch prompt lost the second-mate relay, signal-span, or stale-liveness rule" ;;
   esac
+  # The overnight stall: routine slot asks and a validated local branch were
+  # held for the captain because the prompt offered only the away words or the
+  # finding policy for a keyed ask, and never said which record carries
+  # landing authority or that queued work needs no words.
+  case "$out_a" in
+    *"# House decisions"*"While attended, MAIN alone answers house decisions"*"While away with MAIN parked, a house decision is yours to answer whatever the away words say"*"a rule that says wait is still your answer, never a hold for the captain"*"every unregistered key keep their ordinary handling"*"a house decision is answered under its registered rule with MAIN parked"*) ;;
+    *) fail "branch prompt lost the house-decision rule" ;;
+  esac
+  case "$out_a" in
+    *"a queued backlog item that is unheld and unblocked is already-approved work"*"the task's explicit recorded posture, including a yolo-off restriction, wins; otherwise applicable recorded standing approval wins; the project's registry posture is only the fallback"*"For both local and PR landing, apply ship-landing's authority precedence at landing time: an explicit task restriction in the brief or backlog notes wins; otherwise applicable recorded standing approval in \`data/captain.md\` applies; the registry posture is only the fallback."*"do not rewrite the task's recorded yolo or require renewed approval"*"run the script and let its gate decide rather than concluding from memory that you cannot land"*"An explicit task restriction, missing applicable approval with registry yolo off, a real decision wait, or failed validation holds for the return"*) ;;
+    *) fail "branch prompt lost the landing-authority or queued-dispatch rule" ;;
+  esac
   # This checks the generated agent interface, not whether a model follows it.
   case "$out_a" in
     *"\`bin/fm-tasks-axi.sh show <refused-handoff-task> --full\`"*'Keep the resolved hold target separate from the wake/report task id'*'re-resolve the refused handoff in the existing backlog'*"never add \`--title\` or create a surrogate producer task"*'report unresolved handoff identity'*) ;;
@@ -1499,7 +1511,7 @@ WRAPPER
 
 # A local-only fixture uses independent clones, never pool/worktree operations.
 test_away_local_landing_keeps_authority_and_continues_eligible_work() {
-  local home project worker out initial fakebin bcopy state
+  local home project worker out initial fakebin bcopy ccopy state
   home="$TMP_ROOT/local-continuation/home"
   project="$home/projects/demo"
   worker="$TMP_ROOT/local-continuation/worker-a"
@@ -1515,13 +1527,8 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   fm_write_meta "$home/state/task-a.meta" "project=$project" "worktree=$worker" \
     "kind=ship" "mode=local-only" "yolo=off" "branch=fm/task-a"
   printf 'done: ready in branch fm/task-a\n' > "$home/state/task-a.status"
+  printf 'Standing approval: land validated fixes through the next stable release.\n' > "$home/data/captain.md"
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'continue approved work' >/dev/null || fail 'away entry'
-  if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a 2>&1); then
-    fail 'away landing without standing authority'
-  fi
-  assert_contains "$out" 'requires existing task yolo=on' 'missing authority diagnostic'
-  sed 's/yolo=off/yolo=on/' "$home/state/task-a.meta" > "$home/state/task-a.next"
-  mv "$home/state/task-a.next" "$home/state/task-a.meta"
   printf 'failed: validation failed\n' >> "$home/state/task-a.status"
   if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a 2>&1); then
     fail 'failed validation declaration landed'
@@ -1538,7 +1545,7 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   rm "$worker/uncommitted"
   [ "$(git -C "$project" rev-parse HEAD)" = "$initial" ] || fail 'negative cases advanced main'
   fm_test_tasks_toml "$home/.tasks.toml"
-  printf '# Backlog\n\n## In flight\n- [ ] task-a - Tested A\n\n## Queued\n- [ ] task-held - Genuine user choice\n- [ ] task-b - Approved successor blocked-by: task-a (repo: demo) (kind: ship)\n\n## Done\n' > "$home/data/backlog.md"
+  printf '# Backlog\n\n## In flight\n- [ ] task-a - Tested A\n\n## Queued\n- [ ] task-held - Genuine user choice\n- [ ] task-b - Approved successor blocked-by: task-a (repo: demo) (kind: ship)\n- [ ] task-c - Explicitly restricted successor (repo: demo) (kind: ship)\n  Captain explicitly requires yolo off for this task.\n\n## Done\n' > "$home/data/backlog.md"
   FM_HOME="$home" "$ROOT/bin/fm-captain-hold.sh" hold task-held --reason 'user design choice' >/dev/null || fail 'hold independent task'
   # Holding A mechanically refuses landing even with a done declaration.
   FM_HOME="$home" "$ROOT/bin/fm-captain-hold.sh" hold task-a --reason 'approval pending' >/dev/null || fail 'hold A'
@@ -1565,19 +1572,107 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   sed -e 's/{TASK}/Continue approved task B after A./' -e 's/{FIRSTMATE_SPEC}/Fixture worker start./' "$home/data/task-b/brief.md" > "$home/data/task-b/next"
   mv "$home/data/task-b/next" "$home/data/task-b/brief.md"
   printf 'pi\n' > "$home/config/crew-harness"
+  printf '# Projects\n\n- demo [local-only] - fixture project\n' > "$home/data/projects.md"
+  printf 'Standing approval: land validated fixes through the next stable release.\n' > "$home/data/captain.md"
   FM_BACKEND=tmux FM_FAKE_LAUNCH_LOG="$home/b-launch.log" FM_SUPERVISION_ACTOR=branch \
     fm_test_run_spawn "$home" "$bcopy" "$fakebin" task-b "$project" --mode local-only --yolo on > "$home/b.out" \
     || fail "eligible B failed to start: $(cat "$home/b.out")"
   [ -s "$home/b-launch.log" ] || fail 'B launch never reached runtime fixture'
+  [ "$(awk -F= '$1=="yolo" {print $2}' "$home/state/task-b.meta")" = on ] || fail 'standing approval was not recorded on B'
   assert_contains "$(FM_HOME="$home" "$ROOT/bin/fm-tasks-axi.sh" show task-b)" 'state: in_flight' 'B not recorded in flight'
+  git -C "$bcopy" checkout -q -b fm/task-b
+  git -C "$bcopy" commit -q --allow-empty -m 'validated task B'
+  git -C "$project" fetch -q "$bcopy" fm/task-b:fm/task-b
+  printf 'done: validated task B\n' > "$home/state/task-b.status"
+  FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-b >/dev/null \
+    || fail 'standing approval could not land B with registry yolo off'
+  [ "$(git -C "$project" rev-parse HEAD)" = "$(git -C "$bcopy" rev-parse HEAD)" ] || fail 'B head did not land'
+
+  printf '# Projects\n\n- demo [local-only +yolo] - fixture project\n' > "$home/data/projects.md"
+  ccopy="$TMP_ROOT/local-continuation/worker-c"
+  git clone -q "$project" "$ccopy"
+  git -C "$ccopy" checkout -q --detach
+  FM_HOME="$home" "$ROOT/bin/fm-brief.sh" task-c demo --mode local-only >/dev/null || fail 'brief C'
+  sed -e 's/{TASK}/Prepare task C with yolo off./' -e 's/{FIRSTMATE_SPEC}/Fixture worker start./' "$home/data/task-c/brief.md" > "$home/data/task-c/next"
+  mv "$home/data/task-c/next" "$home/data/task-c/brief.md"
+  FM_BACKEND=tmux FM_FAKE_LAUNCH_LOG="$home/c-launch.log" FM_SUPERVISION_ACTOR=branch \
+    fm_test_run_spawn "$home" "$ccopy" "$fakebin" task-c "$project" --mode local-only --yolo off > "$home/c.out" \
+    || fail "restricted C failed to start: $(cat "$home/c.out")"
+  [ -s "$home/c-launch.log" ] || fail 'C launch never reached runtime fixture'
+  [ "$(awk -F= '$1=="yolo" {print $2}' "$home/state/task-c.meta")" = off ] || fail 'registry overrode the explicit restriction on C'
+  git -C "$ccopy" checkout -q -b fm/task-c
+  git -C "$ccopy" commit -q --allow-empty -m 'validated task C'
+  git -C "$project" fetch -q "$ccopy" fm/task-c:fm/task-c
+  printf 'done: validated task C\n' > "$home/state/task-c.status"
+  FM_HOME="$home" "$ROOT/bin/fm-captain-hold.sh" hold task-c --reason 'captain explicitly restricts this task to yolo off' >/dev/null || fail 'hold restricted C'
+  if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-c 2>&1); then
+    fail 'captain-held C landed unattended on a registry +yolo project'
+  fi
+  assert_contains "$out" 'still held for the captain' 'C lost the captain-hold refusal'
+  [ "$(git -C "$project" rev-parse HEAD)" = "$(git -C "$bcopy" rev-parse HEAD)" ] || fail 'restricted C advanced main'
   FM_HOME="$home" "$ROOT/bin/fm-captain-hold.sh" open task-held >/dev/null || fail 'B start released independent hold'
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail 'archive away'
   out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a 2>&1)
   [ "$?" -eq 6 ] || fail 'archive did not restore attended actor restriction'
-  pass 'away A lands and records completion, eligible B starts, independent hold persists; missing authority, failed validation, dirty copy and decisions refuse'
+  pass 'away dispatch and landing preserve standing approval on registry off and task restrictions on registry on; independent holds and validation gates persist'
+}
+
+test_approved_landing_does_not_depend_on_dispatch_snapshot() {
+  local actor posture authority record home project worker initial before_meta n=0
+  while IFS=: read -r actor posture authority record; do
+    n=$((n + 1))
+    home="$TMP_ROOT/landing-authority-$n/home"
+    project="$home/projects/demo"
+    worker="$TMP_ROOT/landing-authority-$n/worker"
+    mkdir -p "$home/state" "$home/config" "$home/data" "$project"
+    fm_git_identity fmtest fmtest@example.invalid
+    git init -q -b main "$project"
+    git -C "$project" commit -q --allow-empty -m initial
+    initial=$(git -C "$project" rev-parse HEAD)
+    git clone -q "$project" "$worker"
+    git -C "$worker" checkout -q -b fm/task-a
+    git -C "$worker" commit -q --allow-empty -m 'validated work'
+    git -C "$project" fetch -q "$worker" fm/task-a:fm/task-a
+    fm_write_meta "$home/state/task-a.$record" "project=$project" "worktree=$worker" \
+      "kind=ship" "mode=local-only" "yolo=off" "branch=fm/task-a"
+    before_meta=$(cat "$home/state/task-a.$record")
+    if [ "$authority" = standing ]; then
+      printf '# Projects\n\n- demo [local-only] - registry yolo off\n' > "$home/data/projects.md"
+      printf 'I approve every validated fix through the next stable release.\n' > "$home/data/captain.md"
+    else
+      printf '# Projects\n\n- demo [local-only +yolo] - registry landing approval\n' > "$home/data/projects.md"
+    fi
+    if [ "$posture" = away ]; then
+      FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'strange, I did not touch the desktop this time' >/dev/null \
+        || fail 'away entry'
+    fi
+    printf 'done: full suite and live check passed on fm/task-a\n' > "$home/state/task-a.status"
+    FM_HOME="$home" FM_SUPERVISION_ACTOR="$actor" "$ROOT/bin/fm-merge-local.sh" task-a >/dev/null \
+      || fail "$actor $posture could not land the approved $record task under $authority authority"
+    [ "$(git -C "$project" rev-parse HEAD)" != "$initial" ] || fail 'approved landing did not advance main'
+    [ "$(git -C "$project" rev-parse HEAD)" = "$(git -C "$worker" rev-parse HEAD)" ] || fail 'approved landing missed the validated head'
+    if [ "$record" = meta ]; then
+      [ "$(cat "$home/state/task-a.meta")" = "$before_meta" ] || fail 'landing rewrote the task record'
+    else
+      [ ! -e "$home/state/task-a.retained" ] || fail 'landed retained record was not retired'
+    fi
+    [ "$posture" != away ] || FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail 'archive away'
+  done <<'CASES'
+main:attended:standing:meta
+main:attended:standing:retained
+main:away:standing:meta
+branch:away:standing:meta
+branch:away:standing:retained
+main:attended:registry:meta
+main:away:registry:retained
+branch:away:registry:meta
+branch:away:registry:retained
+CASES
+  pass 'the guarded landing path accepts approved live and retained tasks without rewriting stale dispatch yolo, for MAIN and the away branch'
 }
 
 test_delivery_hold_is_independent_of_the_producer_report_scope
+test_approved_landing_does_not_depend_on_dispatch_snapshot
 test_branch_prompt_is_byte_stable_and_above_cache_floor
 test_outcome_store_is_append_only_with_cursor_reads
 test_outcome_append_keeps_a_bounded_display_tail

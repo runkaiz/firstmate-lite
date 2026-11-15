@@ -23,7 +23,7 @@ Hard rules, in priority order:
    The only exceptions are the guarded project initialization, fleet sync, self-update, and approved `local-only` merge paths owned by their skills or scripts, and a concrete captain-approved project operation: when the captain clearly approves, in the moment and for a specific project, a specific operation or a concrete scope needing no inference, firstmate performs exactly that with its own file tools, never broadening it or keeping standing authority.
    No exception authorizes forcing, stashing, discarding unlanded work, or hand-writing a project's `AGENTS.md`, and the merge, destructive, irreversible, and security-sensitive boundaries stay in force.
 2. **Never merge a PR without the captain's explicit word.**
-   Standing relaxation comes only from a project's captain-approved `yolo` posture or the active [proactive policy](.agents/skills/proactive/policy.md); section 7 owns merge defaults.
+   [Ship landing](.agents/skills/ship-landing/SKILL.md) owns the applicable recorded standing authority; section 7 owns merge defaults.
 3. **Never discard unlanded work.**
    Uncommitted changes are never landed, and `bin/fm-teardown.sh` owns the landed-work test.
    Never bypass a refusal or use `--force` unless the captain explicitly authorized discarding that work.
@@ -95,6 +95,7 @@ Route durable knowledge to its most specific owner:
 
 - A `Memory layering` section in the captain-preference files may declare authoritative external memory tiers ([`docs/configuration.md`](docs/configuration.md)); a declared tier owns its named classes, `data/` is then only a cache, capture to the tier is never skipped, corrections follow the tier's rule, and firstmate captures for workers that cannot reach it.
 - Captain preferences go in `data/captain.md` after inspect-then-update; other fleet-local operational facts go in `data/learnings.md`.
+- A rule firstmate applies to a recurring keyed worker ask without the captain, such as a test-slot or GPU-window grant, goes in `config/house-decisions` ([`docs/configuration.md`](docs/configuration.md) "House decisions"), the one place the supervision session reads it.
 - Task notes go with the backlog item, and investigation findings in the scout report.
 - Knowledge useful to almost every contributor to one project belongs in that project's committed `AGENTS.md`, which only deliberate human edits extend; knowledge general to every firstmate user belongs in this repo's shared surface via an authorized contribution, otherwise in `data/learnings.md` or a local draft.
 
@@ -120,7 +121,8 @@ Consult existing reports and evidence before commissioning an investigation, and
 
 Resolve every ship task's delivery mode and `yolo` merge posture at intake and pass them explicitly, since each command refuses to guess:
 
-- A current explicit captain instruction wins; otherwise the project's registry entry stands, and dropping below its rigor needs a stated reason.
+- A current explicit captain instruction wins; otherwise the project's registry delivery mode stands, and dropping below its rigor needs a stated reason.
+  `ship-landing` resolves effective merge authority at landing from current recorded instructions; a dispatch-time `yolo` snapshot does not override it.
 - Pass the registered ship-branch prefix (`bin/fm-project-mode.sh --branch-prefix <project>`) as `--branch-prefix` to the ship brief, spawn, and promotion; pass a non-default start and target branch as `--base-branch` to the ship or scout brief and spawn, with promotion retaining the recorded base.
 - For this firstmate repository, pass the project directory to the brief as `--project` and any captain-approved one-task consent as `--upstream-consent <host>/<owner>/<repo>` to the brief, spawn, and promotion.
 - On a `no-mistakes-prod-only` project, pass `--delivery-surface internal-only|product-facing|mixed|unknown`; only internal tooling, automation, process, and release work ships `direct-PR`, and never infer internal-only from location or name.
@@ -146,7 +148,7 @@ A separate review is allowed only when the captain explicitly requests it or the
 - **direct-PR** pushes and opens a PR without the pipeline, then waits for merge authority.
 - **local-only** stops with a clean ready branch, then waits for merge authority before the guarded fast-forward.
 
-Delivery mode and `yolo` are orthogonal: with `yolo` off the captain approves PR merges (unless the active proactive policy authorizes them) and every local-only landing; with it on, firstmate merges green, in-scope work itself.
+Delivery mode and merge authority are orthogonal; `ship-landing` owns landing-time authority.
 Never merge a red PR, or one with an unreported required check, unless a current explicit captain instruction names the check to waive (`bin/fm-pr-merge.sh` owns the waiver); standing `yolo` never authorizes a red merge, and destructive, irreversible, and security-sensitive merges still escalate.
 Load `ask-user-authority` and `validation-supervision` before deciding or answering any ask-user finding; the implementation worker never answers its own finding.
 Merge task PRs only with `bin/fm-pr-merge.sh` and local-only landings only with `bin/fm-merge-local.sh`, never a lower-level command; after an autonomous merge give the captain a one-line full-URL or local-main outcome.

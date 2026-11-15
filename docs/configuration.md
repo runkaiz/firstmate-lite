@@ -212,7 +212,7 @@ While the away-posture record `state/.afk-contract` exists:
 [docs/pi-supervision-branch.md](pi-supervision-branch.md#postures) defines that posture.
 [`bin/fm-afk-contract.sh`](../bin/fm-afk-contract.sh) owns away entry, read-back, and record compatibility.
 
-While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision.
+While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision, including a registered [house decision](#house-decisions-confighouse-decisions).
 These are the bounds set by the captain-approved architecture.
 Every existing captain gate remains unchanged in either posture.
 Homes on other primary harnesses do not load the Pi branch extension; shared per-task lease behavior is owned by `bin/fm-lease-lib.sh`.
@@ -415,7 +415,7 @@ Other fresh allocations select current origin history when origin is configured,
 Existing task metadata selects cleanup and recovery independently of the current allocator setting, so changing the setting never migrates or releases pooled tasks.
 Startup reports orphan native reservations through the existing bootstrap diagnostics; [`fm-task-record-restore.sh`](../bin/fm-task-record-restore.sh) owns explicit restoration of byte-verified archived metadata without changing its original contract.
 [`fm-teardown.sh`](../bin/fm-teardown.sh) owns the remaining retirement proofs - an explicitly identified sibling PR, patch-equivalent local-only delivery, a pipeline-bound merged PR, and an explicit `--retain-branch` retirement of branch-kept work - and keeps the ordinary clean-copy and ownership gates for each.
-After branch-retaining cleanup, [`fm-merge-local.sh`](../bin/fm-merge-local.sh) can still land a local-only branch under its existing merge-authority and clean fast-forward guards.
+After branch-retaining cleanup, [`fm-merge-local.sh`](../bin/fm-merge-local.sh) can still land a local-only branch after authority is evaluated under [`ship-landing`](../.agents/skills/ship-landing/SKILL.md), retaining its clean fast-forward guards.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
 It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
@@ -955,6 +955,21 @@ Unsupported runtimes and launches without pins receive an explicit notice in the
 An independently configured session can still expose browser tools; otherwise workers report the limitation without installing tools.
 The same launch construction covers ships, scouts, relaunches, and each backend; existing supervisor sessions require their own MCP registration.
 [Runtime verification](verification/runtime-backends.md#pinned-browser-mcp-server) records capability evidence and live-check limits.
+
+## House decisions (config/house-decisions)
+
+The optional local, gitignored `config/house-decisions` registers the keyed worker asks that firstmate answers itself, each with the rule that settles it.
+A worker files anything above its own authority as a keyed `needs-decision`, and some of those asks are the home's own routine, such as who gets the next full-test-suite slot or GPU window, rather than the captain's.
+Each line is `<key>: <rule>`, where the key is the one workers use in `needs-decision [key=<key>]`:
+
+```text
+test-slot: at most two full suites at once, one overnight; grant in request order
+```
+
+MAIN alone answers a registered key while attended; the supervision session answers it while away with MAIN parked, and the open-decisions listing prints the rule beside the ask.
+The record grants nothing else: no merge, landing, dispatch, or captain decision reads it, and an unregistered key keeps its ordinary handling.
+An absent file changes nothing, and a malformed one registers no key at all.
+`bin/fm-house-decisions-lib.sh` owns the format and its refusals.
 
 ## Home brief include (config/brief-include.md)
 

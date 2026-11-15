@@ -2576,7 +2576,7 @@ ok - away A lands and records completion, eligible B starts, independent hold pe
 ```
 
 This is portable fixture evidence for both Pi and supervision-host branch actors, not live harness or Herdr lifecycle evidence.
-The local merge script header owns its authority and ready-head contract; the branch prompt requires the supervisor to verify passing validation evidence at that head.
+[`ship-landing`](../../.agents/skills/ship-landing/SKILL.md) owns landing authority, and the local merge script header owns the ready-head contract; the branch prompt requires the supervisor to verify passing validation evidence at that head.
 No vendor classifier, runtime adapter, watcher transport, or live primary is changed by this repair.
 The earlier dated observation that local landing was never relocated describes the former behavior.
 
