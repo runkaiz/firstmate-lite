@@ -1276,4 +1276,73 @@ test_proactive_validation_handoff() {
 }
 
 test_proactive_validation_handoff
+
+# The supervisor supplies validation/scope judgment; the executable enforces the
+# current proactive preference and existing ready-head, role, and hold guards.
+test_proactive_local_landing() {
+  local actor posture scenario home proj worker initial head out before_meta
+  for actor in main branch; do
+    for posture in attended away; do
+      for scenario in green off malformed restriction failed missing dirty; do
+        home="$TMP_ROOT/proactive-local-$actor-$posture-$scenario/home"
+        proj="$home/projects/demo"
+        worker="$TMP_ROOT/proactive-local-$actor-$posture-$scenario/worker"
+        mkdir -p "$home/state" "$home/config" "$home/data" "$proj"
+        git init -q -b main "$proj" || fail 'initialize proactive local project'
+        git -C "$proj" -c user.name=test -c user.email=test@example.invalid commit -qm initial --allow-empty || fail 'initial commit'
+        initial=$(git -C "$proj" rev-parse HEAD)
+        git clone -q "$proj" "$worker" || fail 'clone proactive local worker'
+        git -C "$worker" checkout -qb fm/task-local || fail 'create ship branch'
+        printf 'validated change\n' > "$worker/change"
+        git -C "$worker" add change
+        git -C "$worker" -c user.name=test -c user.email=test@example.invalid commit -qm 'validated change' || fail 'ship commit'
+        head=$(git -C "$worker" rev-parse HEAD)
+        git -C "$proj" fetch -q "$worker" fm/task-local:fm/task-local || fail 'fetch ship head'
+        fm_write_meta "$home/state/task-local.meta" "project=$proj" "worktree=$worker" \
+          'kind=ship' 'mode=local-only' 'yolo=off' 'branch=fm/task-local'
+        before_meta=$(cat "$home/state/task-local.meta")
+        printf '%s\n' '- demo [local-only] - registry yolo off' > "$home/data/projects.md"
+        printf 'on\n' > "$home/config/proactive"
+        printf 'done: validation passed at %s\n' "$head" > "$home/state/task-local.status"
+        if [ "$posture" = away ]; then
+          FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'continue approved work' >/dev/null || fail 'enter away'
+        fi
+        case "$scenario" in
+          off) printf 'off\n' > "$home/config/proactive" ;;
+          malformed) printf 'yes\n' > "$home/config/proactive" ;;
+          restriction)
+            # Natural-language restrictions are supervisor-owned. Persist the
+            # review-first decision through its existing mechanical hold owner.
+            fm_test_tasks_toml "$home/.tasks.toml"
+            FM_HOME="$home" "$ROOT/bin/fm-captain-hold.sh" hold task-local \
+              --title 'Restricted local change' --reason 'explicit review-first instruction' >/dev/null || fail 'hold restricted task'
+            ;;
+          failed) printf 'failed: validation failed\n' >> "$home/state/task-local.status" ;;
+          missing) rm "$home/state/task-local.status" ;;
+          dirty) printf 'uncommitted\n' > "$worker/dirty" ;;
+        esac
+        if out=$(FM_HOME="$home" FM_CONFIG_OVERRIDE="$home/config" FM_SUPERVISION_ACTOR="$actor" \
+          "$MERGE_LOCAL" task-local --proactive 2>&1); then
+          if [ "$scenario" != green ] || { [ "$actor" != main ] && [ "$posture" != away ]; }; then
+            fail "$actor $posture $scenario unexpectedly landed"
+          fi
+          [ "$(git -C "$proj" rev-parse HEAD)" = "$head" ] || fail 'proactive landing missed validated head'
+        else
+          if [ "$scenario" = green ] && { [ "$actor" = main ] || [ "$posture" = away ]; }; then
+            fail "$actor $posture proactive green local landing refused: $out"
+          fi
+          [ "$(git -C "$proj" rev-parse HEAD)" = "$initial" ] || fail 'refused proactive landing advanced main'
+          if [ "$scenario" = restriction ] && { [ "$actor" = main ] || [ "$posture" = away ]; }; then
+            assert_contains "$out" 'still held for the captain' 'explicit review-first hold lost its guard'
+          fi
+        fi
+        [ "$(cat "$home/state/task-local.meta")" = "$before_meta" ] || fail 'proactive landing rewrote dispatch yolo'
+      done
+    done
+  done
+  pass 'proactive local landing admits validated yolo-off work for MAIN and away, while off, malformed, restrictions, invalid readiness and attended branch refuse'
+}
+
+test_proactive_local_landing
+
 echo "# all fm-task-delivery tests passed"

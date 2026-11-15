@@ -25,6 +25,17 @@ Merge fixtures prove ordinary green reviewed PRs can use the proactive path with
 The mode is re-read under the toggle's lock before that synchronous action.
 No endpoint or backend lifecycle mechanism changed, so tmux and Herdr use the same instruction path without backend-specific changes.
 These are executable-interface and package-contract fixtures, not proof of model obedience, live forge merging, or measured turn/token/latency improvement.
+On 2026-11-15, GNU Bash 5.3.15 on Linux passed the local-only extension through:
+
+```sh
+bash bin/fm-test-run.sh tests/fm-task-delivery.test.sh tests/fm-branch-supervision.test.sh tests/fm-supervision-instructions.test.sh
+```
+
+The result was `FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0`.
+The local landing fixture exercises MAIN attended and away, plus the away branch, with project and dispatch yolo off; proactive on lands the validated ship head, while off/malformed mode, a review-first restriction persisted as a captain hold, failed/missing readiness, and a dirty worker copy refuse without moving the default branch.
+An attended branch still refuses, and the task's recorded yolo remains unchanged.
+The supervisor remains responsible for interpreting natural-language restrictions, scope, and validation evidence; these fixtures prove the executable guards, not that model judgment.
+The shared merge entrypoint and instruction delivery have no harness-specific or tmux/Herdr lifecycle change.
 The policy owner remains the [conditional proactive policy](../../.agents/skills/proactive/policy.md).
 
 ## Away records and worker return counts

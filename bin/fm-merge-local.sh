@@ -24,7 +24,15 @@
 # A task whose cleanup kept its branch (bin/fm-teardown.sh --retain-branch) has
 # no task record; its state/<id>.retained record stands in under the same
 # guards, and a successful landing removes it.
-# Usage: fm-merge-local.sh <task-id>
+# --proactive uses the active proactive policy's standing approval within the
+# ship-landing authority order, for MAIN and the away session alike. Explicit
+# task restrictions and validation/scope judgments remain the supervisor's
+# responsibility; a done declaration alone is not test evidence. This path
+# requires a reconciled done declaration and a clean worker at the ship head
+# in either posture. It rechecks config/proactive under the toggle's lock and
+# holds that lock through the synchronous fast-forward; off/malformed refuses.
+# Without --proactive, existing explicit/standing/registry authority is unchanged.
+# Usage: fm-merge-local.sh <task-id> [--proactive]
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -35,11 +43,16 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-pr-lib.sh"
 # shellcheck source=bin/fm-backlog-transition-lib.sh
 . "$SCRIPT_DIR/fm-backlog-transition-lib.sh"
-if [ "$#" -ne 1 ] || ! fm_pr_task_id_valid "$1"; then
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ] || ! fm_pr_task_id_valid "$1"; then
   echo "error: invalid local merge request" >&2
   exit 2
 fi
 ID=$1
+PROACTIVE=false
+if [ "$#" -eq 2 ]; then
+  [ "$2" = --proactive ] || { echo "error: invalid local merge option: $2" >&2; exit 2; }
+  PROACTIVE=true
+fi
 fm_backlog_directory_present "$STATE" "state directory" || {
   echo "error: local merge refused: $FM_BACKLOG_TRANSITION_ERROR" >&2
   exit 1
@@ -71,7 +84,9 @@ fi
 MERGE_EXPECTED_SPAWN_GEN=$FM_BACKLOG_META_SPAWN_GEN
 
 MERGE_CONTROL_LOCK=
+PROACTIVE_LOCK=
 merge_control_cleanup() {
+  [ -z "$PROACTIVE_LOCK" ] || fm_lock_release "$PROACTIVE_LOCK" || true
   fm_afk_contract_lock_release || true
   [ -z "$MERGE_CONTROL_LOCK" ] || fm_lock_release "$MERGE_CONTROL_LOCK" || true
 }
@@ -147,17 +162,17 @@ if fm_afk_contract_present "$STATE"; then
 fi
 # Archive/refresh may have occurred since the early actor check.
 fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
-if fm_afk_contract_away_present "$STATE"; then
+if [ "$PROACTIVE" = true ] || fm_afk_contract_away_present "$STATE"; then
   READY_LINE=$(status_current_line "$STATE/$ID.status" ship)
   [ "$(status_line_verb "$READY_LINE")" = 'done' ] || {
-    echo "error: local merge while away requires a reconciled done declaration; validation failures and decision waits must be resolved" >&2
+    echo "error: local merge while away or proactive requires a reconciled done declaration; validation failures and decision waits must be resolved" >&2
     exit 1
   }
   WORKTREE=$(awk '/^worktree=/{n++; value=substr($0,10)} END{if(n==1) print value}' "$META")
   SHIP_HEAD=$MERGE_HEAD
   WORKER_HEAD=$(git -C "$WORKTREE" rev-parse --verify HEAD 2>/dev/null || true)
   [ "$WORKER_HEAD" = "$SHIP_HEAD" ] && [ -z "$(git -C "$WORKTREE" status --porcelain 2>/dev/null)" ] || {
-    echo "error: local merge while away requires a clean worker copy at the exact ship head" >&2
+    echo "error: local merge while away or proactive requires a clean worker copy at the exact ship head" >&2
     exit 1
   }
 fi
@@ -175,8 +190,22 @@ case "$hold_status" in
     exit 1
     ;;
 esac
+if [ "$PROACTIVE" = true ]; then
+  if [ "$("$SCRIPT_DIR/fm-proactive.sh" status)" != 'PROACTIVE MODE: on' ]; then
+    echo 'error: proactive local merge refused: mode is off at action time' >&2
+    exit 1
+  fi
+  PROACTIVE_LOCK="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}/.proactive.lock"
+  fm_lock_acquire_wait "$PROACTIVE_LOCK"
+  if [ "$("$SCRIPT_DIR/fm-proactive.sh" status)" != 'PROACTIVE MODE: on' ]; then
+    echo 'error: proactive local merge refused: mode is off at action time' >&2
+    exit 1
+  fi
+fi
 merge_status=0
 git -C "$PROJ" merge --ff-only "$MERGE_HEAD" >/dev/null || merge_status=$?
+[ -z "$PROACTIVE_LOCK" ] || fm_lock_release "$PROACTIVE_LOCK" || true
+PROACTIVE_LOCK=
 fm_afk_contract_lock_release || true
 fm_lock_release "$MERGE_CONTROL_LOCK" || true
 MERGE_CONTROL_LOCK=
