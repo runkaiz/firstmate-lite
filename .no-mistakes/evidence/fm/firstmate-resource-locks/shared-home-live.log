@@ -1,0 +1,15 @@
+$ FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/parent ['/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh', 'run', 'gpu', '--', 'sh', '-c', ': > "$1/held"; while [ ! -e "$1/release" ]; do sleep .05; done', 'holder', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared'] pid=1887204
+$ FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/child ['/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh', 'run', 'gpu', '--', 'touch', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/child-ran'] pid=1887220
+OBSERVED child waits for root GPU slot despite its local gpu=9 declaration:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+
+OBSERVED cancelling waiter does not preempt root holder or execute payload.
+$ FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/child ['/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh', 'run', 'gpu', '--', 'touch', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/child-ran'] pid=1887275
+OBSERVED repeating same wrapped command runs after root holder exits:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+resource-lock: holding gpu slot 1
+
+OBSERVED unreachable parent refuses instead of using permissive child-local declaration: exit=1
+error: could not resolve the root Firstmate home that declares resource locks for /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.live-validation/shared/child
+
+CLEANUP: shared-home fixture and all workload processes removed.

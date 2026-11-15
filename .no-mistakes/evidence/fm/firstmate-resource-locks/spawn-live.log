@@ -1,0 +1,448 @@
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-lab-home.sh', 'create', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l']
+exit=0
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+
+$ ['tmux', '-L', 'fm-lab', '-f', '/dev/null', 'new-session', '-d', '-s', 'firstmate', '-x', '120', '-y', '40', '-c', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ', 'bash --noprofile --norc']
+exit=0
+
+$ ['git', '-C', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'init', '-q', '-b', 'main']
+exit=0
+
+$ ['git', '-C', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'add', 'README.md']
+exit=0
+
+$ ['git', '-C', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', '-c', 'user.name=Validation', '-c', 'user.email=validation@example.invalid', 'commit', '-qm', 'initial']
+exit=0
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'add', 'lab-1', 'Disposable dispatch probe 1', '--kind', 'ship']
+exit=0
+ok: add lab-1
+task:
+  id: lab-1
+  title: Disposable dispatch probe 1
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh', 'lab-1', 'project', '--mode', 'local-only']
+exit=0
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/lab-1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh', 'lab-1', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/worker.sh', '--mode', 'local-only', '--yolo', 'off', '--backend', 'tmux']
+exit=0
+HEAD is now at a1a667d initial
+native allocation task=lab-1 source_ref=refs/heads/main base=a1a667d050d7e59095eaaa9a4648b8f3a0464e8b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree
+spawned lab-1 harness=bash kind=ship mode=local-only yolo=off window=firstmate:fm-lab-1 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+notice: lab-1 ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD a1a667d)
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+
+OBSERVED worker=lab-1 pid=1879078 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'show', 'lab-1']
+exit=0
+task:
+  id: lab-1
+  title: Disposable dispatch probe 1
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['tmux', '-L', 'fm-lab', 'capture-pane', '-p', '-t', 'firstmate:fm-lab-1']
+exit=0
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree'
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project$ cd -- '/var/home/runkai/.no-
+mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree$ export
+ GOTMPDIR=/tmp/fm-lab-1/gotmp
+export COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree$ export
+ COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=lab-1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree$ export
+ FM_TASK_ID=lab-1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree$ . '/tm
+p/fm-lab-1+fe142e14aae3f849d3d32db4743bb0c33404a0ff62dbea45e5b705bff2a3c559/launch.s1794724490.1878044.8671.sh'
+worker=lab-1 pid=1879078 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/wo
+rktree
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'add', 'lab-2', 'Disposable dispatch probe 2', '--kind', 'ship']
+exit=0
+ok: add lab-2
+task:
+  id: lab-2
+  title: Disposable dispatch probe 2
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh', 'lab-2', 'project', '--mode', 'local-only']
+exit=0
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/lab-2/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh', 'lab-2', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/worker.sh', '--mode', 'local-only', '--yolo', 'off', '--backend', 'tmux']
+exit=0
+HEAD is now at a1a667d initial
+native allocation task=lab-2 source_ref=refs/heads/main base=a1a667d050d7e59095eaaa9a4648b8f3a0464e8b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree
+spawned lab-2 harness=bash kind=ship mode=local-only yolo=off window=firstmate:fm-lab-2 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+notice: lab-2 ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD a1a667d)
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+
+OBSERVED worker=lab-2 pid=1880582 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'show', 'lab-2']
+exit=0
+task:
+  id: lab-2
+  title: Disposable dispatch probe 2
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['tmux', '-L', 'fm-lab', 'capture-pane', '-p', '-t', 'firstmate:fm-lab-2']
+exit=0
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree'
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project$ cd -- '/var/home/runkai/.no-
+mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree$ export
+ GOTMPDIR=/tmp/fm-lab-2/gotmp
+export COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree$ export
+ COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=lab-2
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree$ export
+ FM_TASK_ID=lab-2
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree$ . '/tm
+p/fm-lab-2+fe142e14aae3f849d3d32db4743bb0c33404a0ff62dbea45e5b705bff2a3c559/launch.s1794724493.1879400.18348.sh'
+worker=lab-2 pid=1880582 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/wo
+rktree
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'add', 'lab-3', 'Disposable dispatch probe 3', '--kind', 'ship']
+exit=0
+ok: add lab-3
+task:
+  id: lab-3
+  title: Disposable dispatch probe 3
+  state: queued
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh', 'lab-3', 'project', '--mode', 'local-only']
+exit=0
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/lab-3/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh', 'lab-3', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/worker.sh', '--mode', 'local-only', '--yolo', 'off', '--backend', 'tmux']
+exit=0
+HEAD is now at a1a667d initial
+native allocation task=lab-3 source_ref=refs/heads/main base=a1a667d050d7e59095eaaa9a4648b8f3a0464e8b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree
+spawned lab-3 harness=bash kind=ship mode=local-only yolo=off window=firstmate:fm-lab-3 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+notice: lab-3 ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+Preparing worktree (detached HEAD a1a667d)
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+
+OBSERVED worker=lab-3 pid=1881934 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'show', 'lab-3']
+exit=0
+task:
+  id: lab-3
+  title: Disposable dispatch probe 3
+  state: in_flight
+  kind: ship
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['tmux', '-L', 'fm-lab', 'capture-pane', '-p', '-t', 'firstmate:fm-lab-3']
+exit=0
+cd -- '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree'
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project$ cd -- '/var/home/runkai/.no-
+mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree'
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree$ export
+ GOTMPDIR=/tmp/fm-lab-3/gotmp
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree$ export
+ COMPACT_ADVISER_DISABLE=1
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree$ export
+ FM_TASK_ID=lab-3
+runkai@griffin:/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree$ . '/tm
+p/fm-lab-3+fe142e14aae3f849d3d32db4743bb0c33404a0ff62dbea45e5b705bff2a3c559/launch.s1794724495.1880906.17757.sh'
+worker=lab-3 pid=1881934 cwd=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/wo
+rktree
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ ['tmux', '-L', 'fm-lab', 'list-windows', '-t', 'firstmate', '-F', '#{window_name} #{pane_pid} #{pane_current_path}']
+exit=0
+bash 1877930 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ
+fm-lab-1 1878631 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree
+fm-lab-2 1880128 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree
+fm-lab-3 1881499 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree
+
+OBSERVED three simultaneous real tmux Bash jobs in distinct native worktrees despite retired project limit=1; malformed retired declaration also admits third job, remains byte-for-byte unchanged, and all backlog items became in_flight.
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'add', 'light-scout', 'Light design scout with busy ships', '--kind', 'scout']
+exit=0
+ok: add light-scout
+task:
+  id: light-scout
+  title: Light design scout with busy ships
+  state: queued
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh', 'light-scout', 'project', '--scout']
+exit=0
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/light-scout/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-spawn.sh', 'light-scout', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/project', 'bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/worker.sh', '--scout', '--backend', 'tmux']
+exit=0
+HEAD is now at a1a667d initial
+native allocation task=light-scout source_ref=refs/heads/main base=a1a667d050d7e59095eaaa9a4648b8f3a0464e8b worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/light-scout/worktree
+spawned light-scout harness=bash kind=scout window=firstmate:fm-light-scout worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/light-scout/worktree
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+warn: no registry at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/data/projects.md; defaulting project to no-mistakes off
+Preparing worktree (detached HEAD a1a667d)
+launch-profile: requested_model=default requested_effort=default model_control=unverified effort_control=unverified service_control=unverified effective_model=unverified effective_effort=unverified effective_service=unverified
+
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-queue.sh', 'show', 'light-scout']
+exit=0
+task:
+  id: light-scout
+  title: Light design scout with busy ships
+  state: in_flight
+  kind: scout
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+$ ['tmux', '-L', 'fm-lab', 'list-windows', '-t', 'firstmate', '-F', '#{window_name} #{pane_pid} #{pane_current_path}']
+exit=0
+bash 1877930 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ
+fm-lab-1 1878631 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-1/worktree
+fm-lab-2 1880128 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-2/worktree
+fm-lab-3 1881499 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/lab-3/worktree
+fm-light-scout 1882897 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.w/light-scout/worktree
+
+OBSERVED light scout running alongside three ships; unreadable retired capacity path is still a directory and does not block dispatch.
+$ ['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh', 'brief']
+exit=0
+# Heavy commands (resource locks)
+This machine runs only a few of the heavy jobs named below at once, so take a slot yourself instead of asking firstmate.
+Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command and any child processes retaining the lock have exited.
+If a command needs more than one resource, nest wrappers from outermost to innermost in the order the resources are listed below (declaration order), so competing jobs do not deadlock.
+Never run one of these commands outside its wrapper and never preempt another holder; a wait for a slot needs no `needs-decision`, and when your shell's command limit ends the wait, run the same wrapped command again.
+- `suite` (2 at once, 1 during 22:00-09:00) - full suites: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/resource-locks suite -- <command>`
+- `gpu` (1 at once) - GPU commands: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.l/config/resource-locks gpu -- <command>`
+
+OBSERVED child home receives root machine declaration and root --file path.
+$ ['tmux', '-L', 'fm-lab', 'kill-server']
+exit=0
+
+CLEANUP: private fm-lab tmux server stopped; disposable home, project and native worktrees removed.
