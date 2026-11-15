@@ -965,9 +965,8 @@ fm_recovery_marker_arm_check_locked() {
   fm_lock_release "$lock"
 }
 
-# Apply the owner-documented announced-episode arm transition atomically with
-# the queue read. Handling successors and foreground checkpoints must not call
-# this transition.
+# Apply the announced-episode arm transition atomically with the queue read.
+# docs/watcher-continuity.md "Announcement" owns which cycles skip it.
 _fm_recovery_marker_reopen_announced() {
   local marker=$1 lock
   lock="${marker}.lock"
@@ -998,10 +997,8 @@ _fm_recovery_marker_reopen_announced() {
 # The handover rule for a watcher stopped by bin/fm-watch-arm.sh --take-over
 # (docs/watcher-continuity.md "Generation reuse" owns it). The snapshot reads
 # the marker token and the queue's append sequence under both locks before the
-# stop; handover-restore puts an acknowledged or announced handling token back
-# only while that sequence is unchanged and the marker reads the pending
-# downtime the stopped watcher's own close published for it: a fresh generation
-# over an acknowledged episode, the same generation over a handling one.
+# stop; restoration checks both under the same locks so an intervening append
+# cannot be hidden by restoring the snapshot.
 FM_RECOVERY_HANDOVER_TOKEN=
 FM_RECOVERY_HANDOVER_SEQ=
 fm_recovery_marker_handover_snapshot() {  # <marker>
