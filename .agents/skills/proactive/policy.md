@@ -20,13 +20,15 @@ Preserve GPU/resource spending grants, unlanded-work protection, leases, isolati
 Read-only or lock-refused sessions remain read-only.
 Never toggle yolo, waive validation, or take over a worker-owned pipeline.
 
-For MAIN firstmate, ON grants automatic merge authority for an authorized in-scope ordinary GitHub PR even with project yolo off, once current-head required checks and reviews pass and findings are resolved.
-Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive`; its header owns the action-time preference, synchronous-merge and review guards.
+For MAIN and the away session, ON supplies recorded standing approval under [ship-landing](../ship-landing/SKILL.md) for authorized in-scope ordinary GitHub PR merges and local-only landings even with project yolo off.
+Treat this as standing approval in that owner's existing authority order, never as a parallel override.
+Land only after validation for the exact current head passes, required PR checks and reviews pass where applicable, and findings are resolved.
+Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive` or `bin/fm-merge-local.sh <task-id> --proactive`; their headers own action-time preference and landing guards.
 Do not ask for another merge approval solely because yolo is off.
-Explicit review-first or do-not-merge instructions, captain holds, and destructive, irreversible, or security-sensitive exceptions still require the captain.
-Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL outcome.
+Explicit review-first or do-not-merge instructions, explicit task restrictions, captain holds, failed or missing validation, and destructive, irreversible, or security-sensitive exceptions still require the captain.
+Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL or local landing outcome.
 OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.
-Local-only landing and non-GitHub merges retain their baseline authority.
+Non-GitHub PR merges retain their baseline authority.
 
 The supervision branch applies this policy only inside its existing role and posture authority.
 For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.

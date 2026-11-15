@@ -174,7 +174,7 @@ This preference is local to each Firstmate home.
 `/proactive` toggles persisted proactive orchestration; `/proactive on`, `/proactive off`, and `/proactive status` set or inspect it explicitly through the bundled skill.
 It is opt-in and off when absent, independently of Calm presentation and away/quiet posture.
 The command, atomic persistence, home resolution, and malformed-file behavior are owned by `bin/fm-proactive.sh`'s header and `--help`.
-The [conditional proactive policy](../.agents/skills/proactive/policy.md) owns repair, continuation, escalation, and automatic ordinary green-PR merge authority while on.
+The [conditional proactive policy](../.agents/skills/proactive/policy.md) owns repair, continuation, escalation, and automatic ordinary green-PR and validated local-only landing authority while on.
 Project yolo settings are not rewritten, and turning the mode off removes its additional authority before the next guarded proactive merge.
 
 Startup/re-emitted supervision instructions read the current preference and present the policy once; successful queued-wake presentations carry the current mode and a compact policy reference on stderr, loading the policy only if it is absent from context.
