@@ -271,6 +271,7 @@ test_competing_jobs_follow_brief_order() {
   local case_dir out order outer inner first_pid second_pid
   case_dir=$(make_case competing 'suite 2 22:00-09:00=1 full test-suite runs' 'gpu 1 any GPU use')
   out=$(lock "$case_dir" 23:00 brief) || fail "brief refused the competing jobs' declaration"
+  # shellcheck disable=SC2016 # Literal brief text.
   order=$(printf '%s\n' "$out" | sed -n 's/^- `\([^`]*\)`.*/\1/p')
   assert_equals $'suite\ngpu' "$order" "the brief did not preserve declaration order"
   outer=${order%%$'\n'*}
