@@ -505,7 +505,7 @@ EOF
 # appended to each task's status log since the LAST drain, not that log's whole
 # lifetime, while still never dropping an old buried decision (see
 # fm-classify-lib.sh's "incremental (cursor-backed) open-decisions fold").
-# Bounded and silent: prints nothing when no decision is open, which is the
+# Silent: prints nothing when no decision is open, which is the
 # common case. A needs-decision whose key the home registered as a house
 # decision (bin/fm-house-decisions-lib.sh) also gets that rule, once per key.
 print_open_decisions_section() {
@@ -552,8 +552,7 @@ print_open_decisions_section() {
       continue
     fi
     [ "$house_status" -eq 0 ] || continue
-    fm_cap_line_var "OPEN DECISIONS: [key=$key] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: $house_rule" 400
-    house_lines="$house_lines$FM_LINE_CAP_LINE
+    house_lines="${house_lines}OPEN DECISIONS: [key=$key] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: $house_rule
 "
   done <<EOF
 $open
