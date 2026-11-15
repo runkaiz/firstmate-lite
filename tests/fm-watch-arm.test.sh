@@ -1259,6 +1259,160 @@ test_take_over_preserves_downtime_from_watcher_self_exit() {
   pass "watch-arm: takeover keeps self-exit downtime and retires it silently with nothing queued"
 }
 
+# Start a taking arm and wait until it confirms its fresh cycle or exits.
+start_take_over_arm() {  # <home> <state> <fakebin> <arm-out> <owner-arm-pid>
+  local home=$1 state=$2 fakebin=$3 armout=$4 owner=$5 i
+  PATH="$fakebin:$PATH" FM_HOME="$home" FM_STATE_OVERRIDE="$state" \
+    FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    FM_ARM_CONFIRM_TIMEOUT="$REARM_CONFIRM_SECONDS" \
+    "$WATCH_ARM" --take-over "$owner" > "$armout" &
+  ARM_PID=$!
+  i=0
+  while [ "$i" -lt "$REARM_REPORT_POLLS" ]; do
+    grep -q '^watcher: started ' "$armout" 2>/dev/null && return 0
+    is_live_non_zombie "$ARM_PID" || return 0
+    sleep 0.05
+    i=$((i + 1))
+  done
+  return 0
+}
+
+# A turn end can arrive while a wake main was already told about is still
+# queued, because its turn ended before the acknowledgement. The take-over that
+# turn end runs continues the cycle it stopped, so it must not announce the same
+# work again, which is what re-woke main at every turn end, while a wake that
+# arrives afterwards still resurfaces once.
+test_take_over_does_not_reannounce_announced_work() {
+  local dir state fakebin armout owner generation status
+  dir=$(make_case take-over-announced)
+  state="$dir/state"
+  fakebin="$dir/fakebin"
+  armout="$dir/arm.out"
+  append_wake "$state" signal take-over "signal: fixture announced to main"
+  start_rearm_arm "$dir" "$state" "$fakebin" "$dir/owner.out" "$$"
+  owner=$ARM_PID
+  SEED_PID=$(cat "$state/.watch.lock/pid")
+  case "$(cat "$state/.watcher-down" 2>/dev/null)" in
+    announced:downtime:*) ;;
+    *) fail "fixture: the queued wake was not announced: $(cat "$state/.watcher-down" 2>/dev/null)" ;;
+  esac
+  generation=$(recovery_marker_generation "$state/.watcher-down")
+
+  start_take_over_arm "$dir" "$state" "$fakebin" "$armout" "$owner"
+  grep -q '^watcher: started pid=' "$armout" \
+    || fail "--take-over did not own a fresh cycle: $(cat "$armout")"
+  wait_for_exit "$SEED_PID" 50 >/dev/null 2>&1 || true
+  ! is_live_non_zombie "$SEED_PID" || fail "--take-over left the watcher it took over running"
+  sleep 3
+  is_live_non_zombie "$ARM_PID" \
+    || fail "the take-over announced work main was already told about: $(cat "$armout")"
+  ! grep -F 'check: rearm-resurface' "$armout" >/dev/null \
+    || fail "the take-over emitted a recovery wake for announced work: $(cat "$armout")"
+  [ "$(cat "$state/.watcher-down" 2>/dev/null)" = "announced:downtime:$generation" ] \
+    || fail "the take-over moved the announced episode: $(cat "$state/.watcher-down" 2>/dev/null)"
+
+  append_wake "$state" signal take-over-later "signal: fixture arrived after the take-over"
+  wait_for_exit "$ARM_PID" "$REARM_EXIT_POLLS"
+  status=$?
+  expect_code 0 "$status" "a wake appended after the take-over closes the fresh cycle cleanly"
+  [ "$(grep -c '^check: rearm-resurface' "$armout")" -eq 1 ] \
+    || fail "work that arrived after the take-over did not resurface exactly once: $(cat "$armout")"
+  pass "watch-arm: --take-over leaves announced work announced and still resurfaces later work once"
+}
+
+# Main drained an announced wake and its turn ended before the acknowledgement.
+# That generation was already announced, so the take-over's own stop must not
+# present it again: the episode stays open under the generation the drain
+# printed and that acknowledgement still retires it.
+test_take_over_keeps_an_announced_handling_episode_open() {
+  local dir state fakebin armout owner handling pair
+  dir=$(make_case take-over-handling)
+  state="$dir/state"
+  fakebin="$dir/fakebin"
+  armout="$dir/arm.out"
+  append_wake "$state" signal take-over "signal: fixture main is handling"
+  start_rearm_arm "$dir" "$state" "$fakebin" "$dir/owner.out" "$$"
+  owner=$ARM_PID
+  SEED_PID=$(cat "$state/.watch.lock/pid")
+  FM_STATE_OVERRIDE="$state" "$DRAIN" > "$dir/drain.out" 2> "$dir/drain.err" \
+    || fail "fixture: main could not drain the announced wake"
+  pair=$(drain_ack_pair "$dir/drain.err") \
+    || fail "fixture: the drain printed no acknowledgement command: $(cat "$dir/drain.err")"
+  handling=$(cat "$state/.watcher-down" 2>/dev/null)
+  case "$handling" in
+    announced:handling:*) ;;
+    *) fail "fixture: the drain did not open an announced handling episode: $handling" ;;
+  esac
+
+  start_take_over_arm "$dir" "$state" "$fakebin" "$armout" "$owner"
+  grep -q '^watcher: started pid=' "$armout" \
+    || fail "--take-over did not own a fresh cycle: $(cat "$armout")"
+  wait_for_exit "$SEED_PID" 50 >/dev/null 2>&1 || true
+  sleep 3
+  is_live_non_zombie "$ARM_PID" \
+    || fail "the take-over presented an announced handling episode again: $(cat "$armout")"
+  ! grep -F 'check: rearm-resurface' "$armout" >/dev/null \
+    || fail "the take-over emitted a recovery wake during open handling: $(cat "$armout")"
+  [ "$(cat "$state/.watcher-down" 2>/dev/null)" = "$handling" ] \
+    || fail "the take-over moved the open handling episode: $(cat "$state/.watcher-down" 2>/dev/null)"
+
+  FM_STATE_OVERRIDE="$state" "$DRAIN" --ack-through "${pair%%$'\t'*}" \
+    --recovery-generation "${pair##*$'\t'}" >/dev/null 2>&1 \
+    || fail "the acknowledgement printed before the take-over no longer applied"
+  case "$(cat "$state/.watcher-down" 2>/dev/null)" in
+    acked:*) ;;
+    *) fail "the printed acknowledgement did not retire the episode: $(cat "$state/.watcher-down" 2>/dev/null)" ;;
+  esac
+  [ ! -s "$state/.wake-queue" ] || fail "the printed acknowledgement left its row queued"
+  sleep 2
+  is_live_non_zombie "$ARM_PID" || fail "the fresh cycle closed after the acknowledgement: $(cat "$armout")"
+  kill -TERM "$ARM_PID" 2>/dev/null || true
+  wait_for_exit "$ARM_PID" 50 >/dev/null 2>&1 || true
+  pass "watch-arm: --take-over keeps an announced handling episode open and its printed acknowledgement valid"
+}
+
+# Genuine downtime is the counterpart: a watcher killed outright releases
+# nothing, so the next turn end's arm announces the gap, exactly once. The
+# successor left after that announcement is then taken over without a second.
+test_killed_watcher_downtime_resurfaces_exactly_once() {
+  local dir state fakebin armout owner watcher status
+  dir=$(make_case take-over-killed-watcher)
+  state="$dir/state"
+  fakebin="$dir/fakebin"
+  armout="$dir/arm.out"
+  append_wake "$state" signal take-over "signal: fixture announced to main"
+  start_rearm_arm "$dir" "$state" "$fakebin" "$dir/owner.out" "$$"
+  owner=$ARM_PID
+  watcher=$(cat "$state/.watch.lock/pid")
+  kill -KILL "$watcher" 2>/dev/null || fail "fixture: could not kill the watcher"
+  wait_for_exit "$owner" "$REARM_EXIT_POLLS" >/dev/null 2>&1 || true
+  [ "$(cat "$state/.watch.lock/pid" 2>/dev/null)" = "$watcher" ] \
+    || fail "fixture: the killed watcher did not leave its lock behind"
+
+  start_take_over_arm "$dir" "$state" "$fakebin" "$armout" "$owner"
+  wait_for_exit "$ARM_PID" "$REARM_EXIT_POLLS"
+  status=$?
+  expect_code 0 "$status" "the arm after a killed watcher closes with the recovery wake"
+  [ "$(grep -c '^check: rearm-resurface' "$armout")" -eq 1 ] \
+    || fail "a killed watcher's downtime did not resurface exactly once: $(cat "$armout")"
+
+  start_rearm_arm "$dir" "$state" "$fakebin" "$dir/owner2.out" "$$"
+  owner=$ARM_PID
+  SEED_PID=$(cat "$state/.watch.lock/pid")
+  start_take_over_arm "$dir" "$state" "$fakebin" "$dir/arm2.out" "$owner"
+  grep -q '^watcher: started pid=' "$dir/arm2.out" \
+    || fail "the take-over after the announced downtime did not own a fresh cycle: $(cat "$dir/arm2.out")"
+  wait_for_exit "$SEED_PID" 50 >/dev/null 2>&1 || true
+  sleep 3
+  is_live_non_zombie "$ARM_PID" \
+    || fail "the announced downtime resurfaced a second time: $(cat "$dir/arm2.out")"
+  ! grep -F 'check: rearm-resurface' "$dir/arm2.out" >/dev/null \
+    || fail "the announced downtime resurfaced a second time: $(cat "$dir/arm2.out")"
+  kill -TERM "$ARM_PID" 2>/dev/null || true
+  wait_for_exit "$ARM_PID" 50 >/dev/null 2>&1 || true
+  pass "watch-arm: a killed watcher's downtime resurfaces exactly once across the following take-over"
+}
+
 test_downtime_marker_does_not_follow_symlink() {
   local dir home state fakebin armout watcher_pid sentinel
   dir=$(make_case downtime-marker-symlink)
@@ -1755,4 +1909,7 @@ test_handling_delivered_rejects_a_superseded_generation
 test_take_over_attaches_to_a_cycle_the_named_arm_does_not_own
 test_take_over_owns_a_fresh_cycle_and_keeps_queued_work_surfacing
 test_take_over_preserves_downtime_from_watcher_self_exit
+test_take_over_does_not_reannounce_announced_work
+test_take_over_keeps_an_announced_handling_episode_open
+test_killed_watcher_downtime_resurfaces_exactly_once
 test_opencode_arm_plugin_decides_with_the_shared_predicate
