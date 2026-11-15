@@ -1,0 +1,10 @@
+Real primary is executing this scenario on its private tmux socket.
+FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l
+TMUX=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/tmux/tmux-1000/fm-lab,2696887,0
+COMMAND: fm-brief.sh resource-live-2698972-1 demo --mode local-only
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/data/resource-live-2698972-1/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+COMMAND: fm-spawn.sh resource-live-2698972-1 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/projects/demo <real Claude print command> --mode local-only --yolo off --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l
+notice: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/config/project-capacity is no longer read - workers are not counted or capped; limit heavy jobs with config/resource-locks instead (docs/configuration.md "Resource locks") and remove the file to silence this line
+notice: resource-live-2698972-1 ships mode=local-only while the standing posture for demo is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: native worktree: root is inside project/primary/home

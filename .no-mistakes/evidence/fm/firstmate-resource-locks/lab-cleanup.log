@@ -1,0 +1,12 @@
+Removing disposable task resource-live-2747106-1 through fm-teardown.sh
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l
+teardown resource-live-2747106-1 complete (window primary:fm-resource-live-2747106-1, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/copies/resource-live-2747106-1/worktree)
+Backlog: resource-live-2747106-1 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/data/backlog.md - move resource-live-2747106-1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+Removing disposable task resource-live-2747106-2 through fm-teardown.sh
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l
+teardown resource-live-2747106-2 complete (window primary:fm-resource-live-2747106-2, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/copies/resource-live-2747106-2/worktree)
+Backlog: resource-live-2747106-2 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/data/backlog.md - move resource-live-2747106-2 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+Removing disposable task resource-live-2747106-3 through fm-teardown.sh
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l
+teardown resource-live-2747106-3 complete (window primary:fm-resource-live-2747106-3, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/copies/resource-live-2747106-3/worktree)
+Backlog: resource-live-2747106-3 just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/l/data/backlog.md - move resource-live-2747106-3 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.

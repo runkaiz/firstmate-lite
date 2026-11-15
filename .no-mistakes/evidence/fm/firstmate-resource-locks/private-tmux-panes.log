@@ -1,0 +1,4 @@
+primary:claude[dead] size=140x40 command=claude
+primary:fm-resource-live-2747106-1 size=140x40 command=sleep
+primary:fm-resource-live-2747106-2 size=140x40 command=sleep
+primary:fm-resource-live-2747106-3 size=140x40 command=sleep

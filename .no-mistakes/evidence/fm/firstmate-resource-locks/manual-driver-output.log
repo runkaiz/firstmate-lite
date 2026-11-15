@@ -1,0 +1,205 @@
+SCENARIO: generated instructions provide declaration order and an executable wrapper
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh brief
+# Heavy commands (resource locks)
+This machine runs only a few of the heavy jobs named below at once, so take a slot yourself instead of asking firstmate.
+Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command and any child processes retaining the lock have exited.
+If a command needs more than one resource, nest wrappers from outermost to innermost in the order the resources are listed below (declaration order), so competing jobs do not deadlock.
+Never run one of these commands outside its wrapper and never preempt another holder; a wait for a slot needs no `needs-decision`, and when your shell's command limit ends the wait, run the same wrapped command again.
+- `suite` (2 at once, 1 during 22:00-09:00) - full test-suite runs: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks suite -- <command>`
+- `gpu` (1 at once) - any GPU use: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks gpu -- <command>`
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh manual-ship fixture --mode local-only
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/data/manual-ship/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh manual-scout fixture --scout
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/data/manual-scout/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})
+[exit 0]
+SCENARIO: two daytime jobs run while a third waits, then all finish
+$ day-a: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- sh -c 'echo "$1 started"; while [ ! -e "$2" ]; do sleep .05; done; echo "$1 finished"' job A /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/day.release
+$ day-b: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- sh -c 'echo "$1 started"; while [ ! -e "$2" ]; do sleep .05; done; echo "$1 finished"' job B /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/day.release
+$ day-c: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- echo 'C started'
+day-a:
+resource-lock: holding suite slot 1
+A started
+
+day-b:
+resource-lock: holding suite slot 2
+B started
+
+day-c:
+resource-lock: waiting for suite (2 slot(s) at this hour, none free)
+
+$ release /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/day.release
+day-c:
+resource-lock: waiting for suite (2 slot(s) at this hour, none free)
+resource-lock: holding suite slot 1
+C started
+
+SCENARIO: overnight admission counts an existing daytime holder in slot 2
+$ plain-suite: flock /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/run/suite-slot-2.lock sh -c 'echo "$1 started"; while [ ! -e "$2" ]; do sleep .05; done; echo "$1 finished"' job 'legacy slot 2 holder' /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/night.release
+$ night: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- echo 'night command ran'
+plain-suite:
+legacy slot 2 holder started
+
+night:
+resource-lock: waiting for suite (1 slot(s) at this hour, none free)
+
+$ release /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/night.release
+night:
+resource-lock: waiting for suite (1 slot(s) at this hour, none free)
+resource-lock: holding suite slot 1
+night command ran
+
+SCENARIO: competing nested jobs retain outer suite slot while GPU is unavailable
+$ plain-gpu: flock /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/run/gpu.lock sh -c 'echo "$1 started"; while [ ! -e "$2" ]; do sleep .05; done; echo "$1 finished"' job 'legacy GPU holder' /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/gpu.release
+$ nested-first: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- sh -c 'echo first-ran; sleep .3'
+$ nested-second: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- echo second-ran
+nested-first:
+resource-lock: holding suite slot 1
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+
+nested-second:
+resource-lock: waiting for suite (1 slot(s) at this hour, none free)
+
+$ release /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/gpu.release
+nested-first:
+resource-lock: holding suite slot 1
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+resource-lock: holding gpu slot 1
+first-ran
+
+nested-second:
+resource-lock: waiting for suite (1 slot(s) at this hour, none free)
+resource-lock: holding suite slot 1
+resource-lock: holding gpu slot 1
+second-ran
+
+SCENARIO: background descendants retain the slot after their parent exits
+$ child-holder: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- sh -c '(while [ ! -e "$1" ]; do sleep .05; done; echo child-exited) & echo parent-exited' parent /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/child.release
+$ child-waiter: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- echo after-child-ran
+child-holder:
+resource-lock: holding gpu slot 1
+parent-exited
+
+child-waiter:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+
+$ release /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/child.release
+child-holder:
+resource-lock: holding gpu slot 1
+parent-exited
+child-exited
+
+child-waiter:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+resource-lock: holding gpu slot 1
+after-child-ran
+
+SCENARIO: local homes use the root declaration and share the GPU lock
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh brief
+# Heavy commands (resource locks)
+This machine runs only a few of the heavy jobs named below at once, so take a slot yourself instead of asking firstmate.
+Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command and any child processes retaining the lock have exited.
+If a command needs more than one resource, nest wrappers from outermost to innermost in the order the resources are listed below (declaration order), so competing jobs do not deadlock.
+Never run one of these commands outside its wrapper and never preempt another holder; a wait for a slot needs no `needs-decision`, and when your shell's command limit ends the wait, run the same wrapped command again.
+- `suite` (2 at once, 1 during 22:00-09:00) - full test-suite runs: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks suite -- <command>`
+- `gpu` (1 at once) - any GPU use: `/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run --file /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks gpu -- <command>`
+[exit 0]
+$ root-gpu: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- sh -c 'echo "$1 started"; while [ ! -e "$2" ]; do sleep .05; done; echo "$1 finished"' job 'root GPU holder' /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/cross.release
+$ mate-gpu: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- echo 'local home ran'
+root-gpu:
+resource-lock: holding gpu slot 1
+root GPU holder started
+
+mate-gpu:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+
+$ release /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/cross.release
+mate-gpu:
+resource-lock: waiting for gpu (1 slot(s) at this hour, none free)
+resource-lock: holding gpu slot 1
+local home ran
+
+SCENARIO: invalid and zero-window declarations refuse before command or partial scaffold
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh brief
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks line 1 gives suite a window count '0' that is not a positive integer of at most three digits
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run suite -- touch /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/must-not-run
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks line 1 gives suite a window count '0' that is not a positive integer of at most three digits
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-brief.sh invalid fixture --scout
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/.test-live/manual/home/config/resource-locks line 1 gives suite a window count '0' that is not a positive integer of at most three digits
+error: the resource-lock declaration is unreadable; fix it so workers are told this machine's limits (docs/configuration.md "Resource locks")
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh list
+fm-resource-lock.sh - machine-local resource locks for heavy commands.
+
+A machine has a few resources that only so many jobs can use at once: memory
+for a full test suite, a GPU, a device. A worker that needs one takes a slot
+itself, by running the heavy command through this script, instead of asking
+firstmate; resource admission counts heavy jobs rather than workers.
+
+Usage:
+  fm-resource-lock.sh run [--file <declaration>] <resource> -- <command> [arg...]
+  fm-resource-lock.sh brief
+
+run    Wait until <resource> has a free slot, then replace this process with
+       <command> while holding it. The exit status is the command's own. One
+       `resource-lock:` line on stderr reports a wait, and one the slot taken.
+       The slot frees when the command and any child processes retaining the
+       lock have exited. A command cut off mid-wait is simply run again.
+       For commands needing multiple resources, nest wrappers from outermost
+       to innermost in brief order (declaration order) to avoid deadlock.
+brief  Print the brief section that tells a worker which commands to wrap and
+       how, or nothing when no resource is declared. bin/fm-brief.sh appends it
+       to every ship and scout scaffold.
+
+This file is the single owner of the declaration format, the lock files, and
+the admission rule. docs/configuration.md "Resource locks" is the operator
+reference.
+
+Declaration: config/resource-locks in the local root Firstmate home (the home
+bin/fm-wake-lib.sh's fm_firstmate_root_home resolves), so every home on this
+machine reads the same slots for the same machine's resources. One line per
+resource:
+  <name> <slots> [<HH:MM>-<HH:MM>=<slots>]... <what it covers>
+<name> starts with a letter or digit and holds only letters, digits, `.`, `_`,
+and `-`, and may not contain `-slot-` followed by a digit, which is how slot
+files are named. <slots> is how many jobs may hold the resource at once: a
+positive integer of at most three digits. Each optional window gives a
+different positive count between two local wall-clock times and may cross
+midnight; the first window containing the current time wins.
+The rest of the line says which commands must hold the
+resource and is required, because it is what the brief tells a worker. Blank
+lines and lines starting with `#` are ignored. Any other shape, a resource
+named twice, or an unreadable file makes the whole declaration unreadable:
+brief and run then refuse rather than guess which limit was meant.
+
+Lock files: exclusive flock(1) locks under $XDG_RUNTIME_DIR, which the machine
+clears at logout or reboot. A resource whose most slots at any hour is one
+uses <name>.lock; any other uses <name>-slot-1.lock through
+<name>-slot-<most>.lock. A job that takes the same file with plain flock is
+therefore an ordinary holder, which is how a lock that predates a declaration
+keeps working beside it. Changing a resource between one slot and several
+renames its files, so do that while nothing holds it.
+
+Admission: a job takes the first slot file it can lock, then counts the other
+slot files that are locked. It keeps its slot only while that count is below
+the slots for the current time; otherwise it lets go and polls again. Every
+job that keeps a slot was counted by any job admitted after it, so the limit
+holds without a second lock, and a job that started under a larger count
+keeps its slot when a window lowers it while new jobs wait.
+
+Requires flock(1) and $XDG_RUNTIME_DIR for run; without either, run refuses
+instead of running the command unlocked.
+Test seams: FM_RESOURCE_LOCK_NOW=<HH:MM> replaces the wall clock, and
+FM_RESOURCE_LOCK_POLL_SECS the seconds between polls (default 5).
+[exit 2]
+SCENARIO: command arguments and exit status survive the wrapper
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E5G3VE4WRF2AH7TSMB9MDJ/bin/fm-resource-lock.sh run gpu -- sh -c 'printf "arg=<%s>\n" "$@"; exit 7' argv 'two words' '' 'literal$()'
+arg=<two words>
+arg=<>
+arg=<literal$()>
+resource-lock: holding gpu slot 1
+[exit 7]
+All direct CLI scenarios passed. No operator home or runtime files were used.

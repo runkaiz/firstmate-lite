@@ -1,0 +1,41 @@
+Warning: this sign-in ends between 2026-11-18 and 2026-11-21 (in 3 days at the earliest). Renewing it does not move those dates. Run claude
+auth login before then, or use claude setup-token for unattended jobs.
+The script `bash .test-live/spawn-scenario.sh` exited with code **1**. It produced no output on stdout or stderr.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pane is dead (status 0, Sat Nov 14 19:23:58 2026)

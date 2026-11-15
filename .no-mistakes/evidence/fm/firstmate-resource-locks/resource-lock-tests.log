@@ -1,0 +1,12 @@
+ok - brief renders declared resources, multiple windows, and descriptions
+ok - an absent declaration declares nothing and adds no brief section
+ok - an unreadable declaration refuses brief and run rather than guessing a limit
+ok - the brief names each resource and gives a wrapper a worker can run as written
+ok - run refuses an undeclared resource, a missing runtime directory, and a missing flock without running the command
+ok - run returns the command's own status and passes its arguments unchanged
+ok - nested wrappers retain both locks while waiting and running, then release both
+ok - competing jobs following brief order finish without circular waits and release both resources
+ok - run applies window boundaries, midnight crossing, first-match priority, and maximum slots
+ok - a resource never runs more jobs at once than it has slots, and every job gets its turn
+ok - plain flock holders and wrapped jobs share the same slots, including a one-slot <name>.lock
+ok - a window lowers the count for new jobs without evicting a running one
