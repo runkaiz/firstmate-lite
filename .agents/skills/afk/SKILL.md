@@ -2,7 +2,7 @@
 name: afk
 description: >-
   Enter the away posture when the captain invokes /afk, says they are going afk, `state/.afk-contract` or `state/.afk` exists, an incoming message starts with `FM_INJECT_MARK`, or any `state/.subsuper-*` marker is involved.
-  It writes the durable away-posture record with the captain's away words verbatim as the whole mandate in the same turn as /afk, before any other work and without waiting for a further go, reads the words back in plain sentences after entry, announces hold-for-return only at entry, keeps the one supervision session running in the away posture (on Pi the supervision branch acts on the words by its own judgment and takes every safe actionable wake with main parked, as the supervision host does on a non-Pi home that runs it; the daemon still delivers batched digests elsewhere for now), and on the first unmarked message renders the return brief from durable records before ordinary work resumes.
+  It writes the durable away-posture record with the captain's away words verbatim as the whole mandate in the same turn as /afk, before any other work and without waiting for a further go, reads the words back in plain sentences after entry, announces the away posture at entry, keeps the one supervision session running in the away posture (on Pi the supervision branch acts on the words by its own judgment and takes every safe actionable wake with main parked, as the supervision host does on a non-Pi home that runs it; the daemon still delivers batched digests elsewhere for now), and on the first unmarked message renders the return brief from durable records before ordinary work resumes.
 user-invocable: true
 metadata:
   internal: true
@@ -16,12 +16,11 @@ It never changes the authority set.
 The posture is a file, `state/.afk-contract`, written only by `bin/fm-afk-contract.sh` in the same turn as `/afk`; nothing infers the posture from chat.
 A record carrying quiet mode (`bin/fm-afk-contract.sh mode`) is not this posture: the captain is present, so none of this skill's holds for a return apply to it (the `quiet` skill owns it).
 Typing `/afk` is itself the go: the captain may not look at the screen again, so entry never waits for a further human response, and no read-back gates it or asks for a go.
-Hold-for-return is the default and the only reach profile this release records: there is no phone channel, and the entry announcement says so aloud every time.
 
 ## Entering: `/afk [words]`
 
 1. **Write the record first, in this same turn.**
-   Before any other work, run `bin/fm-afk-launch.sh enter --words-file <path> [--expected-return <UTC ISO 8601>] [--spend <n>]` (or `--words <text>`).
+   Before any other work, run `bin/fm-afk-launch.sh enter --words-file <path>` (or `--words <text>`).
    It writes `state/.afk-contract` at once, with no separate confirmation step, then prints the entry announcement and the record's read-back.
    The words are the whole mandate: `bin/fm-afk-contract.sh` records them exactly as given, with no clause fields, verbs, ids, or merge-grant list, and by the captain's mandate no parser, tokenizer, classifier, or grammar reads them anywhere.
    Read `bin/fm-afk-contract.sh --help` for the flags rather than memorizing them.
@@ -48,8 +47,8 @@ Hold-for-return is the default and the only reach profile this release records: 
    Both daemon paths require the record `enter` wrote and share `bin/fm-afk-start.sh` as the daemon entry.
    The daemon is **presence-gated**: it injects escalations only while `state/.afk` exists, and stays quiet otherwise.
 3. **Announce, then read back after entry.**
-   Relay the announcement in spirit: hold-for-return only, no phone channel, your instructions are recorded and the away session will carry them out where it can, anything it is unsure of, or that needs you, waits for your return, and destructive, irreversible, and security-sensitive actions are never pre-authorizable whatever the words say.
-   Then give your own plain-sentence restatement of the words in `AGENTS.md` section 9 language - what you read them as asking for, sentence by sentence, never a numbered field list - beside the expected return, the spend cap, and the one-sentence reach announcement.
+   Relay the announcement in spirit: your instructions are recorded and the away session will carry them out where it can, anything it is unsure of, or that needs you, waits for your return, and destructive, irreversible, and security-sensitive actions are never pre-authorizable whatever the words say.
+   Then give your own plain-sentence restatement of the words in `AGENTS.md` section 9 language - what you read them as asking for, sentence by sentence, never a numbered field list.
    Say plainly which sentence, if any, you could not act on while away (a red merge, a discard, anything on the never-set, a local landing without standing authority); it waits for their return.
    This read-back is informational: the record already stands, so never ask for a go or wait for a reply; a captain who wants a different reading sends `/afk` again with new words.
 4. **Do not separately arm `fm-watch.sh` where the daemon runs.** The daemon manages the watcher as its child; the singleton lock no-ops a stray arm harmlessly.
@@ -57,7 +56,7 @@ Hold-for-return is the default and the only reach profile this release records: 
 
 ## While away
 
-For worker occupancy and preserving finished task evidence without retaining an AI-worker slot, follow `bin/fm-afk-capacity-lib.sh` and the lifecycle control plane in `docs/agent-control.md`.
+For the return brief's worker count and preserving finished task evidence after a verified stop, follow `bin/fm-afk-capacity-lib.sh` and the lifecycle control plane in `docs/agent-control.md`.
 For a capacity-blocked authorized handoff, follow `bin/fm-branch-prompt.sh` "Capacity recovery while away", including safe remediation or one concrete escalation rather than unchanged-wait churn.
 
 - The record exists, so the watcher never rechecks an item held for the captain, in either supervision shape; the return brief lists it instead.
@@ -65,7 +64,7 @@ For a capacity-blocked authorized handoff, follow `bin/fm-branch-prompt.sh` "Cap
 - The away session acts on the captain's words.
   It reads them at the tail of every wake, decides by its own judgment whether the event in front of it is the moment they name, acts on them only through the guarded scripts under standing authority, never by analogy, holds with verdict captain on doubt, and opens every outcome summary for an action taken under the words with "per your away instructions:" (`bin/fm-branch-prompt.sh` "Postures" owns the execution rules).
   Destructive, irreversible, and security-sensitive actions are never pre-authorizable whatever the words say, and ask-user findings keep the `ask-user-authority` policy unless the words pre-answer the exact decision; anything else that needs the captain holds for their return.
-- On Pi, main is parked and the supervision branch handles every safe actionable wake under main's standing authority, through the same guarded scripts main would use: any pull request green at its live head may merge (which one the words meant is the branch's reading), queued work whose blockers cleared - already queued, or filed by the branch because the words explicitly call for it - dispatches within the spend cap, and a decision is answered with the captain's own pre-stated answer or under `ask-user-authority`.
+- On Pi, main is parked and the supervision branch handles every safe actionable wake under main's standing authority, through the same guarded scripts main would use: any pull request green at its live head may merge (which one the words meant is the branch's reading), queued work whose blockers cleared - already queued, or filed by the branch because the words explicitly call for it - dispatches within project capacity, and a decision is answered with the captain's own pre-stated answer or under `ask-user-authority`.
   Anything else holds for the return, a red merge never proceeds while away, local-only landing uses `bin/fm-merge-local.sh` under existing standing authority with verified passing validation evidence, and only a wake the branch declines (including a broken branch or unsafe scan) or a watcher failure wakes main (`docs/pi-supervision-branch.md` "Postures").
 - On a non-Pi home that runs the supervision host, the host's engine is that branch under the same rules, and a wake it hands back reaches main through that harness's own wake path (`Stop hook feedback` on Claude, a `watcher` follow-up on Cursor, OpenCode, and omp, the arm's background-task-completed notification on Grok, the checkpoint's output on Codex) with a `supervision-host:` line: that is automatic supervision, never the captain's return, so handle it under the away posture ([supervision protocol](../../../docs/supervision-protocols/supervision-host.md)).
 - The session-start digest reports the posture under its AFK subsection, so a restart re-enters the posture from the record, not from memory.
@@ -103,7 +102,7 @@ While the away-posture record exists, any pull request green at its live head ma
 Away authority never releases a captain hold, and it expires when the away record is archived.
 `--allow-red` and `--allow-missing` remain attended-only and are refused while the away record exists.
 A merge under away authority must be synchronous; `fm-pr-merge.sh` refuses auto-merge and any GitHub queue state that cannot prove an immediate merge while the away record exists.
-The same gates bind whichever actor performs the action: on Pi the parked main's standing authority relocates to the supervision branch, which meets exactly these rules, and the spend cap recorded at entry is enforced by `fm-spawn.sh` for both actors while the away record exists.
+The same gates bind whichever actor performs the action: on Pi the parked main's standing authority relocates to the supervision branch, which meets exactly these rules.
 The captain's away words are their explicit instruction given before leaving, recorded verbatim and acted on by the away session's judgment at the moment an event makes them relevant; the words cover nothing they do not say, are never applied by analogy, and die at archive.
 Destructive, irreversible, and security-sensitive actions are never pre-authorizable whatever the words say.
 

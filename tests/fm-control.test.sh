@@ -1134,34 +1134,22 @@ EOF
   pass "fm-control-lib: only a runtime's own recorded session has a relaunch resume form"
 }
 
-write_afk_fixture() {  # <case-dir> [cap]
-  cat > "$1/home/state/.afk-contract" <<EOF
-version: 2
-entered: 2026-10-24T00:00:00Z
-entered_epoch: 1792800000
-expected_return: -
-reach_channels: none
-reach_announced: Fixture only.
-spend_max_concurrent_workers: ${2:-1}
-confirmed: 2026-10-24T00:00:00Z
-confirmed_epoch: 1792800000
-words: -
-EOF
-}
-
-# No project is supplied: admission either refuses first, or ordinary input
-# validation stops it. Neither path allocates an endpoint/worktree/provider.
-afk_fresh_attempt() {  # <case-dir>
+# shellcheck disable=SC2016 # Variables expand in the child Bash process.
+worker_count() {  # <case-dir>; the return brief's conservative population
   env PATH="$1/fakebin:$PATH" FM_HOME="$1/home" FM_FAKE_DIR="$1/fake" \
-    FM_ROOT_OVERRIDE="$ROOT" FM_SPAWN_NO_GUARD=1 \
-    "$ROOT/bin/fm-spawn.sh" newcomer --mode local-only --yolo off 2>&1
+    bash -c '
+      . "$1/bin/fm-backend.sh"
+      . "$1/bin/fm-wake-lib.sh"
+      . "$1/bin/fm-afk-capacity-lib.sh"
+      fm_afk_capacity_count "$2/state"
+      printf "%s\n" "$FM_AFK_CAPACITY_COUNT"
+    ' _ "$ROOT" "$1/home"
 }
 
-test_afk_slots_require_a_verified_stop_and_preserve_evidence() {
+test_return_count_requires_a_verified_stop_and_preserves_evidence() {
   local dir out state before_meta before_report before_status before_code
   dir=$(new_case afk-preserved)
   add_task "$dir" t1 claude scout
-  write_afk_fixture "$dir"
   printf 'proof\n' > "$dir/home/data/t1/report.md"
   printf 'unfinished code\n' > "$dir/wt-t1/uncommitted.txt"
   printf 'hold=preserve\npr=https://example.invalid/o/r/pull/1\nspawn_gen=original\n' >> "$dir/home/state/t1.meta"
@@ -1172,27 +1160,25 @@ test_afk_slots_require_a_verified_stop_and_preserve_evidence() {
     'done: landed-awaiting-cleanup' 'needs-decision [key=keep]: retained' \
     'done: reset-held reference'; do
     printf '%s\n' "$state" > "$dir/home/state/t1.status"
-    out=$(afk_fresh_attempt "$dir") || :
-    assert_contains "$out" 'caps concurrent workers at 1' "status alone freed a slot: $state"
+    out=$(worker_count "$dir")
+    [ "$out" = 1 ] || fail "status alone freed a slot: $state"
   done
   before_status=$(cat "$dir/home/state/t1.status")
   # Exit is idempotent on this provider-proven stopped agent. It releases
   # occupancy without a cleanup, merge, or change to report/code/hold/status.
   out=$(run_control "$dir" t1 exit) || fail "confirmed exit failed: $out"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_not_contains "$out" 'caps concurrent workers' 'confirmed stopped worker still occupies a slot'
+  out=$(worker_count "$dir")
+  [ "$out" = 0 ] || fail 'confirmed stopped worker still occupies a slot'
   [ "$(grep -v '^afk_worker_stopped=' "$dir/home/state/t1.meta")" = "$before_meta" ] || fail 'stop changed unrelated metadata'
   [ "$(cat "$dir/home/data/t1/report.md")" = "$before_report" ] || fail 'report changed'
   [ "$(cat "$dir/home/state/t1.status")" = "$before_status" ] || fail 'hold/status changed'
   [ "$(cat "$dir/wt-t1/uncommitted.txt")" = "$before_code" ] || fail 'unlanded code changed'
-  [ ! -e "$dir/home/state/newcomer.meta" ] || fail 'admission probe published a worker'
-  pass 'AFK: completion/PR/holds do not imply stopped; confirmed stop frees capacity and preserves evidence'
+  pass 'return count: completion/PR/holds do not imply stopped; confirmed stop updates count and preserves evidence'
 }
 
-test_afk_staged_contexts_and_history_block_handoff_until_parked() {
+test_return_count_excludes_stopped_staged_contexts_and_history() {
   local dir out id n before before_status
   dir=$(new_case afk-staged-handoff)
-  write_afk_fixture "$dir" 4
   # Five independent staged contexts, ten unreconciled deferred records and
   # one validated repair awaiting delivery: none yet has a stopped receipt.
   for n in {1..16}; do
@@ -1209,22 +1195,15 @@ test_afk_staged_contexts_and_history_block_handoff_until_parked() {
   done
   for n in {1..16}; do printf 'fm-context-%s\n' "$n"; done > "$dir/fake/windows"
   printf 'done: repair validated; delivery pending\n' > "$dir/home/state/context-16.status"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers at 4; 16 AI worker slot(s)' 'workload did not reproduce the handoff refusal'
-  # One-variable counterfactual: no additional away cap does not interpret
-  # mandate text or change the conservative population; admission passes it.
-  write_afk_fixture "$dir" -
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_not_contains "$out" 'caps concurrent workers' 'unspecified cap blocked the handoff'
-  write_afk_fixture "$dir" 4
+  out=$(worker_count "$dir")
+  [ "$out" = 16 ] || fail 'all retained workers must count before stop proof'
   # First park the ten deferred workers through their owner. They become
   # historical records with receipts, distinct from the six remaining holders.
-  # Then park three staged contexts to admit delivery under the unchanged cap.
+  # Then park three staged contexts and verify the remaining return count.
   for n in {6..15} {1..3}; do
     if [ "$n" -eq 1 ]; then
-      out=$(afk_fresh_attempt "$dir") || :
-      assert_contains "$out" 'caps concurrent workers at 4; 6 AI worker slot(s)' 'parked history still occupied slots'
-      assert_contains "$out" '(context-1, context-16, context-2, context-3, context-4, context-5)' 'parked history and remaining workers were not distinguished'
+      out=$(worker_count "$dir")
+      [ "$out" = 6 ] || fail 'parked history still occupied slots'
     fi
     id="context-$n"
     before=$(cat "$dir/home/state/$id.meta")
@@ -1235,39 +1214,37 @@ test_afk_staged_contexts_and_history_block_handoff_until_parked() {
     [ "$(cat "$dir/wt-$id/uncommitted.txt")" = "unmerged change $n" ] || fail 'unmerged copy changed'
     [ "$(cat "$dir/home/state/$id.status")" = "$before_status" ] || fail 'parking reactivated deferred work'
   done
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_not_contains "$out" 'caps concurrent workers' 'supported parking did not admit delivery'
+  out=$(worker_count "$dir")
+  [ "$out" = 3 ] || fail 'supported parking did not update return count'
   # One unknown historical owner is still charged, even with no incarnation
   # or endpoint: this is a genuine reconciliation blocker, not free capacity.
   printf 'kind=scout\n' > "$dir/home/state/unattributed.meta"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers at 4; 4 AI worker slot(s)' 'unknown owner silently freed capacity'
-  assert_contains "$out" 'unattributed' 'refusal did not identify the unresolved holder'
-  pass 'AFK: staged contexts plus historical records reproduce refusal; supported parking admits delivery without cleanup; unknown ownership still blocks'
+  out=$(worker_count "$dir")
+  [ "$out" = 4 ] || fail 'unknown owner was omitted from return count'
+  pass 'return count: stopped staged and historical workers preserve evidence; unknown ownership remains counted'
 }
 
 test_afk_late_unknown_and_stale_workers_count_conservatively() {
   local dir out command
   dir=$(new_case afk-uncertain)
   add_task "$dir" t1 claude
-  write_afk_fixture "$dir"
   out=$(run_control "$dir" t1 exit) || fail "fixture stop failed: $out"
   for command in claude mystery-runtime; do
     alive_as "$dir" "$command"
-    out=$(afk_fresh_attempt "$dir") || :
-    assert_contains "$out" '1 AI worker slot(s) are occupied or unconfirmed (t1)' "late/unknown worker was released: $command"
+    out=$(worker_count "$dir")
+    [ "$out" = 1 ] || fail "late/unknown worker was released: $command"
   done
   alive_as "$dir" zsh
   : > "$dir/fake/windows"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers' 'missing tmux endpoint implied stopped'
+  out=$(worker_count "$dir")
+  [ "$out" = 1 ] || fail 'missing tmux endpoint implied stopped'
   printf 'fm-t1\n' > "$dir/fake/windows"
   printf 'spawn_gen=replacement\n' >> "$dir/home/state/t1.meta"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers' 'stale stop receipt freed replacement incarnation'
+  out=$(worker_count "$dir")
+  [ "$out" = 1 ] || fail 'stale stop receipt freed replacement incarnation'
   printf 'backend=bogus\n' >> "$dir/home/state/t1.meta"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers' 'unsupported liveness freed capacity'
+  out=$(worker_count "$dir")
+  [ "$out" = 1 ] || fail 'unsupported liveness changed return count'
   pass 'AFK: late agents, unknown/missing/unsupported liveness and stale receipts retain occupancy'
 }
 
@@ -1275,7 +1252,6 @@ test_afk_stopped_steering_cannot_bypass_relaunch() {
   local dir out rc target
   dir=$(new_case afk-steer)
   add_task "$dir" t1 claude
-  write_afk_fixture "$dir"
   out=$(run_control "$dir" t1 exit) || fail "fixture stop failed: $out"
   for target in t1 fmses:fm-t1; do
     out=$(env PATH="$dir/fakebin:$PATH" FM_HOME="$dir/home" FM_FAKE_DIR="$dir/fake" \
@@ -1298,13 +1274,12 @@ test_afk_background_computation_is_not_worker_occupancy() {
   local dir out job rc=0
   dir=$(new_case afk-background)
   add_task "$dir" t1 claude
-  write_afk_fixture "$dir"
   /bin/sleep 30 &
   job=$!
   out=$(run_control "$dir" t1 exit) || rc=1
   if [ "$rc" = 0 ]; then
-    out=$(afk_fresh_attempt "$dir") || :
-    case "$out" in *'caps concurrent workers'*) rc=1 ;; esac
+    out=$(worker_count "$dir")
+    [ "$out" = 0 ] || rc=1
     kill -0 "$job" 2>/dev/null || rc=1
   fi
   kill "$job" 2>/dev/null || :
@@ -1313,11 +1288,10 @@ test_afk_background_computation_is_not_worker_occupancy() {
   pass 'AFK: confirmed stopped AI worker releases its slot while unrelated background work remains running'
 }
 
-test_afk_preserved_nine_record_fleet_no_longer_exhausts_four_slots() {
+test_return_count_excludes_nine_preserved_stopped_records() {
   local dir out i meta
   dir=$(new_case afk-nine)
   add_task "$dir" t1 claude scout
-  write_afk_fixture "$dir" 4
   for ((i=2; i<=9; i++)); do
     meta="$dir/home/state/t$i.meta"
     sed "s/fm-t1/fm-t$i/g; s/endpoint_task_id=t1/endpoint_task_id=t$i/" \
@@ -1331,25 +1305,25 @@ test_afk_preserved_nine_record_fleet_no_longer_exhausts_four_slots() {
   mkdir -p "$dir/home/data/history-only"
   printf 'historical proof\n' > "$dir/home/data/history-only/report.md"
   printf 'done: historical\n' > "$dir/home/state/history-only.status"
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_contains "$out" 'caps concurrent workers at 4; 9 AI worker slot(s)' 'nine-record lead no longer reproduces before stop proof'
+  out=$(worker_count "$dir")
+  [ "$out" = 9 ] || fail 'nine records must be counted before stop proof'
   for ((i=1; i<=9; i++)); do
     out=$(run_control "$dir" "t$i" exit) || fail "verified stop failed for t$i: $out"
   done
-  out=$(afk_fresh_attempt "$dir") || :
-  assert_not_contains "$out" 'caps concurrent workers' 'nine preserved stopped workers exhaust four AI slots'
+  out=$(worker_count "$dir")
+  [ "$out" = 0 ] || fail 'stopped records remained in return count'
   for ((i=2; i<=9; i++)); do
     [ -f "$dir/home/state/t$i.meta" ] && [ -f "$dir/home/data/t$i/report.md" ] \
       || fail "preserved record or report removed for t$i"
   done
-  pass 'AFK: nine retained worker records release four-cap admission after verified stops without deleting evidence'
+  pass 'return count: nine retained worker records are excluded after verified stops without deleting evidence'
 }
 
-test_afk_slots_require_a_verified_stop_and_preserve_evidence
+test_return_count_requires_a_verified_stop_and_preserves_evidence
 test_afk_late_unknown_and_stale_workers_count_conservatively
 test_afk_stopped_steering_cannot_bypass_relaunch
 test_afk_background_computation_is_not_worker_occupancy
-test_afk_preserved_nine_record_fleet_no_longer_exhausts_four_slots
+test_return_count_excludes_nine_preserved_stopped_records
 test_exit_types_each_harness_verified_command
 test_interrupt_sends_each_harness_verified_key
 test_devin_interrupt_invalidates_busy
@@ -1396,4 +1370,4 @@ test_grok_idle_footer_does_not_confirm_cancellation
 test_secondmate_control_command_carries_no_marker
 test_fm_send_still_marks_the_same_secondmate_task
 
-test_afk_staged_contexts_and_history_block_handoff_until_parked
+test_return_count_excludes_stopped_staged_contexts_and_history

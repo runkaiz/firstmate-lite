@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# AFK admission counts AI workers, including launching and unknown workers.
+# Return reporting counts AI workers, including launching and unknown workers.
 # Requires fm-backend.sh and fm-wake-lib.sh; sourcing has no side effects.
 #
 # Occupancy is conservative: every ordinary task record holds a slot unless
@@ -11,7 +11,7 @@
 #
 # The receipt lives in the task metadata and is bound to its incarnation.
 # Control writes it under the control and metadata locks after verified exit.
-# Relaunch takes the task-set lock, admits against the other workers, then
+# Relaunch takes the task-set lock, then
 # consumes the receipt under the metadata lock before launching. Failure after
 # consumption conservatively retains occupancy until another verified exit.
 # Fresh spawn holds that same task-set lock through metadata publication.
@@ -77,34 +77,14 @@ fm_afk_capacity_record_stop() {  # <meta>; caller holds control lock
   return "$rc"
 }
 
-# Outputs count + holder ids. With no exclusion this is also the reporting
-# population; a relaunch excludes its own already-reserved/released record.
-fm_afk_capacity_count() {  # <state> [exclude-id]
-  local state=$1 exclude=${2:-} meta id
+# Count the return brief's worker population.
+fm_afk_capacity_count() {  # <state>
+  local state=$1 meta
   FM_AFK_CAPACITY_COUNT=0
-  FM_AFK_CAPACITY_HOLDERS=
   for meta in "$state"/*.meta; do
     [ -f "$meta" ] || continue
-    id=${meta##*/}; id=${id%.meta}
-    [ "$id" != "$exclude" ] || continue
     [ "$(fm_meta_get "$meta" kind)" != secondmate ] || continue
     fm_afk_capacity_released "$meta" && continue
     FM_AFK_CAPACITY_COUNT=$((FM_AFK_CAPACITY_COUNT + 1))
-    FM_AFK_CAPACITY_HOLDERS="${FM_AFK_CAPACITY_HOLDERS:+$FM_AFK_CAPACITY_HOLDERS, }$id"
   done
-}
-
-fm_afk_capacity_check() {  # <state> <task-id> <fresh|relaunch>
-  local state=$1 id=$2 action=$3 cap exclude=
-  [ -f "$state/.afk-contract" ] || return 0
-  FM_STATE_OVERRIDE="$state" "$SCRIPT_DIR/fm-afk-contract.sh" validate >/dev/null 2>&1 || return 0
-  [ "$(FM_STATE_OVERRIDE="$state" "$SCRIPT_DIR/fm-afk-contract.sh" mode 2>/dev/null)" = away ] || return 0
-  cap=$(FM_STATE_OVERRIDE="$state" "$SCRIPT_DIR/fm-afk-contract.sh" field spend_max_concurrent_workers 2>/dev/null || true)
-  case "$cap" in ''|*[!0-9]*|0) return 0 ;; esac
-  [ "$action" != relaunch ] || exclude=$id
-  fm_afk_capacity_count "$state" "$exclude"
-  if [ "$FM_AFK_CAPACITY_COUNT" -ge "$cap" ]; then
-    echo "error: spawn refused - the away-posture record caps concurrent workers at $cap; $FM_AFK_CAPACITY_COUNT AI worker slot(s) are occupied or unconfirmed ($FM_AFK_CAPACITY_HOLDERS). Task $id stays queued or stopped. Completion alone does not release a slot: use fm-control exit to confirm a worker stopped; preserved reports and work need no cleanup." >&2
-    return 1
-  fi
 }

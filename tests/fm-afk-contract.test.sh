@@ -68,12 +68,9 @@ test_readback_renders_words_verbatim_with_the_record_scalars() {
   home=$(make_home readback)
   words="$home/words.txt"
   printf 'drive the windows fix to green and merge it,\n  cut a prerelease; then re-run "nm-ci-windows"\n\tif the install deadlocks abort the competing pipeline\nmerge task y even if nm-ci-windows looks red enough, honestly\n' > "$words"
-  out=$(contract "$home" enter --words-file "$words" --expected-return 2026-09-08T08:00Z --spend 3 2>&1) \
+  out=$(contract "$home" enter --words-file "$words" 2>&1) \
     || fail "entry with words failed: $out"
   assert_contains "$out" 'Away posture (recorded):' 'read-back title'
-  assert_contains "$out" 'expected return: 2026-09-08T08:00Z' 'expected return rendered'
-  assert_contains "$out" 'spend cap: 3 concurrent workers' 'spend cap rendered'
-  assert_contains "$out" 'reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.' 'reach rendered'
   assert_contains "$out" '  your words (verbatim):' 'words header'
   assert_contains "$out" '    drive the windows fix to green and merge it,' 'words line 1'
   assert_contains "$out" '      cut a prerelease; then re-run "nm-ci-windows"' 'words line 2 keeps its own indentation and quotes'
@@ -85,7 +82,7 @@ test_readback_renders_words_verbatim_with_the_record_scalars() {
   assert_not_contains "$out" 'task ids' 'the read-back must carry no merge-grant list'
   # The verbatim words survive the record byte for byte, trailing newline included.
   [ "$(contract "$home" words; printf x)" = "$(cat "$words"; printf x)" ] || fail "the record did not keep the words verbatim"
-  pass "the read-back renders the words verbatim beside the expected return, spend cap, and reach line"
+  pass "the read-back renders the words verbatim beside the entry time"
 }
 
 test_words_preserve_final_newline_shape() {
@@ -124,10 +121,9 @@ test_enter_writes_a_v2_record_in_one_step_and_announces_hold_for_return() {
   [ -f "$record" ] || fail "enter did not write the record"
   [ ! -e "$home/state/.afk-contract.proposed" ] || fail "enter staged a proposal instead of writing the record"
   assert_contains "$out" 'Away posture recorded at ' 'announcement opens with the recorded time'
-  assert_contains "$out" 'hold-for-return only. No phone channel is configured; anything that needs you waits for your return.' 'announcement says hold-for-return only, aloud'
+  assert_contains "$out" 'anything it is unsure of, or that needs you, waits for your return.' 'announcement keeps return holds'
   assert_contains "$out" 'Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return.' 'announcement says the words will be carried out'
   assert_contains "$out" 'Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.' 'announcement states the never-set'
-  assert_contains "$out" 'Expected return: not given. Spend cap: not set (no additional away limit).' 'announcement carries the defaults'
   assert_contains "$out" 'Away posture (recorded):' 'the read-back follows the entry'
   assert_contains "$out" '    merge it when green' 'the read-back carries the words'
   assert_not_contains "$out" 'Say go' 'entry must never ask for a go'
@@ -135,7 +131,6 @@ test_enter_writes_a_v2_record_in_one_step_and_announces_hold_for_return() {
   assert_not_contains "$out" 'not executed' 'the announcement must not call the words inert'
   assert_not_contains "$out" 'clause' 'the announcement must carry no clause apparatus'
   [ "$(contract "$home" field version)" = 2 ] || fail "record version is not 2: $(contract "$home" field version)"
-  [ "$(contract "$home" field reach_channels)" = none ] || fail "reach channels are not none"
   case "$(contract "$home" field confirmed_epoch)" in ''|*[!0-9]*) fail "confirmed_epoch is not numeric" ;; esac
   case "$(contract "$home" field entered_epoch)" in ''|*[!0-9]*) fail "entered_epoch is not numeric" ;; esac
   [ "$(contract "$home" field entered_epoch)" -ge "$before" ] && [ "$(contract "$home" field entered_epoch)" -le "$after" ] \
@@ -149,7 +144,7 @@ test_enter_writes_a_v2_record_in_one_step_and_announces_hold_for_return() {
   out=$(contract "$home" readback) || fail "readback of the record failed"
   assert_contains "$out" 'Away posture (recorded):' 'read-back title'
   assert_contains "$out" '    merge it when green' 'read-back carries the words'
-  pass "one enter call writes a version 2 record, announces hold-for-return only, reads it back without asking for a go, and every read subcommand reflects it"
+  pass "one enter call writes a version 2 record, announces the away posture, reads it back without asking for a go, and every read subcommand reflects it"
 }
 
 # The wait-for-go gate is gone: the retired two-step subcommands and the
@@ -204,7 +199,7 @@ test_same_turn_entry_pre_authorizes_nothing_on_the_never_set() {
   out=$(contract "$home" enter --words "$words" 2>&1) || fail "never-set entry failed: $out"
   [ "$(contract "$home" words)" = "$words" ] || fail "the never-set words were not recorded verbatim"
   keys=$(sed -n 's/^\([a-z_]*\):.*/\1/p' "$home/state/.afk-contract" | tr '\n' ' ')
-  [ "$keys" = 'version entered entered_epoch expected_return reach_channels reach_announced spend_max_concurrent_workers confirmed confirmed_epoch words ' ] \
+  [ "$keys" = 'version entered entered_epoch confirmed confirmed_epoch words ' ] \
     || fail "the record carries fields beyond its fixed schema: $keys"
   assert_contains "$out" 'Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.' \
     'the same-turn announcement must restate the never-set'
@@ -217,14 +212,13 @@ test_plain_entry_and_refresh_leave_no_wait() {
   out=$(contract "$home" enter 2>&1) || fail "plain entry failed: $out"
   [ -f "$home/state/.afk-contract" ] || fail "plain entry did not write the record"
   assert_contains "$out" 'No away instructions were recorded; the away session acts on standing authority only, and anything that needs you waits for your return.' 'plain announcement'
-  assert_contains "$out" 'hold-for-return only.' 'plain announcement says hold-for-return'
+  assert_contains "$out" 'waits for your return.' 'plain announcement says hold-for-return'
   assert_contains "$out" '  your words: (none)' 'a plain entry reads back no words'
   first=$(cat "$home/state/.afk-contract")
   sleep 1
-  out=$(contract "$home" enter --spend 9 2>&1) || fail "refresh failed: $out"
+  out=$(contract "$home" enter 2>&1) || fail "refresh failed: $out"
   assert_contains "$out" 'already recorded at' 'refresh names the standing record'
-  assert_contains "$out" 'were not applied' 'refresh says its scalars were not applied'
-  assert_contains "$out" 'hold-for-return only.' 'refresh repeats the announcement'
+  assert_contains "$out" 'waits for your return.' 'refresh repeats the announcement'
   [ "$(cat "$home/state/.afk-contract")" = "$first" ] || fail "a refresh rewrote the standing record"
   pass "a plain entry records no mandate in one step, and a refresh leaves the standing record untouched"
 }
@@ -391,19 +385,16 @@ test_archive_moves_the_record_aside_and_is_idempotent() {
 }
 
 test_inputs_are_validated() {
-  local home out rc
+  local home out rc flag
   home=$(make_home inputs)
-  set +e
-  out=$(contract "$home" enter --expected-return 'tomorrow morning' 2>&1)
-  rc=$?
-  set -e
-  [ "$rc" -eq 2 ] || fail "a non-ISO expected return should be a usage error (rc=$rc): $out"
-  assert_contains "$out" '--expected-return must be UTC ISO 8601' 'expected-return refusal wording'
-  set +e
-  out=$(contract "$home" enter --spend 0 2>&1)
-  rc=$?
-  set -e
-  [ "$rc" -eq 2 ] || fail "a zero spend cap should be a usage error (rc=$rc): $out"
+  for flag in --expected-return --spend; do
+    set +e
+    out=$(contract "$home" enter "$flag" unused 2>&1)
+    rc=$?
+    set -e
+    [ "$rc" -eq 2 ] || fail "removed option $flag should be a usage error (rc=$rc): $out"
+    [ ! -e "$home/state/.afk-contract" ] || fail "removed option wrote a record"
+  done
   set +e
   out=$(contract "$home" enter --words-file "$home/absent.txt" 2>&1)
   rc=$?
@@ -467,14 +458,10 @@ test_version_1_record_still_validates_reads_and_archives() {
   write_v1_record "$home" 'merge the windows fix when green'
   contract "$home" validate || fail "a version 1 record must still validate"
   [ "$(contract "$home" field version)" = 1 ] || fail "field did not read the version 1 record"
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = 3 ] || fail "field did not read the v1 spend cap"
-  [ "$(contract "$home" field expected_return)" = 2026-09-20T09:00:00Z ] || fail "field did not read the v1 expected return"
   [ "$(contract "$home" words; printf x)" = 'merge the windows fix when greenx' ] \
     || fail "words did not read the v1 words block bounded by its clauses section: $(contract "$home" words)"
   out=$(contract "$home" readback) || fail "readback of a version 1 record failed"
   assert_contains "$out" 'Away posture (recorded):' 'v1 read-back title'
-  assert_contains "$out" 'spend cap: 3 concurrent workers' 'v1 read-back spend cap'
-  assert_contains "$out" 'expected return: 2026-09-20T09:00:00Z' 'v1 read-back expected return'
   assert_contains "$out" '    merge the windows fix when green' 'v1 read-back words'
   assert_not_contains "$out" 'task x1 PR' 'the ignored v1 clauses leaked into the read-back'
   assert_not_contains "$out" 'task-x1' 'the ignored v1 merge grants leaked into the read-back'
@@ -588,7 +575,7 @@ test_quiet_record_reads_as_a_present_captain_holding_nothing() {
   home=$(make_home away-still-holds)
   out=$(contract "$home" enter 2>&1) || fail "away entry failed: $out"
   assert_contains "$out" 'Away posture recorded at ' 'away announcement unchanged'
-  assert_contains "$out" 'hold-for-return only' 'away announcement still holds for the return'
+  assert_contains "$out" 'waits for your return' 'away announcement still holds for the return'
   [ "$(contract "$home" mode)" = away ] || fail "mode of an away record is not away"
   printf 'version: 2\nmode: bogus\n' > "$home/other-record"
   [ "$(contract "$home" mode --path "$home/other-record")" = away ] \
@@ -607,7 +594,7 @@ test_away_entry_over_quiet_mode_becomes_away_and_quiet_never_masks_away() {
   quiet_entered=$(contract "$home" field entered_epoch)
   out=$(contract "$home" enter 2>&1) || fail "away refresh over quiet failed: $out"
   assert_contains "$out" 'quiet mode became the away posture' 'the conversion names itself'
-  assert_contains "$out" 'hold-for-return only' 'the converted record holds for the return'
+  assert_contains "$out" 'waits for your return' 'the converted record holds for the return'
   [ "$(contract "$home" mode)" = away ] || fail "an /afk refresh over quiet mode left the record quiet"
   ls "$home/state/afk-contracts/$quiet_entered-superseded-"*.afk-contract >/dev/null 2>&1 \
     || fail "the quiet record was not archived when it became away"
@@ -615,31 +602,37 @@ test_away_entry_over_quiet_mode_becomes_away_and_quiet_never_masks_away() {
   home=$(make_home away-not-masked)
   contract "$home" enter --words 'merge it when green' >/dev/null 2>&1 || fail "away entry failed"
   out=$(FM_AFK_MODE=quiet contract "$home" enter 2>&1) || fail "quiet refresh over away failed: $out"
-  assert_contains "$out" 'hold-for-return only' 'a quiet refresh over away still reads away'
+  assert_contains "$out" 'waits for your return' 'a quiet refresh over away still reads away'
   [ "$(contract "$home" mode)" = away ] || fail "a quiet refresh turned an away record quiet"
   FM_AFK_MODE=quiet contract "$home" enter --words 'new words' >/dev/null 2>&1 || fail "quiet replacement over away failed"
   [ "$(contract "$home" mode)" = away ] || fail "a quiet replacement turned an away record quiet"
   pass "an away entry over quiet mode records away, and a quiet entry never masks a standing away record"
 }
 
-test_cap_is_user_selected_and_replacements_preserve_finite_limits() {
-  local home out
-  home=$(make_home cap-selection)
-  out=$(contract "$home" enter --words 'finish the authorized handoff' 2>&1) || fail "$out"
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = - ] || fail 'entry invented a concurrency cap'
-  assert_contains "$out" 'spend cap: not set (no additional away limit)' 'entry hides unspecified cap'
-  contract "$home" validate || fail 'uncapped record is invalid'
-  contract "$home" enter --words 'finish the handoff with a finite limit' --spend 2 >/dev/null || fail 'explicit cap failed'
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = 2 ] || fail 'explicit cap lost'
-  contract "$home" enter --words 'continue the same authorized work' >/dev/null || fail 'replacement failed'
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = 2 ] || fail 'new words silently relaxed finite cap'
-  contract "$home" enter --words 'continue with revised explicit limit' --spend 3 >/dev/null || fail 'explicit revision failed'
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = 3 ] || fail 'explicit revision lost'
-  home=$(make_home legacy-cap-selection)
-  write_v1_record "$home" 'finish authorized work'
-  contract "$home" enter --words 'continue authorized work' >/dev/null || fail 'legacy replacement failed'
-  [ "$(contract "$home" field spend_max_concurrent_workers)" = 3 ] || fail 'legacy finite cap silently relaxed'
-  pass 'AFK: no invented default; explicit and legacy finite caps survive replacement words'
+# Legacy fields are ignored even when malformed; archive and refresh preserve bytes.
+test_retired_fields_in_old_records_are_ignored_without_migration() {
+  local home version before archived out
+  for version in 1 2; do
+    home=$(make_home "ignored-fields-$version")
+    write_v1_record "$home" 'keep working'
+    if [ "$version" = 2 ]; then
+      sed '/^clauses:/,$d; s/^version: 1$/version: 2/' "$home/state/.afk-contract" > "$home/new-record"
+      mv "$home/new-record" "$home/state/.afk-contract"
+    fi
+    sed 's/^expected_return:.*/expected_return: unused/; s/^reach_channels:.*/reach_channels: retired/; s/^spend_max_concurrent_workers:.*/spend_max_concurrent_workers: invalid/' "$home/state/.afk-contract" > "$home/new-record"
+    mv "$home/new-record" "$home/state/.afk-contract"
+    before=$(cat "$home/state/.afk-contract")
+    contract "$home" validate || fail "legacy v$version fields affected validation"
+    out=$(contract "$home" enter) || fail "legacy refresh failed"
+    assert_not_contains "$out" 'unused' 'removed expected return leaked into output'
+    assert_not_contains "$out" 'No phone channel' 'removed reach announcement leaked into output'
+    assert_not_contains "$out" 'spend cap' 'removed cap leaked into output'
+    [ "$(cat "$home/state/.afk-contract")" = "$before" ] || fail 'refresh migrated old fields'
+    archived=$(contract "$home" archive) || fail 'legacy archive failed'
+    contract "$home" validate --path "$archived" || fail 'archived record unreadable'
+    [ "$(cat "$archived")" = "$before" ] || fail 'archive changed legacy bytes'
+  done
+  pass 'old away records ignore retired fields and remain readable without migration'
 }
 
 test_readback_renders_words_verbatim_with_the_record_scalars
@@ -663,4 +656,4 @@ test_record_changes_refuse_while_a_reader_holds_the_lock
 test_quiet_record_reads_as_a_present_captain_holding_nothing
 test_away_entry_over_quiet_mode_becomes_away_and_quiet_never_masks_away
 
-test_cap_is_user_selected_and_replacements_preserve_finite_limits
+test_retired_fields_in_old_records_are_ignored_without_migration

@@ -1333,8 +1333,7 @@ test_branch_cannot_force_teardown_or_directly_relaunch() {
 # The relocation is exactly bin/fm-lease-lib.sh's role-partition paragraph:
 # the branch passes the main-only partition for the PR merge and a fresh spawn
 # ONLY while a confirmed, live away-posture record exists; local-only landing
-# reaches its own standing-authority gate; the record's spend cap binds a fresh ordinary spawn for
-# either actor; and an unconfirmed, archived, or invalid record is absence,
+# reaches its own standing-authority gate; an unconfirmed, archived, or invalid record is absence,
 # restoring the attended refusal byte for byte.
 test_away_record_relocates_main_owned_actions_to_the_branch() {
   local home root out status refusal
@@ -1353,7 +1352,7 @@ test_away_record_relocates_main_owned_actions_to_the_branch() {
   assert_contains "$out" "$refusal" "attended refusal lost its wording"
 
   # /afk is the go: the one entry call writes the record that relocates.
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 2 >/dev/null || fail "away entry failed"
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter >/dev/null || fail "away entry failed"
 
   # Under the record the partition passes and the merge script reaches its
   # OWN gate (no task record here), never the partition refusal.
@@ -1369,8 +1368,12 @@ test_away_record_relocates_main_owned_actions_to_the_branch() {
   [ "$status" -ne 6 ] || fail "branch fm-merge-local was not relocated under the record (exit $status): $out"
   assert_contains "$out" "no meta for task task-x" "merge-local did not reach its own gate"
 
-  # A fresh spawn passes the partition and meets the spend cap: one ordinary
-  # task record against a cap of 2, then a second ordinary record refuses.
+  # A legacy finite cap is ignored for both actors, without rewriting it.
+  sed '/^words:/i\
+spend_max_concurrent_workers: 1
+' "$home/state/.afk-contract" > "$home/legacy-record"
+  mv "$home/legacy-record" "$home/state/.afk-contract"
+  # A fresh spawn passes the partition.
   # An arbitrary id is not already-queued work, so the branch is refused at
   # that gate rather than proceeding to ordinary validation.
   fm_write_meta "$home/state/task-a.meta" "window=fm-task-a" "kind=ship"
@@ -1381,45 +1384,11 @@ test_away_record_relocates_main_owned_actions_to_the_branch() {
   [ "$status" -ne 6 ] || fail "branch fm-spawn still hit the partition under the record: $out"
   assert_contains "$out" "main is parked" "the spawn relocation did not announce itself"
   assert_contains "$out" "queued unblocked work" "an arbitrary branch spawn was not held to queued work"
-  assert_not_contains "$out" "caps concurrent workers" "one ordinary task under a cap of 2 was refused"
-  fm_write_meta "$home/state/task-b.meta" "window=fm-task-b" "kind=ship"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_SUPERVISION_ACTOR=branch \
-    "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
+  # A raw launch command reaches project validation without host harness detection.
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new "$home/missing-project" 'sleep 600' --mode no-mistakes --yolo off 2>&1)
   status=$?
-  [ "$status" -eq 1 ] || fail "spend-cap refusal exited $status, not 1: $out"
-  assert_contains "$out" "caps concurrent workers at 2; 2 AI worker slot(s) are occupied or unconfirmed" "spend-cap refusal lost its count"
-  # The cap binds main too: the posture, not the actor, is what caps spend.
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
-  status=$?
-  [ "$status" -eq 1 ] || fail "main spawn past the cap exited $status, not 1: $out"
-  assert_contains "$out" "caps concurrent workers" "main was not held to the spend cap"
-
-  rm -f "$root/bin"
-  mkdir -p "$root/bin"
-  for f in "$ROOT/bin"/*; do
-    ln -s "$f" "$root/bin/${f##*/}"
-  done
-  rm -f "$root/bin/fm-afk-contract.sh"
-  cat > "$root/bin/fm-afk-contract.sh" <<WRAPPER
-#!/usr/bin/env bash
-set -eu
-REAL="$ROOT/bin/fm-afk-contract.sh"
-COUNT="$home/contract-call-count"
-n=0
-[ -f "\$COUNT" ] && n=\$(cat "\$COUNT")
-n=\$((n + 1))
-printf '%s\n' "\$n" > "\$COUNT"
-if [ "\$n" -eq 2 ]; then
-  "\$REAL" archive >/dev/null
-fi
-exec "\$REAL" "\$@"
-WRAPPER
-  chmod +x "$root/bin/fm-afk-contract.sh"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$root/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1) || true
-  assert_not_contains "$out" "caps concurrent workers" "a field-read after archive refused a main spawn via the spend cap"
-  assert_not_contains "$out" "no readable spend cap" "a field-read after archive killed the spawn instead of restoring attended behavior"
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 2 >/dev/null || fail "away re-entry failed"
-
+  [ "$status" -eq 1 ] || fail "missing-project main spawn exited $status: $out"
+  assert_contains "$out" "$home/missing-project" "legacy cap prevented ordinary project validation"
   # Archive is absence: the attended refusal returns, byte for byte.
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null || fail "away archive failed"
   out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-pr-merge.sh" task-x https://github.com/o/r/pull/1 2>&1)
@@ -1427,17 +1396,12 @@ WRAPPER
   [ "$status" -eq 6 ] || fail "an archived record still relocated the merge (exit $status): $out"
   assert_contains "$out" "$refusal" "the attended refusal changed after archive"
   assert_not_contains "$out" "main is parked" "an archived record still announced a relocation"
-  out=$(FM_HOME="$home" "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
-  assert_not_contains "$out" "caps concurrent workers" "the spend cap outlived the record"
   # A record that no longer validates is absence too.
   printf 'version: 99\n' > "$home/state/.afk-contract"
   out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-pr-merge.sh" task-x https://github.com/o/r/pull/1 2>&1)
   status=$?
   [ "$status" -eq 6 ] || fail "an invalid record relocated the merge (exit $status): $out"
   assert_contains "$out" "$refusal" "the attended refusal changed under an invalid record"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
-  assert_not_contains "$out" "caps concurrent workers" "an invalid record refused a main spawn via the spend cap"
-  assert_not_contains "$out" "no readable spend cap" "an invalid record refused a main spawn for an unreadable cap"
   # Quiet mode's record is a present captain (bin/fm-afk-contract.sh AWAY OR
   # QUIET), so it relocates nothing: main keeps its standing authority.
   rm -f "$home/state/.afk-contract"
@@ -1448,7 +1412,7 @@ WRAPPER
   [ "$status" -eq 6 ] || fail "quiet mode's record relocated the merge to the branch (exit $status): $out"
   assert_contains "$out" "$refusal" "the attended refusal changed under quiet mode's record"
   assert_not_contains "$out" "main is parked" "quiet mode's record announced a relocation"
-  pass "the away-posture record relocates the PR merge and a spawn under the spend cap to the branch, including guarded local landing, and only while confirmed, valid, and away"
+  pass "the away-posture record relocates the PR merge and a spawn to the branch, including guarded local landing, and only while confirmed, valid, and away"
 }
 
 test_away_branch_spawn_requires_queued_dispatchable_work() {
@@ -1470,7 +1434,7 @@ test_away_branch_spawn_requires_queued_dispatchable_work() {
 
 ## Done
 EOF
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 2 >/dev/null || fail "away entry failed"
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter >/dev/null || fail "away entry failed"
 
   out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_SUPERVISION_ACTOR=branch \
     "$ROOT/bin/fm-spawn.sh" task-arbitrary --mode no-mistakes --yolo off 2>&1)
@@ -1533,82 +1497,6 @@ WRAPPER
   pass "relocated branch spawn admits only already-queued dispatchable work, including on a manual-backend home"
 }
 
-# A quiet-mode record is a present captain: its spend cap never queues the
-# captain's own dispatch for a return, while an away record's cap still binds.
-test_quiet_record_never_caps_a_present_captains_spawn() {
-  local home root out
-  home="$TMP_ROOT/quiet-spend-home"
-  root="$TMP_ROOT/quiet-spend-root"
-  mkdir -p "$home/state" "$root/bin"
-  git init -q -b main "$root"
-  git -C "$root" commit -q --allow-empty -m init
-  FM_AFK_MODE=quiet FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 1 >/dev/null || fail "quiet entry failed"
-  fm_write_meta "$home/state/task-a.meta" "window=fm-task-a" "kind=ship"
-  fm_write_meta "$home/state/task-b.meta" "window=fm-task-b" "kind=ship"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
-  assert_not_contains "$out" "caps concurrent workers" "a quiet record capped a present captain's spawn"
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 1 >/dev/null 2>&1 || fail "away entry over quiet failed"
-  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
-  assert_contains "$out" "caps concurrent workers at 1; 2 AI worker slot(s) are occupied or unconfirmed" "the away record's cap no longer binds"
-  pass "a quiet-mode record never caps a present captain's spawn, while the away record's cap still binds"
-}
-
-test_away_spend_cap_is_rechecked_under_the_task_set_lock() {
-  local home root out i
-  home="$TMP_ROOT/away-cap-lock-home"
-  root="$TMP_ROOT/away-cap-lock-root"
-  mkdir -p "$home/state" "$home/data" "$home/config" "$root/bin"
-  git init -q -b main "$root"
-  git -C "$root" commit -q --allow-empty -m init
-  for f in "$ROOT/bin"/*; do
-    ln -s "$f" "$root/bin/${f##*/}"
-  done
-  rm -f "$root/bin/fm-afk-contract.sh"
-  cat > "$root/bin/fm-afk-contract.sh" <<WRAPPER
-#!/usr/bin/env bash
-set -eu
-REAL="$ROOT/bin/fm-afk-contract.sh"
-COUNT="$home/contract-field-count"
-if [ "\${1:-}" = field ]; then
-  n=0
-  [ -f "\$COUNT" ] && n=\$(cat "\$COUNT")
-  n=\$((n + 1))
-  printf '%s\n' "\$n" > "\$COUNT"
-  if [ "\$n" -eq 1 ]; then
-    : > "$home/early-cap-passed"
-    i=0
-    while [ ! -f "$home/competitor-published" ]; do
-      i=\$((i + 1))
-      [ "\$i" -lt 200 ] || exit 1
-      sleep 0.05
-    done
-  fi
-fi
-exec "\$REAL" "\$@"
-WRAPPER
-  chmod +x "$root/bin/fm-afk-contract.sh"
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --spend 1 >/dev/null || fail "away entry failed"
-
-  FM_HOME="$home" FM_ROOT_OVERRIDE="$root" \
-    "$root/bin/fm-spawn.sh" task-q1 --mode no-mistakes --yolo off \
-    > "$home/q1.out" 2>&1 &
-  i=0
-  while [ ! -f "$home/early-cap-passed" ]; do
-    i=$((i + 1))
-    [ "$i" -lt 200 ] || fail "spawn never reached the early spend-cap check: $(cat "$home/q1.out" 2>/dev/null || true)"
-    sleep 0.05
-  done
-  fm_write_meta "$home/state/task-live.meta" "window=fm-task-live" "kind=ship"
-  : > "$home/competitor-published"
-  wait || true
-  out=$(cat "$home/q1.out" 2>/dev/null || true)
-  assert_contains "$out" "caps concurrent workers at 1; 1 AI worker slot(s) are occupied or unconfirmed" \
-    "the paused spawn did not recheck the cap after the competitor published: $out"
-  [ ! -f "$home/state/task-q1.meta" ] || fail "the stale-count spawn published after a competitor landed"
-  pass "the away spend cap is rechecked under the task-set lock so concurrent spawns cannot both publish"
-}
-
-
 # A local-only fixture uses independent clones, never pool/worktree operations.
 test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   local home project worker out initial fakebin bcopy state
@@ -1627,7 +1515,7 @@ test_away_local_landing_keeps_authority_and_continues_eligible_work() {
   fm_write_meta "$home/state/task-a.meta" "project=$project" "worktree=$worker" \
     "kind=ship" "mode=local-only" "yolo=off" "branch=fm/task-a"
   printf 'done: ready in branch fm/task-a\n' > "$home/state/task-a.status"
-  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'continue approved work' --spend 4 >/dev/null || fail 'away entry'
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter --words 'continue approved work' >/dev/null || fail 'away entry'
   if out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-a 2>&1); then
     fail 'away landing without standing authority'
   fi
@@ -1722,7 +1610,5 @@ test_release_actor_drops_only_that_actors_leases
 test_branch_cannot_force_teardown_or_directly_relaunch
 test_away_record_relocates_main_owned_actions_to_the_branch
 test_away_branch_spawn_requires_queued_dispatchable_work
-test_away_spend_cap_is_rechecked_under_the_task_set_lock
-test_quiet_record_never_caps_a_present_captains_spawn
 
 test_away_local_landing_keeps_authority_and_continues_eligible_work

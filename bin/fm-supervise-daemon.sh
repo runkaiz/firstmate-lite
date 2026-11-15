@@ -893,7 +893,7 @@ escalate_flush() {  # <state>
 # surfaces until the next fleet action (that night, 20 escalations sat buffered
 # for 8.5h). These helpers add a configurable active alert that does not depend
 # on any pane or its backend status-line: an OS-level macOS notification, a
-# herdr notification, or a captain-supplied command (push to a phone, etc.).
+# herdr notification, or an operator-supplied command.
 # Every channel is best-effort - a missing or failing channel logs and is
 # skipped, never crashing the daemon loop - and the durable marker plus the tmux
 # flash stay exactly as before.
@@ -1051,9 +1051,9 @@ wedge_alarm_via_herdr() {  # <summary>
   return 1
 }
 
-# Run a captain-supplied command with the summary on $1 and on stdin, so an
-# alert can reach a phone/pager (ntfy, Slack, SMS) even when the captain is away
-# from the machine entirely. Best-effort: logs and returns 1 on failure.
+# Run an operator-supplied command with the summary on $1 and on stdin.
+# This alarm is shared by away and quiet supervision.
+# Best-effort: logs and returns 1 on failure.
 wedge_alarm_via_command() {  # <cmd> <summary>
   local cmd=$1 summary=$2 rc
   if [ "${WEDGE_ALARM_EMIT_ACTIVE:-}" != 1 ]; then

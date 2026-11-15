@@ -614,7 +614,7 @@ fm_send_feed_resolved_holds() { # <answer-text>
 # error with the attempted resolution attached.
 
 # Typed input can execute a shell command after an agent exits. Serialize it
-# with lifecycle control, and require relaunch (which reacquires capacity) for
+# with lifecycle control, and require relaunch (which clears the stop receipt) for
 # a preserved stopped worker. Inbox enqueue itself cannot reactivate an agent.
 SEND_CONTROL_LOCK=
 fm_send_release_control() {
@@ -638,7 +638,7 @@ fm_send_require_active_worker() {
     return 1
   fi
   if [ -n "$(fm_meta_get "$TARGET_META" afk_worker_stopped)" ]; then
-    echo "error: task $id has a confirmed-stop receipt; use fm-control relaunch to reacquire an AI worker slot before reactivation (ordinary inbox messages remain preserved)" >&2
+    echo "error: task $id has a confirmed-stop receipt; use fm-control relaunch before reactivation (ordinary inbox messages remain preserved)" >&2
     return 1
   fi
 }

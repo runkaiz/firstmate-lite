@@ -2637,7 +2637,7 @@ EOF
   FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" enter >/dev/null 2>&1 || fail "away entry over quiet failed"
   out=$(run_session_start "$home" "$root" "$fakebin:$BASE_PATH")
   assert_contains "$out" "present - away posture recorded at" "AFK digest did not name the away record"
-  assert_contains "$out" "hold-for-return only" "AFK digest lost hold-for-return for an away record"
+  assert_contains "$out" "away posture" "AFK digest lost hold-for-return for an away record"
 
   pass "the AFK digest reads a quiet record as a present captain holding nothing, and an away record as hold-for-return"
 }

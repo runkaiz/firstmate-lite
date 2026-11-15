@@ -210,6 +210,7 @@ While the away-posture record `state/.afk-contract` exists:
 - Main's standing authority moves to the branch through the guarded scripts, each retaining its own gate.
 
 [docs/pi-supervision-branch.md](pi-supervision-branch.md#postures) defines that posture.
+[`bin/fm-afk-contract.sh`](../bin/fm-afk-contract.sh) owns away entry, read-back, and record compatibility.
 
 While attended, the branch cannot merge a PR, land local work, freshly spawn, or answer a decision.
 These are the bounds set by the captain-approved architecture.
@@ -519,7 +520,7 @@ Selecting any other supervisor backend refuses at daemon startup instead of tryi
 
 ## Away-mode wedge alarm channels (config/wedge-alarm)
 
-When away-mode injection wedges past `FM_MAX_DEFER_SECS`, the sub-supervisor raises a loud, rate-limited alarm.
+When away or quiet injection wedges past `FM_MAX_DEFER_SECS`, the sub-supervisor raises a loud, rate-limited alarm.
 Beyond the durable `state/.subsuper-inject-wedged` marker and the tmux status-line flash, it attempts a configured backend-independent active alert that can reach the captain even when every pane and its backend status-line is unreadable.
 
 ### Channels and overrides
@@ -528,7 +529,7 @@ Beyond the durable `state/.subsuper-inject-wedged` marker and the tmux status-li
 `FM_WEDGE_ALARM_CHANNEL` overrides the file with a single directive.
 
 Directives are `off` (a position-independent kill switch that disables every active alert), `auto`/`default`, `osascript` (macOS Notification Center banner), `herdr` (herdr UI notification), and `command:<cmd>` (run `<cmd>` via `sh -c`, summary on `$1` and stdin).
-An absent file means `auto`, i.e. default-on on macOS: the alarm exists precisely so a wedged away-mode primary is never silent, and it fires at most once per max-defer window after a genuine wedge.
+An absent file means `auto`, i.e. default-on on macOS: the alarm exists precisely so a wedged primary is never silent, and it fires at most once per max-defer window after a genuine wedge.
 
 A missing or failing channel logs and falls through to the next, never crashing the daemon.
 See [`wedge-alarm.md`](wedge-alarm.md) for the current channel reference, [`verification/supervision.md`](verification/supervision.md#wedge-alarm-channels) for active evidence, and [`examples/wedge-alarm`](examples/wedge-alarm) for a copyable config.

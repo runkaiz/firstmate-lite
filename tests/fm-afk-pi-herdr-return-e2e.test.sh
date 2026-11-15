@@ -183,7 +183,7 @@ set -e
 assert_contains "$START_OUT" 'the away daemon is no longer launched on pi' "the Pi refusal did not name its reason"
 ENTER_OUT=$(PATH="$FAKEBIN:$ORIGINAL_PATH" HERDR_SESSION="$SESSION" FM_HOME="$HOME_DIR" FM_STATE_OVERRIDE="$STATE" \
   PI_CODING_AGENT=true "$ROOT/bin/fm-afk-launch.sh" enter 2>&1) || fail "the away posture could not be recorded on Pi: $ENTER_OUT"
-assert_contains "$ENTER_OUT" 'hold-for-return only' "the entry announcement did not say hold-for-return"
+assert_contains "$ENTER_OUT" 'waits for your return' "the entry announcement did not say hold-for-return"
 [ -f "$STATE/.afk-contract" ] || fail "enter did not write the away-posture record"
 [ ! -e "$STATE/.afk" ] || fail "enter wrote the daemon flag on Pi"
 [ ! -e "$STATE/.afk-daemon-terminal" ] || fail "enter recorded a daemon terminal on Pi"
