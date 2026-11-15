@@ -15,6 +15,8 @@
 #        `resource-lock:` line on stderr reports a wait, and one the slot taken.
 #        The slot frees when the command and any child processes retaining the
 #        lock have exited. A command cut off mid-wait is simply run again.
+#        For commands needing multiple resources, nest wrappers from outermost
+#        to innermost in brief order (declaration order) to avoid deadlock.
 # brief  Print the brief section that tells a worker which commands to wrap and
 #        how, or nothing when no resource is declared. bin/fm-brief.sh appends it
 #        to every ship and scout scaffold.
@@ -321,6 +323,7 @@ cmd_brief() {
     '# Heavy commands (resource locks)' \
     'This machine runs only a few of the heavy jobs named below at once, so take a slot yourself instead of asking firstmate.' \
     'Run each such command through its wrapper: it waits for a free slot, runs the command while holding it, and frees the slot when the command and any child processes retaining the lock have exited.' \
+    'If a command needs more than one resource, nest wrappers from outermost to innermost in the order the resources are listed below (declaration order), so competing jobs do not deadlock.' \
     "Never run one of these commands outside its wrapper and never preempt another holder; a wait for a slot needs no \`needs-decision\`, and when your shell's command limit ends the wait, run the same wrapped command again."
   while [ "$i" -lt "$RL_COUNT" ]; do
     counts="${RL_SLOTS[$i]} at once"

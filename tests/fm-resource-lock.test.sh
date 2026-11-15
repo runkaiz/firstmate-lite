@@ -164,6 +164,8 @@ test_brief_gives_a_wrapper_that_runs() {
   out=$(lock "$case_dir" 12:00 brief) || fail "brief refused a valid declaration"
   assert_contains "$out" '# Heavy commands (resource locks)' "the brief section has no heading"
   assert_contains "$out" 'take a slot yourself instead of asking firstmate' "the brief does not tell the worker to self-serve"
+  assert_contains "$out" 'nest wrappers from outermost to innermost in the order the resources are listed below (declaration order)' \
+    "the generated worker instructions do not specify one acquisition order"
   # shellcheck disable=SC2016 # Literal brief text.
   assert_contains "$out" '- `suite` (2 at once, 1 during 22:00-09:00) - full test-suite runs: `' \
     "the brief did not describe the resource and its hours"
@@ -220,10 +222,15 @@ test_run_passes_the_command_through() {
 test_nested_wrappers_keep_outer_slots() {
   local case_dir direction outer inner blocker nested_pid outer_pid inner_pid
   for direction in suite-gpu gpu-suite; do
-    case_dir=$(make_case "nested-$direction" 'suite 2 22:00-09:00=1 full test-suite runs' 'gpu 1 any GPU use')
     case "$direction" in
-      suite-gpu) outer=suite inner=gpu blocker=gpu.lock ;;
-      gpu-suite) outer=gpu inner=suite blocker=suite-slot-2.lock ;;
+      suite-gpu)
+        outer=suite inner=gpu blocker=gpu.lock
+        case_dir=$(make_case "nested-$direction" 'suite 2 22:00-09:00=1 full test-suite runs' 'gpu 1 any GPU use')
+        ;;
+      gpu-suite)
+        outer=gpu inner=suite blocker=suite-slot-2.lock
+        case_dir=$(make_case "nested-$direction" 'gpu 1 any GPU use' 'suite 2 22:00-09:00=1 full test-suite runs')
+        ;;
     esac
     hold_file "$case_dir/run/$blocker" "$case_dir/blocker"
     # shellcheck disable=SC2016
@@ -258,6 +265,40 @@ test_nested_wrappers_keep_outer_slots() {
     wait
   done
   pass "nested wrappers retain both locks while waiting and running, then release both"
+}
+
+test_competing_jobs_follow_brief_order() {
+  local case_dir out order outer inner first_pid second_pid
+  case_dir=$(make_case competing 'suite 2 22:00-09:00=1 full test-suite runs' 'gpu 1 any GPU use')
+  out=$(lock "$case_dir" 23:00 brief) || fail "brief refused the competing jobs' declaration"
+  order=$(printf '%s\n' "$out" | sed -n 's/^- `\([^`]*\)`.*/\1/p')
+  assert_equals $'suite\ngpu' "$order" "the brief did not preserve declaration order"
+  outer=${order%%$'\n'*}
+  inner=${order#*$'\n'}
+
+  hold_file "$case_dir/run/gpu.lock" "$case_dir/blocker"
+  # shellcheck disable=SC2016
+  lock "$case_dir" 23:00 run "$outer" -- "$LOCK" run "$inner" -- \
+    sh -c ': > "$1.ran"' job "$case_dir/first" 2> "$case_dir/first.err" &
+  first_pid=$!
+  await_text "$case_dir/first.err" "resource-lock: waiting for $inner" || fail "the first job did not wait for its inner resource"
+  # shellcheck disable=SC2016
+  lock "$case_dir" 23:00 run "$outer" -- "$LOCK" run "$inner" -- \
+    sh -c ': > "$1.ran"' job "$case_dir/second" 2> "$case_dir/second.err" &
+  second_pid=$!
+  await_text "$case_dir/second.err" "resource-lock: waiting for $outer" || fail "the competing job did not wait for the first resource in brief order"
+  assert_absent "$case_dir/first.ran" "the first job ran while its inner resource was held"
+  assert_absent "$case_dir/second.ran" "the competing job ran while the first job held the outer resource"
+
+  : > "$case_dir/blocker.release"
+  await_path "$case_dir/first.ran" || fail "the first job did not finish once its inner resource became free"
+  await_path "$case_dir/second.ran" || fail "the competing job deadlocked instead of finishing after the first job"
+  wait "$first_pid" "$second_pid" || fail "a competing job failed"
+  wait
+  flock -n "$case_dir/run/gpu.lock" true || fail "the competing jobs left the GPU lock held"
+  flock -n "$case_dir/run/suite-slot-1.lock" true || fail "the competing jobs left a suite slot held"
+  flock -n "$case_dir/run/suite-slot-2.lock" true || fail "the competing jobs left a suite slot held"
+  pass "competing jobs following brief order finish without circular waits and release both resources"
 }
 
 test_windows_select_slot_counts_for_the_hour() {
@@ -369,6 +410,7 @@ else
   test_run_refuses_rather_than_run_unlocked
   test_run_passes_the_command_through
   test_nested_wrappers_keep_outer_slots
+  test_competing_jobs_follow_brief_order
   test_windows_select_slot_counts_for_the_hour
   test_no_more_jobs_than_slots_run_at_once
   test_plain_flock_holders_share_the_same_slots

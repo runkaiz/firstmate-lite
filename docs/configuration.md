@@ -1094,7 +1094,7 @@ bin/fm-resource-lock.sh run suite -- <command>
 ```
 
 The wrapper waits for a free slot and holds it until the command and any child processes retaining the lock have exited.
-Nest wrappers when a command needs several resources; each outer slot stays held while the inner wrapper waits and runs.
+When a command needs several resources, nest wrappers from outermost to innermost in the order resources are listed in the brief (declaration order) to avoid deadlock; each outer slot stays held while the inner wrapper waits and runs.
 A job that takes the same file with plain `flock` is an ordinary holder, so a lock already in use by hand, such as `$XDG_RUNTIME_DIR/gpu.lock`, keeps working unchanged whether or not the resource is declared here; the script header below owns slot-file naming.
 A malformed or unreadable file stops every ship and scout scaffold and every wrapped command until it is fixed, rather than guessing the intended limit, and the wrapper refuses to run a command unlocked where `flock` or `$XDG_RUNTIME_DIR` is missing.
 [`bin/fm-resource-lock.sh`](../bin/fm-resource-lock.sh) owns the file format, the lock files, and the admission rule.
