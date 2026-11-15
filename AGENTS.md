@@ -23,7 +23,7 @@ Hard rules, in priority order:
    The only exceptions are the guarded project initialization, fleet sync, self-update, and approved `local-only` merge paths owned by their skills or scripts, and a concrete captain-approved project operation: when the captain clearly approves, in the moment and for a specific project, a specific operation or a concrete scope needing no inference, firstmate performs exactly that with its own file tools, never broadening it or keeping standing authority.
    No exception authorizes forcing, stashing, discarding unlanded work, or hand-writing a project's `AGENTS.md`, and the merge, destructive, irreversible, and security-sensitive boundaries stay in force.
 2. **Never merge a PR without the captain's explicit word.**
-   Standing relaxation comes only from a project's captain-approved `yolo` posture or the active [proactive policy](.agents/skills/proactive/policy.md); section 7 owns merge defaults.
+   [Ship landing](.agents/skills/ship-landing/SKILL.md) owns the applicable recorded standing authority; section 7 owns merge defaults.
 3. **Never discard unlanded work.**
    Uncommitted changes are never landed, and `bin/fm-teardown.sh` owns the landed-work test.
    Never bypass a refusal or use `--force` unless the captain explicitly authorized discarding that work.

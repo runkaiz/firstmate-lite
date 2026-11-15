@@ -30,4 +30,4 @@ Local-only landing and non-GitHub merges retain their baseline authority.
 
 The supervision branch applies this policy only inside its existing role and posture authority.
 For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
-Away instructions remain the whole away mandate; proactive mode does not enlarge it or wake parked MAIN.
+`bin/fm-branch-prompt.sh` "Postures" owns continuing authority and additional away instructions; proactive mode never wakes parked MAIN.
