@@ -1,0 +1,8 @@
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/h/projects/demo
+worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/worker-restricted
+kind=ship
+mode=local-only
+yolo=off
+window=primary:fm-slot2
+backend=tmux
+harness=claude

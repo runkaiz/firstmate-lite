@@ -1,0 +1,21 @@
+task:
+  id: queued-fix
+  title: Fix demo queued answer
+  state: done
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: 2026-11-15
+  closed: 2026-11-15
+  links: local main
+  body: Fix queued_answer.txt from 0 to 42. This demo fix is already authorized under the recorded standing approval. Delivery local-only. Use the configured Codex worker on the tmux backend.
+  notes_file: queued-fix/notes.md
+  archived: no

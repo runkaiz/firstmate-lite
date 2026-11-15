@@ -1,0 +1,6 @@
+fm-afk-contract: away posture already recorded at 2026-11-15T03:23:30Z; a refresh leaves it untouched
+Away posture recorded at 2026-11-15T03:25:18Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T03:23:30Z
+  your words (verbatim):
+    strange, I did not touch ssh or the desktop this time

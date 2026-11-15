@@ -1,0 +1,31 @@
+{
+  "approved_landing": {
+    "initial": "92b1058fcd693853bc78a86173ce7fb3754491a1",
+    "landed_exact_validated_head": "d702dc6ae8ff5e039319f06f8c11fab89fe72da3",
+    "dispatch_metadata": "unchanged"
+  },
+  "overnight_scheduling": [
+    "slot1 granted",
+    "slot2 and slot3 wait",
+    "renewed slot2 denied while occupied",
+    "slot1 released -> slot2 granted, slot3 waits",
+    "slot2 released -> slot3 granted"
+  ],
+  "house_rule": "519-character rule retained its final overnight one-suite constraint in the real supervisor decisions",
+  "authority_boundaries": [
+    "explicit restriction retained with registry +yolo",
+    "other project unmerged",
+    "unregistered design question remains open"
+  ],
+  "queued_dispatch": {
+    "state": "in_flight",
+    "mode": "local-only",
+    "yolo": "on",
+    "registry_yolo": "off",
+    "worker": "real Codex processed brief, validated and committed the fix",
+    "final_main": "83a6e55f53e35abd3675bf652aa725e7a0bca1a4",
+    "queued_answer.txt": 42
+  },
+  "limitations": "Suite tasks were disposable status/inbox requests with live placeholder endpoints. Real supervisor decisions and durable inbox delivery were exercised; no actual full suites or native slot-worker receipt were claimed. Initial fixture cleanup refusals preserved missing-generation and live endpoints. The real queued worker later landed and was retired.",
+  "cleanup": "Queued task reached done and was retired by the host. Recorded lab host stopped through its private tmux socket; private server stopped; .l and .lv removed; worktree clean at unchanged target 79cc2686527629cf7b6d50603b9aa7a3e1aaced7."
+}

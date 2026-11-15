@@ -1,0 +1,1 @@
+Private fm-lab tmux server was already stopped after the rate-limited primary exited. fm-lab-home teardown returned 0. Removed .v disposable homes, repositories, worker copies, socket directories and test caches. git status --short produced no output. No source changes.

@@ -1,0 +1,1 @@
+test-slot: grant in request order; at most one full suite at once overnight; an occupied slot must finish before another starts. Tell each waiting requester exactly which task it waits for.

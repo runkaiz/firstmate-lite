@@ -1,0 +1,13 @@
+{
+  "initial": {
+    "demo": "a5c70ad18aae45d8465952c9f67d6beec64a423b",
+    "other": "a5c70ad18aae45d8465952c9f67d6beec64a423b"
+  },
+  "heads": {
+    "restricted": "f9308e916aa7848635753db424a825de18c63c88",
+    "unapproved": "177493ceb149ae1791119ee6c0d8ad028e605d9c"
+  },
+  "root": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN",
+  "home": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/h",
+  "slot_fixture": "status/inbox requests with placeholder endpoints; no full suites running"
+}

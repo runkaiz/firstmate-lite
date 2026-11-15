@@ -1,0 +1,5 @@
+Stopped only recorded lab host through private socket: 0 
+Host record retired; engine and watcher cleanup completed.
+Killed only fm-lab server on lab private socket: 0 
+Private server is no longer running: server exited unexpectedly
+Removed .l and .lv. Git status clean; target HEAD unchanged. Final queue records queued-fix done and retired.

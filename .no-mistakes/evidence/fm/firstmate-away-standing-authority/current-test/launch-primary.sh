@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -eu
+exec claude --safe-mode -p 'Run exactly: bash .v/primary.sh . Wait for that command. Do not independently supervise any task. The script runs an isolated product validation session.' --system-prompt 'You are driving an isolated CLI validation. Execute the requested command with Bash and wait for its result. All intentional writes must stay in the FM_HOME lab or this current worktree. Do not access another home or change user configuration.' --tools Bash,Read --permission-mode dontAsk --allowedTools Bash Read --model sonnet --output-format json > .v/h/primary-result.json 2> .v/h/primary-errors.log

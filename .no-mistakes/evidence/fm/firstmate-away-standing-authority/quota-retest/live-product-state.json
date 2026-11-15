@@ -1,0 +1,23 @@
+{
+  "demo": {
+    "initial": "a5c70ad18aae45d8465952c9f67d6beec64a423b",
+    "main": "82009cfdf53d12f3e2ce15c732210f901c5c10aa",
+    "held_head": "f9308e916aa7848635753db424a825de18c63c88",
+    "held_branch_merged": false,
+    "queued_answer": "42\n"
+  },
+  "other": {
+    "initial": "a5c70ad18aae45d8465952c9f67d6beec64a423b",
+    "main": "a5c70ad18aae45d8465952c9f67d6beec64a423b",
+    "held_head": "177493ceb149ae1791119ee6c0d8ad028e605d9c",
+    "held_branch_merged": false,
+    "queued_answer": "0\n"
+  },
+  "slot_grants": [
+    "slot1 initially",
+    "slot2 after slot1 release",
+    "slot3 after slot2 release"
+  ],
+  "active_reask": "slot2 refused while slot1 running",
+  "design_decision": "left unresolved"
+}

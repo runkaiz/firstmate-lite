@@ -1,0 +1,76 @@
+{
+  "findings": [],
+  "summary": "Four previously untested live host scenarios passed",
+  "tested": [
+    "TMPDIR=\"$PWD/.v\" FM_SUPERVISION_HOST_LIVE_E2E=1 FM_SUPERVISION_HOST_LIVE_POLLS=4800 bash tests/fm-supervision-host-live-e2e.test.sh",
+    "python3 /home/runkai/.no-mistakes/evidence/01M7E4EMMHJV5XTAZSM4MWEZTN/quota-retest/setup-live.py",
+    "Real Claude primary and supervision engine; observed Git refs, durable task inboxes, queue state, and lifecycle metadata across repeated wakes"
+  ],
+  "testing_summary": "The earlier 429 usage limit was an external quota blocker. After its reset, real Claude executed successfully; all four requested autonomous scenarios passed at the unchanged target commit. No source, test, documentation, global configuration, or production credential changes were needed. Only focused live validation ran; no broad suite, linter, formatter, pipeline control, push, PR, or CI phase ran. The disposable lab and private tmux server were removed and git status was clean.",
+  "scenarios": [
+    {
+      "name": "The real supervision host lands standing-approved work under observation-only away words",
+      "result": "pass",
+      "live": true,
+      "evidence": [
+        "focused-live-e2e.log",
+        "focused-product-state.json",
+        "focused-branch-outcomes.jsonl"
+      ],
+      "reason": "Real Claude Code 2.1.325 advanced local main from 290dbb587895080c98571e351174fbbd72a83faa to validated head 69cf19a7c4455241dd41e19dae4f22a0aab9130e with task and registry yolo off. Observation-only words were unchanged. Dispatch metadata remained byte-identical and the restricted sibling remained unmerged. The same conversation handled a follow-up wake."
+    },
+    {
+      "name": "The real supervision host grants overnight suite slots in request order without exceeding the house limit",
+      "result": "pass",
+      "live": true,
+      "evidence": [
+        "live-branch-outcomes.jsonl",
+        "live-product-state.json",
+        "slot1-001.msg",
+        "slot2-001.msg",
+        "slot2-002.msg",
+        "slot2-003.msg",
+        "slot3-001.msg",
+        "slot3-002.msg",
+        "slot3-003.msg"
+      ],
+      "reason": "Real Claude granted slot1 first, made slot2 wait for slot1 and slot3 for slot2, refused a renewed slot2 ask while slot1 was running, then granted slot2 only after slot1 released and slot3 only after slot2 released. The unrelated design decision remained open. These were disposable status/inbox request fixtures with live placeholder endpoints; no real full suites were run, and worker receipt was not claimed."
+    },
+    {
+      "name": "The real supervision host preserves explicit task restrictions and holds work outside standing approval",
+      "result": "pass",
+      "live": true,
+      "evidence": [
+        "focused-live-e2e.log",
+        "live-branch-outcomes.jsonl",
+        "live-product-state.json",
+        "restricted.status",
+        "unapproved.status"
+      ],
+      "reason": "Restricted and outside-scope branches remained unmerged. The explicit task restriction continued to hold when the demo registry was switched to +yolo as an adversarial fixture condition; the unrelated other project stayed at its initial main head."
+    },
+    {
+      "name": "The away session dispatches eligible queued work under existing authority without renewed away instructions",
+      "result": "pass",
+      "live": true,
+      "evidence": [
+        "first-stage-supervision-host.log",
+        "first-stage-branch-outcomes.jsonl",
+        "entry-review.txt",
+        "queued-meta.txt",
+        "queued-state.txt",
+        "dispatch-registry.txt",
+        "queued-final-state.txt",
+        "live-product-state.json"
+      ],
+      "reason": "A real Claude primary parked MAIN and the real host handled check: away-entry-review after an unchanged-words entry refresh. The host itself invoked fm-spawn, allocating an isolated native Git worker with mode local-only and yolo on under standing approval while registry yolo remained off. The queue became in_flight. After accepting the Codex folder-trust dialog only in its isolated worktree-local configuration, the real worker fixed queued_answer.txt, committed, and was later landed and closed by the host. No manual spawn was used."
+    }
+  ],
+  "verdict": "go",
+  "tested_head_sha": "79cc2686527629cf7b6d50603b9aa7a3e1aaced7",
+  "limitations": [
+    "Scheduling evidence is real model decisions and durable inbox delivery against disposable status requests, not actual full-suite processes.",
+    "The queued worker broad file check also identified pre-existing answer.txt=0; the changed queued_answer.txt check passed. The host disclosed the baseline failure and left the unrelated file unchanged. Dispatch proof does not rely on this later landing.",
+    "The focused credentialed regression uses a lock-holder fixture and real Claude engine; the additional integrated scenarios use a real Claude primary in a marked disposable home."
+  ]
+}

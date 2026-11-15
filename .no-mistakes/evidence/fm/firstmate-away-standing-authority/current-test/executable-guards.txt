@@ -1,0 +1,134 @@
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges [actor=main]
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-wake-drain.sh [actor=main]
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+request [key=test-slot] needs-decision: need one full-suite slot
+request [key=design] needs-decision: choose REST or RPC
+OPEN DECISIONS: [key=test-slot] is a house decision, MAIN's while attended and the supervision session's while away with MAIN parked, under the home's rule: one full suite at once; grant in request order
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-send.sh request --resolve-key test-slot Granted [actor=branch]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-afk-contract.sh enter [actor=main]
+Quiet mode recorded at 2026-11-15T00:10:57Z: you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation. Only an explicit /quiet off ends it.
+Quiet mode (recorded):
+  entered: 2026-11-15T00:10:57Z
+  holds: none - you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.
+  your words: (none)
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-send.sh request --resolve-key test-slot Granted [actor=branch]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-afk-contract.sh archive [actor=main]
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/state/afk-contracts/1794701457.afk-contract
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-send.sh request --resolve-key design REST [actor=branch]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-wake-drain.sh [actor=main]
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+request [key=test-slot] needs-decision: need one full-suite slot
+request [key=design] needs-decision: choose REST or RPC
+OPEN DECISIONS: the house-decision record (config/house-decisions) is malformed, so no key is treated as a house decision
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+exit=0
+
+$ git init -qb main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/projects/demo [actor=main]
+exit=0
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/projects/demo commit --allow-empty -qm initial [actor=main]
+exit=0
+
+$ git clone -q /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/projects/demo /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/worker [actor=main]
+exit=0
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/worker checkout -qb fm/gate [actor=main]
+exit=0
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/worker commit --allow-empty -qm validated fix [actor=main]
+exit=0
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/projects/demo fetch -q /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/worker fm/gate:fm/gate [actor=main]
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+error: local-only landing (fm-merge-local) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-afk-contract.sh enter --words strange, I did not touch the desktop this time [actor=main]
+Away posture recorded at 2026-11-15T00:10:58Z. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say.
+Away posture (recorded):
+  entered: 2026-11-15T00:10:58Z
+  your words (verbatim):
+    strange, I did not touch the desktop this time
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: local merge while away requires a reconciled done declaration; validation failures and decision waits must be resolved
+exit=1
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: local merge while away requires a reconciled done declaration; validation failures and decision waits must be resolved
+exit=1
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: local merge while away requires a clean worker copy at the exact ship head
+exit=1
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-captain-hold.sh hold gate --reason explicit captain restriction [actor=main]
+gate
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+error: task gate is still held for the captain; release it before merging
+exit=1
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-captain-hold.sh answer gate --decision-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/answer.txt --release [actor=main]
+released: gate
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+note: local-only landing (fm-merge-local) proceeds for the supervision branch under the away-posture record: main is parked and its standing authority is relocated; this script's own gate still applies (docs/pi-supervision-branch.md "Postures")
+merged fm/gate into local main (070fa69 -> 2e0985d) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/projects/demo
+exit=0
+
+Observed main=2e0985de2b9485df6678e84d56b91d71e888e326 validated head=2e0985de2b9485df6678e84d56b91d71e888e326; immutable task metadata unchanged=True
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-afk-contract.sh archive [actor=main]
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.v/edges/state/afk-contracts/1794701458.afk-contract
+exit=0
+
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/bin/fm-merge-local.sh gate [actor=branch]
+error: local-only landing (fm-merge-local) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+exit=6
+
+All executable guard scenarios passed.

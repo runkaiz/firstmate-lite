@@ -1,0 +1,7 @@
+needs-decision [key=test-slot] [at=1794712539]: request 2 full suite ready; need a slot before starting
+resolved [key=test-slot] [at=1794712553]: answered: Wait: slot is granted to slot1 (request 1). You are next; start only after slot1 finishes its full suite.
+needs-decision [key=test-slot] [at=1794712659]: request 2 still waiting; slot1 remains running, may I start now?
+resolved [key=test-slot] [at=1794712666]: answered: No: slot1 is still running its full suite. Wait for slot1 to finish; you are next in order.
+needs-decision [key=test-slot] [at=1794712692]: request 2 next in order; slot1 has finished and released its suite slot, may I start?
+resolved [key=test-slot] [at=1794712699]: answered: Proceed: slot1 has finished and released the slot; you hold the full-suite slot now. Report when finished.
+paused [at=1794712716]: full suite finished successfully; released overnight full-suite slot, worker waiting for other work

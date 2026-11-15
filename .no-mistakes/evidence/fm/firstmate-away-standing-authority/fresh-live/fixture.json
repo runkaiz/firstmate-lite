@@ -1,0 +1,20 @@
+{
+  "initial": {
+    "demo": "92b1058fcd693853bc78a86173ce7fb3754491a1",
+    "other": "92b1058fcd693853bc78a86173ce7fb3754491a1"
+  },
+  "heads": {
+    "approved": "d702dc6ae8ff5e039319f06f8c11fab89fe72da3",
+    "restricted": "485be96a9d8103c198f769587ae12c59b2db79dd",
+    "unapproved": "0435c7b87f9eb37d629845aeea81b267bcb81d4e"
+  },
+  "metadata_before": {
+    "approved": "project=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/projects/demo\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.lv/worker-approved\nkind=ship\nmode=local-only\nyolo=off\nbranch=fm/approved\nwindow=primary:fm-approved\nbackend=tmux\nharness=claude\n",
+    "restricted": "project=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/projects/demo\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.lv/worker-restricted\nkind=ship\nmode=local-only\nyolo=off\nbranch=fm/restricted\nwindow=primary:fm-restricted\nbackend=tmux\nharness=claude\n",
+    "unapproved": "project=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/projects/other\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.lv/worker-unapproved\nkind=ship\nmode=local-only\nyolo=off\nbranch=fm/unapproved\nwindow=primary:fm-unapproved\nbackend=tmux\nharness=claude\n"
+  },
+  "root": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN",
+  "home": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l",
+  "house_rule_length": 519,
+  "slot_fixture": "disposable status/inbox requests, live placeholder endpoints; no actual full suites"
+}

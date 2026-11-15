@@ -1,0 +1,1 @@
+Stopped lab host 2325246; watcher 2535562 exited. Killed only the private .v/t.sock tmux server. Removed the .v fixture tree, isolated worker configuration, and native copies. No source changes.

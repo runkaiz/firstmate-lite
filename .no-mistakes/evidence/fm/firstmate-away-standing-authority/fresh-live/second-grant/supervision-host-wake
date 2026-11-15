@@ -1,0 +1,10 @@
+FIRSTMATE SUPERVISION WAKE: signal: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/state/slot1.status /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/state/slot2.status /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7E4EMMHJV5XTAZSM4MWEZTN/.l/state/slot3.status
+
+Handle this per your operating procedure and finish with the bin/fm-branch-report.sh command.
+
+POSTURE: AWAY. The away-posture record state/.afk-contract exists, so the captain is not present and MAIN is parked: you take every row, including check rows and decision rows, and no outcome reaches the captain until the return brief. Apply the Postures section of your operating procedure to the captain's away words below and MAIN's continuing recorded authority. The record, verbatim:
+Away posture (recorded):
+  entered: 2026-11-15T03:23:30Z
+  your words (verbatim):
+    strange, I did not touch ssh or the desktop this time
+

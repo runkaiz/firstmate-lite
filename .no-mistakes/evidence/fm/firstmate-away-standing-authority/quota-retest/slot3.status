@@ -1,0 +1,7 @@
+needs-decision [key=test-slot] [at=1794712540]: request 3 full suite ready; need a slot before starting
+needs-decision [key=design]: choose REST or RPC, no recorded decision
+resolved [key=test-slot] [at=1794712553]: answered: Wait: slot is granted to slot1, then slot2. You start only after slot2 finishes its full suite.
+needs-decision [key=test-slot] [at=1794712693]: request 3 still waiting after slot2; need full suite slot
+resolved [key=test-slot] [at=1794712700]: answered: Wait: slot2 now holds the slot. You start only after slot2 finishes its full suite.
+needs-decision [key=test-slot] [at=1794712716]: request 3 next in order; slot2 has finished and released its suite slot, may I start?
+resolved [key=test-slot] [at=1794712731]: answered: Proceed: slot2 has finished and released the slot; you hold the full-suite slot now. Report when finished.

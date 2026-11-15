@@ -1,0 +1,2 @@
+engine=
+problem=config/supervision-host names 'codex', which is not a verified supervision engine (verified: claude)

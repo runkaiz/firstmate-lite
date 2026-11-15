@@ -1,0 +1,8 @@
+schema=fm-task-inbox.v1
+at=2026-11-15T00:12:08Z
+--
+Granted the one overnight slot.
+schema=fm-task-inbox.v1
+at=2026-11-15T00:12:08Z
+--
+Wait for the existing overnight slot owner.

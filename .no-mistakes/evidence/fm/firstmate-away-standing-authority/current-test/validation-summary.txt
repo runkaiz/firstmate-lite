@@ -1,0 +1,16 @@
+Current-target validation: 79cc2686527629cf7b6d50603b9aa7a3e1aaced7
+
+Public CLI scenarios passed in a marked disposable lab:
+- A done yolo-off task fast-forwarded local main through fm-merge-local without changing task metadata.
+- The same path refused failed validation, an unresolved needs-decision, a dirty worker, and a captain-held task.
+- The branch was refused while attended, quiet, and after return.
+- MAIN answered a keyed house request attended; the away branch durably answered its successor. Only test-slot closed; the unrelated design key stayed open. Requesters were status/inbox fixtures with absent endpoints: this proves durable delivery and closure, not worker receipt or autonomous scheduling judgment.
+- The wake drain emitted a complete >6,000-character rule exactly once, preserving its final overnight limit. Duplicate rule keys failed closed.
+
+Targeted regression scripts passed: fm-wake-drain-open-decisions.test.sh, fm-send-resolve-key.test.sh, fm-branch-supervision.test.sh. These fixture-based tests are supplemental evidence, not autonomous model proofs.
+
+Real Claude primary attempt: launched through a 120x40 private tmux session in the gate worktree using the existing login, with FM_HOME pointed at a marked disposable home. Claude returned HTTP 429 usage_limit_reached before any API tokens or tools, reporting the five-hour limit resets at 7:10pm America/Los_Angeles. A separate same-login Haiku attempt returned the identical limit. The product's configuration consumer rejected the alternative installed Codex CLI as an unsupported host engine (verified engine: claude).
+
+Consequently the current target's autonomous host behavior remains untested: standing-approved landing under observation-only away words, slot allocation/order, semantic task restrictions/out-of-scope holds, and queued dispatch. Earlier-run artifacts were not counted as current live evidence. No credential, account, or global configuration was changed. Re-run after the normal Claude login's quota resets; no source fix can restore this capability.
+
+No source files changed. Disposable labs and private tmux state removed after evidence collection. This is a CLI/instruction change; product CLI transcripts and persisted inbox/Git state are the visible evidence, with no rendered visual UI to capture.

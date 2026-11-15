@@ -1,0 +1,4 @@
+needs-decision [key=test-slot] [at=1794712538]: request 1 full suite ready; need a slot before starting
+resolved [key=test-slot] [at=1794712552]: answered: Proceed: you hold the full-suite slot now (request 1, first in order). Report when finished.
+paused [at=1794712659]: full suite running in the granted overnight slot; not finished yet
+paused [at=1794712692]: full suite finished successfully; released overnight full-suite slot, worker waiting for other work
