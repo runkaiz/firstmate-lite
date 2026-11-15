@@ -1,0 +1,117 @@
+Real Claude launch, 120x40 private tmux pane:
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Accessing workspace:
+
+ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F6R6SC4DDMR2SEFJ7W1FZQ
+
+ Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source
+ project, or work from your team). If not, take a moment to review what's in this folder first.
+
+ Claude Code'll be able to read, edit, and execute files here.
+
+ Security guide
+
+ ❯ No, exit
+   Yes, I trust this folder
+
+ Enter to confirm · Esc to cancel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+captain event appended: signal: existing work announced before turn end; marker=pending:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh  [initial-announcement, arm=1403633]
+check: rearm-resurface
+marker=announced:downtime:1403550.1794733358.iNqUTT
+cycle closed rc=0 with exactly one recovery wake:
+check: rearm-resurface
+marker=announced:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh  [handling-successor, arm=1404099]
+watcher: started pid=1404118 (beacon fresh) recovery-generation=1403550.1794733358.iNqUTT
+marker=announced:downtime:1403550.1794733358.iNqUTT
+observed 2s: arm=1404099 remains live, watcher=1404118, no recovery wake, marker=announced:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh --take-over 1404099 [announced-takeover-1, arm=1405308]
+watcher: started pid=1405732 (beacon fresh)
+marker=announced:downtime:1403550.1794733358.iNqUTT
+previous watcher=1404118 exited; only replacement singleton=1405732 owns lab lock
+observed 11s: arm=1405308 remains live, watcher=1405732, no recovery wake, marker=announced:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh --take-over 1405308 [announced-takeover-2, arm=1414221]
+watcher: started pid=1414579 (beacon fresh)
+marker=announced:downtime:1403550.1794733358.iNqUTT
+previous watcher=1405732 exited; only replacement singleton=1414579 owns lab lock
+observed 11s: arm=1414221 remains live, watcher=1414579, no recovery wake, marker=announced:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh --take-over 1414221 [announced-takeover-3, arm=1425235]
+watcher: started pid=1425974 (beacon fresh)
+marker=announced:downtime:1403550.1794733358.iNqUTT
+previous watcher=1414579 exited; only replacement singleton=1425974 owns lab lock
+observed 11s: arm=1425235 remains live, watcher=1425974, no recovery wake, marker=announced:downtime:1403550.1794733358.iNqUTT
+$ bin/fm-wake-drain.sh
+1794733358	1	signal	live-original	signal: existing work announced before turn end
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1403550.1794733358.iNqUTT
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+
+$ bin/fm-watch-arm.sh --take-over 1425235 [handling-takeover, arm=1432473]
+watcher: started pid=1432871 (beacon fresh)
+marker=announced:handling:1403550.1794733358.iNqUTT
+previous watcher=1425974 exited; only replacement singleton=1432871 owns lab lock
+observed 11s: arm=1432473 remains live, watcher=1432871, no recovery wake, marker=announced:handling:1403550.1794733358.iNqUTT
+$ exact acknowledgement printed before take-over
+
+$ bin/fm-watch-arm.sh --take-over 1432473 [acked-takeover-1, arm=1449292]
+watcher: started pid=1450064 (beacon fresh)
+marker=acked:handling:1403550.1794733358.iNqUTT
+previous watcher=1432871 exited; only replacement singleton=1450064 owns lab lock
+observed 11s: arm=1449292 remains live, watcher=1450064, no recovery wake, marker=acked:handling:1403550.1794733358.iNqUTT
+$ bin/fm-watch-arm.sh --take-over 1449292 [acked-takeover-2, arm=1464942]
+watcher: started pid=1465844 (beacon fresh)
+marker=acked:handling:1403550.1794733358.iNqUTT
+previous watcher=1450064 exited; only replacement singleton=1465844 owns lab lock
+observed 11s: arm=1464942 remains live, watcher=1465844, no recovery wake, marker=acked:handling:1403550.1794733358.iNqUTT
+captain event appended: signal: new work after confirmed takeover; marker=pending:downtime:1479241.1794733430.kGhnll
+cycle closed rc=0 with exactly one recovery wake:
+watcher: started pid=1465844 (beacon fresh)
+check: rearm-resurface
+marker=announced:downtime:1479241.1794733430.kGhnll
+$ bin/fm-watch-arm.sh  [before-kill-successor, arm=1480352]
+watcher: started pid=1480375 (beacon fresh) recovery-generation=1479241.1794733430.kGhnll
+marker=announced:downtime:1479241.1794733430.kGhnll
+Adversarial SIGKILL: watcher=1480375 dead while singleton lock still names it; marker=announced:downtime:1479241.1794733430.kGhnll
+$ bin/fm-watch-arm.sh --take-over 1480352 [killed-watcher-recovery, arm=1481440]
+check: rearm-resurface
+marker=announced:downtime:1481479.1794733431.D4rRuU
+cycle closed rc=0 with exactly one recovery wake:
+check: rearm-resurface
+marker=announced:downtime:1481479.1794733431.D4rRuU
+$ bin/fm-watch-arm.sh  [after-kill-successor, arm=1482259]
+watcher: started pid=1482278 (beacon fresh) recovery-generation=1481479.1794733431.D4rRuU
+marker=announced:downtime:1481479.1794733431.D4rRuU
+$ bin/fm-watch-arm.sh --take-over 1482259 [after-kill-takeover, arm=1482635]
+watcher: started pid=1483084 (beacon fresh)
+marker=announced:downtime:1481479.1794733431.D4rRuU
+previous watcher=1482278 exited; only replacement singleton=1483084 owns lab lock
+observed 11s: arm=1482635 remains live, watcher=1483084, no recovery wake, marker=announced:downtime:1481479.1794733431.D4rRuU
+Lab cleanup: watcher: stopped pid=1483084
+
+Removed disposable lab home and stopped private tmux server.

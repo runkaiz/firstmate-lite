@@ -1,0 +1,1 @@
+arm_pid=1387321	watcher_pid=1387340	origin=started	started_at=1794733324	ended_at=1794733324	exit_code=0	signal=none	reason=actionable-check	beacon_age=0	lock_before=pid:none|identity:none	lock_after=pid:none|identity:none	successor=none

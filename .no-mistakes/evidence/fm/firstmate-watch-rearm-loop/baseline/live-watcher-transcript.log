@@ -1,0 +1,70 @@
+Real Claude launch, 120x40 private tmux pane:
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Accessing workspace:
+
+ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F6R6SC4DDMR2SEFJ7W1FZQ/.watch-validation-tmp/baseline
+
+ Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source
+ project, or work from your team). If not, take a moment to review what's in this folder first.
+
+ Claude Code'll be able to read, edit, and execute files here.
+
+ Security guide
+
+ ❯ No, exit
+   Yes, I trust this folder
+
+ Enter to confirm · Esc to cancel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+captain event appended: signal: existing work announced before turn end; marker=pending:downtime:1513185.1794733523.DFcSdP
+$ bin/fm-watch-arm.sh  [initial-announcement, arm=1513252]
+check: rearm-resurface
+marker=announced:downtime:1513185.1794733523.DFcSdP
+cycle closed rc=0 with exactly one recovery wake:
+check: rearm-resurface
+marker=announced:downtime:1513185.1794733523.DFcSdP
+$ bin/fm-watch-arm.sh  [handling-successor, arm=1513637]
+watcher: started pid=1513656 (beacon fresh) recovery-generation=1513185.1794733523.DFcSdP
+marker=announced:downtime:1513185.1794733523.DFcSdP
+observed 2s: arm=1513637 remains live, watcher=1513656, no recovery wake, marker=announced:downtime:1513185.1794733523.DFcSdP
+$ bin/fm-watch-arm.sh --take-over 1513637 [announced-takeover-1, arm=1514303]
+check: rearm-resurface
+marker=announced:downtime:1514644.1794733525.WQrk5o
+Traceback (most recent call last):
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F6R6SC4DDMR2SEFJ7W1FZQ/.watch-validation-tmp/live-watch.py", line 117, in <module>
+    owner, path = takeover(f'announced-takeover-{i+1}', owner)
+                  ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F6R6SC4DDMR2SEFJ7W1FZQ/.watch-validation-tmp/live-watch.py", line 79, in takeover
+    assert 'check: rearm-resurface' not in path.read_text(), 'Takeover unexpectedly emitted a recovery wake:\n' + path.read_text()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Takeover unexpectedly emitted a recovery wake:
+check: rearm-resurface
+
+
+Lab cleanup: watcher: none running
+
+Removed disposable lab home and stopped private tmux server.

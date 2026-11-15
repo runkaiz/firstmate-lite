@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Repeated turn-end takeovers preserve announced queued work without a recovery loop",
+    "result": "pass"
+  },
+  {
+    "name": "A takeover during handling keeps the printed acknowledgement valid and consumes its rows",
+    "result": "pass"
+  },
+  {
+    "name": "Confirmed takeovers stay quiet with an acknowledged empty queue and supervision host disabled",
+    "result": "pass"
+  },
+  {
+    "name": "New work arriving after a quiet takeover still resurfaces exactly once",
+    "result": "pass"
+  },
+  {
+    "name": "A killed watcher with queued work recovers once and the next confirmed takeover does not replay it",
+    "result": "pass"
+  }
+]

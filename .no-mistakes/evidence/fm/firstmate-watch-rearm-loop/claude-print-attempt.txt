@@ -1,0 +1,42 @@
+Real Claude print-mode fallback in a 120x40 private lab pane; no credential or trust-store changes.
+Warning: this sign-in ends between 2026-11-18 and 2026-11-21 (in 3 days at the earliest). Renewing it does not move thos
+e dates. Run claude auth login before then, or use claude setup-token for unattended jobs.
+LAB_READY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pane is dead (status 0, Sun Nov 15 01:04:10 2026)

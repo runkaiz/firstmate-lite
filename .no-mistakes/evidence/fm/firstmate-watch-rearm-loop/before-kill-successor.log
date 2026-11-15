@@ -1,0 +1,3 @@
+watcher: started pid=1480375 (beacon fresh) recovery-generation=1479241.1794733430.kGhnll
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7F6R6SC4DDMR2SEFJ7W1FZQ/bin/fm-watch-arm.sh: line 772: 1480375 Killed                     FM_WATCH_HANDLING_SUCCESSOR=1 "$WATCH" > "$child_out"
+watcher: FAILED - watcher cycle exited 137 without an actionable reason
