@@ -1,0 +1,30 @@
+Real Claude; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+
+Elapsed: 24.1 seconds.
+
+TOOL Bash: {"command": "echo \"paused [at=$(date +%s)]: waiting on quiet-probe resource lock for wrapped printf; resumes when TIMEOUT_RECOVERY_COMPLETE prints\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/timeout.status", "description": "Append paused declaration to status file"}
+
+TOOL RESULT: (Bash completed with no output)
+
+TOOL Bash: {"command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"", "description": "Run printf under quiet-probe resource lock", "timeout": 600000}
+
+TOOL RESULT: Exit code 124
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+
+TOOL Bash: {"command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"", "description": "Run printf under quiet-probe resource lock", "timeout": 600000}
+
+TOOL RESULT: Exit code 124
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+
+TOOL Bash: {"command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"", "description": "Run printf under quiet-probe resource lock", "timeout": 600000}
+
+TOOL RESULT: resource-lock: holding quiet-probe slot 1
+TIMEOUT_RECOVERY_COMPLETE
+
+ASSISTANT: The command printed `TIMEOUT_RECOVERY_COMPLETE`, so the task is done.
+
+- **Before the wait:** I added one `paused [at=<epoch>]` line to the status file. It says I was waiting on the `quiet-probe` resource lock and would continue once `TIMEOUT_RECOVERY_COMPLETE` printed.
+- **Attempts 1 and 2:** Both stopped at the 5-second timeout (exit 124) with the message `resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)`. Each time I re-ran the exact same command right away, with nothing in between.
+- **Attempt 3:** It got the lock (`resource-lock: holding quiet-probe slot 1`) and printed `TIMEOUT_RECOVERY_COMPLETE`.
+
+The only file I wrote to was the status file. I didn't start a pipeline or invoke fleet lifecycle.

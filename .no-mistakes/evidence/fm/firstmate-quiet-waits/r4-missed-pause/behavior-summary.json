@@ -1,0 +1,30 @@
+{
+  "delivery": {
+    "pass": true,
+    "emitted_modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ]
+  },
+  "timeout": {
+    "pass": true,
+    "completed": true,
+    "elapsed_seconds": 20.03,
+    "wait_calls": 3,
+    "tool_timeouts_ms": [
+      600000,
+      600000,
+      600000
+    ],
+    "forced_timeouts": 2,
+    "identical_immediate_retries": [
+      true,
+      true
+    ],
+    "text_between_wait_and_completion": [],
+    "pause_declarations": 0,
+    "expected_pause_declarations": 0
+  }
+}

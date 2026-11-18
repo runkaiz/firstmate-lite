@@ -1,0 +1,21 @@
+Real Claude; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+
+Elapsed: 21.03 seconds.
+
+TOOL Bash: {"command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: long foreground pbkdf2 command running; resumes when it prints LONG_COMMAND_COMPLETE or exits\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/long.status", "description": "Append paused status declaration"}
+
+TOOL RESULT: (Bash completed with no output)
+
+TOOL Bash: {"command": "python3 -c \"import hashlib; print(hashlib.pbkdf2_hmac('sha256',b'isolated',b'validation',120000000).hex()); print('LONG_COMMAND_COMPLETE')\"", "description": "Run long PBKDF2 hash computation", "timeout": 600000}
+
+TOOL RESULT: bfe121eff42d193075c21b98405a713276e8101dc3483099bbe85c7c820304a1
+LONG_COMMAND_COMPLETE
+
+ASSISTANT: The command finished and exited normally. Output:
+
+```
+bfe121eff42d193075c21b98405a713276e8101dc3483099bbe85c7c820304a1
+LONG_COMMAND_COMPLETE
+```
+
+Before starting it, I added one `paused [at=<epoch>]:` line to `.q/state/long.status`. It said a long PBKDF2 command was running and work would resume once it printed `LONG_COMMAND_COMPLETE`. It finished within one blocking call without timing out, so no repeat wait was needed. The only file I wrote to was that status file inside `.q`. I didn't start a pipeline or use fleet lifecycle.

@@ -1,0 +1,11 @@
+This is a disposable development evaluation of emitted worker instructions, not a coding assignment. Execute this one harmless command in the current worktree and report its result: ./bin/fm-resource-lock.sh run quiet-probe -- printf "LOCKED_COMMAND_COMPLETE\n"
+The command may take time to complete. Apply the following status instructions emitted by the real Firstmate brief generator. The status file is /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/lock.status. All intentional writes must stay in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q. Do not initialize a pipeline or invoke fleet lifecycle.
+   Use `paused: {why}` - distinct from `blocked:` - when deliberately waiting for work or an external condition expected to clear on its own, including your own validation round.
+   Before ending your turn with your own background shell or monitor still running, or before waiting on your own pipeline run or a long foreground command, append `paused [at=<epoch>]: {job and completion condition}` to the status file.
+   Name what you are waiting for and what will let you resume; do not repeat the declaration on every poll.
+   Wait on a long-running command, validation run, or queued resource lock with one blocking tool call at the longest timeout your shell tool allows (unless this brief says to background that job); make any paused declaration once before the first blocking wait; if that call times out, your very next tool call must be the identical wait (same command and arguments), with no text, status append, or other check in between, even if you forgot the initial paused declaration - never catch up on pause bookkeeping after a timeout; post no progress or "still waiting" text between waits; report once when the result arrives.
+   Do not declare active implementation or reasoning as a wait.
+   Firstmate may still raise one first-sight alert; the declared wait then uses the existing long recheck cadence instead of repeated possible-wedge alarms.
+   When you know when the wait clears, include `until <YYYY-MM-DDTHH:MMZ>` (UTC) for a recheck at that time.
+   Follow the resolution rule below when the wait clears, then resume the task.
+   Use `blocked:` when you are stuck and need help.

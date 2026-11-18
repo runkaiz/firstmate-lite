@@ -1,0 +1,9 @@
+   Use `paused: {why}` - distinct from `blocked:` - when deliberately waiting for work or an external condition expected to clear on its own, including your own validation round.
+   Before ending your turn with your own background shell or monitor still running, or before waiting on your own pipeline run or a long foreground command, append `paused [at=<epoch>]: {job and completion condition}` to the status file.
+   Name what you are waiting for and what will let you resume; do not repeat the declaration on every poll.
+   Wait on a long-running command, validation run, or queued resource lock with one blocking tool call at the longest timeout your shell tool allows (unless this brief says to background that job); on timeout, immediately reissue the same wait with no intervening text and no new paused declaration; post no progress or "still waiting" text between waits; report once when the result arrives.
+   Do not declare active implementation or reasoning as a wait.
+   Firstmate may still raise one first-sight alert; the declared wait then uses the existing long recheck cadence instead of repeated possible-wedge alarms.
+   When you know when the wait clears, include `until <YYYY-MM-DDTHH:MMZ>` (UTC) for a recheck at that time.
+   Follow the resolution rule below when the wait clears, then resume the task.
+   Use `blocked:` when you are stuck and need help.

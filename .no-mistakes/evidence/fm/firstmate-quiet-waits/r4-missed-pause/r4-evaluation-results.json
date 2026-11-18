@@ -1,0 +1,60 @@
+{
+  "delivery": {
+    "result": "pass",
+    "modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ],
+    "wait_no_turns_flag": "absent"
+  },
+  "timeout": {
+    "elapsed_seconds": 20.03,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run probe command under resource lock with 5s timeout",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "Exit code 124\nresource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run probe command under resource lock with 5s timeout",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "Exit code 124\nresource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run probe command under resource lock with 5s timeout",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "resource-lock: holding quiet-probe slot 1\nTIMEOUT_RECOVERY_COMPLETE"
+      ],
+      [
+        "text",
+        "The command finished on the third try and printed `TIMEOUT_RECOVERY_COMPLETE`.\n\n- **Tries 1 and 2:** both hit the 5-second timeout (exit code 124) while still waiting for the `quiet-probe` lock (`1 slot(s) at this hour, none free`).\n- **Try 3:** got lock slot 1 and printed `TIMEOUT_RECOVERY_COMPLETE`.\n\nAs your fault-injection setup said, I skipped the first `paused` note. After each timeout, my next step was the same command again, with nothing written to the status file in between. I didn't write anything to `.q`."
+      ]
+    ],
+    "status": "",
+    "forced_timeout_results": 2
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "delivery": {
+    "result": "pass",
+    "modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ],
+    "wait_no_turns_flag": "absent"
+  },
+  "timeout": {
+    "elapsed_seconds": 24.27,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting on resource lock quiet-probe for wrapped printf; resumes when TIMEOUT_RECOVERY_COMPLETE prints\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/timeout.status",
+          "description": "Append paused declaration to status file"
+        }
+      ],
+      [
+        "result",
+        "(Bash completed with no output)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run printf under the quiet-probe resource lock",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "Exit code 124\nresource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run printf under the quiet-probe resource lock",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "Exit code 124\nresource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"",
+          "description": "Run printf under the quiet-probe resource lock",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "resource-lock: holding quiet-probe slot 1\nTIMEOUT_RECOVERY_COMPLETE"
+      ],
+      [
+        "text",
+        "The command finished and printed `TIMEOUT_RECOVERY_COMPLETE` on the third attempt.\n\n- **Attempts 1 and 2:** Each hit the 5-second timeout (exit code 124) while still waiting for the `quiet-probe` lock. The message was \"1 slot(s) at this hour, none free\". Each time I re-ran the identical command right away, with nothing else in between.\n- **Attempt 3:** It got the lock (\"holding quiet-probe slot 1\") and printed `TIMEOUT_RECOVERY_COMPLETE`.\n\nBefore the first wait, I added a single `paused [at=<epoch>]: ...` line to `.q/state/timeout.status`. I didn't write it again during the retries. The instructions mention a resolution rule \"below\" for when the wait clears, but that rule wasn't included. So I didn't add a resume line to the status file, and the `paused` entry is still its last line. I made no other changes."
+      ]
+    ],
+    "status": "paused [at=1795044631]: waiting on resource lock quiet-probe for wrapped printf; resumes when TIMEOUT_RECOVERY_COMPLETE prints\n",
+    "forced_timeout_results": 2
+  }
+}

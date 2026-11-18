@@ -1,0 +1,76 @@
+{
+  "delivery": {
+    "result": "pass",
+    "modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ],
+    "wait_no_turns_flag": "absent"
+  },
+  "long": {
+    "result": "pass",
+    "completed": true,
+    "elapsed_seconds": 19.62,
+    "wait_calls": [
+      {
+        "command": "python3 -c \"import hashlib; print(hashlib.pbkdf2_hmac('sha256',b'isolated',b'validation',120000000).hex()); print('LONG_COMMAND_COMPLETE')\"",
+        "description": "Run long PBKDF2 validation command",
+        "timeout": 600000
+      }
+    ],
+    "intermediate_assistant_text": [],
+    "paused_declaration_count": 1,
+    "paused_before_first_wait": true,
+    "final_reports": 1,
+    "status": "paused [at=1795044241]: foreground pbkdf2 validation command (120M iterations); resumes when it prints LONG_COMMAND_COMPLETE\n"
+  },
+  "lock": {
+    "result": "pass",
+    "completed": true,
+    "elapsed_seconds": 31.51,
+    "wait_calls": [
+      {
+        "command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"EXIT=$?\"",
+        "description": "Run the probe command under the resource lock",
+        "timeout": 600000
+      }
+    ],
+    "intermediate_assistant_text": [],
+    "paused_declaration_count": 1,
+    "paused_before_first_wait": true,
+    "final_reports": 1,
+    "status": "paused [at=1795044261]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits\n"
+  },
+  "timeout": {
+    "result": "fail",
+    "completed": true,
+    "elapsed_seconds": 52.31,
+    "wait_calls": [
+      {
+        "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"",
+        "description": "Run quiet-probe through resource lock wrapper"
+      },
+      {
+        "command": "for i in $(seq 1 110); do out=$(timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\" 2>&1); rc=$?; if echo \"$out\" | grep -q TIMEOUT_RECOVERY_COMPLETE; then echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; fi; [ $rc -ne 124 ] && { echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; }; done; echo \"still waiting after $i attempts\"",
+        "description": "Retry the wrapped command until lock acquired",
+        "timeout": 600000
+      }
+    ],
+    "intermediate_assistant_text": [],
+    "paused_declaration_count": 1,
+    "paused_before_first_wait": false,
+    "final_reports": 1,
+    "status": "paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed\n",
+    "next_action_after_timeout": {
+      "kind": "tool",
+      "value": {
+        "command": "mkdir -p .q/state && echo \"paused [at=$(date +%s)]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed\" >> .q/state/timeout.status && tail -1 .q/state/timeout.status",
+        "description": "Append paused declaration to status file"
+      }
+    },
+    "observed_timeout_results": 1,
+    "manual_setup_note": "After the worker switched to a retry loop, manually released the isolated lock. The first exit=124 was tool-visible; the loop then completed on attempt 8. No second tool-visible timeout was needed to demonstrate the intervening status-write failure."
+  }
+}

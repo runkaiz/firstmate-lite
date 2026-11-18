@@ -1,0 +1,68 @@
+{
+  "delivery": {
+    "result": "pass",
+    "modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ],
+    "wait_no_turns_flag": "absent"
+  },
+  "timeout": {
+    "elapsed_seconds": 25.47,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"",
+          "description": "Run quiet-probe command under resource lock with 5s timeout"
+        }
+      ],
+      [
+        "result",
+        "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nexit=124"
+      ],
+      [
+        "tool",
+        {
+          "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting for queued resource lock quiet-probe (no free slot); resumes when the wrapped printf acquires the lock and prints TIMEOUT_RECOVERY_COMPLETE\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/timeout.status",
+          "description": "Append paused declaration to status file"
+        }
+      ],
+      [
+        "result",
+        "(Bash completed with no output)"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"",
+          "description": "Retry quiet-probe command under resource lock"
+        }
+      ],
+      [
+        "result",
+        "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nexit=124"
+      ],
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"",
+          "description": "Retry quiet-probe command under resource lock"
+        }
+      ],
+      [
+        "result",
+        "resource-lock: holding quiet-probe slot 1\nTIMEOUT_RECOVERY_COMPLETE\nexit=0"
+      ],
+      [
+        "text",
+        "The command succeeded on the third try and printed `TIMEOUT_RECOVERY_COMPLETE` (exit 0), so I stopped retrying.\n\n- **Try 1:** the 5-second timeout ran out (exit 124) while it was still waiting for the `quiet-probe` lock, which had no free slot.\n- **Before try 2:** I added a `paused [at=<epoch>]: ...` line to `.q/state/timeout.status`, saying it was waiting for the `quiet-probe` lock.\n- **Try 2:** it timed out the same way (exit 124).\n- **Try 3:** it got the lock (`resource-lock: holding quiet-probe slot 1`) and the printf ran.\n\nThe `paused` line is still the last entry in the status file. The brief mentions a resolution rule to follow once the wait clears, but no rule was included, so I didn't add anything after the wait ended. All writes stayed inside `.q`. I didn't initialize a pipeline or invoke fleet lifecycle."
+      ]
+    ],
+    "status": "paused [at=1795044591]: waiting for queued resource lock quiet-probe (no free slot); resumes when the wrapped printf acquires the lock and prints TIMEOUT_RECOVERY_COMPLETE\n",
+    "forced_timeout_results": 2
+  }
+}

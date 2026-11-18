@@ -1,0 +1,13 @@
+Executed a temporary copy of existing fm-brief.test.sh definitions with only these selected checks:
+- test_ship_and_scout_teach_validation_round_pause
+- test_workers_wait_without_spending_turns
+- test_wait_no_turns_absent_keeps_the_previous_brief
+The definitions also execute test_worker_role_scope. All passed. No linter, formatter, static-analysis check, or complete suite ran.
+
+Live development evaluation: python3 r2-live-driver.py, saved beside this record. Real fm-brief.sh emitted four delivery contracts with wait-no-turns absent. Real Claude consumed the emitted paused-rule block and used Bash for a foreground CPU command, a real queued fm-resource-lock.sh command, and a timeout-wrapped lock command. Each ran under a marked FM_HOME with a private 120x40 tmux server. Settings/hooks/MCP and persistence were disabled for the evaluation; the existing normal Claude login was used without credential changes.
+
+Manual step: after observing exit=124 followed by an intervening paused-status write and a retry loop, ran pathlib.Path(".q/state/holder-release").touch() to release only the disposable holder. This let the real wrapper complete; no second tool-visible timeout was produced. The failure is the intervening status action after the first timeout, not a setup failure.
+
+The driver removed the disposable home, socket, and temporary selected-test file in finally. Final git status --short and git diff --stat were empty.
+
+No rendered UI changed: this is generated worker-instruction and CLI behavior. Stream transcripts and status outputs are the product evidence. Prior-round evidence remains preserved under its original filenames; this round uses r2-* files.

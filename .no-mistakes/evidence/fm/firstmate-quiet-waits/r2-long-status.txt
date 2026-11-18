@@ -1,0 +1,1 @@
+paused [at=1795044241]: foreground pbkdf2 validation command (120M iterations); resumes when it prints LONG_COMMAND_COMPLETE

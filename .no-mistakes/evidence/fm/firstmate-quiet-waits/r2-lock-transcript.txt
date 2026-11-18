@@ -1,0 +1,26 @@
+Real Claude; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+
+Elapsed: 31.51 seconds.
+
+TOOL Bash: {"command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/lock.status", "description": "Append paused declaration to status file"}
+
+TOOL RESULT: (Bash completed with no output)
+
+TOOL Bash: {"command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"EXIT=$?\"", "description": "Run the probe command under the resource lock", "timeout": 600000}
+
+TOOL RESULT: resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: holding quiet-probe slot 1
+LOCKED_COMMAND_COMPLETE
+EXIT=0
+
+ASSISTANT: The command finished successfully with exit code 0.
+
+```
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: holding quiet-probe slot 1
+LOCKED_COMMAND_COMPLETE
+```
+
+It first had to wait because the only `quiet-probe` slot was taken. Once it got the slot, it printed `LOCKED_COMMAND_COMPLETE`.
+
+Before starting the wait, I added one line to `.q/state/lock.status`: `paused [at=<epoch>]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits`. That was the only status line I wrote. I didn't initialize a pipeline or start any fleet lifecycle, and the only file I wrote was inside `.q`.

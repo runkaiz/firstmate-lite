@@ -1,0 +1,3 @@
+test_ship_and_scout_teach_validation_round_pause
+test_workers_wait_without_spending_turns
+test_wait_no_turns_absent_keeps_the_previous_brief

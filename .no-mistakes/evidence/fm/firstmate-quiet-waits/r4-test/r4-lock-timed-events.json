@@ -1,0 +1,656 @@
+[
+  {
+    "received_after_seconds": 0.4,
+    "event": {
+      "type": "system",
+      "subtype": "init",
+      "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ",
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "tools": [
+        "Bash"
+      ],
+      "mcp_servers": [],
+      "model": "claude-opus-5-5",
+      "permissionMode": "default",
+      "slash_commands": [
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring",
+        "advisor",
+        "agents",
+        "auto-mode-setup",
+        "autocompact",
+        "clear",
+        "color",
+        "compact",
+        "config",
+        "output-style",
+        "context",
+        "effort",
+        "fast",
+        "focus",
+        "heapdump",
+        "init",
+        "mcp",
+        "import",
+        "model",
+        "__remote-workflow",
+        "workflow-launch-exec",
+        "reload-plugins",
+        "reload-skills",
+        "rename",
+        "ultrareview",
+        "security-review",
+        "usage-credits",
+        "extra-usage",
+        "usage",
+        "insights",
+        "recap",
+        "skill-doctor",
+        "goal",
+        "design-consent",
+        "design-revoke",
+        "list-agents",
+        "team-onboarding"
+      ],
+      "terminal_slash_commands": [
+        "doctor",
+        "color",
+        "focus",
+        "reload-plugins"
+      ],
+      "apiKeySource": "none",
+      "claude_code_version": "2.1.327",
+      "output_style": "default",
+      "agents": [
+        "claude",
+        "Explore",
+        "general-purpose",
+        "Plan",
+        "statusline-setup"
+      ],
+      "skills": [
+        "design",
+        "design-sync",
+        "dataviz",
+        "update-config",
+        "verify",
+        "debug",
+        "code-review",
+        "simplify",
+        "batch",
+        "fewer-permission-prompts",
+        "doctor",
+        "loop",
+        "schedule",
+        "claude-api",
+        "run",
+        "run-skill-generator",
+        "plugin-authoring"
+      ],
+      "plugins": [
+        {
+          "name": "cc-plugin-agents-md",
+          "path": "builtin",
+          "source": "cc-plugin-agents-md@builtin"
+        },
+        {
+          "name": "cc-plugin-telemetry",
+          "path": "builtin",
+          "source": "cc-plugin-telemetry@builtin"
+        },
+        {
+          "name": "cc-plugin-privacy",
+          "path": "builtin",
+          "source": "cc-plugin-privacy@builtin"
+        },
+        {
+          "name": "cc-plugin-plugin-authoring",
+          "path": "builtin",
+          "source": "cc-plugin-plugin-authoring@builtin"
+        }
+      ],
+      "capabilities": [
+        "interrupt_receipt_v1",
+        "interrupt_cancel_queued_v1",
+        "interrupt_send_now_v1",
+        "interrupt_requeue_taken_v1",
+        "msg_lifecycle_v1",
+        "request_marker_lists_v1",
+        "ask_user_question_unanswered_v1",
+        "lifecycle_wakeup_source_v1",
+        "sdk_mcp_tools_list_changed",
+        "sdk_mcp_manifests",
+        "mcp_read_resource_v1",
+        "mcp_tool_ui_meta_v1",
+        "ui_surface_v1",
+        "mcp_call_result_not_for_model_v1",
+        "mcp_call_check_permissions_v1",
+        "voice_call_talk_line_v1",
+        "withdrawn_files_note_v2",
+        "ui_pane_widget_v1",
+        "reload_plugins_refuse_if_busy_v1",
+        "silent_resend_files_v1"
+      ],
+      "analytics_disabled": false,
+      "product_feedback_disabled": false,
+      "uuid": "a70f7a41-6a20-44f6-bb8c-f1b36c1e3861",
+      "memory_paths": {
+        "auto": "/home/runkai/.claude/projects/-var-home-runkai--no-mistakes-repos-6b05071b95c8-git/memory/"
+      },
+      "original_cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ",
+      "additional_directories": [
+        "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ"
+      ],
+      "messaging_socket_path": "/tmp/cc-socks-1000/2748855.sock",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "per_turn_effort_active": true,
+      "ultrathink_available": false,
+      "ultrathink_typed_raises": false,
+      "view_mode": "default"
+    }
+  },
+  {
+    "received_after_seconds": 2.02,
+    "event": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 50,
+      "estimated_tokens_delta": 50,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "bba9e699-3f5a-467e-9902-b28bb050d613"
+    }
+  },
+  {
+    "received_after_seconds": 2.63,
+    "event": {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 216,
+      "estimated_tokens_delta": 166,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "b2a2ba5b-b49e-4b8c-a870-6fce837ef01a"
+    }
+  },
+  {
+    "received_after_seconds": 2.63,
+    "event": {
+      "type": "assistant",
+      "message": {
+        "model": "claude-opus-5-5",
+        "id": "msg_011ChBGSMycS3wAdUdkKzJTU",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "",
+            "signature": "CAQS1AYKEAgTGAI4AUIIdGhpbmtpbmcSDCSZ/TGHA/stR2i+jhoMpTY0mFvM/Nzt37R2IjBtZw3ddDPjVU5PWeF/aoj0D4FpD0tHWFRonDuKuJDbPX51serwzARxOOH3ju4u53Aq8QVn+Yc2H4OuxDh7AHYSIhd7nbpxkoAMpuZaQowrBKoGK7l9l/EysB1XKq3e4mZIUuDnNSXfmmd2pOYhfzP7xIGVgFt+WK4oVkd06KeiPOa+kWNOrcz5q+LkuCP3n+n6w0j0xWMQ3HMiYrZYgzbwA2vFnTF7lyuXRJw42SiYYYM6wU1D/4Vg4/A2oJzD0mnpBBk/7cyaU/QnMslHBaBhSzD8Q1MyCau+gMYKJrjidyYvrI54j7tbCbgDezTrvSYxg7Fopeo8HoVokZvPs1SlCy1tdGl9VHdrNgPrRAyn9vUogPsfpgyh7ljWK0BGwopWuYw9lZNvdtnIWTEkLR0cTbiEp4ZFF2ueNpA15hGo57gO2teKCCPjJtG2EkMzwqE57kZIaz3MNUYoVujyZjOcrMreW8+UYsoy0b9Y2sEvROzhoNW4kYhK1TCNMLGN9bZ+0Ex8nkHsOLr1aphpJbhrMFDjG7vECRf3fhJjI/pMVB+C9K1uY04BoP+Q2YBg+T/5xpyFhEfNKzOS2M1wirrcJkM9a1uXsdhf680MDaZFvP4SnTk/ySuR+9atiHQe0JiGnl8ghN2DwUh+43IfgbPhh7hJ3h9g+RgbZDfvCYAcrVLYZ8k/HU2mG8g3CdEax6UEJ/CiACe01JKAT/65HgTOUSkpufKzrOq4EKljF6blzplsZRjz5gLf+UN3O5oBBoT+K8hikx7LNOOzR397+ZygnKYE81/UxTTMp8+XO9EkrQpaHXuUecbrUYVWyI7ud/N0J0IH574Rjtrp8euqINNEKO5nsAVIU5psE78mMIW/K94srC3J8w1zHSSYRO9QSJ1TzZACaNsTJG/cU61Ka4DMyZCXeweTdzC5UjyC4TamrcvWTrhP8F/8qDjPmPdER2GR5hKd8Ij2DqvhSAuZEVrIchD7r3I9m5qgWT5wTi4bI5Ih3jmiliLTMB+LLhGQ/XGLZlU7q3nZ+FZ57SVcxsGXypnG5t/AMHT26kQn75Aanji1LLAYAQ=="
+          }
+        ],
+        "container": null,
+        "stop_reason": null,
+        "stop_sequence": null,
+        "stop_details": null,
+        "usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 1940,
+          "cache_read_input_tokens": 1775,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1940
+          },
+          "output_tokens": 3,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "speed": "standard"
+        },
+        "input_transformations": [],
+        "diagnostics": null,
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "8c463d92-bb61-43f1-b0c2-25144ab5c857",
+      "timestamp": "2026-11-18T23:32:45.630Z",
+      "request_id": "req_011ChBGSMqRuBLJWoaGr2K76",
+      "thinking_duration_ms": 1242,
+      "thinking_display": "updates"
+    }
+  },
+  {
+    "received_after_seconds": 4.04,
+    "event": {
+      "type": "assistant",
+      "message": {
+        "model": "claude-opus-5-5",
+        "id": "msg_011ChBGSMycS3wAdUdkKzJTU",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_01XeZucfS2iD2qmYdRnWf28g",
+            "name": "Bash",
+            "input": {
+              "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting on fm-resource-lock.sh run quiet-probe (queued resource lock); resumes when the locked command exits\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/lock.status",
+              "description": "Append paused declaration to status file"
+            },
+            "caller": {
+              "type": "direct"
+            }
+          }
+        ],
+        "container": null,
+        "stop_reason": null,
+        "stop_sequence": null,
+        "stop_details": null,
+        "usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 1940,
+          "cache_read_input_tokens": 1775,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 1940
+          },
+          "output_tokens": 3,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "speed": "standard"
+        },
+        "input_transformations": [],
+        "diagnostics": null,
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "bc2650c4-1548-47a7-b0ff-431a897364aa",
+      "timestamp": "2026-11-18T23:32:47.116Z",
+      "request_id": "req_011ChBGSMqRuBLJWoaGr2K76",
+      "wire_tool_inputs": {
+        "toolu_01XeZucfS2iD2qmYdRnWf28g": {
+          "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting on fm-resource-lock.sh run quiet-probe (queued resource lock); resumes when the locked command exits\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/lock.status",
+          "description": "Append paused declaration to status file"
+        }
+      }
+    }
+  },
+  {
+    "received_after_seconds": 4.04,
+    "event": {
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed_warning",
+        "resetsAt": 1795143600,
+        "rateLimitType": "seven_day",
+        "utilization": 0.8,
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "surpassedThreshold": 0.75,
+        "unifiedWindows": {
+          "five_hour": {
+            "utilization": 0.4,
+            "resetsAt": 1795057200,
+            "status": "allowed"
+          },
+          "seven_day": {
+            "utilization": 0.8,
+            "resetsAt": 1795143600,
+            "status": "allowed_warning",
+            "surpassedThreshold": 0.75
+          }
+        },
+        "overageEnabled": false
+      },
+      "uuid": "124f419e-88f9-461f-9095-f2638984e897",
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe"
+    }
+  },
+  {
+    "received_after_seconds": 4.25,
+    "event": {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_01XeZucfS2iD2qmYdRnWf28g",
+            "type": "tool_result",
+            "content": "(Bash completed with no output)",
+            "is_error": false
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "cce2a1fa-6c65-4c6a-8910-0ca237cdcfc1",
+      "timestamp": "2026-11-18T23:32:47.228Z",
+      "tool_use_result": {
+        "stdout": "",
+        "stderr": "",
+        "interrupted": false,
+        "isImage": false,
+        "noOutputExpected": false
+      },
+      "tool_result_meta": [
+        {
+          "id": "toolu_01XeZucfS2iD2qmYdRnWf28g",
+          "permission_decision": {
+            "decision": "accept",
+            "source": "config",
+            "reason_type": "rule"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "received_after_seconds": 6.07,
+    "event": {
+      "type": "assistant",
+      "message": {
+        "model": "claude-opus-5-5",
+        "id": "msg_011ChBGSeDRBQZWLg6Xs7v8x",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_01CYgjJeCccxDpH33rwvfMfZ",
+            "name": "Bash",
+            "input": {
+              "command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"exit=$?\"",
+              "description": "Run the probe command under the resource lock",
+              "timeout": 600000
+            },
+            "caller": {
+              "type": "direct"
+            }
+          }
+        ],
+        "container": null,
+        "stop_reason": null,
+        "stop_sequence": null,
+        "stop_details": null,
+        "usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 341,
+          "cache_read_input_tokens": 3715,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 341
+          },
+          "output_tokens": 16,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "speed": "standard"
+        },
+        "input_transformations": [],
+        "diagnostics": null,
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "fbb41b03-28e6-438f-9fc9-cef41053e85d",
+      "timestamp": "2026-11-18T23:32:49.174Z",
+      "request_id": "req_011ChBGSe3kYmMpSwzNiosME",
+      "wire_tool_inputs": {
+        "toolu_01CYgjJeCccxDpH33rwvfMfZ": {
+          "command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"exit=$?\"",
+          "description": "Run the probe command under the resource lock",
+          "timeout": 600000
+        }
+      }
+    }
+  },
+  {
+    "received_after_seconds": 9.1,
+    "event": {
+      "type": "system",
+      "subtype": "task_started",
+      "task_id": "bqugptoqg",
+      "run_id": "0mwmrb6n3-c3e30ec6",
+      "tool_use_id": "toolu_01CYgjJeCccxDpH33rwvfMfZ",
+      "description": "Run the probe command under the resource lock",
+      "is_backgrounded": false,
+      "task_type": "local_bash",
+      "uuid": "ad6a986b-289e-4ed7-a73a-f44b1f3d3dbe",
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe"
+    }
+  },
+  {
+    "received_after_seconds": 27.71,
+    "event": {
+      "type": "system",
+      "subtype": "task_notification",
+      "task_id": "bqugptoqg",
+      "run_id": "0mwmrb6n3-c3e30ec6",
+      "tool_use_id": "toolu_01CYgjJeCccxDpH33rwvfMfZ",
+      "status": "completed",
+      "output_file": "",
+      "summary": "Run the probe command under the resource lock",
+      "uuid": "e5d9bd03-9c88-418f-8aaa-09f10ea206fe",
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe"
+    }
+  },
+  {
+    "received_after_seconds": 27.71,
+    "event": {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "tool_use_id": "toolu_01CYgjJeCccxDpH33rwvfMfZ",
+            "type": "tool_result",
+            "content": "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nresource-lock: holding quiet-probe slot 1\nLOCKED_COMMAND_COMPLETE\nexit=0",
+            "is_error": false
+          }
+        ]
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "555fd8e3-6c6b-4f64-8a36-c985f5e70ee8",
+      "timestamp": "2026-11-18T23:33:10.716Z",
+      "tool_use_result": {
+        "stdout": "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nresource-lock: holding quiet-probe slot 1\nLOCKED_COMMAND_COMPLETE\nexit=0",
+        "stderr": "",
+        "interrupted": false,
+        "isImage": false,
+        "noOutputExpected": false
+      },
+      "tool_result_meta": [
+        {
+          "id": "toolu_01CYgjJeCccxDpH33rwvfMfZ",
+          "permission_decision": {
+            "decision": "accept",
+            "source": "config",
+            "reason_type": "rule"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "received_after_seconds": 30.94,
+    "event": {
+      "type": "assistant",
+      "message": {
+        "model": "claude-opus-5-5",
+        "id": "msg_011ChBGUNdMaMuTWbHAbo2fA",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "The command completed successfully with exit code 0.\n\n- **Lock:** At first, all 1 slot(s) for `quiet-probe` were taken and the command had to wait. It then got slot 1.\n- **Output:** `LOCKED_COMMAND_COMPLETE`\n\nBefore the wait, I added this line to `.q/state/lock.status`: `paused [at=<epoch>]: waiting on fm-resource-lock.sh run quiet-probe (queued resource lock); resumes when the locked command exits`. I left out the `until` time because I didn't know when the lock would be released.\n\nThe paused line is still the last entry in the status file. Your instructions didn't include the \"resolution rule\" for when a wait clears, so I didn't add a resumed or done entry."
+          }
+        ],
+        "container": null,
+        "stop_reason": null,
+        "stop_sequence": null,
+        "stop_details": null,
+        "usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 240,
+          "cache_read_input_tokens": 4056,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 240
+          },
+          "output_tokens": 248,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "speed": "standard"
+        },
+        "input_transformations": [],
+        "diagnostics": null,
+        "context_management": null
+      },
+      "parent_tool_use_id": null,
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "uuid": "a2a4f7d7-75ce-446f-97e8-5c2babe6fb7b",
+      "timestamp": "2026-11-18T23:33:13.943Z",
+      "request_id": "req_011ChBGUNThCzdaYjW5NV7eb"
+    }
+  },
+  {
+    "received_after_seconds": 30.94,
+    "event": {
+      "duration_api_ms": 8918,
+      "stop_reason": "end_turn",
+      "session_id": "4985bb26-ed5a-437f-9f15-523622ae4abe",
+      "total_cost_usd": 0.0367812,
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 2521,
+        "cache_read_input_tokens": 9546,
+        "output_tokens": 734,
+        "output_tokens_details": {
+          "thinking_tokens": 65
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2521,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 248,
+            "cache_read_input_tokens": 4056,
+            "cache_creation_input_tokens": 240,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 240
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 734,
+          "cacheReadInputTokens": 9546,
+          "cacheCreationInputTokens": 2521,
+          "webSearchRequests": 0,
+          "costUSD": 0.0367812,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 65,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 2521,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "permission_denials": [],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "safety_stops": 0,
+      "is_error": false,
+      "num_turns": 3,
+      "subtype": "success",
+      "api_error_status": null,
+      "result": "The command completed successfully with exit code 0.\n\n- **Lock:** At first, all 1 slot(s) for `quiet-probe` were taken and the command had to wait. It then got slot 1.\n- **Output:** `LOCKED_COMMAND_COMPLETE`\n\nBefore the wait, I added this line to `.q/state/lock.status`: `paused [at=<epoch>]: waiting on fm-resource-lock.sh run quiet-probe (queued resource lock); resumes when the locked command exits`. I left out the `until` time because I didn't know when the lock would be released.\n\nThe paused line is still the last entry in the status file. Your instructions didn't include the \"resolution rule\" for when a wait clears, so I didn't add a resumed or done entry.",
+      "ttft_ms": 2256,
+      "type": "result",
+      "duration_ms": 30581,
+      "uuid": "9e2a5546-7e45-4210-9f51-c3da60001ce0",
+      "ttft_stream_ms": 1014,
+      "time_to_request_ms": 53,
+      "first_content_frame_ms": 1014,
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "model_usage_since_last_result": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 734,
+          "cacheReadInputTokens": 9546,
+          "cacheCreationInputTokens": 2521,
+          "webSearchRequests": 0,
+          "costUSD": 0.0367812,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 65,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 2521,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "credential_expires_at": "2026-11-21T23:24:51.498Z"
+    }
+  }
+]

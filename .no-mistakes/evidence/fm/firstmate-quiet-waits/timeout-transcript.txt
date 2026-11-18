@@ -1,0 +1,26 @@
+Real Claude Code 2.1.327; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+Observed evaluation elapsed: 36.1s.
+
+TOOL Bash: {"command": "timeout 5s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"EXIT=$?\"", "description": "Run the probe command under the resource lock"}
+
+TOOL RESULT: resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+EXIT=124
+
+ASSISTANT: Timed out waiting for the lock; retrying as instructed. First I'll declare the wait.
+
+TOOL Bash: {"command": "echo \"paused [at=$(date +%s)]: waiting for quiet-probe resource lock via fm-resource-lock.sh; resumes when the wrapped printf prints TIMEOUT_RECOVERY_COMPLETE\" >> /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.quiet-validation/home/state/timeout.status; for i in $(seq 1 100); do timeout 5s /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; rc=$?; [ $rc -ne 124 ] && { echo \"EXIT=$rc attempt=$i\"; break; }; done", "description": "Declare paused status and retry the locked command until it runs", "timeout": 600000}
+
+TOOL RESULT: resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: holding quiet-probe slot 1
+TIMEOUT_RECOVERY_COMPLETE
+EXIT=0 attempt=5
+
+ASSISTANT: The wrapped command finished: it printed `TIMEOUT_RECOVERY_COMPLETE` and exited with code 0.
+
+- **First run:** the 5-second timeout ran out (exit 124) while it was still waiting for the `quiet-probe` lock. The lock said "1 slot(s) at this hour, none free".
+- **Retries:** before retrying, I added this line to `.quiet-validation/home/state/timeout.status`: `paused [at=<epoch>]: waiting for quiet-probe resource lock ...`. I then ran the same command again in one blocking loop. Retries 1–4 also timed out waiting for the lock. On retry 5 it got slot 1 and printed the line, so I stopped.
+
+The status file write was the only change I made, and it stayed inside `.quiet-validation`. I didn't start a pipeline or use fleet lifecycle.

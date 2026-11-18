@@ -1,0 +1,2 @@
+paused [at=1795043591]: foreground command "sleep 25; printf LONG_COMMAND_COMPLETE" running; resumes when it exits until 2026-11-18T23:14Z
+paused [at=1795043685]: foreground pbkdf2 validation command (80M iterations); resumes when it prints LONG_COMMAND_COMPLETE or exits

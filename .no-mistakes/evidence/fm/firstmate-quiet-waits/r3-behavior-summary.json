@@ -1,0 +1,15 @@
+{
+  "before": "reproduced belated pause after exit 124; original driver later encountered a stream parsing error",
+  "focused_generated_prompt_checks": "pass",
+  "final_live_timeout_result": "pass",
+  "identical_immediate_retries": 2,
+  "pause_declarations_before_first_wait": 1,
+  "intervening_chat_or_checks": 0,
+  "generated_brief_modes": [
+    "no-mistakes",
+    "direct-PR",
+    "local-only",
+    "scout"
+  ],
+  "transcript": "r3-final/r2-timeout-transcript.txt"
+}

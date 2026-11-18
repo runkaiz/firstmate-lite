@@ -1,0 +1,58 @@
+{
+  "delivery": {
+    "pass": true,
+    "emitted_modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ]
+  },
+  "long": {
+    "pass": true,
+    "completed": true,
+    "elapsed_seconds": 21.03,
+    "wait_calls": 1,
+    "tool_timeouts_ms": [
+      600000
+    ],
+    "forced_timeouts": 0,
+    "identical_immediate_retries": [],
+    "text_between_wait_and_completion": [],
+    "pause_declarations": 1,
+    "expected_pause_declarations": 1
+  },
+  "lock": {
+    "pass": true,
+    "completed": true,
+    "elapsed_seconds": 30.94,
+    "wait_calls": 1,
+    "tool_timeouts_ms": [
+      600000
+    ],
+    "forced_timeouts": 0,
+    "identical_immediate_retries": [],
+    "text_between_wait_and_completion": [],
+    "pause_declarations": 1,
+    "expected_pause_declarations": 1
+  },
+  "timeout": {
+    "pass": true,
+    "completed": true,
+    "elapsed_seconds": 24.1,
+    "wait_calls": 3,
+    "tool_timeouts_ms": [
+      600000,
+      600000,
+      600000
+    ],
+    "forced_timeouts": 2,
+    "identical_immediate_retries": [
+      true,
+      true
+    ],
+    "text_between_wait_and_completion": [],
+    "pause_declarations": 1,
+    "expected_pause_declarations": 1
+  }
+}

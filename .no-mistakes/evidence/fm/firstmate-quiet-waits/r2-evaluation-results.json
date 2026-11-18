@@ -1,0 +1,128 @@
+{
+  "delivery": {
+    "result": "pass",
+    "modes": [
+      "no-mistakes",
+      "direct-PR",
+      "local-only",
+      "scout"
+    ],
+    "wait_no_turns_flag": "absent"
+  },
+  "long": {
+    "elapsed_seconds": 19.62,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: foreground pbkdf2 validation command (120M iterations); resumes when it prints LONG_COMMAND_COMPLETE\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/long.status",
+          "description": "Append paused declaration to status file"
+        }
+      ],
+      [
+        "result",
+        "(Bash completed with no output)"
+      ],
+      [
+        "tool",
+        {
+          "command": "python3 -c \"import hashlib; print(hashlib.pbkdf2_hmac('sha256',b'isolated',b'validation',120000000).hex()); print('LONG_COMMAND_COMPLETE')\"",
+          "description": "Run long PBKDF2 validation command",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "bfe121eff42d193075c21b98405a713276e8101dc3483099bbe85c7c820304a1\nLONG_COMMAND_COMPLETE"
+      ],
+      [
+        "text",
+        "The command finished successfully within the time limit, so I didn't need to re-run the wait. It printed:\n\n```\nbfe121eff42d193075c21b98405a713276e8101dc3483099bbe85c7c820304a1\nLONG_COMMAND_COMPLETE\n```\n\nBefore it started, I added one line to `.q/state/long.status`, as the status instructions require. It marks the run as paused (with the start time) until `LONG_COMMAND_COMPLETE` prints. That was the only file I wrote, and it is inside `.q`. I didn't set up a pipeline or call any fleet lifecycle commands."
+      ]
+    ],
+    "status": "paused [at=1795044241]: foreground pbkdf2 validation command (120M iterations); resumes when it prints LONG_COMMAND_COMPLETE\n",
+    "forced_timeout_results": 0
+  },
+  "lock": {
+    "elapsed_seconds": 31.51,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "mkdir -p /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state && echo \"paused [at=$(date +%s)]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits\" >> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RER93RQ5FCMJD426B48YQJ/.q/state/lock.status",
+          "description": "Append paused declaration to status file"
+        }
+      ],
+      [
+        "result",
+        "(Bash completed with no output)"
+      ],
+      [
+        "tool",
+        {
+          "command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"EXIT=$?\"",
+          "description": "Run the probe command under the resource lock",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nresource-lock: holding quiet-probe slot 1\nLOCKED_COMMAND_COMPLETE\nEXIT=0"
+      ],
+      [
+        "text",
+        "The command finished successfully with exit code 0.\n\n```\nresource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nresource-lock: holding quiet-probe slot 1\nLOCKED_COMMAND_COMPLETE\n```\n\nIt first had to wait because the only `quiet-probe` slot was taken. Once it got the slot, it printed `LOCKED_COMMAND_COMPLETE`.\n\nBefore starting the wait, I added one line to `.q/state/lock.status`: `paused [at=<epoch>]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits`. That was the only status line I wrote. I didn't initialize a pipeline or start any fleet lifecycle, and the only file I wrote was inside `.q`."
+      ]
+    ],
+    "status": "paused [at=1795044261]: waiting on queued resource lock command 'fm-resource-lock.sh run quiet-probe'; resumes when it exits\n",
+    "forced_timeout_results": 0
+  },
+  "timeout": {
+    "elapsed_seconds": 52.31,
+    "completed": true,
+    "flat": [
+      [
+        "tool",
+        {
+          "command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"",
+          "description": "Run quiet-probe through resource lock wrapper"
+        }
+      ],
+      [
+        "result",
+        "resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)\nexit=124"
+      ],
+      [
+        "tool",
+        {
+          "command": "mkdir -p .q/state && echo \"paused [at=$(date +%s)]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed\" >> .q/state/timeout.status && tail -1 .q/state/timeout.status",
+          "description": "Append paused declaration to status file"
+        }
+      ],
+      [
+        "result",
+        "paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed"
+      ],
+      [
+        "tool",
+        {
+          "command": "for i in $(seq 1 110); do out=$(timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\" 2>&1); rc=$?; if echo \"$out\" | grep -q TIMEOUT_RECOVERY_COMPLETE; then echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; fi; [ $rc -ne 124 ] && { echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; }; done; echo \"still waiting after $i attempts\"",
+          "description": "Retry the wrapped command until lock acquired",
+          "timeout": 600000
+        }
+      ],
+      [
+        "result",
+        "resource-lock: holding quiet-probe slot 1\nTIMEOUT_RECOVERY_COMPLETE\nattempt=8 rc=0"
+      ],
+      [
+        "text",
+        "The command worked on a later try and printed `TIMEOUT_RECOVERY_COMPLETE`.\n\n- **First run:** the 5-second timeout ran out (exit 124) before it got the lock. The output was `resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)`.\n- **Waiting:** I added one line to the status file: `paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed`. I then re-ran the exact same command in a loop inside one long call, retrying only when it timed out.\n- **Result:** the 8th try got the lock (`resource-lock: holding quiet-probe slot 1`), printed `TIMEOUT_RECOVERY_COMPLETE` and exited with 0. I stopped there.\n\nThe only thing I wrote was that one status line, inside `.q/state/`. I did not start a pipeline or use fleet lifecycle."
+      ]
+    ],
+    "status": "paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed\n",
+    "forced_timeout_results": 1
+  }
+}

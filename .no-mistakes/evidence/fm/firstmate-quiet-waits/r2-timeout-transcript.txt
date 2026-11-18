@@ -1,0 +1,26 @@
+Real Claude; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+
+Elapsed: 52.31 seconds.
+
+TOOL Bash: {"command": "timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\"; echo \"exit=$?\"", "description": "Run quiet-probe through resource lock wrapper"}
+
+TOOL RESULT: resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+exit=124
+
+TOOL Bash: {"command": "mkdir -p .q/state && echo \"paused [at=$(date +%s)]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed\" >> .q/state/timeout.status && tail -1 .q/state/timeout.status", "description": "Append paused declaration to status file"}
+
+TOOL RESULT: paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed
+
+TOOL Bash: {"command": "for i in $(seq 1 110); do out=$(timeout 5s ./bin/fm-resource-lock.sh run quiet-probe -- printf \"TIMEOUT_RECOVERY_COMPLETE\\n\" 2>&1); rc=$?; if echo \"$out\" | grep -q TIMEOUT_RECOVERY_COMPLETE; then echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; fi; [ $rc -ne 124 ] && { echo \"$out\"; echo \"attempt=$i rc=$rc\"; exit 0; }; done; echo \"still waiting after $i attempts\"", "description": "Retry the wrapped command until lock acquired", "timeout": 600000}
+
+TOOL RESULT: resource-lock: holding quiet-probe slot 1
+TIMEOUT_RECOVERY_COMPLETE
+attempt=8 rc=0
+
+ASSISTANT: The command worked on a later try and printed `TIMEOUT_RECOVERY_COMPLETE`.
+
+- **First run:** the 5-second timeout ran out (exit 124) before it got the lock. The output was `resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)`.
+- **Waiting:** I added one line to the status file: `paused [at=1795044300]: retrying quiet-probe resource lock wrapper; resumes when TIMEOUT_RECOVERY_COMPLETE is printed`. I then re-ran the exact same command in a loop inside one long call, retrying only when it timed out.
+- **Result:** the 8th try got the lock (`resource-lock: holding quiet-probe slot 1`), printed `TIMEOUT_RECOVERY_COMPLETE` and exited with 0. I stopped there.
+
+The only thing I wrote was that one status line, inside `.q/state/`. I did not start a pipeline or use fleet lifecycle.

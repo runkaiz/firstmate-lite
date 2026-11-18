@@ -1,0 +1,29 @@
+Real Claude Code 2.1.327; disposable marked FM_HOME; private fm-lab tmux server (120x40).
+Observed evaluation elapsed: 39.1s.
+
+ASSISTANT: I'll declare the wait in the status file first, then run the locked command in one blocking call.
+
+TOOL Bash: {"command": "mkdir -p .quiet-validation/home/state && echo \"paused [at=$(date +%s)]: waiting on fm-resource-lock.sh run quiet-probe (printf LOCKED_COMMAND_COMPLETE); resumes when the lock is acquired and the command exits\" >> .quiet-validation/home/state/lock.status && cat .quiet-validation/home/state/lock.status", "description": "Append paused declaration to status file"}
+
+TOOL RESULT: paused [at=1795043603]: waiting on fm-resource-lock.sh run quiet-probe (printf LOCKED_COMMAND_COMPLETE); resumes when the lock is acquired and the command exits
+
+TOOL Bash: {"command": "./bin/fm-resource-lock.sh run quiet-probe -- printf \"LOCKED_COMMAND_COMPLETE\\n\"; echo \"EXIT=$?\"", "description": "Run the probe command under the resource lock", "timeout": 600000}
+
+TOOL RESULT: resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: holding quiet-probe slot 1
+LOCKED_COMMAND_COMPLETE
+EXIT=0
+
+ASSISTANT: The locked command finished successfully with exit code 0.
+
+**Output:**
+```
+resource-lock: waiting for quiet-probe (1 slot(s) at this hour, none free)
+resource-lock: holding quiet-probe slot 1
+LOCKED_COMMAND_COMPLETE
+```
+
+- **Wait declaration:** Before running the command, I added this line to `.quiet-validation/home/state/lock.status`: `paused [at=1795043603]: waiting on fm-resource-lock.sh run quiet-probe (printf LOCKED_COMMAND_COMPLETE); resumes when the lock is acquired and the command exits`
+- **Lock behaviour:** The `quiet-probe` lock had no free slot at first, so the command queued. It then took slot 1 and ran the `printf` within the single blocking call, without needing a second wait.
+- **Status file:** The brief says to "follow the resolution rule below" once the wait clears, but no rule was included. Because of that, I didn't add a resume or clear entry, and the `paused` line is still the last entry in the file.
+- **Scope:** My only write was to that status file. I didn't initialize a pipeline or call any fleet lifecycle commands.

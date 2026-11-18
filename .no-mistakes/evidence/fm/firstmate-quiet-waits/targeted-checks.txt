@@ -1,0 +1,9 @@
+Ran a temporary driver containing the existing fm-brief.test.sh definitions and these selected checks:
+- test_ship_and_scout_teach_validation_round_pause
+- test_workers_wait_without_spending_turns
+- test_wait_no_turns_absent_keeps_the_previous_brief
+The definitions also execute test_worker_role_scope. All passed. No static-analysis test or full suite was run.
+
+Manual consumer checks: emitted real briefs with config/wait-no-turns absent for no-mistakes, direct-PR, local-only, and scout; all included the shared blocking/silent-wait rule. This verifies generated interface delivery only. Live model behavior was evaluated separately in the attached transcripts.
+
+Setup corrections: direct worktree tmux socket exceeded Unix socket path length; used fm-lab-home.sh tmux-dir/teardown. Claude blocks an explicit sleep followed by a command, so the final foreground check used an actual PBKDF2 computation. Fixed a driver output-file race before final evaluations. These setup attempts are not counted as product failures.

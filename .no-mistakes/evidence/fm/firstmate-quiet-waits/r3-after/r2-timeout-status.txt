@@ -1,0 +1,1 @@
+paused [at=1795044591]: waiting for queued resource lock quiet-probe (no free slot); resumes when the wrapped printf acquires the lock and prints TIMEOUT_RECOVERY_COMPLETE
