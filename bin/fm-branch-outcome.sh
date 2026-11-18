@@ -679,15 +679,17 @@ case "$CMD" in
       select(.seq > $previous and .seq <= $through and .verdict == "captain")
       | select(.statusEndpoint != null and .statusIdent != null)
       | [.task, (.statusEndpoint | tostring), .statusIdent] | @tsv' "$STORE") || { fm_lock_release "$LOCK"; exit 1; }
+    fm_lock_release "$LOCK"
     while IFS=$'\t' read -r PRESENTED_TASK PRESENTED_ENDPOINT PRESENTED_IDENT; do
       [ -n "$PRESENTED_TASK" ] || continue
       FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-inactive-reconcile.sh" \
         presented-status "$PRESENTED_TASK" "$PRESENTED_ENDPOINT" "$PRESENTED_IDENT" || {
-          fm_lock_release "$LOCK"
           exit 1
         }
     done <<< "$PRESENTED_ROWS"
-    write_processed "$THROUGH"
+    fm_lock_acquire_wait "$LOCK"
+    PROCESSED_SEQ=$(read_processed) || { fm_lock_release "$LOCK"; exit 1; }
+    if [ "$THROUGH" -gt "$PROCESSED_SEQ" ]; then write_processed "$THROUGH"; fi
     fm_lock_release "$LOCK"
     ;;
   processed-init)

@@ -767,6 +767,180 @@ test_backstop_status_ack_is_bound_to_its_wake() {
   pass "backstop status snapshots are acknowledged only through their presented wake"
 }
 
+run_home_bounded() {
+  PATH="$WORLD/fakebin:$PATH" FM_ROOT_OVERRIDE="$WORLD/root" FM_HOME="$MAIN" \
+    FM_STATE_OVERRIDE="$MAIN/state" FM_CONFIG_OVERRIDE="$MAIN/config" \
+    FM_SUPERVISION_ACTOR="${STATUS_ACTOR:-main}" bash -c '
+      . "$1/bin/fm-timeout-lib.sh"
+      shift
+      fm_run_timed 15 "$@"
+    ' _ "$ROOT" "$@"
+}
+
+wait_case_path() {
+  local path=$1 i=0
+  while [ "$i" -lt 100 ] && [ ! -e "$path" ]; do sleep 0.1; i=$((i + 1)); done
+  [ -e "$path" ] || fail "timed out waiting for $path"
+}
+
+hold_status_metadata() {
+  run_home_bounded bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    . "$1/bin/fm-classify-lib.sh"
+    lock=$(fm_meta_lock_path "$FM_STATE_OVERRIDE/child.meta") || exit 1
+    fm_lock_acquire_wait "$lock" || exit 1
+    : > "$2/meta-held"
+    i=0
+    while [ "$i" -lt 100 ] && [ ! -e "$2/release-meta" ]; do sleep 0.1; i=$((i + 1)); done
+    [ -e "$2/release-meta" ] || exit 1
+    if [ "$3" = retire ]; then
+      status_retire_presentation_task "$FM_STATE_OVERRIDE" child || exit 1
+    fi
+    fm_lock_release "$lock"
+  ' _ "$ROOT" "$WORLD" "$1"
+}
+
+test_status_receipts_do_not_deadlock_cleanup() {
+  local mode cleanup_pid ack_pid drain_pid outcome_seq
+  for mode in main branch branch-outcome; do
+    make_world "receipt-cleanup-$mode"
+    write_child "$MAIN" child 'done: ready for approval'
+    STATUS_ACTOR=main
+    if [ "$mode" = branch-outcome ]; then
+      outcome_seq=$(FM_HOME="$MAIN" "$ROOT/bin/fm-branch-outcome.sh" append \
+        --task child --verdict captain --summary 'Ready for approval') || fail "outcome append failed"
+      FM_HOME="$MAIN" "$ROOT/bin/fm-branch-outcome.sh" mark-read --through "$outcome_seq" || fail "mark-read failed"
+    fi
+    queue_status_wake child.status
+    if [ "$mode" = branch ]; then
+      STATUS_ACTOR=branch
+      FM_HOME="$MAIN" "$GRANT" activate "$$" cleanup-ack || fail "branch activation failed"
+      FM_HOME="$MAIN" "$GRANT" publish cleanup-ack 1 || fail "branch grant failed"
+    fi
+    present_status_wake
+    hold_status_metadata retire > "$WORLD/cleanup.out" 2> "$WORLD/cleanup.err" &
+    cleanup_pid=$!
+    wait_case_path "$WORLD/meta-held"
+    if [ "$mode" = branch-outcome ]; then
+      run_home_bounded "$ROOT/bin/fm-branch-outcome.sh" mark-processed --through "$outcome_seq" \
+        > "$WORLD/ack.out" 2> "$WORLD/ack.err" &
+    else
+      run_home_bounded "$DRAIN" --ack-through "$STATUS_SEQ" --recovery-generation "$STATUS_GENERATION" \
+        > "$WORLD/ack.out" 2> "$WORLD/ack.err" &
+    fi
+    ack_pid=$!
+    wait_case_path "$MAIN/state/.inactive-outcome-reconcile.lock/pid"
+    drain_pid=
+    if [ "$mode" = branch-outcome ]; then
+      FM_WAKE_ENRICH_TEST_DELAY=2 run_home_bounded "$DRAIN" > "$WORLD/concurrent.out" 2> "$WORLD/concurrent.err" &
+      drain_pid=$!
+      wait_case_path "$MAIN/state/.status-presentation-lock/pid"
+    fi
+    : > "$WORLD/release-meta"
+    wait "$cleanup_pid" || fail "$mode: cleanup could not retire status while acknowledgement awaited metadata"
+    wait "$ack_pid" || fail "$mode: receipt acknowledgement did not finish after cleanup"
+    if [ -n "$drain_pid" ]; then wait "$drain_pid" || fail "concurrent presentation failed"; fi
+    [ ! -e "$MAIN/state/child.status" ] || fail "$mode: cleanup left the status log"
+  done
+  unset STATUS_ACTOR
+  pass "main, branch, and branch-outcome receipt acknowledgements cannot deadlock status cleanup"
+}
+
+test_status_ack_retires_only_its_captured_snapshot() {
+  local holder ack_pid endpoint
+  make_world receipt-concurrent-snapshot
+  write_child "$MAIN" child 'done: original outcome'
+  queue_status_wake child.status
+  present_status_wake
+  hold_status_metadata preserve > "$WORLD/holder.out" 2> "$WORLD/holder.err" &
+  holder=$!
+  wait_case_path "$WORLD/meta-held"
+  run_home_bounded "$DRAIN" --ack-through "$STATUS_SEQ" --recovery-generation "$STATUS_GENERATION" \
+    > "$WORLD/ack.out" 2> "$WORLD/ack.err" &
+  ack_pid=$!
+  wait_case_path "$MAIN/state/.inactive-outcome-reconcile.lock/pid"
+  printf 'failed: new outcome during acknowledgement\n' >> "$MAIN/state/child.status"
+  present_status_wake
+  assert_grep 'failed: new outcome during acknowledgement' "$WORLD/drain.out" "new snapshot could not be presented during receipt recording"
+  endpoint=$(wc -c < "$MAIN/state/child.status" | tr -d ' ')
+  : > "$WORLD/release-meta"
+  wait "$holder" || fail "metadata holder failed"
+  wait "$ack_pid" || fail "captured snapshot acknowledgement failed"
+  awk -F '\t' -v endpoint="$endpoint" '
+    $1 == 1 && $2 == "child" && $3 == endpoint { found=1 }
+    END { exit !(found && NR == 1) }
+  ' "$MAIN/state/.main.status-wake-presented" || fail "acknowledgement retired a concurrent replacement snapshot"
+  [ "$(outcome_count "$MAIN" presented)" = 0 ] || fail "old snapshot acknowledged a new failure"
+  age "$MAIN/state/child.status"
+  FM_FAKE_CREW_STATE=failed run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "concurrent new outcome lost its notification"
+  pass "receipt recording releases presentation and retires only its captured snapshot entries"
+}
+
+publish_empty_recovery() {
+  : > "$MAIN/state/.wake-queue"
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    fm_recovery_marker_publish "$FM_STATE_OVERRIDE/.watcher-down" handling
+  ' _ "$ROOT" || fail "empty recovery publication failed"
+}
+
+test_empty_recovery_ack_records_terminal_receipts() {
+  local state
+  for state in done failed; do
+    make_world "empty-recovery-$state"
+    write_child "$MAIN" child "$state: waiting for approval"
+    publish_empty_recovery
+    present_status_wake
+    [ "$STATUS_SEQ" = 0 ] || fail "empty recovery did not name its zero cutoff"
+    assert_grep "$state: waiting for approval" "$WORLD/drain.out" "empty recovery did not present terminal backstop"
+    run_status_drain --ack-through 0 --recovery-generation different-generation || fail "stale empty ack failed"
+    [ "$(outcome_count "$MAIN" presented)" = 0 ] || fail "wrong generation acknowledged terminal backstop"
+    ack_status_wake
+    [ "$(outcome_count "$MAIN" presented)" = 1 ] || fail "empty recovery did not record terminal receipt"
+    FM_FAKE_CREW_STATE="$state" run_reconcile "$MAIN" --startup
+    [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "empty recovery repeated a handled backstop"
+  done
+  pass "empty-queue recovery acknowledgements bind terminal receipts to their presented generation"
+}
+
+test_empty_recovery_ack_preserves_unpresented_outcomes() {
+  local mutation state
+  for mutation in append replace sibling unseen new-generation; do
+    make_world "empty-recovery-$mutation"
+    write_child "$MAIN" child 'done: original outcome'
+    publish_empty_recovery
+    if [ "$mutation" = unseen ]; then
+      STATUS_SEQ=0
+      STATUS_GENERATION=$(sed 's/.*://' "$MAIN/state/.watcher-down")
+    else
+      present_status_wake
+    fi
+    state=done
+    case "$mutation" in
+      append)
+        printf 'failed: later validation failure\n' >> "$MAIN/state/child.status"
+        state=failed
+        ;;
+      replace)
+        mv "$MAIN/state/child.status" "$WORLD/original.status"
+        printf 'done: original outcome\n' > "$MAIN/state/child.status"
+        ;;
+      sibling) write_child "$MAIN" other 'done: never presented sibling' ;;
+      new-generation) publish_empty_recovery ;;
+    esac
+    ack_status_wake
+    age "$MAIN/state/child.status"
+    FM_FAKE_CREW_STATE="$state" run_reconcile "$MAIN" --startup
+    [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "$mutation: empty acknowledgement hid an unpresented outcome"
+  done
+  pass "empty recovery preserves changed logs, unseen outcomes, and newer recovery generations"
+}
+
+test_status_receipts_do_not_deadlock_cleanup
+test_status_ack_retires_only_its_captured_snapshot
+test_empty_recovery_ack_records_terminal_receipts
+test_empty_recovery_ack_preserves_unpresented_outcomes
 test_handled_status_wake_suppresses_inactive_duplicate
 test_status_ack_preserves_unpresented_outcomes
 test_backstop_status_ack_is_bound_to_its_wake

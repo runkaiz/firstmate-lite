@@ -11,10 +11,11 @@
 # stderr for MAIN and either branch host, keeping stdout records unchanged.
 #
 # Stderr names the exact `handled` command for each presented captured process-event result.
-# .<actor>.status-wake-presented stores tab-separated wake sequence, task,
+# .<actor>.status-wake-presented stores tab-separated wake binding, task,
 # status byte endpoint, and file identity after successful presentation.
 # Acknowledgement records terminal receipts only for snapshots bound to its
-# consumed rows; annotations bind to their signal and backstops to the cutoff.
+# consumed rows or empty-queue recovery generation; annotations bind to their
+# signal and backstops to the cutoff or recovery:<generation> when no row exists.
 #
 # Keep sequence-bound row consumption independent from generation-bound episode
 # retirement; docs/watcher-continuity.md owns the recovery contract.
@@ -321,7 +322,8 @@ acknowledge_inactive_outcomes() { # <mode> <newline-separated-fingerprints>
 }
 
 commit_status_wake_snapshots() {
-  local rows=$1 tmp epoch seq kind key payload task endpoint ident
+  local rows=$1 tmp epoch seq kind key payload task endpoint ident binding=${ACK_THROUGH:-0}
+  if [ "$binding" = 0 ]; then binding="recovery:${RECOVERY_MARKER_TOKEN##*:}"; fi
   [ -n "${FM_WAKE_PRESENTED_STATUS_SNAPSHOTS:-}${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}" ] || return 0
   tmp=$(mktemp "$STATE/.status-wake-presented.XXXXXX") || return 1
   if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
@@ -339,7 +341,7 @@ commit_status_wake_snapshots() {
   done <<< "$rows"
   while IFS=$'\t' read -r task endpoint ident; do
     [ -n "$task" ] || continue
-    printf '%s\t%s\t%s\t%s\n' "$ACK_THROUGH" "$task" "$endpoint" "$ident" >> "$tmp" \
+    printf '%s\t%s\t%s\t%s\n' "$binding" "$task" "$endpoint" "$ident" >> "$tmp" \
       || { rm -f "$tmp"; return 1; }
   done <<< "${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}"
   LC_ALL=C sort -u "$tmp" -o "$tmp" && _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS" \
@@ -347,7 +349,24 @@ commit_status_wake_snapshots() {
 }
 
 acknowledge_status_wake_snapshots() {
-  local sequences=$1 lock="$STATE/.status-presentation-lock" tmp seq task endpoint ident rc=0
+  local sequences=$1 lock="$STATE/.status-presentation-lock" captured='' tmp _binding task endpoint ident rc=0
+  fm_lock_acquire_wait "$lock" || return 1
+  if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+    if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+      fm_lock_release "$lock"
+      return 1
+    fi
+    captured=$(awk -F '\t' -v sequences="$sequences" '
+      BEGIN { n = split(sequences, seqs, "\n"); for (i = 1; i <= n; i++) selected[seqs[i]]=1 }
+      $1 in selected
+    ' "$STATUS_WAKE_SNAPSHOTS") || rc=1
+  fi
+  fm_lock_release "$lock"
+  [ "$rc" -eq 0 ] || return "$rc"
+  [ -n "$captured" ] || return 0
+  while IFS=$'\t' read -r _binding task endpoint ident; do
+    "$SCRIPT_DIR/fm-inactive-reconcile.sh" presented-status "$task" "$endpoint" "$ident" || return 1
+  done <<< "$captured"
   fm_lock_acquire_wait "$lock" || return 1
   if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
     if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
@@ -355,14 +374,11 @@ acknowledge_status_wake_snapshots() {
       return 1
     fi
     tmp=$(mktemp "$STATE/.status-wake-presented.XXXXXX") || { fm_lock_release "$lock"; return 1; }
-    while IFS=$'\t' read -r seq task endpoint ident; do
-      if printf '%s\n' "$sequences" | grep -Fxq -- "$seq"; then
-        "$SCRIPT_DIR/fm-inactive-reconcile.sh" presented-status "$task" "$endpoint" "$ident" || { rc=1; break; }
-      else
-        printf '%s\t%s\t%s\t%s\n' "$seq" "$task" "$endpoint" "$ident" >> "$tmp" || { rc=1; break; }
-      fi
-    done < "$STATUS_WAKE_SNAPSHOTS"
-    if [ "$rc" -eq 0 ]; then _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS" || rc=1; fi
+    awk -v captured="$captured" '
+      BEGIN { n = split(captured, rows, "\n"); for (i = 1; i <= n; i++) retired[rows[i]]=1 }
+      !($0 in retired)
+    ' "$STATUS_WAKE_SNAPSHOTS" > "$tmp" \
+      && _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS" || rc=1
     rm -f "$tmp"
   fi
   fm_lock_release "$lock"
@@ -927,7 +943,9 @@ print_status_presentation() {  # [<deduped-raw-rows>]
     fi
   fi
   if [ "$rc" -eq 0 ] && [ -n "$snapshot" ]; then print_status_sections "$snapshot" "$fully_presented" || rc=1; fi
-  if [ "$rc" -eq 0 ] && [ -n "$rows" ]; then commit_status_wake_snapshots "$rows" || rc=1; fi
+  if [ "$rc" -eq 0 ] && { [ -n "$rows" ] || [ "$RECOVERY_ACK_REQUIRED" = true ]; }; then
+    commit_status_wake_snapshots "$rows" || rc=1
+  fi
   fm_lock_release "$lock"
   if [ "$rc" -eq 0 ] && [ -n "$rows" ]; then
     "$SCRIPT_DIR/fm-proactive.sh" context >&2
@@ -1012,6 +1030,14 @@ if [ -n "$ACK_THROUGH" ]; then
     BEGIN { while ((getline seq < rows) > 0) owned[seq]=1 }
     NF >= 5 && $2 ~ /^[0-9]+$/ && $2 <= cutoff && ($2 in owned) { print $2 }
   ' "$FM_WAKE_QUEUE") || exit 1
+  if [ "$ACK_THROUGH" = 0 ]; then
+    fm_recovery_marker_snapshot "$RECOVERY_MARKER" || exit 1
+    case "$FM_RECOVERY_MARKER_TOKEN" in
+      pending:*:"$ACK_GENERATION"|announced:*:"$ACK_GENERATION")
+        ACK_STATUS_SEQUENCES="recovery:$ACK_GENERATION"
+        ;;
+    esac
+  fi
   fm_lock_release "$FM_WAKE_QUEUE_LOCK"
   DRAIN_LOCK_HELD=false
   if ! acknowledge_status_wake_snapshots "$ACK_STATUS_SEQUENCES" \
