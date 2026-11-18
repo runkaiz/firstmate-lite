@@ -1,0 +1,72 @@
+SCENARIO metadata/presentation interleaving main
+1795038948	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 744286.1795038948.Hsqux1
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+OBSERVED: receipt writer waits on metadata without retaining the presentation lock
+OBSERVED: cleanup retired the status under the held metadata lock
+OBSERVED: cleanup and acknowledgement both finished within 15 seconds
+SCENARIO metadata/presentation interleaving branch
+1795038949	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 746467.1795038949.hFQgBf
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+OBSERVED: receipt writer waits on metadata without retaining the presentation lock
+OBSERVED: cleanup retired the status under the held metadata lock
+OBSERVED: cleanup and acknowledgement both finished within 15 seconds
+SCENARIO metadata/presentation interleaving branch-outcome
+1795038950	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 748718.1795038950.wjBlfh
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+OBSERVED: receipt writer waits on metadata without retaining the presentation lock
+OBSERVED: cleanup retired the status under the held metadata lock
+OBSERVED: cleanup and acknowledgement both finished within 15 seconds
+1795038950	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 750706.1795038950.PzloXw
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+1795038950	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: failed: newer failure during acknowledgement
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child failed: newer failure during acknowledgement
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 750706.1795038950.PzloXw
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+1	child	81	strong:61:10607252961:2026-11-18 13:55:50.872283419 -0800
+OBSERVED: old acknowledgement preserved the newer concurrently presented failure snapshot
+LIVE LOCK CHECKS COMPLETE

@@ -1,0 +1,309 @@
+SCENARIO ordinary main child.status
+1795038829	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 547813.1795038829.3g2NBK
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038830
+notice_emitted=0
+phase=presentation
+OBSERVED: handled receipt recorded; awaiting-approval task retained
+SCENARIO ordinary main child.turn-ended
+1795038830	1	signal	child.turn-ended	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state; historical / not necessarily the triggering event: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 549820.1795038830.tyw7JC
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038830
+notice_emitted=0
+phase=presentation
+OBSERVED: handled receipt recorded; awaiting-approval task retained
+SCENARIO ordinary branch child.status
+1795038830	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 551900.1795038830.crxo85
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038831
+notice_emitted=0
+phase=presentation
+OBSERVED: handled receipt recorded; awaiting-approval task retained
+SCENARIO ordinary branch child.turn-ended
+1795038831	1	signal	child.turn-ended	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state; historical / not necessarily the triggering event: child.status: done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 553862.1795038831.WnWNgr
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038831
+notice_emitted=0
+phase=presentation
+OBSERVED: handled receipt recorded; awaiting-approval task retained
+SCENARIO preserve ordinary append
+1795038831	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 555771.1795038831.d43w3q
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+OBSERVED: receipts=0 after append; status=failed: new validation failure
+SCENARIO preserve ordinary replace
+1795038832	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 557671.1795038832.n5EENl
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+OBSERVED: receipts=0 after replace; status=done: ready awaiting merge approval
+SCENARIO preserve ordinary sibling
+1795038832	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 559429.1795038832.zbaUSI
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+OBSERVED: receipts=1 after sibling; status=done: ready awaiting merge approval
+SCENARIO preserve ordinary unseen
+wake drain: acknowledged wakes through 1 (1 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+OBSERVED: receipts=0 after unseen; status=done: ready awaiting merge approval
+SCENARIO preserve ordinary wrong-generation
+1795038833	1	signal	child.status	validation event
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: ready awaiting merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 560909.1795038833.8Q8EcG
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+wake drain: acknowledged wakes through 1 (1 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+OBSERVED: receipts=1 after wrong-generation; status=done: ready awaiting merge approval
+SCENARIO preserve recovery append
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 562484.1795038834.WxvbwU
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: receipts=0 after append; status=failed: new validation failure
+SCENARIO preserve recovery replace
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 564137.1795038834.PGU4nx
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: receipts=0 after replace; status=done: ready awaiting merge approval
+SCENARIO preserve recovery sibling
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 565150.1795038835.iDCTt2
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVED: receipts=1 after sibling; status=done: ready awaiting merge approval
+SCENARIO preserve recovery unseen
+OBSERVED: receipts=0 after unseen; status=done: ready awaiting merge approval
+SCENARIO preserve recovery wrong-generation
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: ready awaiting merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 566594.1795038835.S8LO7K
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+OBSERVED: receipts=0 after wrong-generation; status=done: ready awaiting merge approval
+SCENARIO empty recovery done
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 568100.1795038836.gEIWFt
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038836
+notice_emitted=0
+phase=presentation
+OBSERVED: only the presented recovery generation recorded a terminal receipt
+SCENARIO empty recovery failed
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child failed: waiting for approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 570063.1795038836.6kCyZw
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+schema=fm-terminal-outcome.v1
+fingerprint=6dae841f77295f9406c4e9d0c5f1547d
+task_id=child
+incarnation=live-child
+state=failed
+outcome_key=inactive-outcome-main-child-failed
+origin=direct
+pr=
+created_epoch=1795038837
+notice_emitted=0
+phase=presentation
+OBSERVED: only the presented recovery generation recorded a terminal receipt
+schema=fm-terminal-outcome.v1
+fingerprint=16b883edfc84144d28c428f7b8c0d121
+task_id=child
+incarnation=live-child
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038837
+notice_emitted=0
+phase=presentation
+OBSERVED: reading alone did not record a terminal receipt; processing did
+fm-pr-poll-merge-notified-v1
+github
+github.com
+validation/disposable
+17
+OBSERVED: synchronous publication followed by poll emits no duplicate wake
+1795038837	1	check	merged-external-https://github.com/validation/disposable/pull/17	check: merge landed: external https://github.com/validation/disposable/pull/17 external
+OBSERVED: an external poll outcome emits exactly one durable merge wake
+OBSERVED: a different PR remains eligible for a wake
+1795038837	2	check	merged-child-other-https://github.com/validation/disposable/pull/17	validation event
+1795038837	4	check	inactive-outcome:sibling	inactive terminal outcome awaiting captain presentation: child=child-other state=done
+OBSERVED: cleanup pruned the retired task outcomes and preserved the similarly named sibling
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+merged fm/child into local main (2891fbd -> 7a18bc6) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7R92E9KRV04638V2J0N9BQ0/.fm-live.YlRUy7/local-landing/projects/demo
+landed product content
+schema=fm-terminal-outcome.v1
+fingerprint=eaa69ae68e51f07403ee561c3e729cc4
+task_id=child
+incarnation=live-landing
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795038838
+notice_emitted=0
+phase=presentation
+OBSERVED: real local fast-forward landed content and recorded the presentation receipt
+LIVE CLI CHECKS COMPLETE
