@@ -327,8 +327,11 @@ commit_status_wake_snapshots() {
   [ -n "${FM_WAKE_PRESENTED_STATUS_SNAPSHOTS:-}${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}" ] || return 0
   tmp=$(mktemp "$STATE/.status-wake-presented.XXXXXX") || return 1
   if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
-    [ -f "$STATUS_WAKE_SNAPSHOTS" ] && [ ! -L "$STATUS_WAKE_SNAPSHOTS" ] \
-      && command cat "$STATUS_WAKE_SNAPSHOTS" > "$tmp" || { rm -f "$tmp"; return 1; }
+    if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ] \
+      || ! command cat "$STATUS_WAKE_SNAPSHOTS" > "$tmp"; then
+      rm -f "$tmp"
+      return 1
+    fi
   fi
   while IFS=$'\t' read -r epoch seq kind key payload; do
     [ "$kind" = signal ] || continue
@@ -344,8 +347,10 @@ commit_status_wake_snapshots() {
     printf '%s\t%s\t%s\t%s\n' "$binding" "$task" "$endpoint" "$ident" >> "$tmp" \
       || { rm -f "$tmp"; return 1; }
   done <<< "${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}"
-  LC_ALL=C sort -u "$tmp" -o "$tmp" && _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS" \
-    || { rm -f "$tmp"; return 1; }
+  if ! LC_ALL=C sort -u "$tmp" -o "$tmp" || ! _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS"; then
+    rm -f "$tmp"
+    return 1
+  fi
 }
 
 # Capture under the presentation lock, then release it before taking scan or

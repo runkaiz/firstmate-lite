@@ -689,7 +689,7 @@ test_handled_status_wake_suppresses_inactive_duplicate() {
   local actor key state
   for actor in main branch; do
     for key in child.status child.turn-ended; do
-      for state in done failed; do
+      for state in 'done' failed; do
         make_world "handled-$actor-$key-$state"
         STATUS_ACTOR=$actor
         write_child "$MAIN" child "$state: outcome awaiting merge approval"
@@ -731,7 +731,7 @@ test_status_ack_preserves_unpresented_outcomes() {
       present_status_wake
       assert_grep 'done: original outcome' "$WORLD/drain.out" "original outcome not presented"
     fi
-    state=done
+    state='done'
     case "$mutation" in
       append)
         printf 'failed: later validation failed\n' >> "$MAIN/state/child.status"
@@ -762,7 +762,7 @@ test_backstop_status_ack_is_bound_to_its_wake() {
   [ "$(outcome_count "$MAIN" presented)" = 0 ] || fail "earlier cutoff acknowledged a later presentation"
   ack_status_wake
   [ "$(outcome_count "$MAIN" presented)" = 1 ] || fail "backstop presentation lacked a handled receipt"
-  FM_FAKE_CREW_STATE=done run_reconcile "$MAIN" --startup
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
   [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "handled backstop repeated its outcome"
   pass "backstop status snapshots are acknowledged only through their presented wake"
 }
@@ -784,6 +784,7 @@ wait_case_path() {
 }
 
 hold_status_metadata() {
+  # shellcheck disable=SC2016 # Expand variables in the child shell program.
   run_home_bounded bash -c '
     . "$1/bin/fm-wake-lib.sh"
     . "$1/bin/fm-classify-lib.sh"
@@ -887,7 +888,7 @@ publish_empty_recovery() {
 
 test_empty_recovery_ack_records_terminal_receipts() {
   local state
-  for state in done failed; do
+  for state in 'done' failed; do
     make_world "empty-recovery-$state"
     write_child "$MAIN" child "$state: waiting for approval"
     publish_empty_recovery
@@ -916,7 +917,7 @@ test_empty_recovery_ack_preserves_unpresented_outcomes() {
     else
       present_status_wake
     fi
-    state=done
+    state='done'
     case "$mutation" in
       append)
         printf 'failed: later validation failure\n' >> "$MAIN/state/child.status"
