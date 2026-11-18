@@ -97,6 +97,8 @@ EOF
 Never inspect or change any other home's endpoint namespace; this authorization is limited to the exact task paths named by this brief.
 When this task works on Firstmate itself, the repository root `AGENTS.md` (also imported by `CLAUDE.md`) is project content and the supervisor contract for the firstmate managing you: follow this brief instead of that supervisor contract.
 Project instructions still govern the work wherever they do not conflict with this worker identity, including `CONTRIBUTING.md` and `firstmate-coding-guidelines` for Firstmate changes.
+Before implementing, read every report or design document cited by the task instructions in full, even when a section is quoted here.
+Its requirements are authoritative over the instructions' summary; if they conflict, stop and raise `needs-decision` through the task's status protocol rather than silently choosing either version.
 EOF
   printf "If the \`firstmate-coding-guidelines\` skill name does not resolve in this session, read \`%s/.agents/skills/firstmate-coding-guidelines/SKILL.md\` instead.\n" "$root"
 }
@@ -142,11 +144,11 @@ fm_base_branch_valid() {  # <base> <mode> <forge> <caller>
 # base-variant Setup sentence bin/fm-brief.sh writes; return 1 when there is
 # none. Any other "Base branch:" line is prose and ignored.
 fm_brief_base_branches() {  # <brief>
-  awk '
+  fm_brief_heading_parse "$1" '' unfenced | awk '
     setup && sub(/^Base branch: /, "") { print; n++ }
     { setup = /^You are in a disposable git worktree of .*, at a detached HEAD on a clean copy of its base branch\.$/ }
     END { exit !n }
-  ' "$1"
+  '
 }
 
 fm_ship_rule_one() {  # <no-mistakes|direct-PR|local-only> <task-id> [branch] [<forge>] [<base>]

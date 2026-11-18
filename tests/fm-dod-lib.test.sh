@@ -468,4 +468,19 @@ test_worker_role_names_skill_and_fallback_file() {
 
 test_worker_role_names_skill_and_fallback_file
 
+test_worker_role_requires_full_sources_and_conflict_escalation() {
+  local role
+  role=$(fm_brief_worker_role "$TMP_ROOT/state" source-rule "$ROOT")
+  assert_contains "$role" 'Before implementing, read every report or design document cited by the task instructions in full, even when a section is quoted here.' \
+    'worker contract permits coding from a summary or excerpt alone'
+  assert_contains "$role" "Its requirements are authoritative over the instructions' summary" \
+    'worker contract lost source authority'
+  # shellcheck disable=SC2016 # Assert the literal protocol name in emitted instructions.
+  assert_contains "$role" 'if they conflict, stop and raise `needs-decision` through the task' \
+    'worker contract does not stop for a source conflict'
+  pass 'worker launch contract requires full source reading and escalation of conflicts'
+}
+
+test_worker_role_requires_full_sources_and_conflict_escalation
+
 echo "all fm-dod-lib tests passed"

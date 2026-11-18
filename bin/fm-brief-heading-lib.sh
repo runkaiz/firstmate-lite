@@ -10,8 +10,9 @@
 
 # Parse an exact ATX heading outside fenced blocks. Body mode prints through
 # the next unfenced heading at the same or a higher level; present mode reports
-# whether the heading exists.
-fm_brief_heading_parse() {  # <file|-> <heading> <body|present>
+# whether the heading exists. Unfenced mode prints only non-fenced lines, so
+# verbatim source quotes cannot supply machine-readable delivery fields.
+fm_brief_heading_parse() {  # <file|-> <heading> <body|present|unfenced>
   local file=$1 heading=$2 mode=$3 input=$1
   if [ "$file" = - ]; then
     input=/dev/stdin
@@ -50,6 +51,10 @@ fm_brief_heading_parse() {  # <file|-> <heading> <body|present>
         }
       }
 
+      if (mode == "unfenced") {
+        if (!was_fenced && !is_fence) print line
+        next
+      }
       if (!found && !was_fenced && line == heading) {
         found = 1
         if (mode == "present") next
