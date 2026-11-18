@@ -1,0 +1,331 @@
+[
+  {
+    "scenario": "consistent",
+    "final_result": {
+      "duration_api_ms": 16674,
+      "stop_reason": "end_turn",
+      "session_id": "dfcdc3c1-1d23-4fcf-80c3-da61463b7158",
+      "total_cost_usd": 0.1125042,
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 9557,
+        "cache_read_input_tokens": 38141,
+        "output_tokens": 1419,
+        "output_tokens_details": {
+          "thinking_tokens": 213
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 9557,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 375,
+            "cache_read_input_tokens": 11179,
+            "cache_creation_input_tokens": 293,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 293
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 1419,
+          "cacheReadInputTokens": 38141,
+          "cacheCreationInputTokens": 9557,
+          "webSearchRequests": 0,
+          "costUSD": 0.1125042,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 213,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 9557,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "permission_denials": [],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "safety_stops": 0,
+      "is_error": false,
+      "num_turns": 7,
+      "subtype": "success",
+      "api_error_status": null,
+      "result": "I wrote the payload and reported the task as done. Nothing was committed: your evaluation instructions put setup, Git and delivery out of scope.\n\n**Sources read:** I read both cited reports in full: `consistent-design.md` and `consistent-purpose.md`. They don't conflict with the spec or with each other. The spec says `mode=\"summary\"` and the design report requires the same value. The reports add two more required fields, which the spec leaves to them.\n\n**Payload** (`.test-work/lab/consistent-payload.json`):\n```json\n{\n  \"mode\": \"summary\",\n  \"tail\": \"full-report-tail-K7\",\n  \"purpose\": \"chosen-purpose-Z4\"\n}\n```\n\n**Status file:** it didn't exist yet, so I created it with one line:\n`done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope`\n\n**Inbox:** I didn't check the steering inbox. Your instructions limited me to the brief and its cited reports.",
+      "ttft_ms": 2180,
+      "type": "result",
+      "duration_ms": 16884,
+      "uuid": "5ad4819e-f1e6-46f2-91fa-008087acf065",
+      "ttft_stream_ms": 1387,
+      "time_to_request_ms": 185,
+      "first_content_frame_ms": 1387,
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "model_usage_since_last_result": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 1419,
+          "cacheReadInputTokens": 38141,
+          "cacheCreationInputTokens": 9557,
+          "webSearchRequests": 0,
+          "costUSD": 0.1125042,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 213,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 9557,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "credential_expires_at": "2026-11-21T23:24:51.498Z"
+    },
+    "status": "done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope\n",
+    "payload": "{\n  \"mode\": \"summary\",\n  \"tail\": \"full-report-tail-K7\",\n  \"purpose\": \"chosen-purpose-Z4\"\n}\n",
+    "reads": [
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-consistent/launch-brief.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/consistent-design.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/consistent-purpose.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-consistent.status"
+        }
+      }
+    ],
+    "writes": [
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/consistent-payload.json",
+          "content": "{\n  \"mode\": \"summary\",\n  \"tail\": \"full-report-tail-K7\",\n  \"purpose\": \"chosen-purpose-Z4\"\n}\n"
+        }
+      },
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-consistent.status",
+          "content": "done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope\n"
+        }
+      }
+    ],
+    "result": "pass"
+  },
+  {
+    "scenario": "conflict",
+    "final_result": {
+      "duration_api_ms": 15522,
+      "stop_reason": "end_turn",
+      "session_id": "861c642f-a52e-4238-b75c-9b8f1717f378",
+      "total_cost_usd": 0.097467,
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 8097,
+        "cache_read_input_tokens": 38855,
+        "output_tokens": 1244,
+        "output_tokens_details": {
+          "thinking_tokens": 65
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 8097,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 399,
+            "cache_read_input_tokens": 10772,
+            "cache_creation_input_tokens": 362,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 362
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 1244,
+          "cacheReadInputTokens": 38855,
+          "cacheCreationInputTokens": 8097,
+          "webSearchRequests": 0,
+          "costUSD": 0.097467,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 65,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 8097,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "permission_denials": [],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "safety_stops": 0,
+      "is_error": false,
+      "num_turns": 6,
+      "subtype": "success",
+      "api_error_status": null,
+      "result": "I stopped before writing the payload because the task spec and one of its cited reports disagree. The brief says that when they conflict I must raise `needs-decision` rather than pick one, so I did.\n\n**The conflict:** the spec asks for `mode=\"summary\"`, but the \"Complete requirements\" section of `conflict-design.md` says the mode field must be `\"source\"`.\n\n**Not in dispute:**\n- `tail=\"full-report-tail-K7\"` (from `conflict-design.md`)\n- `purpose=\"chosen-purpose-Z4\"` (from `conflict-purpose.md`)\n\n**Done:** I wrote this line to `.test-work/lab/state/worker-conflict.status`:\n```\nneeds-decision [at=1794995346]: spec says mode=\"summary\" but conflict-design.md \"Complete requirements\" says mode MUST be \"source\"; choose (a) mode=\"source\" per report or (b) mode=\"summary\" per spec. ...\n```\n\n**Not done:**\n- I didn't write `conflict-payload.json`.\n- I didn't check the steering inbox, because it's outside the files this evaluation lets me open.\n\nOnce Firstmate says which `mode` to use, the payload is a single small JSON file with the three fields above.",
+      "ttft_ms": 2224,
+      "type": "result",
+      "duration_ms": 15730,
+      "uuid": "081f1124-3e44-4d92-950e-de2e89ac28cd",
+      "ttft_stream_ms": 1426,
+      "time_to_request_ms": 170,
+      "first_content_frame_ms": 1427,
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "model_usage_since_last_result": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 1244,
+          "cacheReadInputTokens": 38855,
+          "cacheCreationInputTokens": 8097,
+          "webSearchRequests": 0,
+          "costUSD": 0.097467,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 65,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 8097,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "credential_expires_at": "2026-11-21T23:24:51.498Z"
+    },
+    "status": "needs-decision [at=1794995346]: spec says mode=\"summary\" but conflict-design.md \"Complete requirements\" says mode MUST be \"source\"; choose (a) mode=\"source\" per report or (b) mode=\"summary\" per spec. Other fields agreed: tail=\"full-report-tail-K7\", purpose=\"chosen-purpose-Z4\". Payload not written.\n",
+    "payload": null,
+    "reads": [
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-conflict/launch-brief.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/conflict-design.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/conflict-purpose.md"
+        }
+      },
+      {
+        "name": "Read",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-conflict.status"
+        }
+      }
+    ],
+    "writes": [
+      {
+        "name": "Write",
+        "input": {
+          "file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-conflict.status",
+          "content": "needs-decision [at=1794995346]: spec says mode=\"summary\" but conflict-design.md \"Complete requirements\" says mode MUST be \"source\"; choose (a) mode=\"source\" per report or (b) mode=\"summary\" per spec. Other fields agreed: tail=\"full-report-tail-K7\", purpose=\"chosen-purpose-Z4\". Payload not written.\n"
+        }
+      }
+    ],
+    "result": "pass"
+  }
+]

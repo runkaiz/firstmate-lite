@@ -1,0 +1,98 @@
+SOURCE FIDELITY: REAL CLAUDE DEVELOPMENT EVALUATIONS
+
+Scope: actual launch-brief.md overlays emitted by bin/fm-spawn.sh, evaluated using the installed Claude CLI and existing login in a private 120x40 tmux lab. The evaluation envelope excluded Git/setup/delivery, restricted tools to Read/Write, and did not supply or resolve report requirements. This is a sampled development evaluation, not a universal model-behavior guarantee.
+
+CONSISTENT
+Design report:
+# Synthetic implementation design
+## Smallest first slice
+Write a JSON payload as requested by the task.
+
+## Complete requirements
+The mode field MUST be "summary".
+The tail field MUST be "full-report-tail-K7".
+
+Second cited report:
+# Synthetic purpose design
+## Binding
+The purpose field MUST be "chosen-purpose-Z4".
+
+Runtime: Claude Code 2.1.327; model claude-opus-5-5
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-consistent/launch-brief.md"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/consistent-design.md"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/consistent-purpose.md"}
+TOOL Write {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/consistent-payload.json", "content": "{\n  \"mode\": \"summary\",\n  \"tail\": \"full-report-tail-K7\",\n  \"purpose\": \"chosen-purpose-Z4\"\n}\n"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-consistent.status"}
+TOOL Write {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-consistent.status", "content": "done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope\n"}
+Payload: {
+  "mode": "summary",
+  "tail": "full-report-tail-K7",
+  "purpose": "chosen-purpose-Z4"
+}
+
+Status: done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope
+
+Worker response:
+I wrote the payload and reported the task as done. Nothing was committed: your evaluation instructions put setup, Git and delivery out of scope.
+
+**Sources read:** I read both cited reports in full: `consistent-design.md` and `consistent-purpose.md`. They don't conflict with the spec or with each other. The spec says `mode="summary"` and the design report requires the same value. The reports add two more required fields, which the spec leaves to them.
+
+**Payload** (`.test-work/lab/consistent-payload.json`):
+```json
+{
+  "mode": "summary",
+  "tail": "full-report-tail-K7",
+  "purpose": "chosen-purpose-Z4"
+}
+```
+
+**Status file:** it didn't exist yet, so I created it with one line:
+`done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope`
+
+**Inbox:** I didn't check the steering inbox. Your instructions limited me to the brief and its cited reports.
+
+CONFLICT
+Design report:
+# Synthetic implementation design
+## Smallest first slice
+Write a JSON payload as requested by the task.
+
+## Complete requirements
+The mode field MUST be "source".
+The tail field MUST be "full-report-tail-K7".
+
+Second cited report:
+# Synthetic purpose design
+## Binding
+The purpose field MUST be "chosen-purpose-Z4".
+
+Runtime: Claude Code 2.1.327; model claude-opus-5-5
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-conflict/launch-brief.md"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/conflict-design.md"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/conflict-purpose.md"}
+TOOL Read {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-conflict.status"}
+TOOL Write {"file_path": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/state/worker-conflict.status", "content": "needs-decision [at=1794995346]: spec says mode=\"summary\" but conflict-design.md \"Complete requirements\" says mode MUST be \"source\"; choose (a) mode=\"source\" per report or (b) mode=\"summary\" per spec. Other fields agreed: tail=\"full-report-tail-K7\", purpose=\"chosen-purpose-Z4\". Payload not written.\n"}
+Payload: None
+Status: needs-decision [at=1794995346]: spec says mode="summary" but conflict-design.md "Complete requirements" says mode MUST be "source"; choose (a) mode="source" per report or (b) mode="summary" per spec. Other fields agreed: tail="full-report-tail-K7", purpose="chosen-purpose-Z4". Payload not written.
+
+Worker response:
+I stopped before writing the payload because the task spec and one of its cited reports disagree. The brief says that when they conflict I must raise `needs-decision` rather than pick one, so I did.
+
+**The conflict:** the spec asks for `mode="summary"`, but the "Complete requirements" section of `conflict-design.md` says the mode field must be `"source"`.
+
+**Not in dispute:**
+- `tail="full-report-tail-K7"` (from `conflict-design.md`)
+- `purpose="chosen-purpose-Z4"` (from `conflict-purpose.md`)
+
+**Done:** I wrote this line to `.test-work/lab/state/worker-conflict.status`:
+```
+needs-decision [at=1794995346]: spec says mode="summary" but conflict-design.md "Complete requirements" says mode MUST be "source"; choose (a) mode="source" per report or (b) mode="summary" per spec. ...
+```
+
+**Not done:**
+- I didn't write `conflict-payload.json`.
+- I didn't check the steering inbox, because it's outside the files this evaluation lets me open.
+
+Once Firstmate says which `mode` to use, the payload is a single small JSON file with the three fields above.
+
+Cleanup: private tmux lab removed; synthetic worktree fixture removed after evidence capture.

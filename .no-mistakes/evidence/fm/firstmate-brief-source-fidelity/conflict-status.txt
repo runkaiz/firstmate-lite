@@ -1,0 +1,1 @@
+needs-decision [at=1794995346]: spec says mode="summary" but conflict-design.md "Complete requirements" says mode MUST be "source"; choose (a) mode="source" per report or (b) mode="summary" per spec. Other fields agreed: tail="full-report-tail-K7", purpose="chosen-purpose-Z4". Payload not written.

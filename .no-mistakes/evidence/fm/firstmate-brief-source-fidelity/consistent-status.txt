@@ -1,0 +1,1 @@
+done [at=1794995346]: consistent-payload.json written (mode=summary, tail, purpose); commit/delivery skipped per evaluation envelope

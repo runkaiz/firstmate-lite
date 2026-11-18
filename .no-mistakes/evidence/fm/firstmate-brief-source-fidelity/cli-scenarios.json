@@ -1,0 +1,430 @@
+[
+  {
+    "command": [
+      "bash",
+      "bin/fm-lab-home.sh",
+      "create",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "quote-ship",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      ".test-work/lab/reports/synthetic # report.md#Smallest first slice",
+      "--quote=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/quote-ship/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      ". \"$1/bin/fm-dod-lib.sh\"; fm_brief_task_heading_body \"$2\" \"## Captain's intent\"; fm_brief_task_heading_body \"$2\" \"## Firstmate spec\"",
+      "_",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/quote-ship/brief.md"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "Only the authored intent.\n\nOnly the authored specification.\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "quote-scout",
+      "synthetic",
+      "--scout",
+      "--quote",
+      ".test-work/lab/reports/synthetic # report.md#Smallest first slice",
+      "--quote=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/quote-scout/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "-c",
+      ". \"$1/bin/fm-dod-lib.sh\"; fm_brief_task_heading_body \"$2\" \"## Captain's intent\"; fm_brief_task_heading_body \"$2\" \"## Firstmate spec\"",
+      "_",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/quote-scout/brief.md"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "Only the authored intent.\n\nOnly the authored specification.\n",
+    "stderr": ""
+  },
+  {
+    "scenario": "Repeated ship/scout quotes",
+    "result": "pass",
+    "exact_section_sha256": "b62aaedb2840889143137131901d4f34a42923b809d8e0aa0f0607b102e5ed44",
+    "CRLF_and_nested_fences": true,
+    "EOF_separator_only": true
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "large",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/large.md#Huge",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/large.md#Also huge"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/large/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "scenario": "No individual or aggregate quote-size ceiling",
+    "result": "pass",
+    "quoted_bytes": [
+      70009,
+      70014
+    ],
+    "sha256": [
+      "332d007afdc6d6da6edff14435d27ed6951e0858cedc42152c07c1062f5bf91a",
+      "8855263f956c85283ca40a6258c4f78c1eb9b0e7223563fd6cd9e628dc052f37"
+    ]
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-syntax",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote source must be a readable regular file: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic \n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-empty",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote requires <report-path>#<heading text>\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-missing-file",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/absent#Target"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote source must be a readable regular file: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/absent\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-directory",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports#Target"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote source must be a readable regular file: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-missing-heading",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#Absent"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote heading missing: 'Absent' in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-ambiguous",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/duplicate.md#Duplicate"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote heading ambiguous: 'Duplicate' in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/duplicate.md\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-utf8",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/bad-utf8.md#Target"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: 'utf-8' codec can't decode byte 0xff in position 9: invalid start byte\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-NUL",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/nul.md#Target"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote source contains NUL bytes: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/nul.md\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-setext",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/setext.md#Target"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote heading missing: 'Target' in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/setext.md\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "refuse-case-sensitive",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#EOF",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md#smallest first slice"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: --quote heading missing: 'smallest first slice' in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/synthetic # report.md\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "quote-ship",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/large.md#Huge"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/quote-ship/brief.md already exists\n"
+  },
+  {
+    "scenario": "Invalid quotes and existing brief refuse atomically",
+    "result": "pass",
+    "refusals": [
+      "syntax",
+      "empty",
+      "missing-file",
+      "directory",
+      "missing-heading",
+      "ambiguous",
+      "utf8",
+      "NUL",
+      "setext",
+      "case-sensitive"
+    ],
+    "existing_brief_unchanged": true
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "contract-boundary",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/contract-examples.md#Examples"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/contract-boundary/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-spawn.sh",
+      "contract-boundary",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/projects/synthetic",
+      "claude",
+      "--mode",
+      "direct-PR",
+      "--yolo",
+      "off"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab\nerror: delivery mismatch for contract-boundary: the brief says mode=local-only but this spawn passed --mode direct-PR; correct the flag or re-scaffold the brief so the worker's instructions and the task record agree\n"
+  },
+  {
+    "scenario": "Quoted delivery examples cannot override actual contract",
+    "result": "pass",
+    "real_spawn_refusal": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab\nerror: delivery mismatch for contract-boundary: the brief says mode=local-only but this spawn passed --mode direct-PR; correct the flag or re-scaffold the brief so the worker's instructions and the task record agree\n",
+    "endpoint_or_metadata_created": false
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "worker-consistent",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/consistent-design.md#Smallest first slice"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-consistent/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-spawn.sh",
+      "worker-consistent",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/projects/synthetic",
+      "claude",
+      "--mode",
+      "direct-PR",
+      "--yolo",
+      "off"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab\nerror: delivery mismatch for worker-consistent: the brief says mode=local-only but this spawn passed --mode direct-PR; correct the flag or re-scaffold the brief so the worker's instructions and the task record agree\n"
+  },
+  {
+    "command": [
+      "bash",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/bin/fm-brief.sh",
+      "worker-conflict",
+      "synthetic",
+      "--mode",
+      "local-only",
+      "--quote",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/reports/conflict-design.md#Smallest first slice"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 0,
+    "stdout": "scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/data/worker-conflict/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-spawn.sh",
+      "worker-conflict",
+      "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab/projects/synthetic",
+      "claude",
+      "--mode",
+      "direct-PR",
+      "--yolo",
+      "off"
+    ],
+    "cwd": "/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7Q0FAWD13KMADT9RSB69HXP/.test-work/lab\nerror: delivery mismatch for worker-conflict: the brief says mode=local-only but this spawn passed --mode direct-PR; correct the flag or re-scaffold the brief so the worker's instructions and the task record agree\n"
+  }
+]
