@@ -971,6 +971,12 @@ The record grants nothing else: no merge, landing, dispatch, or captain decision
 An absent file changes nothing, and a malformed one registers no key at all.
 `bin/fm-house-decisions-lib.sh` owns the format and its refusals.
 
+## Source quotes in task instructions
+
+`bin/fm-brief.sh` supports source-report excerpts in ship and scout instructions; its [`--help`](../bin/fm-brief.sh) owns invocation and the source-quote contract.
+This embeds source material without making it captain-authored intent.
+The generated [worker contract](../bin/fm-dod-lib.sh) owns source-reading and conflict handling.
+
 ## Home brief include (config/brief-include.md)
 
 The optional local, gitignored `config/brief-include.md` adds standing worker instructions to every ship and scout brief.

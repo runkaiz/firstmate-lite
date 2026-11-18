@@ -1318,6 +1318,91 @@ test_crewmate_scaffolds_forbid_pool_administration() {
   pass "fm-brief.sh: every crewmate scaffold forbids administering the shared worktree pool"
 }
 
+test_source_quotes_are_verbatim_and_separate_from_intent() {
+  local home source kind id brief
+  home="$TMP_ROOT/quotes-home"
+  source="$TMP_ROOT/synthetic report.md"
+  mkdir -p "$home"
+  python3 - "$source" <<'PY'
+import sys
+from pathlib import Path
+Path(sys.argv[1]).write_bytes(
+    b'# Report\nBefore.\n```markdown\n## First slice\nfake\n```\n'
+    b'~~~markdown\n## First slice\nalso fake\n~~~\n'
+    b'## First slice\nKeep $(literal) `bytes`, spaces  \n\n'
+    b'### Nested\n```markdown\n# Task\n```\n\n'
+    b'## Next\nExclude this.\n'
+    b'  ### Detail ###\r\nExact CRLF.\r\n\r\n'
+    b'# End\nOutside.\n'
+    b'## EOF\nNo final newline')
+PY
+  for kind in ship scout; do
+    id="quoted-$kind"
+    if [ "$kind" = ship ]; then
+      FM_HOME="$home" bash "$ROOT/bin/fm-brief.sh" "$id" example --mode local-only \
+        --quote "$source#First slice" --quote="$source#Detail" --quote "$source#EOF" >/dev/null \
+        || fail 'ship source quotes failed'
+    else
+      (cd "$TMP_ROOT" && FM_HOME="$home" bash "$ROOT/bin/fm-brief.sh" "$id" example --scout \
+        --quote 'synthetic report.md#First slice' --quote="$source#Detail" --quote "$source#EOF") >/dev/null \
+        || fail 'scout source quotes failed'
+    fi
+    brief="$home/data/$id/brief.md"
+    python3 - "$brief" "$source" <<'PY' || fail 'source section bytes or provenance changed'
+import json
+import sys
+from pathlib import Path
+brief, source = (Path(p) for p in sys.argv[1:])
+raw = source.read_bytes()
+rendered = brief.read_bytes()
+assert b'# Source quotes\n' in rendered
+assert ('Source: ' + json.dumps(str(source))).encode() in rendered
+for start, end in ((b'## First slice\n', b'## Next\n'),
+                   (b'  ### Detail ###\r\n', b'# End\n'),
+                   (b'## EOF\n', None)):
+    # The first slice title also occurs in fenced examples; take the real one.
+    begin = raw.index(start + b'Keep') if b'First slice' in start else raw.index(start)
+    finish = raw.index(end, begin) if end else len(raw)
+    content = raw[begin:finish]
+    assert content in rendered, content
+    assert rendered.count(content) == 1
+assert b'Exclude this.' not in rendered
+PY
+    # Public section readers must see only the authored intent/spec, even
+    # though the quoted section contains a literal task heading.
+    bash -c '. "$1/bin/fm-dod-lib.sh"; [ "$(fm_brief_task_heading_body "$2" "## Captain'\''s intent")" = "{TASK}" ] && [ "$(fm_brief_task_heading_body "$2" "## Firstmate spec")" = "{FIRSTMATE_SPEC}" ]' _ \
+      "$ROOT" "$brief" || fail 'source quotes contaminated task intent or spec'
+  done
+  pass 'fm-brief.sh: repeated source quotes preserve bytes, source paths and task boundaries for ship/scout'
+}
+
+test_source_quote_refusals_leave_no_partial_brief() {
+  local home source label selector out status n=0
+  home="$TMP_ROOT/quote-refusals"
+  source="$TMP_ROOT/quote-errors.md"
+  mkdir -p "$home"
+  printf '# Report\n## Duplicate\nOne.\n## Duplicate\nTwo.\n' > "$source"
+  while IFS='|' read -r label selector; do
+    n=$((n + 1))
+    out=$(FM_HOME="$home" bash "$ROOT/bin/fm-brief.sh" "quote-error-$n" example --mode local-only \
+      --quote "$selector" 2>&1)
+    status=$?
+    [ "$status" -ne 0 ] || fail "$label quote unexpectedly succeeded"
+    assert_contains "$out" "$label" 'quote refusal did not explain the problem'
+    assert_absent "$home/data/quote-error-$n" 'quote refusal created a partial task directory'
+  done <<EOF
+requires|$source
+requires|$source#
+regular file|$source.missing#Report
+regular file|$home#Report
+missing|$source#Absent
+ambiguous|$source#Duplicate
+EOF
+  pass 'fm-brief.sh: invalid quotes refuse before writing'
+}
+
+test_source_quotes_are_verbatim_and_separate_from_intent
+test_source_quote_refusals_leave_no_partial_brief
 test_script_parses
 test_no_heredoc_in_command_substitution
 test_help_includes_entire_header

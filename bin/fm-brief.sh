@@ -16,8 +16,23 @@
 # --delivery-surface <internal-only|product-facing|mixed|unknown> records the
 # per-task semantic intake result (default unknown); never infer it from paths.
 # bin/fm-delivery-record.py owns the conditional PR record and trust limits.
-# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab]
-#        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab]
+# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab] [--quote <report-path>#<heading> ...]
+#        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab] [--quote <report-path>#<heading> ...]
+# --quote is repeatable and embeds a named Markdown section verbatim under
+# "# Source quotes", outside captain intent and Firstmate specification.
+# Quote the whole argument in the shell; paths are relative to the caller's
+# current directory and recorded as absolute paths so workers can find them.
+# Split the selector at the last #; match unique ATX heading text exactly
+# (case-sensitive, levels 1-6, optional closing hashes), ignoring fenced examples.
+# Setext headings and slug selectors are unsupported.
+# Include the original heading through the next unfenced heading of the same
+# or higher level (exclusive), or EOF, preserving UTF-8 bytes and line endings.
+# Sources must be readable regular UTF-8 files without NUL bytes.
+# Missing or ambiguous headings refuse before writing; content is never truncated.
+# Quotes use Markdown fences longer than any backtick run in their content.
+# An EOF without a newline gets a separating newline before the closing fence.
+# bin/fm-brief-quote.py implements this source-quote contract.
+# Python 3.9+ is required only when --quote is used.
 #   --scout writes the scout contract instead: the deliverable is a report at
 #   data/<task-id>/report.md (no branch, no push, no PR) and the worktree is scratch.
 #   It offers the Lavish review loop only when `fm-bootstrap.sh lavish-compatible`
@@ -196,6 +211,8 @@ UPSTREAM_CONSENT=
 UPSTREAM_CONSENT_SET=0
 PROJECT_DIR=
 PROJECT_DIR_SET=0
+QUOTES=()
+QUOTE_SET=0
 POS=()
 want_value=
 for a in "$@"; do
@@ -212,6 +229,7 @@ for a in "$@"; do
       shape) SHAPE_SET=1 ;;
       upstream-consent) UPSTREAM_CONSENT=$a; UPSTREAM_CONSENT_SET=1 ;;
       project) PROJECT_DIR=$a; PROJECT_DIR_SET=1 ;;
+      quote) QUOTES+=("$a"); QUOTE_SET=1 ;;
       *) echo "error: internal parser state for --$want_value" >&2; exit 1 ;;
     esac
     want_value=
@@ -238,6 +256,8 @@ for a in "$@"; do
     --upstream-consent=*) UPSTREAM_CONSENT=${a#--upstream-consent=}; UPSTREAM_CONSENT_SET=1 ;;
     --project) want_value="project" ;;
     --project=*) PROJECT_DIR=${a#--project=}; PROJECT_DIR_SET=1 ;;
+    --quote) want_value=quote ;;
+    --quote=*) QUOTES+=("${a#--quote=}"); QUOTE_SET=1 ;;
     # yolo never reaches the worker: it is firstmate's merge authority, not a
     # brief input. Refuse it loudly so it is never silently dropped here and then
     # believed to have been recorded.
@@ -395,6 +415,13 @@ append_resource_locks() {
   [ -n "$RESOURCE_LOCKS_SECTION" ] || return 0
   printf '\n%s\n' "$RESOURCE_LOCKS_SECTION" >> "$BRIEF"
 }
+
+# Validate and render all quotes before creating the task directory.
+# The closing fence protects source trailing newlines from command substitution.
+SOURCE_QUOTES=
+if [ "$QUOTE_SET" -eq 1 ]; then
+  SOURCE_QUOTES=$(python3 "$SCRIPT_DIR/fm-brief-quote.py" "${QUOTES[@]}") || exit 1
+fi
 
 BRIEF="$DATA/$ID/brief.md"
 [ -e "$BRIEF" ] && { echo "error: $BRIEF already exists" >&2; exit 1; }
@@ -560,6 +587,8 @@ You are a crewmate: an autonomous worker agent managed by firstmate. Work on you
 
 $TASK_SECTION
 
+$SOURCE_QUOTES
+
 $HERDR_SECTION
 
 # Setup
@@ -632,6 +661,8 @@ cat > "$BRIEF" <<EOF
 You are a crewmate: an autonomous worker agent managed by firstmate. Work on your own; do not wait for a human.
 
 $TASK_SECTION
+
+$SOURCE_QUOTES
 
 $HERDR_SECTION
 

@@ -2796,10 +2796,11 @@ if [ "$KIND" = ship ]; then
   fi
   [ -n "$STANDING_FORGE" ] || STANDING_FORGE=none
   STANDING_MODE=$("$FM_ROOT/bin/fm-project-mode.sh" --raw "$PROJ_NAME" 2>/dev/null | cut -d' ' -f1) || STANDING_MODE=
-  BRIEF_MODE=$(sed -n 's/^Delivery contract: mode=\([^ ]*\).*$/\1/p' "$BRIEF" | head -n 1)
-  BRIEF_FORGE=$(sed -n 's/^Delivery contract: mode=[^ ]*.*[[:space:]]forge=\([^ ]*\).*$/\1/p' "$BRIEF" | head -n 1)
+  BRIEF_CONTRACT_TEXT=$(fm_brief_heading_parse "$BRIEF" '' unfenced)
+  BRIEF_MODE=$(printf '%s\n' "$BRIEF_CONTRACT_TEXT" | sed -n 's/^Delivery contract: mode=\([^ ]*\).*$/\1/p' | head -n 1)
+  BRIEF_FORGE=$(printf '%s\n' "$BRIEF_CONTRACT_TEXT" | sed -n 's/^Delivery contract: mode=[^ ]*.*[[:space:]]forge=\([^ ]*\).*$/\1/p' | head -n 1)
   [ -n "$BRIEF_FORGE" ] || BRIEF_FORGE=none
-  BRIEF_BRANCH=$(sed -n 's/^Ship branch: //p' "$BRIEF" | head -n 1)
+  BRIEF_BRANCH=$(printf '%s\n' "$BRIEF_CONTRACT_TEXT" | sed -n 's/^Ship branch: //p' | head -n 1)
   if [ -n "$BRIEF_BRANCH" ]; then
     [ "$BRIEF_BRANCH" = "$BRANCH" ] || {
       echo "error: branch mismatch for $ID: the brief says branch=$BRIEF_BRANCH but this spawn selected branch=$BRANCH" >&2
@@ -2828,7 +2829,7 @@ if [ "$KIND" = ship ]; then
   # as an upstream-consent= token on that same line; like mode and forge, the
   # brief and the spawn flag must agree so the worker's contract and the task
   # record carry the same authority.
-  BRIEF_CONSENT=$(sed -n 's/^Delivery contract: mode=[^ ]*.*[[:space:]]upstream-consent=\([^ ]*\).*$/\1/p' "$BRIEF" | head -n 1)
+  BRIEF_CONSENT=$(printf '%s\n' "$BRIEF_CONTRACT_TEXT" | sed -n 's/^Delivery contract: mode=[^ ]*.*[[:space:]]upstream-consent=\([^ ]*\).*$/\1/p' | head -n 1)
   if [ "$BRIEF_CONSENT" != "$UPSTREAM_CONSENT" ]; then
     echo "error: upstream-consent mismatch for $ID: $BRIEF records upstream-consent=${BRIEF_CONSENT:-none} but this spawn passed ${UPSTREAM_CONSENT:-none}; correct the flag or re-scaffold the brief so the worker's contract and the task record agree" >&2
     exit 1
