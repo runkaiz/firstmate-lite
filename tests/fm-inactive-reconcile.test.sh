@@ -659,6 +659,117 @@ test_processed_before_first_scan_and_new_pr() {
   pass "presentation before the first scan suppresses repetition but preserves a different PR"
 }
 
+queue_status_wake() {
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    fm_wake_append "$2" "$3" "fixture wake"
+  ' _ "$ROOT" "${2:-signal}" "$1" || fail "wake publication failed"
+}
+
+run_status_drain() {
+  PATH="$WORLD/fakebin:$PATH" FM_ROOT_OVERRIDE="$WORLD/root" FM_HOME="$MAIN" \
+    FM_STATE_OVERRIDE="$MAIN/state" FM_CONFIG_OVERRIDE="$MAIN/config" \
+    FM_SUPERVISION_ACTOR="${STATUS_ACTOR:-main}" bash "$DRAIN" "$@"
+}
+
+present_status_wake() {
+  : > "$MAIN/config/supervision-host-off"
+  run_status_drain > "$WORLD/drain.out" 2> "$WORLD/drain.err" || fail "status drain failed"
+  STATUS_SEQ=$(sed -n 's/^WAKE_ACK_REQUIRED:.*--ack-through \([0-9][0-9]*\) --recovery-generation .*/\1/p' "$WORLD/drain.err")
+  STATUS_GENERATION=$(sed -n 's/^WAKE_ACK_REQUIRED:.*--recovery-generation \([A-Za-z0-9._-][A-Za-z0-9._-]*\)$/\1/p' "$WORLD/drain.err")
+  [ -n "$STATUS_SEQ" ] && [ -n "$STATUS_GENERATION" ] || fail "status drain omitted acknowledgement"
+}
+
+ack_status_wake() {
+  run_status_drain --ack-through "$STATUS_SEQ" --recovery-generation "$STATUS_GENERATION" \
+    || fail "status acknowledgement failed"
+}
+
+test_handled_status_wake_suppresses_inactive_duplicate() {
+  local actor key state
+  for actor in main branch; do
+    for key in child.status child.turn-ended; do
+      for state in done failed; do
+        make_world "handled-$actor-$key-$state"
+        STATUS_ACTOR=$actor
+        write_child "$MAIN" child "$state: outcome awaiting merge approval"
+        queue_status_wake "$key"
+        if [ "$actor" = branch ]; then
+          FM_HOME="$MAIN" "$GRANT" activate "$$" status-ack || fail "branch activation failed"
+          FM_HOME="$MAIN" "$GRANT" publish status-ack 1 || fail "branch grant failed"
+        fi
+        present_status_wake
+        assert_grep "$state: outcome awaiting merge approval" "$WORLD/drain.out" "terminal event was not presented"
+        [ "$(outcome_count "$MAIN" presented)" = 0 ] || fail "drain acknowledged an unhandled outcome"
+        if [ "$state" = failed ]; then
+          FM_FAKE_CREW_STATE="$state" run_reconcile "$MAIN" --startup
+          [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "unhandled outcome lost its safety net"
+        fi
+        ack_status_wake
+        [ "$(outcome_count "$MAIN" presented)" = 1 ] || fail "$actor/$key/$state: no handled-status receipt"
+        FM_FAKE_CREW_STATE="$state" run_reconcile "$MAIN" --startup
+        [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "handled status queued a duplicate"
+        [ ! -e "$MAIN/state/branch-outcomes.jsonl" ] || fail "ordinary status needed a branch outcome"
+        [ -f "$MAIN/state/child.meta" ] || fail "waiting-for-approval task was retired"
+      done
+    done
+  done
+  unset STATUS_ACTOR
+  pass "handled terminal status and turn-ended wakes suppress inactive duplicates for both actors"
+}
+
+test_status_ack_preserves_unpresented_outcomes() {
+  local mutation state
+  for mutation in append replace sibling unseen; do
+    make_world "status-ack-$mutation"
+    write_child "$MAIN" child 'done: original outcome'
+    queue_status_wake child.status
+    if [ "$mutation" = unseen ]; then
+      STATUS_SEQ=1
+      STATUS_GENERATION=unpresented
+    else
+      present_status_wake
+      assert_grep 'done: original outcome' "$WORLD/drain.out" "original outcome not presented"
+    fi
+    state=done
+    case "$mutation" in
+      append)
+        printf 'failed: later validation failed\n' >> "$MAIN/state/child.status"
+        state=failed
+        ;;
+      replace)
+        mv "$MAIN/state/child.status" "$WORLD/original.status"
+        printf 'done: original outcome\n' > "$MAIN/state/child.status"
+        ;;
+      sibling) write_child "$MAIN" other 'done: never presented sibling' ;;
+    esac
+    ack_status_wake
+    age "$MAIN/state/child.status"
+    FM_FAKE_CREW_STATE="$state" run_reconcile "$MAIN" --startup
+    [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "$mutation: acknowledgement hid an unpresented outcome"
+  done
+  pass "status acknowledgements preserve appended, replaced, sibling, and never-presented outcomes"
+}
+
+test_backstop_status_ack_is_bound_to_its_wake() {
+  make_world backstop-status-ack
+  write_child "$MAIN" child 'done: ready for approval'
+  queue_status_wake heartbeat check
+  queue_status_wake later check
+  present_status_wake
+  assert_grep 'child done: ready for approval' "$WORLD/drain.out" "backstop did not present terminal outcome"
+  run_status_drain --ack-through 1 --recovery-generation "$STATUS_GENERATION" || fail "partial ack failed"
+  [ "$(outcome_count "$MAIN" presented)" = 0 ] || fail "earlier cutoff acknowledged a later presentation"
+  ack_status_wake
+  [ "$(outcome_count "$MAIN" presented)" = 1 ] || fail "backstop presentation lacked a handled receipt"
+  FM_FAKE_CREW_STATE=done run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "handled backstop repeated its outcome"
+  pass "backstop status snapshots are acknowledged only through their presented wake"
+}
+
+test_handled_status_wake_suppresses_inactive_duplicate
+test_status_ack_preserves_unpresented_outcomes
+test_backstop_status_ack_is_bound_to_its_wake
 test_processed_before_first_scan_and_new_pr
 test_old_branch_snapshot_does_not_hide_new_terminal_outcome
 test_processed_branch_outcome_is_not_presented_again

@@ -34,7 +34,7 @@
 # acknowledges the corresponding inactive-outcome wake.
 # A receipt is intentionally independent of .hb-surfaced-* bookkeeping.
 # presented-status <id> <byte-endpoint> <file-identity> records the terminal
-# outcome acknowledged by branch-outcome mark-processed, only while that exact
+# outcome acknowledged by wake-drain or branch-outcome mark-processed, only while that exact
 # status snapshot remains current; presented-current <id> records the ready
 # outcome observed by a synchronous landing. Both retire only their
 # matching inactive-outcome queue row, preserving genuinely new events.

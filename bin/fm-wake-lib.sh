@@ -2791,8 +2791,9 @@ fm_wake_latest_event() {  # <validated-status-path> <tail-byte-cap>
 # raw queue consumption and released the append lock.
 fm_wake_print_annotations() {  # <deduped-raw-rows> [<presentation-snapshot>]
   local rows=$1 snapshot=${2:-} manifest status_key mode path prefix line task endpoint
-  local snapshot_task snapshot_endpoint _snapshot_ident offset last_event event_line
+  local snapshot_task snapshot_endpoint snapshot_ident ident offset last_event event_line
   local LC_ALL=C
+  FM_WAKE_PRESENTED_STATUS_SNAPSHOTS=
 
   manifest=$(fm_wake_annotation_manifest "$rows" | awk -F '\t' '
     {
@@ -2836,10 +2837,11 @@ fm_wake_print_annotations() {  # <deduped-raw-rows> [<presentation-snapshot>]
     fi
     offset=$(fm_wake_status_cursor_offset "$path") || return 1
     endpoint=
+    ident=
     if [ -n "$snapshot" ]; then
       task=${status_key%.status}
-      while IFS=$(printf '\t') read -r snapshot_task snapshot_endpoint _snapshot_ident; do
-        if [ "$snapshot_task" = "$task" ]; then endpoint=$snapshot_endpoint; break; fi
+      while IFS=$(printf '\t') read -r snapshot_task snapshot_endpoint snapshot_ident; do
+        if [ "$snapshot_task" = "$task" ]; then endpoint=$snapshot_endpoint; ident=$snapshot_ident; break; fi
       done <<EOF
 $snapshot
 EOF
@@ -2869,6 +2871,10 @@ EOF
     done <<EOF
 $FM_WAKE_UNREAD_LINES
 EOF
+    if [ -n "$ident" ]; then
+      FM_WAKE_PRESENTED_STATUS_SNAPSHOTS="$FM_WAKE_PRESENTED_STATUS_SNAPSHOTS$task$(printf '\t')$endpoint$(printf '\t')$ident
+"
+    fi
   done <<EOF
 $manifest
 EOF

@@ -91,7 +91,7 @@ Fresh stale panes use the same current-state read before trusting the status log
 No-change heartbeats are also benign.
 Separately from heartbeat backoff and wedge handling, the watcher poll runs `bin/fm-inactive-reconcile.sh` on its own bounded cadence, while locked session start sends the same bounded local scan through `bin/fm-startup-network.sh`'s deferred worker so current-state reads never block the digest.
 In each home the scan considers only that home's long-inactive direct ordinary crewmates, excludes captain-held work, and accepts only `done` or `failed` from `bin/fm-crew-state.sh`.
-`bin/fm-inactive-reconcile.sh` owns terminal presentation receipts, including acknowledgements from branch outcomes and synchronous landings, so its safety net remains armed only for outcomes without matching presentation evidence.
+`bin/fm-inactive-reconcile.sh` owns terminal presentation receipts, including acknowledgements from handled wake snapshots, branch outcomes, and synchronous landings, so its safety net remains armed only for outcomes without matching presentation evidence.
 Absorbed wakes advance their suppression markers, log to `state/.watch-triage.log`, and keep the watcher blocking without a queue record or LLM turn.
 Each `fm-wake-drain.sh` presentation runs the same liveness guard as the supervision scripts, so a lapsed watcher chain surfaces even on a turn that only handles queued wakes.
 Routine watcher polling, supervision no-ops, elapsed waiting time, and absorbed benign wakes stay silent.
