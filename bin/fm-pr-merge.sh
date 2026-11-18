@@ -113,8 +113,8 @@
 # Usage: fm-pr-merge.sh <task-id> <pr-url> [--proactive] [--attended-override] [--allow-red <check-name>] [--allow-missing <check-name>] [-- <extra forge merge args>]
 #
 # An unconfirmed request leaves the poll armed and records no landed outcome.
-# bin/fm-merge-outcome-lib.sh owns a confirmed merge's
-# destination, normal-case deduplication, and at-least-once recovery.
+# bin/fm-merge-outcome-lib.sh owns confirmed-merge acknowledgement,
+# poll notification, deduplication, and recovery ordering.
 # A landed merge whose outcome cannot be written is reported loudly rather than
 # misreported as a failed merge.
 set -eu

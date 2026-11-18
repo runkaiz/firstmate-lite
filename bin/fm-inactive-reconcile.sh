@@ -4,6 +4,8 @@
 # Usage:
 #   fm-inactive-reconcile.sh scan [--startup]
 #   fm-inactive-reconcile.sh acknowledge <fingerprint>
+#   fm-inactive-reconcile.sh presented-status <id> <byte-endpoint> <file-identity>
+#   fm-inactive-reconcile.sh presented-current <id>
 #
 # This is an adjunct to the existing watcher poll loop and session-start path,
 # not a watcher, daemon, PR poll, or forge client of its own.
@@ -30,12 +32,12 @@
 # Working, paused, parked, blocked, unknown, persistent secondmates, and
 # captain-held work retain their existing supervision semantics.
 #
-# A terminal-outcomes/<fingerprint>.pending record remains until fm-wake-drain
-# acknowledges the corresponding inactive-outcome wake.
+# A terminal-outcomes/<fingerprint>.pending record remains until its outcome
+# is acknowledged through the inactive-outcome wake or a matching presentation.
 # A receipt is intentionally independent of .hb-surfaced-* bookkeeping.
 # presented-status <id> <byte-endpoint> <file-identity> records the terminal
-# outcome acknowledged by wake-drain or branch-outcome mark-processed, only while that exact
-# status snapshot remains current; presented-current <id> records the ready
+# outcome acknowledged by wake-drain or branch-outcome mark-processed, only
+# while that exact status snapshot remains current; presented-current <id> records the ready
 # outcome observed by a synchronous landing. Both retire only their
 # matching inactive-outcome queue row, preserving genuinely new events.
 #

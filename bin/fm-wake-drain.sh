@@ -348,6 +348,10 @@ commit_status_wake_snapshots() {
     || { rm -f "$tmp"; return 1; }
 }
 
+# Capture under the presentation lock, then release it before taking scan or
+# metadata locks: cleanup holds metadata while retiring presentation state.
+# Retire only the captured entries afterward so concurrent presentations survive.
+# tests/fm-inactive-reconcile.test.sh covers both interleavings.
 acknowledge_status_wake_snapshots() {
   local sequences=$1 lock="$STATE/.status-presentation-lock" captured='' tmp _binding task endpoint ident rc=0
   fm_lock_acquire_wait "$lock" || return 1

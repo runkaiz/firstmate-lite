@@ -1072,11 +1072,10 @@ fm_pr_poll_retirement_recover_all() {
 # watcher cycle that detects it, which is normally enough on its own to stop a
 # duplicate detection: the check.sh is gone, so nothing re-polls it. The
 # exception is the same poll re-registered after its merge was already
-# surfaced. Its retirement state is scoped to one registration, so this marker
-# carries the canonical PR identity across registrations for the task. Only a
-# matching identity is a no-op; a different PR for the same task reaches its
-# role-routed supervision destination and replaces the marker when its first
-# outcome is published.
+# acknowledged or surfaced. Its retirement state is scoped to one registration,
+# so this marker carries the canonical PR identity across registrations for the task. Only a
+# matching identity is a no-op; a different PR for the same task replaces the
+# marker when first acknowledged or published by bin/fm-merge-outcome-lib.sh.
 fm_pr_poll_merge_marker_matches() {  # <marker> <device> <provider> <host> <path> <number>
   local marker=$1 device=$2 expected_provider=$3 expected_host=$4 expected_path=$5 expected_number=$6
   local version provider host path number
