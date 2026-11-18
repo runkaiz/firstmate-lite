@@ -804,6 +804,8 @@ test_ship_and_scout_teach_validation_round_pause() {
       "$kind brief did not forbid repeated still-waiting chatter during a long wait"
     assert_grep 'with one blocking tool call at the longest timeout your shell tool allows' "$brief" \
       "$kind brief did not require a single long blocking wait"
+    assert_grep 'on timeout, immediately reissue the same wait with no intervening text and no new paused declaration' "$brief" \
+      "$kind brief did not require silent timeout retries without redeclaring the pause"
   done
   pass "fm-brief.sh: ship and scout scaffolds declare a validation-round pause once, then hold it"
 }
