@@ -2020,6 +2020,16 @@ test_wake_queue_prune_task() {
   append_wake "$state" signal "task-b.status" "signal: $state/task-b.status"
   append_wake "$state" check "$state/task-b.check.sh" "check: $state/task-b.check.sh: merged: https://example.test/pr/2"
 
+  append_wake "$state" check "merged-task-a-https://github.com/example/repo/pull/1" \
+    "check: merge landed: task-a https://github.com/example/repo/pull/1"
+  append_wake "$state" check "inactive-outcome:aaaa" \
+    "inactive terminal outcome awaiting captain presentation: child=task-a state=done"
+  append_wake "$state" check "merged-task-a-extra-https://github.com/example/repo/pull/2" \
+    "check: merge landed: task-a-extra https://github.com/example/repo/pull/2"
+  append_wake "$state" check "inactive-outcome:bbbb" \
+    "inactive terminal outcome awaiting captain presentation: child=task-a-extra state=done"
+  append_wake "$state" check "new-event" "new evidence for task-a"
+
   FM_STATE_OVERRIDE="$state" bash -c '. "$0/bin/fm-wake-lib.sh"; fm_wake_queue_prune_task "$1" "$2" "$3"' "$ROOT" "$state" "task-a" "test:window-a" \
     || fail "fm_wake_queue_prune_task returned non-zero"
 
@@ -2031,6 +2041,23 @@ test_wake_queue_prune_task() {
   grep -F 'task-b.status' "$queue" >/dev/null || fail "prune removed status wake for task-b"
   grep -F 'task-b.check.sh' "$queue" >/dev/null || fail "prune removed check wake for task-b"
 
+  assert_no_grep 'merged-task-a-https://' "$queue" "cleanup left a handled merge for rearm-resurface"
+  assert_no_grep 'inactive-outcome:aaaa' "$queue" "cleanup left a presentation fallback for rearm-resurface"
+  assert_grep 'merged-task-a-extra-https://' "$queue" "cleanup removed another task with a shared prefix"
+  assert_grep 'inactive-outcome:bbbb' "$queue" "cleanup removed another task presentation"
+  assert_grep 'new-event' "$queue" "cleanup removed unrelated new evidence"
+  # With only an already-handled merge remaining, cleanup also leaves no
+  # recovery obligation to produce a later rearm-resurface turn.
+  state="$dir/rearm-state"
+  mkdir -p "$state"
+  append_wake "$state" check "merged-task-a-https://github.com/example/repo/pull/1" \
+    "check: merge landed: task-a https://github.com/example/repo/pull/1"
+  FM_STATE_OVERRIDE="$state" bash -c '
+    . "$0/bin/fm-wake-lib.sh"
+    fm_wake_queue_prune_task "$1" task-a || exit 1
+    fm_recovery_marker_arm_check "$1/.watcher-down" || exit 1
+    [ "$FM_RECOVERY_MARKER_ACTION" = none ]
+  ' "$ROOT" "$state" || fail "cleanup left a redundant rearm-resurface obligation"
   pass "fm_wake_queue_prune_task: prunes wakes for target task without touching other tasks"
 }
 

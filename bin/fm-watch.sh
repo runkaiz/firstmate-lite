@@ -199,8 +199,8 @@ WATCH_HOME_EXISTED=0
 # the per-cycle reconcile itself runs as a separate process.
 # shellcheck source=bin/fm-procevent-lib.sh
 . "$SCRIPT_DIR/fm-procevent-lib.sh"
-# Single owner of durable merge-outcome publication, shared with
-# bin/fm-pr-merge.sh so self and poll origins use the same role-routed outcome.
+# Single owner of merge acknowledgement and poll publication, shared with
+# bin/fm-pr-merge.sh; its header owns notification and recovery ordering.
 # The watcher still owns immediate delivery of its actionable poll result and
 # poll retirement.
 # This library is a canonical lint root in its own right, and it reaches the

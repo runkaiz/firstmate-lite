@@ -526,12 +526,22 @@ test_local_merge_uses_the_recorded_ship_branch() {
 - $(basename "$proj") [local-only branch=contrib/] - changed after task intake (added 2026-01-01)
 EOF
   printf 'project=%s\nmode=local-only\nbranch=fix/%s\n' "$proj" "$id" > "$home/state/$id.meta"
+  printf 'done: local branch ready\n' > "$home/state/$id.status"
   out=$(FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" "$MERGE_LOCAL" "$id") \
     || fail "local merge did not use the branch recorded at task intake: $out"
   [ "$(git -C "$proj" rev-parse HEAD)" = "$fix" ] \
     || fail "local merge did not fast-forward the default branch to the recorded ship branch"
   assert_contains "$out" "merged fix/$id into local $main" \
     "local merge did not report the immutable recorded branch"
+  [ "$(find "$home/state/terminal-outcomes" -name '*.presented' | wc -l | tr -d ' ')" = 1 ] \
+    || fail "local landing did not record presentation of its terminal outcome"
+  printf '#!/usr/bin/env bash\nprintf "state: done\\n"\n' > "$home/crew-state"
+  chmod +x "$home/crew-state"
+  FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" \
+    FM_INACTIVE_CREW_STATE_BIN="$home/crew-state" \
+    FM_INACTIVE_RECONCILE_NOW="$(( $(date +%s) + 3600 ))" \
+    "$ROOT/bin/fm-inactive-reconcile.sh" scan --startup || fail "post-landing scan failed"
+  assert_absent "$home/state/.wake-queue" "local landing queued another outcome"
   pass "fm-merge-local: a registry change cannot redirect an in-flight local-only task"
 }
 

@@ -14,7 +14,8 @@
 # The task's existing per-task control lock serializes the captain-hold check
 # through that fast-forward. A still-held or unreadable row refuses before the
 # merge, so a captain approval must be recorded as an `answer --release` before
-# this entrypoint is invoked. The lock ends when the fast-forward returns;
+# this entrypoint is invoked. The lock ends after the fast-forward and its
+# terminal presentation receipt;
 # docs/captain-hold-lifecycle.md owns the accepted merge-to-cleanup residual.
 # While away, only an approved task with a reconciled done declaration,
 # a clean worker copy at the exact ship head, and no captain hold may land.
@@ -207,9 +208,13 @@ git -C "$PROJ" merge --ff-only "$MERGE_HEAD" >/dev/null || merge_status=$?
 [ -z "$PROACTIVE_LOCK" ] || fm_lock_release "$PROACTIVE_LOCK" || true
 PROACTIVE_LOCK=
 fm_afk_contract_lock_release || true
+[ "$merge_status" -eq 0 ] || exit "$merge_status"
+# The synchronous caller observed this ready outcome by landing it. Record its
+# presentation before a later inactive scan can ask for the same report again.
+FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-inactive-reconcile.sh" \
+  presented-current "$ID" || printf 'actionable: local merge landed but its presentation receipt could not be recorded\n' >&2
 fm_lock_release "$MERGE_CONTROL_LOCK" || true
 MERGE_CONTROL_LOCK=
-[ "$merge_status" -eq 0 ] || exit "$merge_status"
 [ "$META" != "$RETAINED" ] || rm -f -- "$RETAINED"
 after=$(git -C "$PROJ" rev-parse --short "$DEFAULT")
 # Opt-in fleet activity ledger (docs/fleet-ledger.md); off costs one file test.

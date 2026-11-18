@@ -4,6 +4,8 @@
 # Usage:
 #   fm-inactive-reconcile.sh scan [--startup]
 #   fm-inactive-reconcile.sh acknowledge <fingerprint>
+#   fm-inactive-reconcile.sh presented-status <id> <byte-endpoint> <file-identity>
+#   fm-inactive-reconcile.sh presented-current <id>
 #
 # This is an adjunct to the existing watcher poll loop and session-start path,
 # not a watcher, daemon, PR poll, or forge client of its own.
@@ -30,9 +32,14 @@
 # Working, paused, parked, blocked, unknown, persistent secondmates, and
 # captain-held work retain their existing supervision semantics.
 #
-# A terminal-outcomes/<fingerprint>.pending record remains until fm-wake-drain
-# acknowledges the corresponding inactive-outcome wake.
+# A terminal-outcomes/<fingerprint>.pending record remains until its outcome
+# is acknowledged through the inactive-outcome wake or a matching presentation.
 # A receipt is intentionally independent of .hb-surfaced-* bookkeeping.
+# presented-status <id> <byte-endpoint> <file-identity> records the terminal
+# outcome acknowledged by wake-drain or branch-outcome mark-processed, only
+# while that exact status snapshot remains current; presented-current <id> records the ready
+# outcome observed by a synchronous landing. Both retire only their
+# matching inactive-outcome queue row, preserving genuinely new events.
 #
 # New fm-terminal-outcome.v1 receipts contain schema, fingerprint, task_id,
 # incarnation, state, outcome_key, origin, phase, pr, created_epoch, and
@@ -451,6 +458,66 @@ acknowledge_notice() { # <fingerprint>
   record_field_set "$pending" notice_emitted 1
 }
 
+# Record a presentation before the first inactive scan, or retire a pending
+# fallback for the exact status snapshot the presenter acknowledged.
+# The scan lock serializes receipt publication and queue removal with scans;
+# the metadata lock binds the receipt to this task's current incarnation.
+record_presented_status() { # <id> [<endpoint> <identity>]
+  local id=$1 endpoint=${2:-} ident=${3:-} meta status lock size current_ident state pr incarnation fingerprint tmp rc=0
+  valid_id "$id" || return 2
+  meta="$STATE/$id.meta"
+  [ -f "$meta" ] && [ ! -L "$meta" ] || return 0
+  lock=$(fm_meta_lock_path "$meta") || return 1
+  fm_lock_acquire_wait "$lock" || return 1
+  [ -f "$meta" ] && [ ! -L "$meta" ] || { fm_lock_release "$lock"; return 0; }
+  status="$STATE/$id.status"
+  [ -f "$status" ] && [ ! -L "$status" ] || { fm_lock_release "$lock"; return 0; }
+  size=$(_fm_status_file_size "$status" 2>/dev/null) || size=''
+  current_ident=$(_fm_open_decisions_file_ident "$status" 2>/dev/null) || current_ident=''
+  # Missing provenance and changed or replaced logs fail toward presentation.
+  if [ -z "$size" ] || [ -z "$current_ident" ] \
+      || { [ -n "$endpoint" ] && { [ "$size" != "$endpoint" ] || [ "$current_ident" != "$ident" ]; }; }; then
+    fm_lock_release "$lock"
+    return 0
+  fi
+  state=$(status_line_verb "$(status_current_line "$status" "$(meta_field "$meta" kind)")")
+  case "$state" in
+    done) ;;
+    failed) [ -n "$endpoint" ] || { fm_lock_release "$lock"; return 0; } ;;
+    *) fm_lock_release "$lock"; return 0 ;;
+  esac
+  pr=$(pr_for_task "$meta")
+  incarnation=$(meta_incarnation "$meta")
+  fingerprint=$(sha256_text "$incarnation|$id|$state|$pr")
+  if [ "$(_fm_status_file_size "$status" 2>/dev/null)" != "$size" ] \
+      || [ "$(_fm_open_decisions_file_ident "$status" 2>/dev/null)" != "$current_ident" ]; then
+    fm_lock_release "$lock"
+    return 0
+  fi
+  ensure_record "$fingerprint" "$id" "$incarnation" "$state" "inactive-outcome-main-$id-$state" direct presentation "$pr" || rc=1
+  if [ "$rc" -eq 0 ] && [ -n "$RECORD_PENDING" ]; then
+    record_phase_set "$RECORD_PENDING" presentation && acknowledge "$fingerprint" || rc=1
+  fi
+  if [ "$rc" -eq 0 ]; then
+    # Remove only this receipt's fallback, never another event for this task.
+    fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || rc=1
+    if [ "$rc" -eq 0 ]; then
+      if [ -f "$FM_WAKE_QUEUE" ]; then
+        tmp=$(mktemp "$STATE/.inactive-presented.XXXXXX") || rc=1
+        if [ "$rc" -eq 0 ]; then
+          awk -F '\t' -v key="inactive-outcome:$fingerprint" \
+            '!($3 == "check" && $4 == key)' "$FM_WAKE_QUEUE" > "$tmp" \
+            && _fm_atomic_replace "$tmp" "$FM_WAKE_QUEUE" || rc=1
+          rm -f -- "$tmp"
+        fi
+      fi
+      fm_lock_release "$FM_WAKE_QUEUE_LOCK" || rc=1
+    fi
+  fi
+  fm_lock_release "$lock"
+  return "$rc"
+}
+
 mode=${1:-scan}
 case "$mode" in
   scan)
@@ -477,6 +544,18 @@ case "$mode" in
     scan "$2"
     ;;
 
+  presented-status)
+    [ "$#" -eq 4 ] || exit 2
+    fm_lock_acquire_wait "$SCAN_LOCK" || exit 1
+    trap 'fm_lock_release "$SCAN_LOCK"' EXIT
+    record_presented_status "$2" "$3" "$4"
+    ;;
+  presented-current)
+    [ "$#" -eq 2 ] || exit 2
+    fm_lock_acquire_wait "$SCAN_LOCK" || exit 1
+    trap 'fm_lock_release "$SCAN_LOCK"' EXIT
+    record_presented_status "$2"
+    ;;
   acknowledge)
     [ "$#" -eq 2 ] || { printf 'usage: fm-inactive-reconcile.sh acknowledge <fingerprint>\n' >&2; exit 2; }
     fm_lock_acquire_wait "$SCAN_LOCK" || exit 1

@@ -11,6 +11,11 @@
 # stderr for MAIN and either branch host, keeping stdout records unchanged.
 #
 # Stderr names the exact `handled` command for each presented captured process-event result.
+# .<actor>.status-wake-presented stores tab-separated wake binding, task,
+# status byte endpoint, and file identity after successful presentation.
+# Acknowledgement records terminal receipts only for snapshots bound to its
+# consumed rows or empty-queue recovery generation; annotations bind to their
+# signal and backstops to the cutoff or recovery:<generation> when no row exists.
 #
 # Keep sequence-bound row consumption independent from generation-bound episode
 # retirement; docs/watcher-continuity.md owns the recovery contract.
@@ -87,6 +92,7 @@ ACTOR=$(fm_lease_actor) || exit 2
 ELIGIBLE_ROWS_FILE="$STATE/.branch-eligible-rows"
 ELIGIBLE_OWNER_FILE="$STATE/.branch-eligible-owner"
 MAIN_ROWS_FILE="$STATE/.main-eligible-rows"
+STATUS_WAKE_SNAPSHOTS="$STATE/.$ACTOR.status-wake-presented"
 
 rows_file_valid() { fm_wake_grant_rows_valid "$1"; }
 
@@ -313,6 +319,79 @@ acknowledge_inactive_outcomes() { # <mode> <newline-separated-fingerprints>
     [ -n "$fingerprint" ] || continue
     "$SCRIPT_DIR/fm-inactive-reconcile.sh" "$mode" "$fingerprint" || return 1
   done <<< "$fingerprints"
+}
+
+commit_status_wake_snapshots() {
+  local rows=$1 tmp epoch seq kind key payload task endpoint ident binding=${ACK_THROUGH:-0}
+  if [ "$binding" = 0 ]; then binding="recovery:${RECOVERY_MARKER_TOKEN##*:}"; fi
+  [ -n "${FM_WAKE_PRESENTED_STATUS_SNAPSHOTS:-}${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}" ] || return 0
+  tmp=$(mktemp "$STATE/.status-wake-presented.XXXXXX") || return 1
+  if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+    if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ] \
+      || ! command cat "$STATUS_WAKE_SNAPSHOTS" > "$tmp"; then
+      rm -f "$tmp"
+      return 1
+    fi
+  fi
+  while IFS=$'\t' read -r epoch seq kind key payload; do
+    [ "$kind" = signal ] || continue
+    fm_wake_status_key_map "$key" || continue
+    while IFS=$'\t' read -r task endpoint ident; do
+      [ "$FM_WAKE_STATUS_KEY" = "$task.status" ] || continue
+      printf '%s\t%s\t%s\t%s\n' "$seq" "$task" "$endpoint" "$ident" >> "$tmp" \
+        || { rm -f "$tmp"; return 1; }
+    done <<< "$FM_WAKE_PRESENTED_STATUS_SNAPSHOTS"
+  done <<< "$rows"
+  while IFS=$'\t' read -r task endpoint ident; do
+    [ -n "$task" ] || continue
+    printf '%s\t%s\t%s\t%s\n' "$binding" "$task" "$endpoint" "$ident" >> "$tmp" \
+      || { rm -f "$tmp"; return 1; }
+  done <<< "${FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS:-}"
+  if ! LC_ALL=C sort -u "$tmp" -o "$tmp" || ! _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS"; then
+    rm -f "$tmp"
+    return 1
+  fi
+}
+
+# Capture under the presentation lock, then release it before taking scan or
+# metadata locks: cleanup holds metadata while retiring presentation state.
+# Retire only the captured entries afterward so concurrent presentations survive.
+# tests/fm-inactive-reconcile.test.sh covers both interleavings.
+acknowledge_status_wake_snapshots() {
+  local sequences=$1 lock="$STATE/.status-presentation-lock" captured='' tmp _binding task endpoint ident rc=0
+  fm_lock_acquire_wait "$lock" || return 1
+  if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+    if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+      fm_lock_release "$lock"
+      return 1
+    fi
+    captured=$(awk -F '\t' -v sequences="$sequences" '
+      BEGIN { n = split(sequences, seqs, "\n"); for (i = 1; i <= n; i++) selected[seqs[i]]=1 }
+      $1 in selected
+    ' "$STATUS_WAKE_SNAPSHOTS") || rc=1
+  fi
+  fm_lock_release "$lock"
+  [ "$rc" -eq 0 ] || return "$rc"
+  [ -n "$captured" ] || return 0
+  while IFS=$'\t' read -r _binding task endpoint ident; do
+    "$SCRIPT_DIR/fm-inactive-reconcile.sh" presented-status "$task" "$endpoint" "$ident" || return 1
+  done <<< "$captured"
+  fm_lock_acquire_wait "$lock" || return 1
+  if [ -e "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+    if [ ! -f "$STATUS_WAKE_SNAPSHOTS" ] || [ -L "$STATUS_WAKE_SNAPSHOTS" ]; then
+      fm_lock_release "$lock"
+      return 1
+    fi
+    tmp=$(mktemp "$STATE/.status-wake-presented.XXXXXX") || { fm_lock_release "$lock"; return 1; }
+    awk -v captured="$captured" '
+      BEGIN { n = split(captured, rows, "\n"); for (i = 1; i <= n; i++) retired[rows[i]]=1 }
+      !($0 in retired)
+    ' "$STATUS_WAKE_SNAPSHOTS" > "$tmp" \
+      && _fm_atomic_replace "$tmp" "$STATUS_WAKE_SNAPSHOTS" || rc=1
+    rm -f "$tmp"
+  fi
+  fm_lock_release "$lock"
+  return "$rc"
 }
 
 BRANCH_OUTCOME_INDEX_VERSION=fm-branch-outcome-index-v1
@@ -809,7 +888,8 @@ cap_outcome_line() {  # <line> <max-bytes>
 }
 
 print_status_sections() {
-  local snapshot=${1:-} fully_presented=${2:-} acknowledged prepared
+  local snapshot=${1:-} fully_presented=${2:-} acknowledged prepared task endpoint ident
+  FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS=
   if [ -z "$snapshot" ]; then snapshot=$(status_presentation_snapshot "$STATE") || return 1; fi
   [ -n "$snapshot" ] || return 0
   acknowledged=$(status_acknowledge_presented_snapshot "$STATE" "$snapshot" "$fully_presented") || return 1
@@ -834,6 +914,13 @@ print_status_sections() {
     rm -f -- "$prepared"
     return 1
   fi
+  while IFS=$'\t' read -r task endpoint ident; do
+    [ -n "$task" ] || continue
+    if printf '%s' "$STATUS_OUTCOME_BACKSTOP_ACKNOWLEDGED" | cut -f1 | grep -Fxq -- "$task"; then
+      FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS="$FM_WAKE_PRESENTED_BACKSTOP_SNAPSHOTS$task$(printf '\t')$endpoint$(printf '\t')$ident
+"
+    fi
+  done <<< "$snapshot"
   rm -f -- "$prepared"
 }
 
@@ -865,6 +952,9 @@ print_status_presentation() {  # [<deduped-raw-rows>]
     fi
   fi
   if [ "$rc" -eq 0 ] && [ -n "$snapshot" ]; then print_status_sections "$snapshot" "$fully_presented" || rc=1; fi
+  if [ "$rc" -eq 0 ] && { [ -n "$rows" ] || [ "$RECOVERY_ACK_REQUIRED" = true ]; }; then
+    commit_status_wake_snapshots "$rows" || rc=1
+  fi
   fm_lock_release "$lock"
   if [ "$rc" -eq 0 ] && [ -n "$rows" ]; then
     "$SCRIPT_DIR/fm-proactive.sh" context >&2
@@ -944,9 +1034,23 @@ if [ -n "$ACK_THROUGH" ]; then
     ACK_FINGERPRINTS=$(inactive_outcome_fingerprints "$ACK_THROUGH" 'inactive-outcome:' "$MAIN_ROWS_FILE") || exit 1
     ACK_NOTICE_FINGERPRINTS=$(inactive_outcome_fingerprints "$ACK_THROUGH" 'inactive-reconcile:' "$MAIN_ROWS_FILE") || exit 1
   fi
+  if [ "$ACTOR" = branch ]; then ACK_ROWS_FILE=$ELIGIBLE_ROWS_FILE; else ACK_ROWS_FILE=$MAIN_ROWS_FILE; fi
+  ACK_STATUS_SEQUENCES=$(awk -F '\t' -v cutoff="$ACK_THROUGH" -v rows="$ACK_ROWS_FILE" '
+    BEGIN { while ((getline seq < rows) > 0) owned[seq]=1 }
+    NF >= 5 && $2 ~ /^[0-9]+$/ && $2 <= cutoff && ($2 in owned) { print $2 }
+  ' "$FM_WAKE_QUEUE") || exit 1
+  if [ "$ACK_THROUGH" = 0 ]; then
+    fm_recovery_marker_snapshot "$RECOVERY_MARKER" || exit 1
+    case "$FM_RECOVERY_MARKER_TOKEN" in
+      pending:*:"$ACK_GENERATION"|announced:*:"$ACK_GENERATION")
+        ACK_STATUS_SEQUENCES="recovery:$ACK_GENERATION"
+        ;;
+    esac
+  fi
   fm_lock_release "$FM_WAKE_QUEUE_LOCK"
   DRAIN_LOCK_HELD=false
-  if ! acknowledge_inactive_outcomes acknowledge "$ACK_FINGERPRINTS" \
+  if ! acknowledge_status_wake_snapshots "$ACK_STATUS_SEQUENCES" \
+    || ! acknowledge_inactive_outcomes acknowledge "$ACK_FINGERPRINTS" \
     || ! acknowledge_inactive_outcomes acknowledge-notice "$ACK_NOTICE_FINGERPRINTS"; then
     echo "wake drain: inactive outcome receipt could not be recorded safely" >&2
     exit 1

@@ -2339,7 +2339,8 @@ fm_wake_restore_queue() {
 # fm_wake_queue_prune_task <state> <task-id> [target]
 # Prune pending durable wakes for <task-id> and its recorded <target> from
 # the wake queue. Removes stale wakes for <target>, signal wakes for the task's
-# status or turn-ended files, and task-specific check wakes.
+# status or turn-ended files, and task-specific check wakes, including merged
+# PR outcomes and inactive presentation fallbacks for the retired task.
 fm_wake_queue_prune_task() {  # <state> <task-id> [target]
   local state=$1 task=$2 target=${3:-}
   local queue="$state/.wake-queue" lock="$state/.wake-queue.lock" tmp
@@ -2353,6 +2354,9 @@ fm_wake_queue_prune_task() {  # <state> <task-id> [target]
       if ($3 == "stale" && target != "" && $4 == target) next
       if ($3 == "signal" && ($4 == task || $4 == task ".status" || $4 == task ".turn-ended" || $4 == state "/" task ".status" || $4 == state "/" task ".turn-ended")) next
       if ($3 == "check" && $4 == state "/" task ".check.sh") next
+      if ($3 == "check" && index($4, "merged-" task "-https://") == 1) next
+      if ($3 == "check" && index($4, "inactive-outcome:") == 1 \
+          && index(" " $5 " ", " child=" task " ") > 0) next
     }
     { print }
   ' "$queue" > "$tmp" || { rm -f "$tmp"; fm_lock_release "$lock"; return 1; }
@@ -2787,8 +2791,9 @@ fm_wake_latest_event() {  # <validated-status-path> <tail-byte-cap>
 # raw queue consumption and released the append lock.
 fm_wake_print_annotations() {  # <deduped-raw-rows> [<presentation-snapshot>]
   local rows=$1 snapshot=${2:-} manifest status_key mode path prefix line task endpoint
-  local snapshot_task snapshot_endpoint _snapshot_ident offset last_event event_line
+  local snapshot_task snapshot_endpoint snapshot_ident ident offset last_event event_line
   local LC_ALL=C
+  FM_WAKE_PRESENTED_STATUS_SNAPSHOTS=
 
   manifest=$(fm_wake_annotation_manifest "$rows" | awk -F '\t' '
     {
@@ -2832,10 +2837,11 @@ fm_wake_print_annotations() {  # <deduped-raw-rows> [<presentation-snapshot>]
     fi
     offset=$(fm_wake_status_cursor_offset "$path") || return 1
     endpoint=
+    ident=
     if [ -n "$snapshot" ]; then
       task=${status_key%.status}
-      while IFS=$(printf '\t') read -r snapshot_task snapshot_endpoint _snapshot_ident; do
-        if [ "$snapshot_task" = "$task" ]; then endpoint=$snapshot_endpoint; break; fi
+      while IFS=$(printf '\t') read -r snapshot_task snapshot_endpoint snapshot_ident; do
+        if [ "$snapshot_task" = "$task" ]; then endpoint=$snapshot_endpoint; ident=$snapshot_ident; break; fi
       done <<EOF
 $snapshot
 EOF
@@ -2865,6 +2871,10 @@ EOF
     done <<EOF
 $FM_WAKE_UNREAD_LINES
 EOF
+    if [ -n "$ident" ]; then
+      FM_WAKE_PRESENTED_STATUS_SNAPSHOTS="$FM_WAKE_PRESENTED_STATUS_SNAPSHOTS$task$(printf '\t')$endpoint$(printf '\t')$ident
+"
+    fi
   done <<EOF
 $manifest
 EOF
