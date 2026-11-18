@@ -1,0 +1,1 @@
+["pr", "view", "https://github.com/lab/disposable/pull/2", "--json", "headRefOid,reviewDecision"]

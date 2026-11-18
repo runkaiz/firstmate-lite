@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Retiring the only handled merge wake prevents redundant watcher rearm resurfacing",
+    "result": "fail",
+    "live": true,
+    "error": "Command '['bash', '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh']' timed out after 45 seconds"
+  }
+]

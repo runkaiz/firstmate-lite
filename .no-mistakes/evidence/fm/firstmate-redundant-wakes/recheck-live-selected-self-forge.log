@@ -1,0 +1,1 @@
+["pr", "view", "https://github.com/lab/disposable/pull/1", "--json", "state", "-q", ".state"]

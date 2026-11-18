@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Actual native task teardown retires exact notifications and preserves sibling/new evidence",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Synchronous self merge and repeated poll re-registration stay quiet",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Queued merge notifies once after landing and a distinct PR remains eligible",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "External merge notifies once and a distinct PR remains eligible",
+    "result": "pass",
+    "live": true
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "tested_head": "bc7c8c5fda309261ad9bc73f8e85c6b166490dec",
+  "fresh_live_checks": [
+    {
+      "name": "Ordinary main and branch terminal acknowledgement stays quiet on subsequent real scans",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Acknowledging an old status preserves appended, replaced, and never-presented outcomes",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Processing a branch outcome suppresses its duplicate while a later failure still notifies",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Empty-queue recovery acknowledges only its presented generation",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Synchronous local landing records its presentation and removes the matching fallback",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Acknowledgement releases presentation before metadata waits and preserves a concurrent new snapshot",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Actual native task teardown retires exact notifications and preserves sibling/new evidence",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Synchronous self merge and repeated poll re-registration stay quiet",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Queued merge notifies once after landing and a distinct PR remains eligible",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "External merge notifies once and a distinct PR remains eligible",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Retiring the only handled merge wake prevents redundant watcher rearm resurfacing",
+      "result": "pass",
+      "live": true
+    }
+  ],
+  "prior_targeted_regression_evidence": [
+    "fm-inactive-reconcile.log",
+    "fm-pr-check-security.log",
+    "fm-pr-merge.log",
+    "fm-wake-queue.log",
+    "fm-task-delivery.log"
+  ],
+  "setup_retry": "Initial rearm driver awaited a heartbeat that the idle watcher correctly absorbs. Replaced that exit condition with an authenticated custom stop-cycle check; both watcher starts then passed without merge or rearm resurfacing. The initial timeout transcript is retained as setup evidence.",
+  "accepted_untested_limits": [
+    "Real model-primary reporting loop",
+    "Real hosted-forge merge integration"
+  ],
+  "cleanup": "All disposable homes, repositories, native task copies, tmux servers/sockets and transient worktree directories removed. git status --short is empty.",
+  "source_changes": false,
+  "recommendation": "Complete Test with the explicitly authorized integration exception; do not skip Test.",
+  "outer_executor_next_action": "no-mistakes axi respond --step test --action approve --reason \"All locally testable scenarios passed in isolated disposable state; accept the explicitly authorized real-model-primary and real hosted-forge validation limits. No product, policy, workflow, or attestation edits.\"",
+  "pipeline_control_executed": false
+}

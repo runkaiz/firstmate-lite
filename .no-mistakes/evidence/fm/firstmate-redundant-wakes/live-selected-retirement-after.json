@@ -1,0 +1,9 @@
+{
+  "task-a-extra.git-worktree": "schema=fm-git-worktree.v1\ntask=task-a-extra\nhome=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement\nproject=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\ncommon=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo/.git\nroot=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies\npath=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nbase=32b1ed5dd49c8ace5a3a99a0b6220e813d605386\nsource_ref=refs/heads/main\n",
+  "task-a-extra.meta": "window=fm-selected:fm-task-a-extra\nendpoint_task_id=task-a-extra\nbackend=tmux\nharness=claude\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\nkind=ship\nmode=local-only\nbranch=fm/task-a-extra\nspawn_gen=s1792922400.123.456\nallocator=git\n",
+  "task-a-extra.status": "done: task landed on local main\n",
+  ".wake-queue.seq": "8\n",
+  ".watcher-down": "pending:downtime:1911575.1795042341.AWTIy6\n",
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  ".wake-queue": "1795042341\t5\tcheck\tmerged-task-a-extra-https://github.com/lab/disposable/pull/2\tcheck: merge landed: task-a-extra https://github.com/lab/disposable/pull/2\n1795042341\t6\tcheck\tinactive-outcome:bbbb\tinactive terminal outcome awaiting captain presentation: child=task-a-extra state=done\n1795042341\t7\tsignal\ttask-a-extra.status\tsignal: task-a-extra.status\n1795042341\t8\tcheck\tnew-event\tnew evidence for task-a\n"
+}

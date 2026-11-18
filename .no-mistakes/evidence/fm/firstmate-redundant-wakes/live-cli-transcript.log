@@ -1,0 +1,675 @@
+$ tmux -f /dev/null -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.t new-session -d -s fm-lab-validation -x 120 -y 35 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 bash --noprofile --norc
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.t display-message -p -t fm-lab-validation #{socket_path},#{pid},0
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.t,1700248,0
+[exit 0]
+
+=== Ordinary main and branch terminal acknowledgement stays quiet on subsequent real scans ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-done
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-done
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-done/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-done/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-done/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041758.1700264.16020
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041758	1	check	inactive-outcome:1d434a2350d7693e00daa26685a0952b	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041758	1	check	inactive-outcome:1d434a2350d7693e00daa26685a0952b	inactive terminal outcome awaiting captain presentation: child=child state=done
+1795041758	2	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: waiting for merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1700407.1795041758.wVOUHI
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1700407.1795041758.wVOUHI
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=1d434a2350d7693e00daa26685a0952b
+task_id=child
+incarnation=lab-handled-main-done
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795041758
+notice_emitted=0
+status_head=1524e49cde84a2a6817224ac9bc0dbe3
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-failed
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-failed
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-failed/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-failed/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-main-failed/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041759.1702353.5746
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed
+[exit 0]
+PERSISTED .wake-queue:
+1795041759	1	check	inactive-outcome:ca3e52035ac740c148b5c5255ef9801c	inactive terminal outcome awaiting captain presentation: child=child state=failed
+[end queue]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041759	1	check	inactive-outcome:ca3e52035ac740c148b5c5255ef9801c	inactive terminal outcome awaiting captain presentation: child=child state=failed
+1795041759	2	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: failed: waiting for merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child failed: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1702474.1795041759.jG4YZk
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1702474.1795041759.jG4YZk
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=ca3e52035ac740c148b5c5255ef9801c
+task_id=child
+incarnation=lab-handled-main-failed
+state=failed
+outcome_key=inactive-outcome-main-child-failed
+origin=direct
+pr=
+created_epoch=1795041759
+notice_emitted=0
+status_head=a9aeb7067767f142a177a06a8fdde83d
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-done
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-done
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-done/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-done/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-done/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041760.1704338.553
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041760	1	check	inactive-outcome:65579dad8d8f815521d2c1f644ba8b22	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-grant.sh activate 1700244 lab
+[exit 0]
+PERSISTED .wake-queue:
+1795041760	1	check	inactive-outcome:65579dad8d8f815521d2c1f644ba8b22	inactive terminal outcome awaiting captain presentation: child=child state=done
+1795041760	2	signal	child.status	lab observation
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-grant.sh publish lab 1 2
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041760	1	check	inactive-outcome:65579dad8d8f815521d2c1f644ba8b22	inactive terminal outcome awaiting captain presentation: child=child state=done
+1795041760	2	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1704481.1795041760.Uqagjt
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1704481.1795041760.Uqagjt
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=65579dad8d8f815521d2c1f644ba8b22
+task_id=child
+incarnation=lab-handled-branch-done
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795041760
+notice_emitted=0
+status_head=1524e49cde84a2a6817224ac9bc0dbe3
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-failed
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-failed
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-failed/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-failed/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/handled-branch-failed/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041761.1706267.16606
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed
+[exit 0]
+PERSISTED .wake-queue:
+1795041761	1	check	inactive-outcome:eded2096bbb15947ee418e85566f2cdf	inactive terminal outcome awaiting captain presentation: child=child state=failed
+[end queue]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-grant.sh activate 1700244 lab
+[exit 0]
+PERSISTED .wake-queue:
+1795041761	1	check	inactive-outcome:eded2096bbb15947ee418e85566f2cdf	inactive terminal outcome awaiting captain presentation: child=child state=failed
+1795041761	2	signal	child.status	lab observation
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-grant.sh publish lab 1 2
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041761	1	check	inactive-outcome:eded2096bbb15947ee418e85566f2cdf	inactive terminal outcome awaiting captain presentation: child=child state=failed
+1795041761	2	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: failed: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1706389.1795041761.DsBGp9
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1706389.1795041761.DsBGp9
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=eded2096bbb15947ee418e85566f2cdf
+task_id=child
+incarnation=lab-handled-branch-failed
+state=failed
+outcome_key=inactive-outcome-main-child-failed
+origin=direct
+pr=
+created_epoch=1795041761
+notice_emitted=0
+status_head=a9aeb7067767f142a177a06a8fdde83d
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+
+=== Acknowledging an old status preserves appended, replaced, and never-presented outcomes ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-append
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-append
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-append/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-append/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-append/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041762.1708952.5390
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041762	1	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: waiting for merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1708987.1795041762.WoeQFX
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1708987.1795041762.WoeQFX
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · new validation failure
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed
+[exit 0]
+PERSISTED .wake-queue:
+1795041762	2	check	inactive-outcome:92800a45875baaca4321883fbe7cae63	inactive terminal outcome awaiting captain presentation: child=child state=failed
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-replace
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-replace
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-replace/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-replace/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-replace/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041762.1712351.6979
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041762	1	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: waiting for merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1712385.1795041762.LwjukY
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1712385.1795041762.LwjukY
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041763	2	check	inactive-outcome:7356e8d2f2e2291fc0fe6ac57197c518	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041763.1714591.1197
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "lab observation" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal child.status
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795041763	1	signal	child.status	lab observation
+wake annotation: latest wake-EVENT observed at drain, not current state: child.status: done: waiting for merge approval
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1714605.1795041763.2PWuLU
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/stale-unseen/state other --state idle --source fm-recovery --event lab-disposable-record
+g1795041764.1715412.6039
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1714605.1795041763.2PWuLU
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=other state=failed
+[exit 0]
+PERSISTED .wake-queue:
+1795041764	2	check	inactive-outcome:d98ea756f1a123802382e41de33113c9	inactive terminal outcome awaiting captain presentation: child=other state=failed
+[end queue]
+
+=== Processing a branch outcome suppresses its duplicate while a later failure still notifies ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/branch-processed
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/branch-processed
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/branch-processed/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/branch-processed/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/branch-processed/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041764.1716433.27760
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-branch-outcome.sh append --task child --verdict captain --summary Ready for approval
+1
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-branch-outcome.sh mark-read --through 1
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041764	1	check	inactive-outcome:26ea0e520072d70714e1630cd1231165	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-branch-outcome.sh mark-processed --through 1
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=26ea0e520072d70714e1630cd1231165
+task_id=child
+incarnation=lab-branch-processed
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795041764
+notice_emitted=0
+status_head=1524e49cde84a2a6817224ac9bc0dbe3
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · a new failure after handled success
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed
+[exit 0]
+PERSISTED .wake-queue:
+1795041765	2	check	inactive-outcome:af88228a4a0fbe4f65933c188fe98916	inactive terminal outcome awaiting captain presentation: child=child state=failed
+[end queue]
+
+=== Empty-queue recovery acknowledges only its presented generation ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-done
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-done
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-done/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-done/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-done/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041765.1718115.2966
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_recovery_marker_publish "$FM_HOME/state/.watcher-down" handling _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1718129.1795041765.cIAWSV
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 0 --recovery-generation wrong-generation
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1718129.1795041765.cIAWSV
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=799ac16c50b6185cc820d63b4f61556b
+task_id=child
+incarnation=lab-empty-done
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795041765
+notice_emitted=0
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-failed
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-failed
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-failed/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-failed/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-failed/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041766.1719722.12879
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_recovery_marker_publish "$FM_HOME/state/.watcher-down" handling _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child failed: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1719736.1795041766.G6hqcn
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 0 --recovery-generation wrong-generation
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1719736.1795041766.G6hqcn
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=f902311a811d89a84bdb8a7e52ee6120
+task_id=child
+incarnation=lab-empty-failed
+state=failed
+outcome_key=inactive-outcome-main-child-failed
+origin=direct
+pr=
+created_epoch=1795041766
+notice_emitted=0
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: failed · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-new-generation
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-new-generation
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-new-generation/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-new-generation/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/empty-new-generation/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041766.1721308.21954
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_recovery_marker_publish "$FM_HOME/state/.watcher-down" handling _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+child done: waiting for merge approval
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1721322.1795041766.gMfNvz
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+$ bash -c . "$1/bin/fm-wake-lib.sh"; fm_recovery_marker_publish "$FM_HOME/state/.watcher-down" handling _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1721322.1795041766.gMfNvz
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+[exit 0]
+PERSISTED terminal presentation receipts:
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041767	1	check	inactive-outcome:9b3d53c24cceb9c982555562118b82ec	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+
+=== Synchronous local landing records its presentation and removes the matching fallback ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing
+[exit 0]
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo commit -q --allow-empty -m base
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/state child --state idle --source fm-recovery --event lab-disposable-record
+g1795041767.1722685.14696
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo checkout -q -b fix/child
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo commit -q --allow-empty -m ship change
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo rev-parse HEAD
+ff2ef21a9b98e1deb405d24a4f68f4043d8b1b38
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo checkout -q main
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done
+[exit 0]
+PERSISTED .wake-queue:
+1795041767	1	check	inactive-outcome:3e096ebc0e68f9ad85dca7ea62a8a3e2	inactive terminal outcome awaiting captain presentation: child=child state=done
+[end queue]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-merge-local.sh child
+merged fix/child into local main (fe15b21 -> ff2ef21) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/live/local-landing/projects/repo rev-parse HEAD
+ff2ef21a9b98e1deb405d24a4f68f4043d8b1b38
+[exit 0]
+PERSISTED terminal presentation receipts:
+schema=fm-terminal-outcome.v1
+fingerprint=3e096ebc0e68f9ad85dca7ea62a8a3e2
+task_id=child
+incarnation=lab-local-landing
+state=done
+outcome_key=inactive-outcome-main-child-done
+origin=direct
+pr=
+created_epoch=1795041767
+notice_emitted=0
+status_head=1524e49cde84a2a6817224ac9bc0dbe3
+phase=presentation
+
+[end receipts]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-crew-state.sh child
+state: done · source: status-log · waiting for merge approval
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-inactive-reconcile.sh scan --startup
+[exit 0]
+PERSISTED .wake-queue:
+[end queue]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.t kill-server
+[exit 0]
+Disposable homes and private tmux server removed.

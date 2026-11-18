@@ -1,0 +1,58 @@
+{
+  "summary": "Validate local retirement and merge notification scenarios",
+  "tested_head_sha": "bc7c8c5fda309261ad9bc73f8e85c6b166490dec",
+  "selected_finding": "test-2",
+  "selected_local_scenarios": "pass",
+  "live_scenarios_completed_overall": "8 of 10, including prior evidence",
+  "scenarios": [
+    {
+      "name": "Actual native task teardown retires exact notifications and preserves sibling/new evidence",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Synchronous self merge and repeated poll re-registration stay quiet",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Queued merge notifies once after landing and a distinct PR remains eligible",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "External merge notifies once and a distinct PR remains eligible",
+      "result": "pass",
+      "live": true
+    }
+  ],
+  "setup_failure": "Initial native-copy allocation refused because fixture copy root was inside its home; moved disposable copy root outside home within the worktree and reran only retirement successfully.",
+  "product_changes": false,
+  "worktree_clean": true,
+  "fixture_cleanup": "Disposable lab homes, repositories, native copies, temporary files, and private tmux server removed",
+  "accepted_validation_limits": [
+    "An actual model primary reports a finished worker and avoids another reporting turn after acknowledgement",
+    "A hosted self-merge or queued/external merge traverses the forge, poll, and watcher without losing or repeating confirmation"
+  ],
+  "verdict": "inconclusive only for the two explicitly accepted integration limits",
+  "completion_recommendation": "approve Test with recorded exception; do not skip",
+  "outer_executor_next_action": "no-mistakes axi respond --step test --action approve --reason \"All locally testable missing scenarios passed in isolated disposable state; accept the explicitly authorized real-model-primary and real hosted-forge validation limits. No product, policy, workflow, or attestation edits.\"",
+  "artifacts": [
+    "live-selected-transcript.log",
+    "live-selected-results.json",
+    "live-selected-retirement-before.json",
+    "live-selected-retirement-after.json",
+    "live-selected-self-after-merge.json",
+    "live-selected-self-after-rearm-1.json",
+    "live-selected-self-after-rearm-2.json",
+    "live-selected-queued-first-notice.json",
+    "live-selected-queued-repeat-quiet.json",
+    "live-selected-queued-distinct-pr.json",
+    "live-selected-external-first-notice.json",
+    "live-selected-external-repeat-quiet.json",
+    "live-selected-external-distinct-pr.json",
+    "live-selected-self-forge.log",
+    "live-selected-queued-forge.log",
+    "live-selected-external-forge.log"
+  ]
+}

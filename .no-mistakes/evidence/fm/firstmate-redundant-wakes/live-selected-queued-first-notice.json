@@ -1,0 +1,18 @@
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "2\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1882892\tlinux-starttime=39923241 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n",
+  ".wake-queue": "1795042312\t2\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/1\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/1\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".watcher-down": "pending:downtime:1882892.1795042312.WSjuN5\n"
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Ordinary main and branch terminal acknowledgement stays quiet on subsequent real scans",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Acknowledging an old status preserves appended, replaced, and never-presented outcomes",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Processing a branch outcome suppresses its duplicate while a later failure still notifies",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Empty-queue recovery acknowledges only its presented generation",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Synchronous local landing records its presentation and removes the matching fallback",
+    "result": "pass",
+    "live": true
+  }
+]

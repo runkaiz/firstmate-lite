@@ -1,0 +1,7 @@
+[
+  {
+    "name": "Retiring the only handled merge wake prevents redundant watcher rearm resurfacing",
+    "result": "pass",
+    "live": true
+  }
+]

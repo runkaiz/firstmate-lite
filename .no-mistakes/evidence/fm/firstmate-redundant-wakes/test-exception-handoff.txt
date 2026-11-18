@@ -1,0 +1,12 @@
+Target: bc7c8c5fda309261ad9bc73f8e85c6b166490dec
+Selected Test finding test-2 is resolved for every locally testable scenario.
+Actual fm-teardown.sh removed a native disposable copy and task records, retired target status/turn/merge/inactive wakes, and preserved the similarly named sibling and unrelated new evidence byte for byte.
+Actual fm-pr-merge.sh, fm-pr-check.sh, fm-pr-poll.sh, fm-watch.sh, and fm-wake-drain.sh were driven against an isolated local fake forge. Synchronous self-merges stayed quiet across repeated poll re-registration. Queued and external observations notified once, repeated registrations stayed quiet, and distinct PRs each notified.
+Four selected live checks passed. Together with the six prior live scenario groups, eight of ten acceptance scenarios have local live evidence. Local-fake-forge validation is intentionally not claimed as hosted integration.
+Initial fixture allocation failure was setup-only: native-copy root must be outside its home; the corrected targeted retirement rerun passed.
+No product, test-source, policy, workflow, attestation, PR, hosted-forge, or real-operator-project changes were made. Fixtures and private tmux server were removed; git status is clean.
+Evidence: selected-test-completion.json, live-selected.py, live-selected-transcript.log, live-selected-*.json, and live-selected-*-forge.log in this directory. Initial setup failure and successful retry are retained in the transcript.
+Accepted limits: actual model-primary reporting loop and real hosted-forge merge. The user's recorded decision expressly accepts these without more live validation and requires completion, not skipping.
+No nested pipeline-control command was executed.
+Outer executor only: record the authorized Test exception at the Test decision gate with this supported next action:
+no-mistakes axi respond --step test --action approve --reason "All locally testable missing scenarios passed in isolated disposable state; accept the explicitly authorized real-model-primary and real hosted-forge validation limits. No product, policy, workflow, or attestation edits."

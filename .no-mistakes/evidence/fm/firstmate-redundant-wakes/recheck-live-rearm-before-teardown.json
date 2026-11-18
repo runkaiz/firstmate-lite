@@ -1,0 +1,8 @@
+{
+  "task-a.git-worktree": "schema=fm-git-worktree.v1\ntask=task-a\nhome=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/rearm\nproject=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/rearm/projects/repo\ncommon=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/rearm/projects/repo/.git\nroot=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies\npath=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree\nbase=b3e36b94a229e36f9b9c999ac268448dbd85f57c\nsource_ref=refs/heads/main\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/rearm/projects/repo\nkind=ship\nmode=local-only\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\nallocator=git\n",
+  "task-a.status": "done: task landed on local main\n",
+  ".wake-queue.seq": "1\n",
+  ".wake-queue": "1795042529\t1\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/1\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/1\n",
+  ".watcher-down": "pending:downtime:2031700.1795042529.mxVwbf\n"
+}

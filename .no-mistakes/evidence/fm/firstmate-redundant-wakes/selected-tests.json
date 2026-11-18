@@ -1,0 +1,36 @@
+{
+  "fm-inactive-reconcile": [
+    "test_status_receipts_do_not_deadlock_cleanup",
+    "test_status_ack_retires_only_its_captured_snapshot",
+    "test_empty_recovery_ack_records_terminal_receipts",
+    "test_empty_recovery_ack_preserves_unpresented_outcomes",
+    "test_handled_status_wake_suppresses_inactive_duplicate",
+    "test_status_ack_preserves_unpresented_outcomes",
+    "test_backstop_status_ack_is_bound_to_its_wake",
+    "test_processed_before_first_scan_and_new_pr",
+    "test_old_branch_snapshot_does_not_hide_new_terminal_outcome",
+    "test_processed_branch_outcome_is_not_presented_again",
+    "test_reused_task_id_reports_each_incarnation"
+  ],
+  "fm-pr-check-security": [
+    "test_merged_poll_retires_once",
+    "test_merged_poll_reregistration_after_notification_is_absorbed",
+    "test_self_merge_and_poll_publish_one_outcome",
+    "test_different_merged_pr_for_same_task_is_not_absorbed",
+    "test_retirement_queue_failure_and_receipt_tampering",
+    "test_external_merge_transition_retires_only_terminal_poll"
+  ],
+  "fm-pr-merge": [
+    "test_failed_merge_reports_nothing",
+    "test_main_home_merge_records_acknowledgement_without_wake",
+    "test_queued_github_merge_leaves_the_poll_armed",
+    "test_distinct_self_merged_prs_record_latest_identity",
+    "test_uncommitted_marker_retry_is_never_silent"
+  ],
+  "fm-wake-queue": [
+    "test_wake_queue_prune_task"
+  ],
+  "fm-task-delivery": [
+    "test_local_merge_uses_the_recorded_ship_branch"
+  ]
+}

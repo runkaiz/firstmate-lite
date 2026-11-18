@@ -1,0 +1,37 @@
+all inactive reconciliation tests passed
+ok - main, branch, and branch-outcome receipt acknowledgements cannot deadlock status cleanup
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+ok - receipt recording releases presentation and retires only its captured snapshot entries
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+ok - empty-queue recovery acknowledgements bind terminal receipts to their presented generation
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=other state=done pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+wake drain: acknowledged wakes through 0 (0 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+ok - empty recovery preserves changed logs, unseen outcomes, and newer recovery generations
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+ok - handled terminal status and turn-ended wakes suppress inactive duplicates for both actors
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=other state=done pr=https://example.test/owner/repo/pull/1
+wake drain: acknowledged wakes through 1 (1 row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+ok - status acknowledgements preserve appended, replaced, sibling, and never-presented outcomes
+ok - backstop status snapshots are acknowledged only through their presented wake
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/2
+ok - presentation before the first scan suppresses repetition but preserves a different PR
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+ok - old branch snapshots cannot acknowledge appended or replaced status logs
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=done pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+ok - processed branch outcomes stay quiet while new terminal states still wake
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+actionable: inactive terminal outcome awaiting captain presentation: child=child state=failed pr=https://example.test/owner/repo/pull/1
+ok - reused task ids retain per-incarnation terminal receipts

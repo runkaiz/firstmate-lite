@@ -1,0 +1,6 @@
+grep: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-phase/tmp/fm-pr-merge-tests.HXglCt/failed-merge-silent/state/parent-replies.status: No such file or directory
+ok - a refused or failed merge reports no outcome
+ok - a synchronous self merge records acknowledgement without another wake
+ok - a queued GitHub merge stays silent and leaves confirmation to the armed poll
+ok - distinct self merges update their identity without redundant notifications
+ok - an uncommitted marker retry preserves at least one durable outcome

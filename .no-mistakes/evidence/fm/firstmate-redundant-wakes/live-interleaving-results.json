@@ -1,0 +1,7 @@
+[
+  {
+    "name": "Acknowledgement releases presentation before metadata waits and preserves a concurrent new snapshot",
+    "result": "pass",
+    "live": true
+  }
+]

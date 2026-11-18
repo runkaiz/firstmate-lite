@@ -1,0 +1,1007 @@
+$ tmux -f /dev/null -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v new-session -d -s fm-selected -x 120 -y 35 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 'bash --noprofile --norc'
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v display-message -p -t fm-selected '#{socket_path},#{pid},0'
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v,1868654,0
+[exit 0]
+
+=== Actual native task teardown retires exact notifications and preserves sibling/new evidence ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement
+[exit 0]
+LAB INPUT retirement/config/supervision-host-off:
+
+LAB INPUT retirement/config/backlog-backend:
+manual
+
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo commit -q --allow-empty -m base
+[exit 0]
+LAB INPUT retirement/config/worktree-allocator:
+git
+
+LAB INPUT retirement/config/git-worktree-root:
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/copies
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo rev-parse HEAD
+9c49d5226748b644fcc33c42bc28c9f8945538f8
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$FM_HOME/copies" "$4" refs/heads/main || exit; printf "%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 task-a /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo 9c49d5226748b644fcc33c42bc28c9f8945538f8
+error: native worktree: root is inside project/primary/home
+[exit 1]
+Traceback (most recent call last):
+  File "/home/runkai/.no-mistakes/evidence/01M7RCW1DGVQEFV4XPMHQNTV34/live-selected.py", line 150, in scenario
+    fn(); RESULTS.append(dict(name=name,result='pass',live=True));print('PASS '+name,flush=True)
+    ~~^^
+  File "/home/runkai/.no-mistakes/evidence/01M7RCW1DGVQEFV4XPMHQNTV34/live-selected.py", line 160, in retirement
+    out=shell(h,'. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$FM_HOME/copies" "$4" refs/heads/main || exit; printf "%s\\n" "$FM_GIT_WORKTREE_PATH"',task,p,head)
+  File "/home/runkai/.no-mistakes/evidence/01M7RCW1DGVQEFV4XPMHQNTV34/live-selected.py", line 28, in shell
+    return run(['bash', '-c', program, '_', ROOT, *args], {'FM_HOME':str(h)})
+  File "/home/runkai/.no-mistakes/evidence/01M7RCW1DGVQEFV4XPMHQNTV34/live-selected.py", line 21, in run
+    if check and p.returncode: raise RuntimeError(f'{args}: {p.returncode}: {p.stderr}')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: ['bash', '-c', '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$FM_HOME/copies" "$4" refs/heads/main || exit; printf "%s\\n" "$FM_GIT_WORKTREE_PATH"', '_', PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34'), 'task-a', PosixPath('/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo'), '9c49d5226748b644fcc33c42bc28c9f8945538f8']: 1: error: native worktree: root is inside project/primary/home
+
+
+=== Synchronous self merge and repeated poll re-registration stay quiet ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self
+[exit 0]
+LAB INPUT self/config/supervision-host-off:
+
+LAB INPUT self/config/backlog-backend:
+manual
+
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo commit -q --allow-empty -m base
+[exit 0]
+LAB INPUT self/state/task-a.meta:
+window=fm-selected:fm-task-a
+endpoint_task_id=task-a
+backend=tmux
+harness=claude
+worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo
+kind=ship
+mode=no-mistakes
+branch=fm/task-a
+spawn_gen=s1792922400.123.456
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo rev-parse HEAD
+9c49d5226748b644fcc33c42bc28c9f8945538f8
+[exit 0]
+LAB INPUT self/forge.json:
+{"1": {"head": "9c49d5226748b644fcc33c42bc28c9f8945538f8", "state": "OPEN", "queued": false, "request": "self"}, "2": {"head": "9c49d5226748b644fcc33c42bc28c9f8945538f8", "state": "OPEN", "queued": false, "request": "self"}}
+LAB INPUT self/fakebin/gh:
+#!/usr/bin/env python3
+import sys, os, json, re
+from pathlib import Path
+a=sys.argv[1:]; store=Path(os.environ['LOCAL_FORGE'])
+with store.with_suffix('.log').open('a') as f:f.write(json.dumps(a)+'\n')
+d=json.loads(store.read_text())
+n=None
+for x in a:
+    m=re.search(r'/pull/(\d+)$',x)
+    if m:n=m[1]
+    if x.startswith('number='):n=x.split('=',1)[1]
+if a[:2]==['pr','merge']:n=a[2]
+r=d.get(n,{})
+if a[:2]==['pr','merge']:
+    assert a[a.index('--match-head-commit')+1]==r['head']
+    if r.get('request')=='queue':r.update(state='OPEN',queued=True)
+    else:r.update(state='MERGED',queued=False)
+    store.write_text(json.dumps(d));print('local forge accepted');sys.exit(0)
+if a[:2]==['api','graphql']:
+    print('state='+r['state']);print('merged='+str(r['state']=='MERGED').lower());print('queued='+str(r.get('queued',False)).lower());print('base=main');sys.exit(0)
+if a[:2]==['pr','view']:
+    fields=a[a.index('--json')+1]
+    if fields=='state':print(r['state'])
+    elif fields=='headRefOid':print(r['head'])
+    elif fields=='isDraft':print('{"isDraft":false}')
+    elif 'statusCheckRollup' in fields:
+        print(json.dumps(dict(state=r['state'],isDraft=False,mergeable='MERGEABLE',mergeStateStatus='CLEAN',headRefOid=r['head'],baseRefName='main',reviewDecision='APPROVED',statusCheckRollup=[dict(__typename='CheckRun',name='ci',status='COMPLETED',conclusion='SUCCESS')])) )
+    elif fields=='headRefOid,reviewDecision':print(json.dumps(dict(headRefOid=r['head'],reviewDecision='APPROVED')))
+    else:raise SystemExit('unexpected pr view '+repr(a))
+    sys.exit(0)
+if a and a[0]=='api':
+    path=next((x for x in a if x.startswith('repos/')),'')
+    if '/rules/branches/' in path:print('[]')
+    elif '/branches/' in path:print('{"name":"main","protected":false}')
+    elif '/check-runs' in path:print('[{"check_runs":[]}]')
+    elif any(x in path for x in ('/comments','/reviews','/statuses')):print('[[]]')
+    elif '/pulls/' in path:
+        n=path.split('/pulls/')[1].split('/')[0];r=d[n]
+        print(json.dumps(dict(state='open',user=dict(login='author'),head=dict(sha=r['head']),draft=False,mergeable=True,merged_at=None)))
+    elif re.fullmatch(r'repos/[^/]+/[^/]+',path):print('{"permissions":{"push":false}}')
+    else:raise SystemExit('unexpected api '+repr(a))
+    sys.exit(0)
+raise SystemExit('unexpected fake forge call '+repr(a))
+
+LAB INPUT self/fakebin/gh-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT self/fakebin/glab:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT self/fakebin/gerrit-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+LAB INPUT self/state/task-a.status:
+done: PR https://github.com/lab/disposable/pull/1 checks green
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-merge.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+verified: https://github.com/lab/disposable/pull/1 is merged (state=MERGED, merged=true, isInMergeQueue=false)
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+verified: https://github.com/lab/disposable/pull/1 is open and mergeable, with every unwaived required check reported and every unwaived check green at head 9c49d5226748b644fcc33c42bc28c9f8945538f8
+[exit 0]
+PERSISTED STATE self-after-merge:
+{
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  "task-a.status": "done: PR https://github.com/lab/disposable/pull/1 checks green\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=9c49d5226748b644fcc33c42bc28c9f8945538f8\n",
+  "task-a.pr-poll": "github\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\n",
+  "task-a.pr-poll-registration": "fm-pr-poll-registration-v2\ntask-a\ngithub\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\nb8c18c7a9fc691edc52fc49e4dc6949ac10cd8fb2a3c784f40787b4b0f17624d\n367c6095cd8b6483a8d718f1ccec6393c8f596e51ab1450c2bff6f469efb6125\n61:10611745084\n61:10611745085\n",
+  "task-a.check.sh": "#!/usr/bin/env bash\n# Static watcher program for a validated GitHub pull request.\n# Reads private poll identity data without executing it; confirms exact merged\n# state before emitting the durable wake and retiring the registration.\nset -u\nLC_ALL=C\nexport LC_ALL\n\nif [ \"$#\" -eq 6 ] && [ \"$1\" = --validated ]; then\n  provider=$2\n  url=$3\n  host=$4\n  path=$5\n  number=$6\nelif [ \"$#\" -eq 0 ]; then\n  case \"$0\" in\n    *.check.sh) data=${0%.check.sh}.pr-poll ;;\n    *) exit 0 ;;\n  esac\n\n  [ -f \"$data\" ] && [ ! -L \"$data\" ] || exit 0\n  { exec 3< \"$data\"; } 2>/dev/null || exit 0\n  IFS= read -r provider <&3 || exit 0\n  IFS= read -r url <&3 || exit 0\n  IFS= read -r host <&3 || exit 0\n  IFS= read -r path <&3 || exit 0\n  IFS= read -r number <&3 || exit 0\n  if IFS= read -r _extra <&3; then\n    exit 0\n  fi\n  exec 3<&-\nelse\n  exit 0\nfi\n\ncase \"$number\" in\n  [1-9]*) ;;\n  *) exit 0 ;;\nesac\ncase \"$number\" in\n  *[!0-9]*) exit 0 ;;\nesac\n\n# Every component is revalidated here rather than trusted from the sidecar, and\n# the stored URL must then be exactly reconstructible from those components, so\n# a doctored sidecar cannot redirect this poll at another host or project.\ncase \"$provider\" in\n  github)\n    [ \"$host\" = github.com ] || exit 0\n    owner=${path%%/*}\n    repo=${path#*/}\n    [ \"${#owner}\" -ge 1 ] && [ \"${#owner}\" -le 39 ] || exit 0\n    case \"$owner\" in\n      *[!A-Za-z0-9-]*|-*|*-|*--*) exit 0 ;;\n    esac\n    [ \"${#repo}\" -ge 1 ] && [ \"${#repo}\" -le 100 ] || exit 0\n    case \"$repo\" in\n      .|..|*[!A-Za-z0-9._-]*) exit 0 ;;\n    esac\n    [ \"$url\" = \"https://github.com/$owner/$repo/pull/$number\" ] || exit 0\n    state=$(gh pr view \"$url\" --json state -q .state 2>/dev/null) || exit 0\n    [ \"$state\" = MERGED ] && printf '%s\\n' merged\n    ;;\n  *) exit 0 ;;\nesac\nexit 0\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\naab708de55a4df624934d0e865f75a0b179bd8e28f6c9ed7f4acd30589378487\n",
+  "task-a.merge-authority": "fm-merge-authority-v1\ngithub\ngithub.com\nlab/disposable\n1\nattended\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  "terminal-outcomes/c03c6796727d6b658b1e02792c8f4c4b.presented": "schema=fm-terminal-outcome.v1\nfingerprint=c03c6796727d6b658b1e02792c8f4c4b\ntask_id=task-a\nincarnation=s1792922400.123.456\nstate=done\noutcome_key=inactive-outcome-main-task-a-done\norigin=direct\npr=https://github.com/lab/disposable/pull/1\ncreated_epoch=1795042306\nnotice_emitted=0\nphase=presentation\n"
+}
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal task-a.status 'signal: task-a.status'
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042306	1	signal	task-a.status	signal: task-a.status
+wake annotation: latest wake-EVENT observed at drain, not current state: task-a.status: done: PR https://github.com/lab/disposable/pull/1 checks green
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+task-a done: PR https://github.com/lab/disposable/pull/1 checks green
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1870774.1795042306.W6Vsxy
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1870774.1795042306.W6Vsxy
+[exit 0]
+LAB INPUT self/state/z-stop.check.sh:
+#!/usr/bin/env bash
+printf "stop-cycle\n"
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-check-register.sh z-stop
+registered: state/z-stop.check.sh
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE self-after-rearm-1:
+{
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  "task-a.status": "done: PR https://github.com/lab/disposable/pull/1 checks green\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".wake-queue.seq": "2\n",
+  ".task-a.open-decisions-cursor": "version=9:ship\noffset=63\nident=strong:61:10611745074:2026-11-18 14:51:45.354078131 -0800\n",
+  ".status-presentation-cursor": "task-a\tstrong:61:10611745074:2026-11-18 14:51:45.354078131 -0800\t63\t63\n",
+  ".main.status-wake-presented": "",
+  ".wake-queue": "1795042307\t2\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=9c49d5226748b644fcc33c42bc28c9f8945538f8\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\naab708de55a4df624934d0e865f75a0b179bd8e28f6c9ed7f4acd30589378487\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042307\ncursor=\n",
+  ".last-check": "",
+  ".watch-triage.log": "[2026-11-18T14:51:47-0800] absorbed duplicate merged PR poll result for task-a\n",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1872931\tlinux-starttime=39922704 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle\n",
+  ".watcher-down": "pending:downtime:1872931.1795042307.x9gBBH\n",
+  "terminal-outcomes/c03c6796727d6b658b1e02792c8f4c4b.presented": "schema=fm-terminal-outcome.v1\nfingerprint=c03c6796727d6b658b1e02792c8f4c4b\ntask_id=task-a\nincarnation=s1792922400.123.456\nstate=done\noutcome_key=inactive-outcome-main-task-a-done\norigin=direct\npr=https://github.com/lab/disposable/pull/1\ncreated_epoch=1795042306\nnotice_emitted=0\nphase=presentation\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042307	2	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1872931.1795042307.x9gBBH
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1872931.1795042307.x9gBBH
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE self-after-rearm-2:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "task-a.status": "done: PR https://github.com/lab/disposable/pull/1 checks green\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".wake-queue.seq": "3\n",
+  ".task-a.open-decisions-cursor": "version=9:ship\noffset=63\nident=strong:61:10611745074:2026-11-18 14:51:45.354078131 -0800\n",
+  ".main.status-wake-presented": "",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042307\ncursor=\n",
+  ".last-check": "",
+  ".watch-triage.log": "[2026-11-18T14:51:47-0800] absorbed duplicate merged PR poll result for task-a\n[2026-11-18T14:51:49-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:51:49-0800] absorbed duplicate merged PR poll result for task-a\n",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1872931\tlinux-starttime=39922704 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle\n1876844\tlinux-starttime=39922888 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle\n",
+  ".status-presentation-cursor": "task-a\tstrong:61:10611745074:2026-11-18 14:51:45.354078131 -0800\t63\t63\n",
+  ".wake-queue": "1795042309\t3\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=9c49d5226748b644fcc33c42bc28c9f8945538f8\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\naab708de55a4df624934d0e865f75a0b179bd8e28f6c9ed7f4acd30589378487\n",
+  ".watcher-down": "pending:downtime:1876844.1795042309.YQ7KqM\n",
+  "terminal-outcomes/c03c6796727d6b658b1e02792c8f4c4b.presented": "schema=fm-terminal-outcome.v1\nfingerprint=c03c6796727d6b658b1e02792c8f4c4b\ntask_id=task-a\nincarnation=s1792922400.123.456\nstate=done\noutcome_key=inactive-outcome-main-task-a-done\norigin=direct\npr=https://github.com/lab/disposable/pull/1\ncreated_epoch=1795042306\nnotice_emitted=0\nphase=presentation\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042309	3	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/self/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1876844.1795042309.YQ7KqM
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 2s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1876844.1795042309.YQ7KqM
+[exit 0]
+
+=== Queued merge notifies once after landing and a distinct PR remains eligible ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued
+[exit 0]
+LAB INPUT queued/config/supervision-host-off:
+
+LAB INPUT queued/config/backlog-backend:
+manual
+
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo commit -q --allow-empty -m base
+[exit 0]
+LAB INPUT queued/state/task-a.meta:
+window=fm-selected:fm-task-a
+endpoint_task_id=task-a
+backend=tmux
+harness=claude
+worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo
+kind=ship
+mode=no-mistakes
+branch=fm/task-a
+spawn_gen=s1792922400.123.456
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo rev-parse HEAD
+6ef97d0e4edf856c3e68fdeb49ab0c79290efd05
+[exit 0]
+LAB INPUT queued/forge.json:
+{"1": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "OPEN", "queued": false, "request": "queue"}, "2": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "OPEN", "queued": false, "request": "queue"}}
+LAB INPUT queued/fakebin/gh:
+#!/usr/bin/env python3
+import sys, os, json, re
+from pathlib import Path
+a=sys.argv[1:]; store=Path(os.environ['LOCAL_FORGE'])
+with store.with_suffix('.log').open('a') as f:f.write(json.dumps(a)+'\n')
+d=json.loads(store.read_text())
+n=None
+for x in a:
+    m=re.search(r'/pull/(\d+)$',x)
+    if m:n=m[1]
+    if x.startswith('number='):n=x.split('=',1)[1]
+if a[:2]==['pr','merge']:n=a[2]
+r=d.get(n,{})
+if a[:2]==['pr','merge']:
+    assert a[a.index('--match-head-commit')+1]==r['head']
+    if r.get('request')=='queue':r.update(state='OPEN',queued=True)
+    else:r.update(state='MERGED',queued=False)
+    store.write_text(json.dumps(d));print('local forge accepted');sys.exit(0)
+if a[:2]==['api','graphql']:
+    print('state='+r['state']);print('merged='+str(r['state']=='MERGED').lower());print('queued='+str(r.get('queued',False)).lower());print('base=main');sys.exit(0)
+if a[:2]==['pr','view']:
+    fields=a[a.index('--json')+1]
+    if fields=='state':print(r['state'])
+    elif fields=='headRefOid':print(r['head'])
+    elif fields=='isDraft':print('{"isDraft":false}')
+    elif 'statusCheckRollup' in fields:
+        print(json.dumps(dict(state=r['state'],isDraft=False,mergeable='MERGEABLE',mergeStateStatus='CLEAN',headRefOid=r['head'],baseRefName='main',reviewDecision='APPROVED',statusCheckRollup=[dict(__typename='CheckRun',name='ci',status='COMPLETED',conclusion='SUCCESS')])) )
+    elif fields=='headRefOid,reviewDecision':print(json.dumps(dict(headRefOid=r['head'],reviewDecision='APPROVED')))
+    else:raise SystemExit('unexpected pr view '+repr(a))
+    sys.exit(0)
+if a and a[0]=='api':
+    path=next((x for x in a if x.startswith('repos/')),'')
+    if '/rules/branches/' in path:print('[]')
+    elif '/branches/' in path:print('{"name":"main","protected":false}')
+    elif '/check-runs' in path:print('[{"check_runs":[]}]')
+    elif any(x in path for x in ('/comments','/reviews','/statuses')):print('[[]]')
+    elif '/pulls/' in path:
+        n=path.split('/pulls/')[1].split('/')[0];r=d[n]
+        print(json.dumps(dict(state='open',user=dict(login='author'),head=dict(sha=r['head']),draft=False,mergeable=True,merged_at=None)))
+    elif re.fullmatch(r'repos/[^/]+/[^/]+',path):print('{"permissions":{"push":false}}')
+    else:raise SystemExit('unexpected api '+repr(a))
+    sys.exit(0)
+raise SystemExit('unexpected fake forge call '+repr(a))
+
+LAB INPUT queued/fakebin/gh-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT queued/fakebin/glab:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT queued/fakebin/gerrit-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-merge.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+verified: https://github.com/lab/disposable/pull/1 is queued (state=OPEN, merged=false, isInMergeQueue=true)
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+verified: https://github.com/lab/disposable/pull/1 is open and mergeable, with every unwaived required check reported and every unwaived check green at head 6ef97d0e4edf856c3e68fdeb49ab0c79290efd05
+[exit 0]
+LAB INPUT queued/state/z-stop.check.sh:
+#!/usr/bin/env bash
+printf "stop-cycle\n"
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-check-register.sh z-stop
+registered: state/z-stop.check.sh
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE queued-before-landing:
+{
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "task-a.pr-poll": "github\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\n",
+  "task-a.pr-poll-registration": "fm-pr-poll-registration-v2\ntask-a\ngithub\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\nb8c18c7a9fc691edc52fc49e4dc6949ac10cd8fb2a3c784f40787b4b0f17624d\n367c6095cd8b6483a8d718f1ccec6393c8f596e51ab1450c2bff6f469efb6125\n61:10611748298\n61:10611748299\n",
+  "task-a.check.sh": "#!/usr/bin/env bash\n# Static watcher program for a validated GitHub pull request.\n# Reads private poll identity data without executing it; confirms exact merged\n# state before emitting the durable wake and retiring the registration.\nset -u\nLC_ALL=C\nexport LC_ALL\n\nif [ \"$#\" -eq 6 ] && [ \"$1\" = --validated ]; then\n  provider=$2\n  url=$3\n  host=$4\n  path=$5\n  number=$6\nelif [ \"$#\" -eq 0 ]; then\n  case \"$0\" in\n    *.check.sh) data=${0%.check.sh}.pr-poll ;;\n    *) exit 0 ;;\n  esac\n\n  [ -f \"$data\" ] && [ ! -L \"$data\" ] || exit 0\n  { exec 3< \"$data\"; } 2>/dev/null || exit 0\n  IFS= read -r provider <&3 || exit 0\n  IFS= read -r url <&3 || exit 0\n  IFS= read -r host <&3 || exit 0\n  IFS= read -r path <&3 || exit 0\n  IFS= read -r number <&3 || exit 0\n  if IFS= read -r _extra <&3; then\n    exit 0\n  fi\n  exec 3<&-\nelse\n  exit 0\nfi\n\ncase \"$number\" in\n  [1-9]*) ;;\n  *) exit 0 ;;\nesac\ncase \"$number\" in\n  *[!0-9]*) exit 0 ;;\nesac\n\n# Every component is revalidated here rather than trusted from the sidecar, and\n# the stored URL must then be exactly reconstructible from those components, so\n# a doctored sidecar cannot redirect this poll at another host or project.\ncase \"$provider\" in\n  github)\n    [ \"$host\" = github.com ] || exit 0\n    owner=${path%%/*}\n    repo=${path#*/}\n    [ \"${#owner}\" -ge 1 ] && [ \"${#owner}\" -le 39 ] || exit 0\n    case \"$owner\" in\n      *[!A-Za-z0-9-]*|-*|*-|*--*) exit 0 ;;\n    esac\n    [ \"${#repo}\" -ge 1 ] && [ \"${#repo}\" -le 100 ] || exit 0\n    case \"$repo\" in\n      .|..|*[!A-Za-z0-9._-]*) exit 0 ;;\n    esac\n    [ \"$url\" = \"https://github.com/$owner/$repo/pull/$number\" ] || exit 0\n    state=$(gh pr view \"$url\" --json state -q .state 2>/dev/null) || exit 0\n    [ \"$state\" = MERGED ] && printf '%s\\n' merged\n    ;;\n  *) exit 0 ;;\nesac\nexit 0\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  "task-a.merge-authority": "fm-merge-authority-v1\ngithub\ngithub.com\nlab/disposable\n1\nattended\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "1\n",
+  ".wake-queue": "1795042312\t1\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  ".watcher-down": "pending:downtime:1881297.1795042312.0B7nro\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042312	1	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1881297.1795042312.0B7nro
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1881297.1795042312.0B7nro
+[exit 0]
+LAB INPUT queued/forge.json:
+{"1": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "MERGED", "queued": false, "request": "queue"}, "2": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "OPEN", "queued": false, "request": "queue"}}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged
+[exit 0]
+PERSISTED STATE queued-first-notice:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "2\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1882892\tlinux-starttime=39923241 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n",
+  ".wake-queue": "1795042312\t2\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/1\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/1\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".watcher-down": "pending:downtime:1882892.1795042312.WSjuN5\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042312	2	check	merged-task-a-https://github.com/lab/disposable/pull/1	check: merge landed: task-a https://github.com/lab/disposable/pull/1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1882892.1795042312.WSjuN5
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1882892.1795042312.WSjuN5
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE queued-repeat-quiet:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "3\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1882892\tlinux-starttime=39923241 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n1885346\tlinux-starttime=39923397 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".wake-queue": "1795042314\t3\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  ".watch-triage.log": "[2026-11-18T14:51:54-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:51:54-0800] absorbed duplicate merged PR poll result for task-a\n",
+  ".watcher-down": "pending:downtime:1885346.1795042314.1RYC16\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042314	3	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1885346.1795042314.1RYC16
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1885346.1795042314.1RYC16
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/2
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+[exit 0]
+LAB INPUT queued/forge.json:
+{"1": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "MERGED", "queued": false, "request": "queue"}, "2": {"head": "6ef97d0e4edf856c3e68fdeb49ab0c79290efd05", "state": "MERGED", "queued": false, "request": "queue"}}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged
+[exit 0]
+PERSISTED STATE queued-distinct-pr:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "4\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1882892\tlinux-starttime=39923241 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n1885346\tlinux-starttime=39923397 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1887877\tlinux-starttime=39923554 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n",
+  ".watch-triage.log": "[2026-11-18T14:51:54-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:51:54-0800] absorbed duplicate merged PR poll result for task-a\n[2026-11-18T14:51:56-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n",
+  ".wake-queue": "1795042316\t4\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/2\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/2 external\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/2\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n2\n",
+  ".watcher-down": "pending:downtime:1887877.1795042316.54QF2R\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042316	4	check	merged-task-a-https://github.com/lab/disposable/pull/2	check: merge landed: task-a https://github.com/lab/disposable/pull/2 external
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 1887877.1795042316.54QF2R
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 1887877.1795042316.54QF2R
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE queued-final:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042311\ncursor=\n",
+  ".wake-queue.seq": "5\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1881297\tlinux-starttime=39923153 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1882892\tlinux-starttime=39923241 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n1885346\tlinux-starttime=39923397 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n1887877\tlinux-starttime=39923554 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/task-a.check.sh: merged\n1889845\tlinux-starttime=39923679 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  ".watch-triage.log": "[2026-11-18T14:51:54-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:51:54-0800] absorbed duplicate merged PR poll result for task-a\n[2026-11-18T14:51:56-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/2\npr_head=6ef97d0e4edf856c3e68fdeb49ab0c79290efd05\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\na9b85c87529cee3926216759545dcf24050a2cfad2f23f982a8f7d4369a2db62\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n2\n",
+  ".wake-queue": "1795042317\t5\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle\n",
+  ".watcher-down": "pending:downtime:1889845.1795042317.2VXu8H\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042317	5	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/queued/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 5 --recovery-generation 1889845.1795042317.2VXu8H
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 5 --recovery-generation 1889845.1795042317.2VXu8H
+[exit 0]
+
+=== External merge notifies once and a distinct PR remains eligible ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external
+[exit 0]
+LAB INPUT external/config/supervision-host-off:
+
+LAB INPUT external/config/backlog-backend:
+manual
+
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo commit -q --allow-empty -m base
+[exit 0]
+LAB INPUT external/state/task-a.meta:
+window=fm-selected:fm-task-a
+endpoint_task_id=task-a
+backend=tmux
+harness=claude
+worktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo
+kind=ship
+mode=no-mistakes
+branch=fm/task-a
+spawn_gen=s1792922400.123.456
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo rev-parse HEAD
+ae4162cacba59cd18ba75c5db137afd2808e3bf7
+[exit 0]
+LAB INPUT external/forge.json:
+{"1": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "OPEN", "queued": false, "request": "queue"}, "2": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "OPEN", "queued": false, "request": "queue"}}
+LAB INPUT external/fakebin/gh:
+#!/usr/bin/env python3
+import sys, os, json, re
+from pathlib import Path
+a=sys.argv[1:]; store=Path(os.environ['LOCAL_FORGE'])
+with store.with_suffix('.log').open('a') as f:f.write(json.dumps(a)+'\n')
+d=json.loads(store.read_text())
+n=None
+for x in a:
+    m=re.search(r'/pull/(\d+)$',x)
+    if m:n=m[1]
+    if x.startswith('number='):n=x.split('=',1)[1]
+if a[:2]==['pr','merge']:n=a[2]
+r=d.get(n,{})
+if a[:2]==['pr','merge']:
+    assert a[a.index('--match-head-commit')+1]==r['head']
+    if r.get('request')=='queue':r.update(state='OPEN',queued=True)
+    else:r.update(state='MERGED',queued=False)
+    store.write_text(json.dumps(d));print('local forge accepted');sys.exit(0)
+if a[:2]==['api','graphql']:
+    print('state='+r['state']);print('merged='+str(r['state']=='MERGED').lower());print('queued='+str(r.get('queued',False)).lower());print('base=main');sys.exit(0)
+if a[:2]==['pr','view']:
+    fields=a[a.index('--json')+1]
+    if fields=='state':print(r['state'])
+    elif fields=='headRefOid':print(r['head'])
+    elif fields=='isDraft':print('{"isDraft":false}')
+    elif 'statusCheckRollup' in fields:
+        print(json.dumps(dict(state=r['state'],isDraft=False,mergeable='MERGEABLE',mergeStateStatus='CLEAN',headRefOid=r['head'],baseRefName='main',reviewDecision='APPROVED',statusCheckRollup=[dict(__typename='CheckRun',name='ci',status='COMPLETED',conclusion='SUCCESS')])) )
+    elif fields=='headRefOid,reviewDecision':print(json.dumps(dict(headRefOid=r['head'],reviewDecision='APPROVED')))
+    else:raise SystemExit('unexpected pr view '+repr(a))
+    sys.exit(0)
+if a and a[0]=='api':
+    path=next((x for x in a if x.startswith('repos/')),'')
+    if '/rules/branches/' in path:print('[]')
+    elif '/branches/' in path:print('{"name":"main","protected":false}')
+    elif '/check-runs' in path:print('[{"check_runs":[]}]')
+    elif any(x in path for x in ('/comments','/reviews','/statuses')):print('[[]]')
+    elif '/pulls/' in path:
+        n=path.split('/pulls/')[1].split('/')[0];r=d[n]
+        print(json.dumps(dict(state='open',user=dict(login='author'),head=dict(sha=r['head']),draft=False,mergeable=True,merged_at=None)))
+    elif re.fullmatch(r'repos/[^/]+/[^/]+',path):print('{"permissions":{"push":false}}')
+    else:raise SystemExit('unexpected api '+repr(a))
+    sys.exit(0)
+raise SystemExit('unexpected fake forge call '+repr(a))
+
+LAB INPUT external/fakebin/gh-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT external/fakebin/glab:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+LAB INPUT external/fakebin/gerrit-axi:
+#!/bin/sh
+echo "unexpected forge fallback" >&2
+exit 99
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 0]
+LAB INPUT external/state/z-stop.check.sh:
+#!/usr/bin/env bash
+printf "stop-cycle\n"
+
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-check-register.sh z-stop
+registered: state/z-stop.check.sh
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE external-before-landing:
+{
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=ae4162cacba59cd18ba75c5db137afd2808e3bf7\n",
+  "task-a.pr-poll": "github\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\n",
+  "task-a.pr-poll-registration": "fm-pr-poll-registration-v2\ntask-a\ngithub\nhttps://github.com/lab/disposable/pull/1\ngithub.com\nlab/disposable\n1\nb8c18c7a9fc691edc52fc49e4dc6949ac10cd8fb2a3c784f40787b4b0f17624d\n367c6095cd8b6483a8d718f1ccec6393c8f596e51ab1450c2bff6f469efb6125\n61:10611751765\n61:10611751766\n",
+  "task-a.check.sh": "#!/usr/bin/env bash\n# Static watcher program for a validated GitHub pull request.\n# Reads private poll identity data without executing it; confirms exact merged\n# state before emitting the durable wake and retiring the registration.\nset -u\nLC_ALL=C\nexport LC_ALL\n\nif [ \"$#\" -eq 6 ] && [ \"$1\" = --validated ]; then\n  provider=$2\n  url=$3\n  host=$4\n  path=$5\n  number=$6\nelif [ \"$#\" -eq 0 ]; then\n  case \"$0\" in\n    *.check.sh) data=${0%.check.sh}.pr-poll ;;\n    *) exit 0 ;;\n  esac\n\n  [ -f \"$data\" ] && [ ! -L \"$data\" ] || exit 0\n  { exec 3< \"$data\"; } 2>/dev/null || exit 0\n  IFS= read -r provider <&3 || exit 0\n  IFS= read -r url <&3 || exit 0\n  IFS= read -r host <&3 || exit 0\n  IFS= read -r path <&3 || exit 0\n  IFS= read -r number <&3 || exit 0\n  if IFS= read -r _extra <&3; then\n    exit 0\n  fi\n  exec 3<&-\nelse\n  exit 0\nfi\n\ncase \"$number\" in\n  [1-9]*) ;;\n  *) exit 0 ;;\nesac\ncase \"$number\" in\n  *[!0-9]*) exit 0 ;;\nesac\n\n# Every component is revalidated here rather than trusted from the sidecar, and\n# the stored URL must then be exactly reconstructible from those components, so\n# a doctored sidecar cannot redirect this poll at another host or project.\ncase \"$provider\" in\n  github)\n    [ \"$host\" = github.com ] || exit 0\n    owner=${path%%/*}\n    repo=${path#*/}\n    [ \"${#owner}\" -ge 1 ] && [ \"${#owner}\" -le 39 ] || exit 0\n    case \"$owner\" in\n      *[!A-Za-z0-9-]*|-*|*-|*--*) exit 0 ;;\n    esac\n    [ \"${#repo}\" -ge 1 ] && [ \"${#repo}\" -le 100 ] || exit 0\n    case \"$repo\" in\n      .|..|*[!A-Za-z0-9._-]*) exit 0 ;;\n    esac\n    [ \"$url\" = \"https://github.com/$owner/$repo/pull/$number\" ] || exit 0\n    state=$(gh pr view \"$url\" --json state -q .state 2>/dev/null) || exit 0\n    [ \"$state\" = MERGED ] && printf '%s\\n' merged\n    ;;\n  *) exit 0 ;;\nesac\nexit 0\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\n5b6598452928502752a28ee6e0daf04d23198457fe356983e8a4db4b68bf1e7b\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042318\ncursor=\n",
+  ".wake-queue.seq": "1\n",
+  ".wake-queue": "1795042318\t1\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1892091\tlinux-starttime=39923801 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  ".watcher-down": "pending:downtime:1892091.1795042318.OFnNWC\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042318	1	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1892091.1795042318.OFnNWC
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1892091.1795042318.OFnNWC
+[exit 0]
+LAB INPUT external/forge.json:
+{"1": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "MERGED", "queued": false, "request": "queue"}, "2": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "OPEN", "queued": false, "request": "queue"}}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged
+[exit 0]
+PERSISTED STATE external-first-notice:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=ae4162cacba59cd18ba75c5db137afd2808e3bf7\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\n5b6598452928502752a28ee6e0daf04d23198457fe356983e8a4db4b68bf1e7b\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042318\ncursor=\n",
+  ".wake-queue.seq": "2\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1892091\tlinux-starttime=39923801 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1893821\tlinux-starttime=39923891 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n",
+  ".wake-queue": "1795042319\t2\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/1\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/1 external\n",
+  ".watch-triage.log": "[2026-11-18T14:51:59-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".watcher-down": "pending:downtime:1893821.1795042319.Pb8tX5\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042319	2	check	merged-task-a-https://github.com/lab/disposable/pull/1	check: merge landed: task-a https://github.com/lab/disposable/pull/1 external
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1893821.1795042319.Pb8tX5
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 1893821.1795042319.Pb8tX5
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/1
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: 2s ago, grace 300s) - full banner already printed this episode.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE external-repeat-quiet:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042318\ncursor=\n",
+  ".wake-queue.seq": "3\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1892091\tlinux-starttime=39923801 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1893821\tlinux-starttime=39923891 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n1896796\tlinux-starttime=39924047 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  ".watch-triage.log": "[2026-11-18T14:51:59-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:00-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:01-0800] absorbed duplicate merged PR poll result for task-a\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n1\n",
+  ".wake-queue": "1795042321\t3\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/1\npr_head=ae4162cacba59cd18ba75c5db137afd2808e3bf7\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\n5b6598452928502752a28ee6e0daf04d23198457fe356983e8a4db4b68bf1e7b\n",
+  ".watcher-down": "pending:downtime:1896796.1795042321.qGDsdG\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042321	3	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1896796.1795042321.qGDsdG
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 1896796.1795042321.qGDsdG
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-pr-check.sh task-a https://github.com/lab/disposable/pull/2
+armed: state/task-a.check.sh
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+[exit 0]
+LAB INPUT external/forge.json:
+{"1": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "MERGED", "queued": false, "request": "queue"}, "2": {"head": "ae4162cacba59cd18ba75c5db137afd2808e3bf7", "state": "MERGED", "queued": false, "request": "queue"}}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged
+[exit 0]
+PERSISTED STATE external-distinct-pr:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042318\ncursor=\n",
+  ".wake-queue.seq": "4\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1892091\tlinux-starttime=39923801 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1893821\tlinux-starttime=39923891 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n1896796\tlinux-starttime=39924047 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1900252\tlinux-starttime=39924203 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n",
+  ".watch-triage.log": "[2026-11-18T14:51:59-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:00-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:01-0800] absorbed duplicate merged PR poll result for task-a\n[2026-11-18T14:52:02-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n",
+  ".wake-queue": "1795042322\t4\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/2\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/2 external\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/2\npr_head=ae4162cacba59cd18ba75c5db137afd2808e3bf7\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\n5b6598452928502752a28ee6e0daf04d23198457fe356983e8a4db4b68bf1e7b\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n2\n",
+  ".watcher-down": "pending:downtime:1900252.1795042322.hQxq2w\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042322	4	check	merged-task-a-https://github.com/lab/disposable/pull/2	check: merge landed: task-a https://github.com/lab/disposable/pull/2 external
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 1900252.1795042322.hQxq2w
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 1900252.1795042322.hQxq2w
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-watch.sh
+check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+[exit 0]
+PERSISTED STATE external-final:
+{
+  ".guard-watcher-stale-banner": "no-watcher\n",
+  "z-stop.check.sh": "#!/usr/bin/env bash\nprintf \"stop-cycle\\n\"\n",
+  "z-stop.check-trust": "fm-custom-check-v1\ne244aa25352911595df3db26468ddb043622f7c295a95883d84537f55be29f11\n",
+  ".last-heartbeat": "",
+  ".last-watcher-beat": "",
+  ".inactive-outcome-reconcile": "epoch=1795042318\ncursor=\n",
+  ".wake-queue.seq": "5\n",
+  ".last-check": "",
+  ".heartbeat-streak": "0\n",
+  ".watch-deliveries.log": "1892091\tlinux-starttime=39923801 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1893821\tlinux-starttime=39923891 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n1896796\tlinux-starttime=39924047 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n1900252\tlinux-starttime=39924203 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/task-a.check.sh: merged\n1903006\tlinux-starttime=39924332 cmdline-hex=62617368002f686f6d652f72756e6b61692f2e6e6f2d6d697374616b65732f776f726b74726565732f3662303530373162393563382f30314d3752435731444756514546563458504d48514e545633342f62696e2f666d2d77617463682e736800\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  ".watch-triage.log": "[2026-11-18T14:51:59-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:00-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n[2026-11-18T14:52:01-0800] absorbed duplicate merged PR poll result for task-a\n[2026-11-18T14:52:02-0800] no matching persisted merge authority for task-a; recording an external merge outcome\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/projects/repo\nkind=ship\nmode=no-mistakes\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\npr=https://github.com/lab/disposable/pull/2\npr_head=ae4162cacba59cd18ba75c5db137afd2808e3bf7\n",
+  "contributions.check.sh": "#!/usr/bin/env bash\nexport FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external\nexport FM_STATE_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state\nexport FM_DATA_OVERRIDE=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/data\nexec /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-contributions.sh poll\n",
+  "contributions.check-trust": "fm-custom-check-v1\n5b6598452928502752a28ee6e0daf04d23198457fe356983e8a4db4b68bf1e7b\n",
+  "task-a.pr-poll-merge-notified": "fm-pr-poll-merge-notified-v1\ngithub\ngithub.com\nlab/disposable\n2\n",
+  ".wake-queue": "1795042323\t5\tcheck\t/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh\tcheck: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle\n",
+  ".watcher-down": "pending:downtime:1903006.1795042323.Le9UVM\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh
+1795042323	5	check	/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh	check: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/external/state/z-stop.check.sh: stop-cycle
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 5 --recovery-generation 1903006.1795042323.Le9UVM
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-wake-drain.sh --ack-through 5 --recovery-generation 1903006.1795042323.Le9UVM
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v kill-server
+[exit 0]
+Disposable lab homes, repositories, and private tmux server removed.
+$ tmux -f /dev/null -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v new-session -d -s fm-selected -x 120 -y 35 -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 'bash --noprofile --norc'
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v display-message -p -t fm-selected '#{socket_path},#{pid},0'
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v,1911004,0
+[exit 0]
+
+=== Actual native task teardown retires exact notifications and preserves sibling/new evidence ===
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement
+[exit 0]
+LAB INPUT retirement/config/supervision-host-off:
+
+LAB INPUT retirement/config/backlog-backend:
+manual
+
+$ git init -q -b main /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo commit -q --allow-empty -m base
+[exit 0]
+LAB INPUT retirement/config/worktree-allocator:
+git
+
+LAB INPUT retirement/config/git-worktree-root:
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies
+
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo rev-parse HEAD
+32b1ed5dd49c8ace5a3a99a0b6220e813d605386
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$5" "$4" refs/heads/main || exit; printf "%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 task-a /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo 32b1ed5dd49c8ace5a3a99a0b6220e813d605386 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies
+HEAD is now at 32b1ed5 base
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree
+Preparing worktree (detached HEAD 32b1ed5)
+[exit 0]
+LAB INPUT retirement/state/task-a.meta:
+window=fm-selected:fm-task-a
+endpoint_task_id=task-a
+backend=tmux
+harness=claude
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo
+kind=ship
+mode=local-only
+branch=fm/task-a
+spawn_gen=s1792922400.123.456
+allocator=git
+
+LAB INPUT retirement/state/task-a.status:
+done: task landed on local main
+
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$5" "$4" refs/heads/main || exit; printf "%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 task-a-extra /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo 32b1ed5dd49c8ace5a3a99a0b6220e813d605386 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies
+HEAD is now at 32b1ed5 base
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree
+Preparing worktree (detached HEAD 32b1ed5)
+[exit 0]
+LAB INPUT retirement/state/task-a-extra.meta:
+window=fm-selected:fm-task-a-extra
+endpoint_task_id=task-a-extra
+backend=tmux
+harness=claude
+worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree
+project=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo
+kind=ship
+mode=local-only
+branch=fm/task-a-extra
+spawn_gen=s1792922400.123.456
+allocator=git
+
+LAB INPUT retirement/state/task-a-extra.status:
+done: task landed on local main
+
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal task-a.status 'signal: task-a.status'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal task-a.turn-ended 'signal: task-a.turn-ended'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 check merged-task-a-https://github.com/lab/disposable/pull/1 'check: merge landed: task-a https://github.com/lab/disposable/pull/1'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 check inactive-outcome:aaaa 'inactive terminal outcome awaiting captain presentation: child=task-a state=done'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 check merged-task-a-extra-https://github.com/lab/disposable/pull/2 'check: merge landed: task-a-extra https://github.com/lab/disposable/pull/2'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 check inactive-outcome:bbbb 'inactive terminal outcome awaiting captain presentation: child=task-a-extra state=done'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 signal task-a-extra.status 'signal: task-a-extra.status'
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append "$2" "$3" "$4"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34 check new-event 'new evidence for task-a'
+[exit 0]
+PERSISTED STATE retirement-before:
+{
+  "task-a.git-worktree": "schema=fm-git-worktree.v1\ntask=task-a\nhome=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement\nproject=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\ncommon=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo/.git\nroot=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies\npath=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree\nbase=32b1ed5dd49c8ace5a3a99a0b6220e813d605386\nsource_ref=refs/heads/main\n",
+  "task-a.meta": "window=fm-selected:fm-task-a\nendpoint_task_id=task-a\nbackend=tmux\nharness=claude\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\nkind=ship\nmode=local-only\nbranch=fm/task-a\nspawn_gen=s1792922400.123.456\nallocator=git\n",
+  "task-a.status": "done: task landed on local main\n",
+  "task-a-extra.git-worktree": "schema=fm-git-worktree.v1\ntask=task-a-extra\nhome=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement\nproject=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\ncommon=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo/.git\nroot=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies\npath=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nbase=32b1ed5dd49c8ace5a3a99a0b6220e813d605386\nsource_ref=refs/heads/main\n",
+  "task-a-extra.meta": "window=fm-selected:fm-task-a-extra\nendpoint_task_id=task-a-extra\nbackend=tmux\nharness=claude\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\nkind=ship\nmode=local-only\nbranch=fm/task-a-extra\nspawn_gen=s1792922400.123.456\nallocator=git\n",
+  "task-a-extra.status": "done: task landed on local main\n",
+  ".wake-queue.seq": "8\n",
+  ".wake-queue": "1795042340\t1\tsignal\ttask-a.status\tsignal: task-a.status\n1795042341\t2\tsignal\ttask-a.turn-ended\tsignal: task-a.turn-ended\n1795042341\t3\tcheck\tmerged-task-a-https://github.com/lab/disposable/pull/1\tcheck: merge landed: task-a https://github.com/lab/disposable/pull/1\n1795042341\t4\tcheck\tinactive-outcome:aaaa\tinactive terminal outcome awaiting captain presentation: child=task-a state=done\n1795042341\t5\tcheck\tmerged-task-a-extra-https://github.com/lab/disposable/pull/2\tcheck: merge landed: task-a-extra https://github.com/lab/disposable/pull/2\n1795042341\t6\tcheck\tinactive-outcome:bbbb\tinactive terminal outcome awaiting captain presentation: child=task-a-extra state=done\n1795042341\t7\tsignal\ttask-a-extra.status\tsignal: task-a-extra.status\n1795042341\t8\tcheck\tnew-event\tnew evidence for task-a\n",
+  ".watcher-down": "pending:downtime:1911575.1795042341.AWTIy6\n"
+}
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/bin/fm-teardown.sh task-a
+teardown task-a complete (window fm-selected:fm-task-a, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a/worktree)
+Backlog: task-a just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/data/backlog.md - move task-a to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+[exit 0]
+PERSISTED STATE retirement-after:
+{
+  "task-a-extra.git-worktree": "schema=fm-git-worktree.v1\ntask=task-a-extra\nhome=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement\nproject=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\ncommon=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo/.git\nroot=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies\npath=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nbase=32b1ed5dd49c8ace5a3a99a0b6220e813d605386\nsource_ref=refs/heads/main\n",
+  "task-a-extra.meta": "window=fm-selected:fm-task-a-extra\nendpoint_task_id=task-a-extra\nbackend=tmux\nharness=claude\nworktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree\nproject=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo\nkind=ship\nmode=local-only\nbranch=fm/task-a-extra\nspawn_gen=s1792922400.123.456\nallocator=git\n",
+  "task-a-extra.status": "done: task landed on local main\n",
+  ".wake-queue.seq": "8\n",
+  ".watcher-down": "pending:downtime:1911575.1795042341.AWTIy6\n",
+  ".guard-watcher-stale-banner": "stale-beacon\n",
+  ".wake-queue": "1795042341\t5\tcheck\tmerged-task-a-extra-https://github.com/lab/disposable/pull/2\tcheck: merge landed: task-a-extra https://github.com/lab/disposable/pull/2\n1795042341\t6\tcheck\tinactive-outcome:bbbb\tinactive terminal outcome awaiting captain presentation: child=task-a-extra state=done\n1795042341\t7\tsignal\ttask-a-extra.status\tsignal: task-a-extra.status\n1795042341\t8\tcheck\tnew-event\tnew evidence for task-a\n"
+}
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo worktree list --porcelain
+worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/retirement/projects/repo
+HEAD 32b1ed5dd49c8ace5a3a99a0b6220e813d605386
+branch refs/heads/main
+
+worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.test-selected-live/native-copies/task-a-extra/worktree
+HEAD 32b1ed5dd49c8ace5a3a99a0b6220e813d605386
+detached
+
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RCW1DGVQEFV4XPMHQNTV34/.v kill-server
+[exit 0]
+Disposable lab homes, repositories, and private tmux server removed.
