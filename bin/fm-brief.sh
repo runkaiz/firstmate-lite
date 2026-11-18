@@ -28,8 +28,7 @@
 # Include the original heading through the next unfenced heading of the same
 # or higher level (exclusive), or EOF, preserving UTF-8 bytes and line endings.
 # Sources must be readable regular UTF-8 files without NUL bytes.
-# Missing or ambiguous headings and selections over 65,536 bytes in aggregate
-# refuse before writing; content is never truncated.
+# Missing or ambiguous headings refuse before writing; content is never truncated.
 # Quotes use Markdown fences longer than any backtick run in their content.
 # An EOF without a newline gets a separating newline before the closing fence.
 # bin/fm-brief-quote.py implements this source-quote contract.

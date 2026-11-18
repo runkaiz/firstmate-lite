@@ -1398,22 +1398,7 @@ regular file|$home#Report
 missing|$source#Absent
 ambiguous|$source#Duplicate
 EOF
-  # The aggregate ceiling counts UTF-8 bytes, including the selected heading;
-  # two individually valid selections can exceed it together.
-  python3 - "$source" <<'PY'
-from pathlib import Path
-import sys
-Path(sys.argv[1]).write_bytes(b'# Exact\n' + b'x' * (65536 - len(b'# Exact\n')))
-PY
-  FM_HOME="$home" bash "$ROOT/bin/fm-brief.sh" quote-boundary example --mode local-only \
-    --quote "$source#Exact" >/dev/null || fail 'exact 65536-byte section was refused'
-  out=$(FM_HOME="$home" bash "$ROOT/bin/fm-brief.sh" quote-overflow example --mode local-only \
-    --quote "$source#Exact" --quote "$source#Exact" 2>&1)
-  status=$?
-  [ "$status" -ne 0 ] || fail 'aggregate quote overflow succeeded'
-  assert_contains "$out" 'limit is 65536 bytes' 'aggregate limit refusal lost its bound'
-  assert_absent "$home/data/quote-overflow" 'overflow left a partial task directory'
-  pass 'fm-brief.sh: invalid and oversized quotes refuse before writing; exact size limit is accepted'
+  pass 'fm-brief.sh: invalid quotes refuse before writing'
 }
 
 test_source_quotes_are_verbatim_and_separate_from_intent

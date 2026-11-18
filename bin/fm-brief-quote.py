@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 
 
-MAX_QUOTE_BYTES = 65_536
 ATX = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*?)|[ \t]*)$")
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 
@@ -57,9 +56,6 @@ def section(spec):
 
 def render(specs):
     quotes = [section(spec) for spec in specs]
-    size = sum(len(content) for _, _, content in quotes)
-    if size > MAX_QUOTE_BYTES:
-        raise ValueError(f"--quote selections total {size} bytes; limit is {MAX_QUOTE_BYTES} bytes")
     output = bytearray(b"# Source quotes\n")
     for index, (path, title, content) in enumerate(quotes, 1):
         longest = max((len(run) for run in re.findall(rb"`+", content)), default=0)

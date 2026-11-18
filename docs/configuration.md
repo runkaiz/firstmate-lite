@@ -977,7 +977,7 @@ Use `bin/fm-brief.sh --quote` to carry an exact section from a source report int
 For example, `bin/fm-brief.sh example-task example-repo --mode local-only --quote '/path/to/report.md#Smallest first slice'` embeds that section under `# Source quotes`, outside the captain intent and implementation specification.
 This embeds source material without making it captain-authored intent.
 The generated worker contract in `bin/fm-dod-lib.sh` owns source-reading and conflict handling.
-The scaffold's `--help` owns invocation, supported heading syntax, verbatim extraction, and the aggregate size limit.
+The scaffold's `--help` owns invocation, supported heading syntax, and verbatim extraction.
 
 ## Home brief include (config/brief-include.md)
 
