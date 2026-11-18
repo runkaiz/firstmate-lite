@@ -1,26 +1,14 @@
 #!/usr/bin/env bash
 # Shared durable, supervisor-facing outcome publication for a confirmed merge.
 #
-# Both a merge performed by this home and a merge detected by its existing poll
-# use this operation, so neither outcome depends on an agent remembering it.
-# This operation publishes the poll's local actionable row; the watcher
-# immediately delivers that row as observation handling, not a second outcome
-# path.
-#
-# The destination is the home's role, never the caller's choice:
-#   - a secondmate home reports upward on its parent channel, resolved and
-#     appended through bin/fm-parent-channel-lib.sh under its channel contract;
-#   - a main home reports to the captain through the durable wake queue.
-# A poll observed in a secondmate home also receives a local durable wake after
-# the upward write, so the mate can handle its own poll observation.
-# No new state file and no new transport are involved.
-#
-# Normal operation deduplicates the task's latest canonical PR identity through
-# the merge-notification marker owned by bin/fm-pr-lib.sh. Main-home wake keys
-# also include that PR identity so distinct PRs for a reused task remain
-# distinct in queue presentation. The outcome is published before the marker
-# is committed, so a failed commit stays eligible for at-least-once retry and
-# may rarely duplicate rather than leave a merge silent.
+# A synchronous self merge is already observed by its caller: commit the
+# canonical notification marker without queueing another supervision turn.
+# A poll observation publishes a durable local wake before committing that
+# marker, so external merges and queued merges still wake exactly once in
+# normal operation. A failed marker commit remains eligible for at-least-once
+# retry, preferring a rare duplicate over a lost merge.
+# Callers serialize their observation and marker commit with the task control
+# lock; the marker lock also protects repeated publication of the same PR.
 #
 # Sourced by bin/fm-pr-merge.sh, bin/fm-watch.sh, and tests. No side effects on
 # source beyond its sourced libraries.
@@ -34,23 +22,14 @@ FM_MERGE_OUTCOME_ALREADY_RECORDED=false
 
 # fm_merge_outcome_report <home> <state> <task-id> <pr-url> <origin> [authority]
 #
-# <origin> says who observed the merge, because that decides whether the
-# existing poll path also needs a local wake:
-#   self - this home performed the merge.
-#   poll - this home's merge poll detected the merge, so the canonical outcome
-#          also wakes this home after any upward hop needed by a secondmate.
-# Optional <authority> is away, attended, or external (the retired yolo and
-# away-grant values are still accepted for a persisted authority written before
-# the words model landed). Away, external, and the retired tags are appended to
-# the ledger line; attended remains untagged. The merge entrypoint supplies its
-# authority after forge acceptance, while the poll supplies the persisted
-# identity-bound value or external when no matching record proves that this
-# home authorized the merge.
+# <origin> is self for a synchronous merge observed by its caller, or poll
+# for an asynchronous observation requiring a durable wake.
+# Optional <authority> supplies the persisted merge authority for poll rows.
+# Attended rows remain untagged; away, external, and legacy tags are appended.
 #
-# Returns 0 when the outcome is recorded (or already was), 2 on an invalid
-# request, 3 when this home's own role or parent binding cannot be read well
-# enough to say where the outcome belongs, and 1 on any other failure to
-# record. A caller that has already merged must report a non-zero return rather
+# Returns 0 when the outcome is acknowledged or published (or already was),
+# 2 on an invalid request, and 1 on failure to record.
+# A caller that has already merged must report a non-zero return rather
 # than treat it as success: the merge landed and the record did not.
 fm_merge_outcome_report() {  # <home> <state> <task-id> <pr-url> <origin> [authority]
   local home=$1 state=$2 id=$3 url=$4 origin=$5
@@ -87,7 +66,7 @@ fm_merge_outcome_report() {  # <home> <state> <task-id> <pr-url> <origin> [autho
     return 0
   fi
 
-  if [ "$status" -eq 0 ]; then
+  if [ "$origin" = poll ]; then
     fm_wake_append check "merged-$id-$FM_PR_URL" \
       "check: merge landed: $id $FM_PR_URL$suffix" || status=1
   fi

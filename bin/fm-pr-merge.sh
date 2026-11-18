@@ -66,7 +66,8 @@
 # script's verdict, including the refusal for an outcome that cannot be read;
 # a merge command that failed keeps its original error surfaced raw and first.
 # Before the merge, the task's existing per-task control lock
-# serializes the captain-hold check through the forge command. A still-held or
+# serializes the captain-hold check through the forge command and confirmed
+# outcome acknowledgement. A still-held or
 # unreadable row refuses before that command, so a captain approval must be
 # recorded as an `answer --release` before this entrypoint is invoked. While
 # an away record exists (a quiet-mode record is a present captain, so its
@@ -1194,8 +1195,8 @@ case "$PROVIDER" in
       FM_PR_GITHUB_MERGE_ACCEPTED=true
       persist_accepted_merge_authority || exit 1
       fm_afk_contract_lock_release || true
-      fm_lock_release "$MERGE_CONTROL_LOCK" || true
-      MERGE_CONTROL_LOCK=
+      # Keep the task lock through outcome verification and marker commit,
+      # so the poll cannot publish the same merge before it is acknowledged.
     else
       fm_afk_contract_lock_release || true
       fm_lock_release "$MERGE_CONTROL_LOCK" || true
@@ -1241,7 +1242,10 @@ outcome_rc=0
 fm_merge_outcome_report "$FM_HOME" "$STATE" "$ID" "$URL" self \
   "${FM_PR_MERGE_AUTHORITY:-}" || outcome_rc=$?
 case "$outcome_rc" in
-  0) ;;
+  0)
+    FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-inactive-reconcile.sh" \
+      presented-current "$ID" || printf 'actionable: merged %s but its terminal presentation receipt could not be recorded\n' "$URL" >&2
+    ;;
   3)
     printf 'actionable: merged %s but could not report it upward: this home has no readable secondmate identity or parent binding (.fm-secondmate-home, .fm-secondmate-parent)\n' \
       "$URL" >&2

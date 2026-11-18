@@ -742,14 +742,10 @@ test_valid_recording_and_merge_derivation() {
     >/dev/null 2>/dev/null || fail "valid merge wrapper failed"
   grep -qxF "pr merge 37 --repo my-org/repo_name.with-dots --match-head-commit $expected --merge" "$dir/gh.log" \
     || fail "merge wrapper did not preserve repository derivation, live head, and method"
-  # A merge this home performed leaves its own durable outcome, so the poll's
-  # confirmation is no longer the first the captain hears of it. Acknowledge that
-  # record before the watcher cycle below, which is what still retires the poll.
-  assert_grep 'https://github.com/my-org/repo_name.with-dots/pull/37' "$dir/home/state/.wake-queue" \
-    "a merge this home performed left no durable outcome"
-  ack_watcher_cycle "$dir/home/state" || fail "merge outcome acknowledgement failed"
-  # With the merge already reported, the poll's own detection is a duplicate the
-  # watcher absorbs, so this cycle needs its own reason to end.
+  # The synchronous caller already observed the confirmed merge. No queue
+  # acknowledgement should be needed before the next watcher is armed.
+  assert_no_grep 'merged-task-a' "$dir/home/state/.wake-queue" \
+    "a synchronous self merge queued a redundant notification"
   add_stop_custom_check "$dir"
   set +e
   FM_TEST_GH_STATE=MERGED run_watcher_bounded "$dir/home" "$dir/fakebin" > "$dir/merged-watch.out" 2> "$dir/merged-watch.err"
@@ -1726,9 +1722,14 @@ test_self_merge_and_poll_publish_one_outcome() {
   write_task_meta "$dir" task-a
   run_check_entry "$dir" task-a "$url" >/dev/null 2>"$dir/seed.err" \
     || fail "merge-outcome-committed: could not arm merge poll"
+  printf 'done: PR %s checks green\n' "$url" > "$state/task-a.status"
   run_merge_entry "$dir" task-a "$url" >"$dir/merge.out" 2>"$dir/merge.err" \
     || fail "merge-outcome-committed: merge entrypoint failed: $(cat "$dir/merge.err")"
-  ack_watcher_cycle "$state" || fail "could not acknowledge the self-merge outcome"
+  assert_no_grep "$url" "$replies" "self merge queued a redundant outcome"
+  [ "$(find "$state/terminal-outcomes" -name '*.presented' | wc -l | tr -d ' ')" = 1 ] \
+    || fail "self merge did not acknowledge its ready outcome"
+  # Re-registering the already-handled merge must also stay quiet.
+  run_check_entry "$dir" task-a "$url" >/dev/null 2>"$dir/rearm.err" || fail "rearm failed"
   add_stop_custom_check "$dir"
   set +e
   FM_TEST_GH_STATE=MERGED run_watcher_bounded "$dir/home" "$dir/fakebin" \
@@ -1743,9 +1744,8 @@ test_self_merge_and_poll_publish_one_outcome() {
     "merge-outcome-committed: absorbed poll published a second outcome"
   assert_poll_absent "$state" task-a
 
-  # Interleaving two: self publication lands but its marker commit fails. After
-  # that outcome is drained, the still-armed poll must publish it again rather
-  # than treating the interrupted attempt as complete and going silent.
+  # Interleaving two: the synchronous acknowledgement fails. The caller sees
+  # that error and the still-armed poll must publish the merge on its next read.
   dir=$(make_case merge-outcome-uncommitted)
   state="$dir/home/state"
   write_task_meta "$dir" task-a
@@ -1766,14 +1766,10 @@ SH
   set -e
   [ "$rc" -eq 0 ] \
     || fail "merge-outcome-uncommitted: landed merge was reported as failed"
-  assert_grep "$url" "$state/.wake-queue" \
-    "merge-outcome-uncommitted: interrupted publication emitted no outcome"
+  assert_grep 'could not record the outcome' "$dir/merge.err" \
+    "merge-outcome-uncommitted: failed acknowledgement was not reported"
   [ ! -e "$state/task-a.pr-poll-merge-notified" ] \
     || fail "merge-outcome-uncommitted: failed marker commit was treated as complete"
-  ack_watcher_cycle "$state" \
-    || fail "merge-outcome-uncommitted: could not drain the first outcome"
-  assert_no_grep "$url" "$state/.wake-queue" \
-    "merge-outcome-uncommitted: first outcome remained queued after its drain"
   rm -f "$dir/fakebin/mv" "$state/.last-check"
 
   set +e

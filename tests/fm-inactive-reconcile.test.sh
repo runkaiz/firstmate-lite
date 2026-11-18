@@ -123,6 +123,7 @@ run_report() { # <home> <child>
 }
 
 wake_count() { # <home> <key prefix>
+  [ -f "$1/state/.wake-queue" ] || { printf '0\n'; return; }
   grep -c "$2" "$1/state/.wake-queue" 2>/dev/null || true
 }
 
@@ -593,6 +594,74 @@ SH
   pass "reconciliation state reads set no-forge mode"
 }
 
+test_processed_branch_outcome_is_not_presented_again() {
+  local seq
+  make_world processed-before-inactive
+  write_child "$MAIN" child 'done: PR https://example.test/owner/repo/pull/1 checks green'
+  seq=$(FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" \
+    append --task child --verdict captain --summary 'Ready for review') || fail "append failed"
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-read --through "$seq" || fail "mark-read failed"
+  # Reading alone must preserve the safety net until main acknowledges it.
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "read-only outcome lost its safety net"
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-processed --through "$seq" || fail "mark-processed failed"
+  age "$MAIN/state/child.meta" "$MAIN/state/child.status"
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "processed branch outcome queued another presentation"
+  [ "$(outcome_count "$MAIN" presented)" = 1 ] || fail "processed outcome lacks receipt"
+  printf 'failed: a new validation failure\n' >> "$MAIN/state/child.status"
+  age "$MAIN/state/child.status"
+  FM_FAKE_CREW_STATE=failed run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "new failure was hidden by old presentation"
+  pass "processed branch outcomes stay quiet while new terminal states still wake"
+}
+
+test_old_branch_snapshot_does_not_hide_new_terminal_outcome() {
+  local seq mutation
+  for mutation in append replace; do
+    make_world "old-snapshot-$mutation"
+    write_child "$MAIN" child 'done: ready'
+    seq=$(FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" \
+      append --task child --verdict captain --summary 'Old ready outcome') || fail "append failed"
+    FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-read --through "$seq" || fail "mark-read failed"
+    if [ "$mutation" = replace ]; then
+      mv "$MAIN/state/child.status" "$WORLD/old.status"
+      printf 'done: ready\n' > "$MAIN/state/child.status"
+    else
+      printf 'failed: new outcome\n' >> "$MAIN/state/child.status"
+    fi
+    FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-processed --through "$seq" || fail "mark-processed failed"
+    age "$MAIN/state/child.status"
+    FM_FAKE_CREW_STATE=failed run_reconcile "$MAIN" --startup
+    [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "$mutation: stale acknowledgement hid a new outcome"
+  done
+  pass "old branch snapshots cannot acknowledge appended or replaced status logs"
+}
+
+test_processed_before_first_scan_and_new_pr() {
+  local seq
+  make_world processed-first
+  write_child "$MAIN" child 'done: ready'
+  seq=$(FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" \
+    append --task child --verdict captain --summary 'Ready outcome') || fail "append failed"
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-read --through "$seq" || fail "mark-read failed"
+  FM_HOME="$MAIN" FM_STATE_OVERRIDE="$MAIN/state" "$ROOT/bin/fm-branch-outcome.sh" mark-processed --through "$seq" || fail "mark-processed failed"
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "first scan repeated a processed outcome"
+  printf 'working: later bookkeeping\n' >> "$MAIN/state/child.status"
+  age "$MAIN/state/child.status"
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 0 ] || fail "later prose repeated a presented outcome"
+  printf 'pr=https://example.test/owner/repo/pull/2\n' >> "$MAIN/state/child.meta"
+  age "$MAIN/state/child.meta"
+  FM_FAKE_CREW_STATE='done' run_reconcile "$MAIN" --startup
+  [ "$(wake_count "$MAIN" inactive-outcome:)" = 1 ] || fail "new PR was hidden by old receipt"
+  pass "presentation before the first scan suppresses repetition but preserves a different PR"
+}
+
+test_processed_before_first_scan_and_new_pr
+test_old_branch_snapshot_does_not_hide_new_terminal_outcome
+test_processed_branch_outcome_is_not_presented_again
 test_main_direct_terminal_presentation_receipt
 test_branch_ack_retires_inactive_outcome_receipt
 test_inactive_receipt_ignores_later_status_prose

@@ -90,7 +90,8 @@
 #     Exit 0 with no output when none.
 #   fm-branch-outcome.sh mark-processed --through <seq>
 #     Advance the processed marker after main acknowledged the captain rows
-#     through <seq>; the target itself must be a currently unprocessed captain
+#     through <seq>, recording matching terminal presentation receipts through
+#     bin/fm-inactive-reconcile.sh; the target must be an unprocessed captain
 #     row at or below the read cursor.
 #   fm-branch-outcome.sh present
 #     A supervision-host drain's presentation off Pi (bin/fm-wake-drain.sh
@@ -672,6 +673,20 @@ case "$CMD" in
       echo "error: refusing processed advancement because seq $THROUGH is not an unprocessed captain outcome" >&2
       exit 1
     fi
+    # Bind presentation receipts to the status snapshots in the acknowledged
+    # rows, before committing the processed cursor so interruption is retryable.
+    PRESENTED_ROWS=$(jq -r --argjson previous "$PROCESSED_SEQ" --argjson through "$THROUGH" '
+      select(.seq > $previous and .seq <= $through and .verdict == "captain")
+      | select(.statusEndpoint != null and .statusIdent != null)
+      | [.task, (.statusEndpoint | tostring), .statusIdent] | @tsv' "$STORE") || { fm_lock_release "$LOCK"; exit 1; }
+    while IFS=$'\t' read -r PRESENTED_TASK PRESENTED_ENDPOINT PRESENTED_IDENT; do
+      [ -n "$PRESENTED_TASK" ] || continue
+      FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-inactive-reconcile.sh" \
+        presented-status "$PRESENTED_TASK" "$PRESENTED_ENDPOINT" "$PRESENTED_IDENT" || {
+          fm_lock_release "$LOCK"
+          exit 1
+        }
+    done <<< "$PRESENTED_ROWS"
     write_processed "$THROUGH"
     fm_lock_release "$LOCK"
     ;;
