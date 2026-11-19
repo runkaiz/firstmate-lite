@@ -16,8 +16,14 @@
 # --delivery-surface <internal-only|product-facing|mixed|unknown> records the
 # per-task semantic intake result (default unknown); never infer it from paths.
 # bin/fm-delivery-record.py owns the conditional PR record and trust limits.
-# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--machine <label>] [--herdr-lab] [--quote <report-path>#<heading> ...]
-#        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab] [--quote <report-path>#<heading> ...]
+# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--machine <label>] [--herdr-lab] [--intent-file <path>] [--spec-file <path>] [--quote <report-path>#<heading> ...]
+#        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab] [--intent-file <path>] [--spec-file <path>] [--quote <report-path>#<heading> ...]
+# --intent-file and --spec-file fill `## Captain's intent` and `## Firstmate
+# spec` from readable regular files instead of leaving `{TASK}` and
+# `{FIRSTMATE_SPEC}` to hand-edit. Before anything is written, a blank file, a
+# body the brief heading reader would not read back unchanged (such as a level
+# 1-2 heading that would end the subsection), and an intent line bin/fm-spawn.sh
+# would refuse as a Captain label or address stop the scaffold.
 # --quote is repeatable and embeds a named Markdown section verbatim under
 # "# Source quotes", outside captain intent and Firstmate specification.
 # Quote the whole argument in the shell; paths are relative to the caller's
@@ -218,6 +224,10 @@ UPSTREAM_CONSENT_SET=0
 PROJECT_DIR=
 PROJECT_DIR_SET=0
 MACHINE=
+INTENT_FILE=
+INTENT_FILE_SET=0
+SPEC_FILE=
+SPEC_FILE_SET=0
 QUOTES=()
 QUOTE_SET=0
 POS=()
@@ -237,6 +247,8 @@ for a in "$@"; do
       upstream-consent) UPSTREAM_CONSENT=$a; UPSTREAM_CONSENT_SET=1 ;;
       project) PROJECT_DIR=$a; PROJECT_DIR_SET=1 ;;
       machine) MACHINE=$a ;;
+      intent-file) INTENT_FILE=$a; INTENT_FILE_SET=1 ;;
+      spec-file) SPEC_FILE=$a; SPEC_FILE_SET=1 ;;
       quote) QUOTES+=("$a"); QUOTE_SET=1 ;;
       *) echo "error: internal parser state for --$want_value" >&2; exit 1 ;;
     esac
@@ -265,6 +277,10 @@ for a in "$@"; do
     --project) want_value="project" ;;
     --machine) want_value=machine ;;
     --project=*) PROJECT_DIR=${a#--project=}; PROJECT_DIR_SET=1 ;;
+    --intent-file) want_value=intent-file ;;
+    --intent-file=*) INTENT_FILE=${a#--intent-file=}; INTENT_FILE_SET=1 ;;
+    --spec-file) want_value=spec-file ;;
+    --spec-file=*) SPEC_FILE=${a#--spec-file=}; SPEC_FILE_SET=1 ;;
     --quote) want_value=quote ;;
     --quote=*) QUOTES+=("${a#--quote=}"); QUOTE_SET=1 ;;
     # yolo never reaches the worker: it is firstmate's merge authority, not a
@@ -446,6 +462,47 @@ append_resource_locks() {
   printf '\n%s\n' "$RESOURCE_LOCKS_SECTION" >> "$BRIEF"
 }
 
+# Read and validate the optional Task section files before anything is written.
+read_section_file() {  # <flag> <path>
+  local body
+  [ -f "$2" ] && [ -r "$2" ] || { echo "error: $1 must name a readable regular file (got '$2')" >&2; return 1; }
+  body=$(cat -- "$2") || { echo "error: $1 could not be read: $2" >&2; return 1; }
+  [ -n "$(printf '%s' "$body" | tr -d '[:space:]')" ] || { echo "error: $1 is blank: $2" >&2; return 1; }
+  printf '%s\n' "$body"
+}
+INTENT_BODY='{TASK}'
+SPEC_BODY='{FIRSTMATE_SPEC}'
+if [ "$INTENT_FILE_SET" -eq 1 ]; then
+  INTENT_BODY=$(read_section_file --intent-file "$INTENT_FILE") || exit 1
+fi
+if [ "$SPEC_FILE_SET" -eq 1 ]; then
+  SPEC_BODY=$(read_section_file --spec-file "$SPEC_FILE") || exit 1
+fi
+# The heading reader must return each body unchanged, so neither file can end
+# its subsection early or forge the other one.
+TASK_SECTION="# Task
+## Captain's intent
+$INTENT_BODY
+
+## Firstmate spec
+$SPEC_BODY"
+section_reads_back() {  # <flag> <heading> <expected-body>
+  [ "$(printf '%s\n' "$TASK_SECTION" | fm_brief_task_heading_body - "$2")" = "$3" ] && return 0
+  echo "error: $1 content would not read back as the whole '$2' subsection; remove level 1-2 headings from it" >&2
+  return 1
+}
+section_reads_back --intent-file "## Captain's intent" "$INTENT_BODY" || exit 1
+section_reads_back --spec-file "## Firstmate spec" "$SPEC_BODY" || exit 1
+if [ "$INTENT_FILE_SET" -eq 1 ] && ADDRESS_LINE=$(printf '%s\n' "$TASK_SECTION" | fm_brief_intent_address_line -); then
+  echo "error: --intent-file opens a line with a Captain label or address: $ADDRESS_LINE" >&2
+  echo "error: write the captain's actual words without speaker labels or direct address (bin/fm-dod-lib.sh)" >&2
+  exit 1
+fi
+PLACEHOLDERS_LEFT=
+[ "$INTENT_FILE_SET" -eq 1 ] || PLACEHOLDERS_LEFT='{TASK}'
+[ "$SPEC_FILE_SET" -eq 1 ] || PLACEHOLDERS_LEFT="${PLACEHOLDERS_LEFT:+$PLACEHOLDERS_LEFT and }{FIRSTMATE_SPEC}"
+PLACEHOLDER_NOTE=${PLACEHOLDERS_LEFT:+; replace $PLACEHOLDERS_LEFT}
+
 # Validate and render all quotes before creating the task directory.
 # The closing fence protects source trailing newlines from command substitution.
 SOURCE_QUOTES=
@@ -570,15 +627,6 @@ EOF
 HERDR_SECTION=${HERDR_SECTION%$'\n'}
 fi
 
-IFS= read -r -d '' TASK_SECTION <<'EOF' || true
-# Task
-## Captain's intent
-{TASK}
-
-## Firstmate spec
-{FIRSTMATE_SPEC}
-EOF
-TASK_SECTION=${TASK_SECTION%$'\n'}
 
 # One shared string keeps the ship and scout infrastructure rule identical.
 # Rule 2 governs file edits, so it does not prohibit pool administration.
@@ -676,7 +724,7 @@ If your findings reveal work that should ship (e.g. you reproduced a bug and the
 EOF
 append_resource_locks
 append_brief_include
-echo "scaffolded: $BRIEF (scout; replace {TASK} and {FIRSTMATE_SPEC})"
+echo "scaffolded: $BRIEF (scout$PLACEHOLDER_NOTE)"
 exit 0
 fi
 
@@ -767,7 +815,7 @@ EOF
 append_resource_locks
 append_brief_include
 if [ "$FORGE" = none ]; then
-  echo "scaffolded: $BRIEF (ship, mode=$MODE; replace {TASK} and {FIRSTMATE_SPEC})"
+  echo "scaffolded: $BRIEF (ship, mode=$MODE$PLACEHOLDER_NOTE)"
 else
-  echo "scaffolded: $BRIEF (ship, mode=$MODE forge=$FORGE; replace {TASK} and {FIRSTMATE_SPEC})"
+  echo "scaffolded: $BRIEF (ship, mode=$MODE forge=$FORGE$PLACEHOLDER_NOTE)"
 fi

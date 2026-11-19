@@ -229,6 +229,7 @@ Keep notes free of temporary paths, moving versions, ephemeral identifiers, and 
 ## 11. Crewmate briefs
 
 `bin/fm-brief.sh` owns the scaffold, status protocol, delivery definitions of done, and safety mechanics; the scaffold is a safety contract, not a suggestion.
+Write the two sections below to files and pass them as `--intent-file` and `--spec-file` instead of hand-editing the scaffold's placeholders.
 Fill `## Captain's intent` with the captain's own ask, stated boundaries, and the substance of any report, decision, or PR it refers to, never widened into general goals or coverage lists, because reviewers treat it as acceptance criteria; `bin/fm-dod-lib.sh` owns intent authoring rules.
 Fill `## Firstmate spec` with only the build instructions the ask requires, naming what stays out of scope; unrequested generalization or hardening is follow-up, not scope.
 Every ship brief keeps the worktree-isolation assertion; a firstmate-repo brief requires `firstmate-coding-guidelines` before editing.
