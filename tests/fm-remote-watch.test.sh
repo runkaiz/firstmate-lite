@@ -6,6 +6,7 @@
 # and one when the machine is reachable again; a courier finding fires once.
 set -u
 
+# shellcheck source=tests/wake-helpers.sh
 . "$(dirname "${BASH_SOURCE[0]}")/wake-helpers.sh"
 
 WATCH="$ROOT/bin/fm-watch.sh"

@@ -72,6 +72,7 @@ export FM_HOME
 . "$SCRIPT_DIR/fm-task-inbox-lib.sh"
 # shellcheck source=bin/fm-ff-lib.sh
 . "$SCRIPT_DIR/fm-ff-lib.sh"
+# shellcheck source=bin/fm-role-lib.sh
 . "$SCRIPT_DIR/fm-role-lib.sh"
 fm_backend_source herdr-remote || { echo "error: the herdr-remote adapter could not be loaded" >&2; exit 1; }
 

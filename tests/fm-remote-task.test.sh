@@ -744,7 +744,7 @@ grep -q 'status-not-delivered' "$T/retire.out" || fail 'backlog refusal did not 
 [ -d "$R3_TASK/wt" ] || fail 'backlog refusal removed the remote copy'
 R3_WINDOW=$(sed -n 's/^window=//p' "$ST/r3.meta")
 hstate | jq -e --arg p "${R3_WINDOW#*:}" '.panes[] | select(.pane_id==$p)' >/dev/null || fail 'incomplete status delivery closed the worker'
-for i in $(seq 1 12); do
+for ((i=0; i<12; i++)); do
   sync_now
   grep -q 'backlog final' "$ST/r3.status" && break
 done
