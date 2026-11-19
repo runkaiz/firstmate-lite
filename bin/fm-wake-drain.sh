@@ -11,6 +11,14 @@
 # stderr for MAIN and either branch host, keeping stdout records unchanged.
 #
 # Stderr names the exact `handled` command for each presented captured process-event result.
+# When a drain that prints WAKE_ACK_REQUIRED also presents captain BRANCH
+# OUTCOMES, that one printed command carries --outcomes-through <seq>, so main
+# acknowledges the queue and marks those outcomes processed in a single call
+# after handling. The acknowledgement first runs bin/fm-branch-outcome.sh
+# mark-processed --through <seq> unchanged, keeping its refusals, then the
+# queue acknowledgement, which a refused outcome mark never blocks; either
+# failure exits nonzero. A drain with captain outcomes but no queue
+# acknowledgement still prints the standalone mark-processed command.
 # .<actor>.status-wake-presented stores tab-separated wake binding, task,
 # status byte endpoint, and file identity after successful presentation.
 # Acknowledgement records terminal receipts only for snapshots bound to its
@@ -64,6 +72,12 @@ ACK_FINGERPRINTS=
 ACK_NOTICE_FINGERPRINTS=
 PRESENTATION_LOCK_TIMEOUT=${FM_STATUS_PRESENTATION_LOCK_TIMEOUT:-10}
 BRANCH_OUTCOMES_RC=0
+OUTCOMES_THROUGH=
+OUTCOMES_ACK_RC=0
+# Set when this drain prints a WAKE_ACK_REQUIRED line after BRANCH OUTCOMES,
+# which then carries the presented captain outcomes' mark-processed target.
+COMBINED_OUTCOME_ACK=false
+OUTCOMES_ACK_TARGET=0
 case "$PRESENTATION_LOCK_TIMEOUT" in ''|*[!0-9]*|0) PRESENTATION_LOCK_TIMEOUT=10 ;; esac
 
 # --- per-actor consume (docs/watcher-continuity.md "Per-actor acknowledgement") --
@@ -274,9 +288,15 @@ case "${1:-}" in
       || { echo "wake drain: acknowledgement requires its recovery generation" >&2; exit 2; }
     ACK_GENERATION=${4:-}
     case "$ACK_GENERATION" in ''|*[!A-Za-z0-9._-]*) echo "wake drain: invalid recovery generation" >&2; exit 2 ;; esac
-    [ "$#" -eq 4 ] || { echo "wake drain: unexpected acknowledgement arguments" >&2; exit 2; }
+    if [ "$#" -eq 6 ] && [ "${5:-}" = --outcomes-through ]; then
+      OUTCOMES_THROUGH=${6:-}
+      case "$OUTCOMES_THROUGH" in ''|*[!0-9]*|0) echo "wake drain: invalid branch outcome sequence" >&2; exit 2 ;; esac
+      [ "$ACTOR" = main ] || { echo "wake drain: only main acknowledges branch outcomes" >&2; exit 2; }
+    else
+      [ "$#" -eq 4 ] || { echo "wake drain: unexpected acknowledgement arguments" >&2; exit 2; }
+    fi
     ;;
-  *) echo "usage: fm-wake-drain.sh [--ack-through SEQUENCE --recovery-generation GENERATION]" >&2; exit 2 ;;
+  *) echo "usage: fm-wake-drain.sh [--ack-through SEQUENCE --recovery-generation GENERATION [--outcomes-through SEQUENCE]]" >&2; exit 2 ;;
 esac
 
 [ "$ACTOR" != branch ] || require_branch_eligible_rows || exit 1
@@ -818,8 +838,13 @@ ROWS
     done
     [ "$held" -eq 0 ] || text="${text}BRANCH OUTCOMES: $held newer captain outcome(s) are held back (byte cap); they follow on the next drain once these are acknowledged
 "
-    text="${text}BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through $target; until then every drain presents them again
+    if [ "$COMBINED_OUTCOME_ACK" = true ]; then
+      text="${text}BRANCH OUTCOMES: the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through $target); until it runs every drain presents them again
 "
+    else
+      text="${text}BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through $target; until then every drain presents them again
+"
+    fi
   fi
 
   used=0
@@ -852,11 +877,22 @@ ROWS
   if [ -n "$text" ]; then
     printf '%s' "$text" || return 1
   fi
+  OUTCOMES_ACK_TARGET=$target
   [ "$through" -gt 0 ] || return 0
   if ! "$SCRIPT_DIR/fm-branch-outcome.sh" mark-read --through "$through" >/dev/null 2>&1; then
+    OUTCOMES_ACK_TARGET=0
     printf 'BRANCH OUTCOMES: the store could not record this presentation, so these outcomes are presented again on the next drain and an acknowledgement above is refused until then.\n' >&2
     return 1
   fi
+}
+
+# The one acknowledgement command for this drain, printed after BRANCH
+# OUTCOMES so it can carry their mark-processed target.
+print_wake_ack_required() {  # <sequence> <generation>
+  local outcomes=
+  [ "$OUTCOMES_ACK_TARGET" -eq 0 ] || outcomes=" --outcomes-through $OUTCOMES_ACK_TARGET"
+  printf 'WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through %s --recovery-generation %s%s\n' \
+    "$1" "$2" "$outcomes" >&2
 }
 
 # BRANCH OUTCOMES' per-item cut: the shared digest marker in place of the
@@ -976,6 +1012,15 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
+
+# Marking outcomes processed is independent of the queue rows: its own lock and
+# refusals apply, and a refusal never blocks the queue acknowledgement below.
+if [ -n "$OUTCOMES_THROUGH" ]; then
+  if ! "$SCRIPT_DIR/fm-branch-outcome.sh" mark-processed --through "$OUTCOMES_THROUGH" >&2; then
+    printf 'wake drain: branch outcomes through %s were not marked processed (refusal above); the queue acknowledgement continues\n' "$OUTCOMES_THROUGH" >&2
+    OUTCOMES_ACK_RC=1
+  fi
+fi
 
 if [ -n "$ACK_THROUGH" ]; then
   fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || exit 1
@@ -1135,7 +1180,7 @@ if [ -n "$ACK_THROUGH" ]; then
     printf 'wake drain: acknowledged wakes through %s (%s row(s) consumed), but a newer recovery episode is pending; re-run bin/fm-wake-drain.sh and use the new WAKE_ACK_REQUIRED command\n' \
       "$ACK_THROUGH" "$ACK_REMOVED" >&2
   fi
-  exit 0
+  exit "$OUTCOMES_ACK_RC"
 fi
 
 if [ ! -s "$FM_WAKE_QUEUE" ]; then
@@ -1156,9 +1201,10 @@ if [ ! -s "$FM_WAKE_QUEUE" ]; then
   fm_lock_release "$FM_WAKE_QUEUE_LOCK"
   DRAIN_LOCK_HELD=false
   (print_status_presentation) || true
+  COMBINED_OUTCOME_ACK=$RECOVERY_ACK_REQUIRED
   print_branch_outcomes_section || BRANCH_OUTCOMES_RC=1
   if [ "$RECOVERY_ACK_REQUIRED" = true ]; then
-    printf 'WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation %s\n' "${RECOVERY_MARKER_TOKEN##*:}" >&2
+    print_wake_ack_required 0 "${RECOVERY_MARKER_TOKEN##*:}"
   fi
   assert_watcher_liveness
   exit "$BRANCH_OUTCOMES_RC"
@@ -1243,10 +1289,10 @@ printf '%s\n' "$RAW_ROWS" | awk -F '\t' '$4 ~ /^procevent:[^:]+:[0-9]+$/ {
   split($4, key, ":")
   printf "PROCEVENT_HANDLED_REQUIRED: after fully handling this result, and before the acknowledgement below, run bin/fm-procevent.sh handled %s %s\n", key[2], key[3]
 }' >&2
-printf 'WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through %s --recovery-generation %s\n' \
-  "$ACK_THROUGH" "${RECOVERY_MARKER_TOKEN##*:}" >&2
 
 (print_status_presentation "$RAW_ROWS") || true
+COMBINED_OUTCOME_ACK=true
 print_branch_outcomes_section || BRANCH_OUTCOMES_RC=1
+print_wake_ack_required "$ACK_THROUGH" "${RECOVERY_MARKER_TOKEN##*:}"
 assert_watcher_liveness
 exit "$BRANCH_OUTCOMES_RC"
