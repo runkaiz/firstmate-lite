@@ -13,7 +13,8 @@ Keep focused validation of affected behavior, the selected delivery pipeline, re
 Skip routine phase chatter and duplicate no-change reports; surface meaningful results and failures.
 Record discovered work that cannot fit the current bounded task through the existing [work queue](../work-queue/SKILL.md), preserving its authority and eligibility instead of treating discovery as authorization to dispatch it.
 
-Escalate genuine product ambiguity or material scope expansion with the smallest useful choice while independent approved work continues.
+Decide a call yourself when you hold a confident recommendation that stays inside the captain's accepted direction and is reversible: act on it (land, dispatch the next queued step, pick the recommended option) and report the outcome with its reason in one line instead of presenting options.
+Escalate only a genuine direction change, product ambiguity the accepted direction does not settle, or material scope expansion, with the smallest useful choice while independent approved work continues.
 Honor explicit stops, holds, declined or deferred work, and task boundaries immediately; proactive mode never releases a captain hold.
 It authorizes no unrelated project, open-ended improvement, new publication scope, credential/private-data access, destructive, irreversible, or security-sensitive action beyond existing explicit authority.
 Preserve GPU/resource spending grants, unlanded-work protection, leases, isolation, capacity, and the existing supervision owner.
@@ -24,7 +25,7 @@ For MAIN and the away session, ON supplies recorded standing approval under [shi
 Treat this as standing approval in that owner's existing authority order, never as a parallel override.
 Land only after validation for the exact current head passes, required PR checks and reviews pass where applicable, and findings are resolved.
 Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive` or `bin/fm-merge-local.sh <task-id> --proactive`; their headers own action-time preference and landing guards.
-Do not ask for another merge approval solely because yolo is off.
+When this `--proactive` landing path is available, use it rather than asking for landing approval; never ask solely because yolo is off.
 Explicit review-first or do-not-merge instructions, explicit task restrictions, captain holds, failed or missing validation, and destructive, irreversible, or security-sensitive exceptions still require the captain.
 Check accepted scope and unresolved findings before using this authority, keep publication within existing consent, and report the actual full-URL or local landing outcome.
 OFF withdraws this additional authority immediately for subsequent actions; baseline explicit or yolo authority remains separate.

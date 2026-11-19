@@ -183,7 +183,6 @@ Off instructions supersede earlier mode context.
 This shared path covers every primary harness, Pi's branch, and the off-Pi supervision host without a second watcher or changed lease ownership.
 A resumed conversation that has not received a startup/wake refresh can use `/proactive status` to refresh immediately.
 Install or reload the bundled skill using the harness's ordinary skill discovery; this is an agent-handled command, not a Calm rendering extension.
-Local-only landing retains its existing approval rules.
 New no-mistakes briefs generated while on replace the implementation-complete/firstmate-invocation round trip with immediate same-worker validation, checking current mode again before proceeding and preserving explicit validation holds.
 Already-issued briefs retain their task-specific handoff until firstmate steers them; enabling mode does not silently rewrite workers' existing instructions.
 
