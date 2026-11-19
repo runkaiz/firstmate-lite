@@ -1,0 +1,62 @@
+ok - sibling-PR, retained-branch and legacy local-main notes survive serialization and repeated replay
+ok - malformed and foreign completion notes refuse without changing the queue or consuming the marker
+Preparing worktree (detached HEAD bcbbd88)
+HEAD is now at bcbbd88 initial
+Restored retire-scout metadata with sha256=88686b9ed3f2f88227e041a7550e083c42d57d1af2c9a2909b44bc69dcf41ced; endpoint and copy unchanged.
+ok - archived scout record restores byte-exactly and an unchanged copy retires despite replaced source history
+Preparing worktree (detached HEAD 8044fc3)
+HEAD is now at 8044fc3 initial
+ok - unchanged local-only copy retires with its base retained when the source history was replaced
+Preparing worktree (detached HEAD 98ec7e7)
+HEAD is now at 98ec7e7 initial
+ok - local-only delivery landed as an identical patch retires, while a commit with no equivalent still refuses
+Preparing worktree (detached HEAD 6249b8e)
+HEAD is now at 6249b8e initial
+ok - native and legacy teardown reject unlanded merge resolutions and accept ancestral merges
+Preparing worktree (detached HEAD 5d8c589)
+HEAD is now at 5d8c589 initial
+ok - branch-kept commits retire only by explicit retention, with the branch kept and the commit pinned
+ok - an approved local landing fast-forwards a retained branch after its task record is gone
+Preparing worktree (detached HEAD 31e8bd6)
+HEAD is now at 31e8bd6 initial
+ok - a merged PR rewritten by its pipeline retires only when the pipeline binds this exact clean HEAD to the merged head
+Preparing worktree (detached HEAD eaf50b7)
+HEAD is now at eaf50b7 initial
+ok - pipeline delivery proof permits covered leftovers while tracked edits and incorrect bindings refuse
+Preparing worktree (detached HEAD d0c0c73)
+HEAD is now at d0c0c73 initial
+ok - teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers
+Preparing worktree (detached HEAD 42299f7)
+HEAD is now at 42299f7 initial
+ok - clean preservation retry verifies moved artifacts before retiring and receipts every path once
+Preparing worktree (detached HEAD 99590ec)
+HEAD is now at 99590ec initial
+ok - partial preservation retry verifies moved artifacts before retiring and receipts every path once
+Preparing worktree (detached HEAD 71068d5)
+HEAD is now at 71068d5 initial
+ok - explicit preservation retry verifies moved artifacts before retiring and receipts every path once
+Preparing worktree (detached HEAD 46e6638)
+HEAD is now at 46e6638 initial
+Preparing worktree (detached HEAD 46e6638)
+HEAD is now at 46e6638 initial
+Preparing worktree (detached HEAD dca6b4c)
+HEAD is now at dca6b4c initial
+ok - teardown stops a finished native worker through task control in one pass and never stops an unfinished one
+Preparing worktree (detached HEAD a63c186)
+HEAD is now at a63c186 initial
+ok - marked stock-layout lab stops only finished workers and preserves generated output in one pass
+Preparing worktree (detached HEAD c5a5cd7)
+HEAD is now at c5a5cd7 initial
+ok - herdr-success closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD d58abe2)
+HEAD is now at d58abe2 initial
+ok - herdr-failed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 7c28dc0)
+HEAD is now at 7c28dc0 initial
+ok - herdr-unconfirmed closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD a3b00ef)
+HEAD is now at a3b00ef initial
+ok - herdr-foreign closes the recorded shell before preserving and retiring the native copy
+Preparing worktree (detached HEAD 4ee6e6d)
+HEAD is now at 4ee6e6d initial
+ok - tmux-success closes the recorded shell before preserving and retiring the native copy

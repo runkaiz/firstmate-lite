@@ -1,0 +1,2 @@
+needs-decision [key=nm-LAB-test]: ask-user findings=test-1 file=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/route/findings.txt
+resolved [key=nm-LAB-test] [at=1795118661]: answered: run no-mistakes axi respond --step test --action approve --reason 'docs only'

@@ -1,0 +1,526 @@
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh files demo --mode local-only --intent-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/intent.md --spec-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/spec.md
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/files/brief.md (ship, mode=local-only)
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh bad-heading demo --mode local-only --intent-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/bad.md
+error: --intent-file content would not read back as the whole '## Captain's intent' subsection; remove level 1-2 headings from it
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh bad-address demo --mode local-only --intent-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/bad.md
+error: --intent-file opens a line with a Captain label or address: Captain, change this.
+error: write the captain's actual words without speaker labels or direct address (bin/fm-dod-lib.sh)
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh bad-blank demo --mode local-only --intent-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/bad.md
+error: --intent-file is blank: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/bad.md
+[exit 1]
+OBSERVED: File-fed scaffold preserves literal intent/spec; heading injection, direct address and blank content refuse without partial output.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-outcome.sh append --task files --verdict captain --summary 'file scaffold ready'
+1
+[exit 0]
+$ bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append check live-combined "check: live-combined"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-wake-drain.sh
+1795118542	1	check	live-combined	check: live-combined
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per task, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement):
+[seq 1, recorded 0m ago] files: file scaffold ready
+BRANCH OUTCOMES: the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through 1); after this drain, handle the entries, then run that one post-handling --ack-through command to mark outcomes processed and acknowledge wakes; until it runs every drain presents them again
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3807942.1795118542.0inKLx --outcomes-through 1
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-wake-drain.sh
+1795118542	1	check	live-combined	check: live-combined
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per task, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement):
+[seq 1, recorded 0m ago] files: file scaffold ready
+BRANCH OUTCOMES: the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through 1); after this drain, handle the entries, then run that one post-handling --ack-through command to mark outcomes processed and acknowledge wakes; until it runs every drain presents them again
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3807942.1795118542.0inKLx --outcomes-through 1
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3807942.1795118542.0inKLx --outcomes-through 1
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3807942.1795118542.0inKLx --outcomes-through 1
+error: refusing processed advancement because seq 1 is already processed
+wake drain: branch outcomes through 1 were not marked processed (refusal above); the queue acknowledgement continues
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-wake-drain.sh --ack-through 1 --recovery-generation none --outcomes-through 1
+wake drain: only main acknowledges branch outcomes
+[exit 2]
+OBSERVED: Two drains re-present identical durable wake/outcome; one printed acknowledgement marks and consumes both. Replay and branch-owned outcome acknowledgement refuse.
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$FM_HOME/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ land /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 3714011a66ee423dc862add2ddd3b17fac63581f
+error: native worktree: root is inside project/primary/home
+[exit 1]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ land /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 3714011a66ee423dc862add2ddd3b17fac63581f
+Preparing worktree (detached HEAD 3714011)
+HEAD is now at 3714011 base
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh land
+error: local-only landing (fm-merge-local) refused - while attended the supervision branch lands only under proactive mode (--proactive) or the task's recorded yolo=on; report the ready branch and leave it to main
+[exit 6]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh land
+error: local merge while away, proactive, or by the supervision branch requires a reconciled done declaration; validation failures and decision waits must be resolved
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh land
+error: local merge while away, proactive, or by the supervision branch requires a clean worker copy at the exact ship head
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh land
+merged fm/land into local main (3714011 -> 8b39a68) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ proactive /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 8b39a68accbd3191c3ed54a372c5c09d8e68cb68
+Preparing worktree (detached HEAD 8b39a68)
+HEAD is now at 8b39a68 feature
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh proactive --proactive
+error: proactive local merge refused: mode is off at action time
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-proactive.sh on
+PROACTIVE MODE: on
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-merge-local.sh proactive --proactive
+merged fm/proactive into local main (8b39a68 -> 5b8489a) in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-proactive.sh off
+PROACTIVE MODE: off
+[exit 0]
+OBSERVED: Attended branch fast-forwards local-only work under yolo and active proactive authority; no authority, unfinished work, dirt and inactive proactive policy refuse.
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ generated /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 5b8489a6295cd4b57c464616020da7d1b4856290
+Preparing worktree (detached HEAD 5b8489a)
+HEAD is now at 5b8489a second
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  3 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+[exit 1]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/generated/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  __pycache__ (1 file)
+  node_modules (1 file)
+  notes.txt (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (3 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/generated/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated --preserve-untracked __pycache__ --preserve-untracked node_modules --preserve-untracked notes.txt
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/generated/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+ M README.md
+Untracked or ignored leftovers, by top-level root:
+  __pycache__ (1 file)
+  node_modules (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/generated/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  __pycache__ (1 file)
+  node_modules (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (2 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/generated/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated --preserve-untracked __pycache__ --preserve-untracked node_modules
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh generated
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: __pycache__ node_modules
+preserved: __pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/generated/preserved-artifacts/files/__pycache__
+preserved: node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/generated/preserved-artifacts/files/node_modules
+teardown generated complete (window primary:fm-generated, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/generated/worktree)
+Backlog: generated just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/backlog.md - move generated to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+OBSERVED: Real teardown preserves node_modules and __pycache__ in one pass; unknown files, tracked edits and nested repositories refuse without moving output.
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ retry-clean /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 5b8489a6295cd4b57c464616020da7d1b4856290
+Preparing worktree (detached HEAD 5b8489a)
+HEAD is now at 5b8489a second
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-clean
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: __pycache__
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-git-worktree-lib.sh: line 504: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/retry-clean/preserved-artifacts/receipt.tmp: Is a directory
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-clean
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: preserved '__pycache__' does not match its journaled manifest
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-clean
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+preserved: __pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/retry-clean/preserved-artifacts/files/__pycache__
+teardown retry-clean complete (window primary:fm-retry-clean, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/retry-clean/worktree)
+Backlog: retry-clean just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/backlog.md - move retry-clean to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ retry-partial /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 5b8489a6295cd4b57c464616020da7d1b4856290
+Preparing worktree (detached HEAD 5b8489a)
+HEAD is now at 5b8489a second
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-partial
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: __pycache__ node_modules
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-git-worktree-lib.sh: line 504: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/retry-partial/preserved-artifacts/receipt.tmp: Is a directory
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-partial
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+error: native worktree: preserved '__pycache__' does not match its journaled manifest
+REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh retry-partial
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+preserved: __pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/retry-partial/preserved-artifacts/files/__pycache__
+preserved: node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/retry-partial/preserved-artifacts/files/node_modules
+teardown retry-partial complete (window primary:fm-retry-partial, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/retry-partial/worktree)
+Backlog: retry-partial just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/backlog.md - move retry-partial to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+OBSERVED: After real receipt-write interruption, clean and partial retries verify journaled custody; corrupted artifacts refuse, restored artifacts retire with exactly one receipt each.
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-dispatch.mjs offer
+eligible=1
+status=safe
+corrupted=0
+rows=101
+tasks=route
+unscoped=0
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-send.sh route 'CI monitor failed: connection unavailable. Inspect the captured evidence and reattach your existing run.'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+fm-send: doorbell not typed because the agent in primary:fm-route has exited; the steer is durably recorded at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/state/route.inbox/001.msg for recovery (stuck-crewmate-recovery), and the watcher will not re-ring a dead pane
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-dispatch.mjs offer
+eligible=0
+status=unsafe
+corrupted=0
+rows=
+tasks=
+unscoped=0
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-dispatch.mjs offer
+eligible=0
+status=unsafe
+corrupted=0
+rows=
+tasks=
+unscoped=0
+[exit 0]
+OBSERVED: Host dispatch offers a known worker CI monitor-error to supervision, steering persists in its real inbox, and action/non-CI captures remain main-owned.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-dispatch.mjs offer
+eligible=1
+status=safe
+corrupted=0
+rows=102
+tasks=route
+unscoped=0
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-send.sh route --resolve-key nm-LAB-test 'run no-mistakes axi respond --step test --action skip'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+[exit 6]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-send.sh route --resolve-key nm-LAB-test 'run no-mistakes axi respond --step test --action fix'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+[exit 6]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-branch-dispatch.mjs offer
+eligible=0
+status=unsafe
+corrupted=0
+rows=
+tasks=
+unscoped=0
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-send.sh route --resolve-key nm-LAB-test 'run no-mistakes axi respond --step test --action approve'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+error: decision answer (fm-send --resolve-key) refused - the supervision branch never performs this action; report the outcome and leave it to main (role partition: docs/pi-supervision-branch.md)
+[exit 6]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-send.sh route --resolve-key nm-LAB-test 'run no-mistakes axi respond --step test --action approve --reason '"'"'docs only'"'"''
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+note: the supervision branch accepts the routine live-surface test finding (nm-LAB-test); every other decision stays main-owned while attended
+fm-send: doorbell not typed because the agent in primary:fm-route has exited; the steer is durably recorded at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/state/route.inbox/002.msg for recovery (stuck-crewmate-recovery), and the watcher will not re-ring a dead pane
+[exit 0]
+OBSERVED: Pure no-surface test decision routes to supervision and approve closes it after durable enqueue; skip, fix and mixed findings refuse before delivery.
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ stop /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 5b8489a6295cd4b57c464616020da7d1b4856290
+Preparing worktree (detached HEAD 5b8489a)
+HEAD is now at 5b8489a second
+[exit 0]
+$ tmux -L fm-lab new-window -d -n fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree -e FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l codex
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop automatic-rename off
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop allow-rename off
+[exit 0]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab capture-pane -p -t primary:fm-stop
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ tmux -L fm-lab respawn-pane -k -t primary:fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree codex -c 'projects."/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo".trust_level="trusted"'
+[exit 0]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab capture-pane -p -t primary:fm-stop
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ tmux -L fm-lab respawn-pane -k -t primary:fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree codex --no-daemon -c 'projects."/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo".trust_level="trusted"'
+[exit 0]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab capture-pane -p -t primary:fm-stop
+
+  Folder access
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Back to Agent Command Center
+
+  enter continue · esc back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ tmux -L fm-lab respawn-pane -k -t primary:fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree pi --no-approve --offline --no-session --no-mcp --no-extensions --no-skills --no-context-files --tui-mode regular
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+teardown: the finished-worker stop through task control failed: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+[exit 1]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-control.sh stop exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+error: exit-delivered stop interrupt=not-needed exit-command=delivered agent-state=missing exit=unconfirmed; the agent did not stop within 30s
+[exit 1]
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ tmux -L fm-lab new-window -d -n fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree bash
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop automatic-rename off
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop allow-rename off
+[exit 0]
+$ tmux -L fm-lab send-keys -t primary:fm-stop 'pi --no-approve --offline --no-session --no-mcp --no-extensions --no-skills --no-context-files --tui-mode regular' Enter
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+teardown: the finished-worker stop through task control failed: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+[exit 1]
+OBSERVED: Confirmed automatic stop fails in a marked lab: its internal path overrides trigger the gate refusal while the real Pi worker stays live.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-control.sh stop exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+stopped stop harness=pi backend=tmux endpoint=primary:fm-stop worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree
+[exit 0]
+OBSERVED: Direct control against the same marked lab stops the real Pi CLI successfully without injected path overrides.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+preserved: node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/stop/preserved-artifacts/files/node_modules
+teardown stop complete (window primary:fm-stop, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree)
+Backlog: stop just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/backlog.md - move stop to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+OBSERVED: After a separate direct stop, teardown preserves generated output and retires the copy; one-call stop failed in the supported gate lab.
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/tmux/tmux-1000/fm-lab
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$FM_HOME/state" "$2" "$FM_HOME" "$3" "$1/.phase-test/copies" "$4" refs/heads/main' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ unlanded /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/projects/demo 5b8489a6295cd4b57c464616020da7d1b4856290
+Preparing worktree (detached HEAD 5b8489a)
+HEAD is now at 5b8489a second
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh unlanded
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: .next
+error: native worktree: task delivery is not proven landed; preserving copy
+[exit 1]
+OBSERVED: An unlanded commit plus recognised .next output refuses teardown and retains both source and generated data.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh files-scout demo --scout --intent-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/intent.md
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/files-scout/brief.md (scout; replace {FIRSTMATE_SPEC})
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-brief.sh files-missing demo --mode local-only --spec-file /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/missing.md
+error: --spec-file must name a readable regular file (got '/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/missing.md')
+[exit 1]
+OBSERVED: Scout intent-file fills its section while leaving only the omitted specification placeholder; a missing file refuses before producing a partial scaffold.

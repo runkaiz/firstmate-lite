@@ -1,0 +1,39 @@
+$ tmux -L fm-lab new-window -d -n fm-stop -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree bash
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop automatic-rename off
+[exit 0]
+$ tmux -L fm-lab set-option -w -t primary:fm-stop allow-rename off
+[exit 0]
+$ tmux -L fm-lab send-keys -t primary:fm-stop 'pi --no-approve --offline --no-session --no-mcp --no-extensions --no-skills --no-context-files --tui-mode regular' Enter
+[exit 0]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+[exit 1]
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first
+teardown: the finished-worker stop through task control failed: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+[exit 1]
+OBSERVED: Confirmed automatic stop fails in a marked lab: its internal path overrides trigger the gate refusal while the real Pi worker stays live.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-control.sh stop exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+stopped stop harness=pi backend=tmux endpoint=primary:fm-stop worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree
+[exit 0]
+OBSERVED: Direct control against the same marked lab stops the real Pi CLI successfully without injected path overrides.
+$ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/bin/fm-teardown.sh stop
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+teardown: preserving recognised generated output after the landing proofs: node_modules
+preserved: node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/stop/preserved-artifacts/files/node_modules
+teardown stop complete (window primary:fm-stop, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree)
+Backlog: stop just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.l/data/backlog.md - move stop to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+OBSERVED: After a separate direct stop, teardown preserves generated output and retires the copy; one-call stop failed in the supported gate lab.

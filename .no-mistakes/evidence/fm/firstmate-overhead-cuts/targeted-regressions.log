@@ -1,0 +1,15 @@
+ok - fm-brief.sh: --intent-file/--spec-file fill the Task subsections and refuse unsafe content
+ok - the attended branch lands local-only work only under recorded yolo or proactive authority, behind the readiness checks
+ok - fm-send --resolve-key: the attended branch accepts only a pure live-surface test gate, and only with approve
+Preparing worktree (detached HEAD 9d2d6c6)
+HEAD is now at 9d2d6c6 initial
+ok - teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers
+Preparing worktree (detached HEAD c548d40)
+HEAD is now at c548d40 initial
+ok - clean preservation retry verifies moved artifacts before retiring and receipts every path once
+Preparing worktree (detached HEAD 1bd57b3)
+HEAD is now at 1bd57b3 initial
+ok - partial preservation retry verifies moved artifacts before retiring and receipts every path once
+Preparing worktree (detached HEAD 826d573)
+HEAD is now at 826d573 initial
+ok - explicit preservation retry verifies moved artifacts before retiring and receipts every path once

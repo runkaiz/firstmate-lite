@@ -1,0 +1,40 @@
+pi --no-approve --offline --no-session --no-mcp --no-extensions --no-skills --no-context-files --tui-mode regular
+runkai@griffin:~/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree$ pi --n
+o-approve --offline --no-session --no-mcp --no-extensions --no-skills --no-context-files --tui-mode regular
+
+ ▀▀█  v1.5.2
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+ This project is not trusted. Project .pi resources and packages are ignored. Use /trust to save a trust decision, then
+ restart pi.
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf
+ and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7TNFDT4DKE65E2WZB0XKFHQ/.phase-test/copies/stop/worktree (det...
+$0.000 (sub) 0.0%/272k (auto)                                                                 (openai) gpt-6-astra • low
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
