@@ -2644,7 +2644,9 @@ fm_wake_status_append_self_announced() (  # <state> <status-file> <line>...
   id=${id%.status}
   if [ "$file" = "$append_state/$id.status" ] && { [ -f "$append_state/$id.remote" ] || [ -f "$append_state/$id.remote-journal" ]; }; then
     if ! declare -F fm_remote_status_recover_locked >/dev/null 2>&1; then
-      # shellcheck source=bin/fm-backend.sh
+      # Linted as its own canonical root; following this lazy subshell import
+      # misattributes backend path initialization to the caller (SC2031).
+      # shellcheck source=/dev/null
       . "$FM_WAKE_LIB_DIR/fm-backend.sh" || return 2
       fm_backend_source herdr-remote || return 2
     fi
