@@ -242,13 +242,21 @@ import_commit() {  # <branch-sha> <head-sha> <head-detached:0|1>
 
 # --- status import (design 6.4) ---------------------------------------------
 
-# status_apply <gen> <from> <to> <prefix> <bytes-file>
+# status_apply <gen> <from> <from-prefix> <from-gen> <to> <prefix> <bytes-file>
 status_apply() {
-  local gen=$1 from=$2 to=$3 prefix=$4 bytes=$5 status="$STATE/$ID.status" size digest lock
+  local gen=$1 from=$2 from_prefix=$3 from_gen=$4 to=$5 prefix=$6 bytes=$7 status="$STATE/$ID.status" size digest lock current_gen
   lock="$STATE/.remote-import-$ID.lock"
   fm_lock_acquire_wait "$lock" || return 1
   fm_remote_status_recover_locked "$STATE" "$ID" || { fm_lock_release "$lock"; return 1; }
-  if [ "$from" != "$(rec_get status_offset)" ] || [ "$from" = "$to" ]; then
+  current_gen=$(rec_get status_gen)
+  if [ "$from" != "$(rec_get status_offset)" ] || [ "$from_prefix" != "$(rec_get status_prefix)" ] || [ "$from_gen" != "$current_gen" ]; then
+    fm_lock_release "$lock"
+    return 0
+  fi
+  if [ -z "$current_gen" ] && [ -n "$gen" ]; then
+    rec_set "status_gen=$gen" || { fm_lock_release "$lock"; return 1; }
+  fi
+  if [ "$from" = "$to" ]; then
     fm_lock_release "$lock"
     return 0
   fi
@@ -279,7 +287,7 @@ EMPTY_SHA=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 # records (oldest first), then reports branch state, the status delta,
 # acknowledgements, publication texts, and process rows.
 sync_remote_script() {  # task ids...
-  local id rec gen off prefix f name rtask
+  local id rec gen off prefix f name rtask cursor
   remote_prelude "$RROOT_M"
   cat <<'EOF'
 echo "link=ok"
@@ -291,12 +299,16 @@ EOF
   for id in "$@"; do
     rec="$STATE/$id.remote"
     rtask=$(fm_meta_get "$rec" remote_task)
-    gen=$(fm_meta_get "$rec" status_gen)
-    off=$(fm_meta_get "$rec" status_offset)
-    prefix=$(fm_meta_get "$rec" status_prefix)
-    printf 'T=%s ID=%s GEN=%s OFF=%s PREFIX=%s BR=%s\n' "$(q "$rtask")" "$(q "$id")" "$(q "$gen")" "$(q "${off:-0}")" "$(q "${prefix:-$EMPTY_SHA}")" "$(q "$(fm_meta_get "$rec" branch)")"
+    cursor=$(fm_remote_status_cursor "$STATE" "$id") || return 1
+    gen=$(printf '%s\n' "$cursor" | sed -n '1p')
+    off=$(printf '%s\n' "$cursor" | sed -n '2p')
+    prefix=$(printf '%s\n' "$cursor" | sed -n '3p')
+    printf 'T=%s ID=%s GEN=%s OFF=%s PREFIX=%s BR=%s\n' "$(q "$rtask")" "$(q "$id")" "$(q "$gen")" "$(q "$off")" "$(q "$prefix")" "$(q "$(fm_meta_get "$rec" branch)")"
     cat <<'EOF'
 echo "task=$ID"
+echo "status_from_gen=$GEN"
+echo "status_from=$OFF"
+echo "status_from_prefix=$PREFIX"
 if [ ! -d "$T/wt" ] || [ ! -d "$T/channel" ]; then echo "missing=1"; else
 I="$T/channel/inbox"
 EOF
@@ -438,12 +450,11 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
   case "$(sec_get status)" in
     ok)
       if [ "$custody_ok" = 1 ]; then
-        if [ -z "$(rec_get status_gen)" ] && [ -n "$(sec_get status_gen)" ]; then rec_set "status_gen=$(sec_get status_gen)"; fi
         to=$(sec_get status_to)
         if [ -n "$to" ]; then
           tmp=$(mktemp "$STATE/.$id.remote-bytes.XXXXXX")
           sec_get status_b64 | base64 -d > "$tmp"
-          status_apply "$(sec_get status_gen)" "$(rec_get status_offset)" "$to" "$(sec_get status_prefix)" "$tmp" || true
+          status_apply "$(sec_get status_gen)" "$(sec_get status_from)" "$(sec_get status_from_prefix)" "$(sec_get status_from_gen)" "$to" "$(sec_get status_prefix)" "$tmp" || true
           rm -f -- "$tmp"
         fi
       fi
@@ -975,13 +986,17 @@ EOF
 
 remote_proof_script() {  # [remove]
   remote_prelude "$RROOT"
-  local artifacts history
+  local artifacts history cursor gen off prefix
   artifacts=$(fm_meta_get "$STATE/$ID.remote-retire" artifacts)
   [ -n "$artifacts" ] && [ -f "$DATA/$ID/remote-artifacts/$artifacts.tar" ] && [ "$(fm_remote_sha256_stdin < "$DATA/$ID/remote-artifacts/$artifacts.tar")" = "$artifacts" ] || artifacts=
   history=$(git -C "$PROJ" for-each-ref --format='%(objectname)' "refs/firstmate/remote-history/$ID/")
   history=$(printf '%s' "$history" | tr '\n' ' ')
   printf 'T=%s C=%s BR=%s LAST=%s ID=%s REMOVE=%s ARTIFACTS=%s HISTORY=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")" "$(q "$(rec_get last_imported)")" "$(q "$ID")" "$(q "${1:-}")" "$(q "$artifacts")" "$(q "$history")"
-  printf 'STATUS_GEN=%s STATUS_OFFSET=%s STATUS_PREFIX=%s\n' "$(q "$(rec_get status_gen)")" "$(q "$(rec_get status_offset)")" "$(q "$(rec_get status_prefix)")"
+  cursor=$(fm_remote_status_cursor "$STATE" "$ID") || return 1
+  gen=$(printf '%s\n' "$cursor" | sed -n '1p')
+  off=$(printf '%s\n' "$cursor" | sed -n '2p')
+  prefix=$(printf '%s\n' "$cursor" | sed -n '3p')
+  printf 'STATUS_GEN=%s STATUS_OFFSET=%s STATUS_PREFIX=%s\n' "$(q "$gen")" "$(q "$off")" "$(q "$prefix")"
   cat <<'EOF'
 set -o pipefail
 bad=""

@@ -61,6 +61,15 @@ git() {
 HOOK
     cat
   } | HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH bash -s
+  rc=$?
+  if [ -e "$FAKE_REMOTE_HOME/.hold-copy" ]; then
+    touch "$FAKE_REMOTE_HOME/.copy-ready"
+    for i in $(seq 1 700); do
+      [ ! -e "$FAKE_REMOTE_HOME/.release-copy" ] || break
+      sleep 0.01
+    done
+  fi
+  exit "$rc"
 else
   HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
 fi
@@ -146,6 +155,11 @@ export PATH="$STUBS:$PATH" FM_REMOTE_SSH="$STUBS/ssh"
 
 cleanup_remote_fixture() {
   local f pid
+  if [ -n "${COPY_PID:-}" ]; then
+    touch "$REMOTE_HOME/.release-copy"
+    kill "$COPY_PID" 2>/dev/null || true
+    wait "$COPY_PID" 2>/dev/null || true
+  fi
   for f in "$HERDR_DB"/pids.*; do
     [ -f "$f" ] || continue
     while IFS= read -r pid; do
@@ -334,6 +348,60 @@ PYORDER
   sync_now
 done
 pass 'local answers recover every interrupted import before appending their close events'
+start_held_copy() {
+  rm -f "$REMOTE_HOME/.copy-ready" "$REMOTE_HOME/.release-copy"
+  touch "$REMOTE_HOME/.hold-copy"
+  "$RT" sync pegasus >> "$T/sync.log" 2>&1 &
+  COPY_PID=$!
+  for i in $(seq 1 400); do [ ! -e "$REMOTE_HOME/.copy-ready" ] || break; sleep 0.01; done
+  [ -e "$REMOTE_HOME/.copy-ready" ] || fail 'the status response did not reach the transport pause'
+}
+finish_held_copy() {
+  rm -f "$REMOTE_HOME/.hold-copy"
+  touch "$REMOTE_HOME/.release-copy"
+  wait "$COPY_PID" || fail 'the held courier pass failed'
+  COPY_PID=
+}
+set_cursor_field() {
+  bash -c '. "$1/bin/fm-backend.sh"; . "$1/bin/fm-wake-lib.sh"; fm_backend_source herdr-remote; lock="$2/.remote-import-r1.lock"; fm_lock_acquire_wait "$lock" || exit 1; rc=0; fm_remote_record_set "$2/r1.remote" "$3=$4" || rc=$?; fm_lock_release "$lock"; exit "$rc"' _ "$ROOT" "$ST" "$1" "$2"
+}
+printf 'needs-decision [at=3] [key=cursor-race]: choose the continuation\n' >> "$RTASK/channel/status"
+sync_now
+printf 'needs-decision [at=3] [key=cursor-race]: journal recovery request\n' >> "$RTASK/channel/status"
+FM_REMOTE_TEST_CRASH=after-journal "$RT" sync pegasus >/dev/null 2>&1
+for l in "$ST"/*.lock "$ST"/.*.lock; do [ -e "$l" ] && rm -rf "$l"; done
+printf 'working [at=3]: after concurrent journal recovery\n' >> "$RTASK/channel/status"
+start_held_copy
+"$ROOT/bin/fm-send.sh" r1 --resolve-key cursor-race 'continue after recovery' > "$T/resolve.out" 2>&1 || fail "answer during a fetched response failed: $(cat "$T/resolve.out")"
+RECOVERED_OFFSET=$(sed -n 's/^status_offset=//p' "$ST/r1.remote")
+[ ! -e "$ST/r1.remote-journal" ] || fail 'the concurrent answer did not recover its journal'
+finish_held_copy
+[ "$(sed -n 's/^status_offset=//p' "$ST/r1.remote")" = "$RECOVERED_OFFSET" ] || fail 'a stale response advanced the recovered cursor'
+[ "$(grep -c 'journal recovery request' "$ST/r1.status")" = 1 ] || fail 'a stale response duplicated the recovered decision'
+! grep -q 'after concurrent journal recovery' "$ST/r1.status" || fail 'a stale response was partially applied'
+[ ! -e "$ST/r1.remote-alert" ] || fail 'concurrent recovery caused a false continuity alert'
+sync_now
+[ "$(grep -c 'after concurrent journal recovery' "$ST/r1.status")" = 1 ] || fail 'the next pass did not deliver the remaining status once'
+OPEN=$(bash -c '. "$1/bin/fm-classify-lib.sh"; status_open_decisions "$2"' _ "$ROOT" "$ST/r1.status")
+case "$OPEN" in *cursor-race*) fail 'a stale response reopened an answered decision' ;; esac
+for msg in "$RTASK"/channel/inbox/*.msg; do [ -f "$msg" ] && mv "$msg" "$RTASK/channel/inbox/handled/"; done
+sync_now
+for field in status_prefix status_gen; do
+  saved=$(sed -n "s/^$field=//p" "$ST/r1.remote")
+  if [ "$field" = status_prefix ]; then changed=$(printf '%064d' 0); else changed=0000000000000000; fi
+  [ "$changed" != "$saved" ] || fail 'the cursor change fixture is vacuous'
+  printf 'working [at=3]: stale %s response\n' "$field" >> "$RTASK/channel/status"
+  start_held_copy
+  set_cursor_field "$field" "$changed" || fail 'could not advance the cursor representation during fetch'
+  finish_held_copy
+  ! grep -q "stale $field response" "$ST/r1.status" || fail "a mismatched $field response was applied"
+  [ "$(sed -n "s/^$field=//p" "$ST/r1.remote")" = "$changed" ] || fail "stale bytes overwrote the committed $field"
+  set_cursor_field "$field" "$saved" || fail 'could not restore the fixture cursor'
+  sync_now
+  [ "$(grep -c "stale $field response" "$ST/r1.status")" = 1 ] || fail "a fresh $field response was lost or duplicated"
+done
+pass 'fetched status stays bound to its original cursor across concurrent recovery'
+
 printf 'working: local task\n' > "$ST/local-append.status"
 APPEND_RC=0
 bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_status_append_self_announced "$2" "$2/local-append.status" "resolved [key=local]: acknowledged"' _ "$ROOT" "$ST" || APPEND_RC=$?

@@ -211,6 +211,18 @@ fm_remote_status_ledger_hook() {
   [ ! -e "$config/fleet-ledger" ] || "$FM_BACKEND_HERDR_REMOTE_ROOT/bin/fm-fleet-ledger.sh" appended "$config" "$state/$id.status" >/dev/null 2>&1 || true
 }
 
+fm_remote_status_cursor() (
+  local state=$1 id=$2 rec lock gen off prefix
+  rec="$state/$id.remote" lock="$state/.remote-import-$id.lock"
+  fm_lock_acquire_wait "$lock" || return 1
+  trap 'fm_lock_release "$lock"' EXIT
+  gen=$(fm_meta_get "$rec" status_gen)
+  off=$(fm_meta_get "$rec" status_offset)
+  prefix=$(fm_meta_get "$rec" status_prefix)
+  [ -n "$prefix" ] || prefix=$(fm_remote_sha256_stdin </dev/null)
+  printf '%s\n%s\n%s\n' "$gen" "${off:-0}" "$prefix"
+)
+
 fm_remote_status_recover_locked() {
   local state=$1 id=$2 j b size to prefix digest have status len note
   j="$state/$id.remote-journal" b="$state/$id.remote-journal.bytes" status="$state/$id.status"
