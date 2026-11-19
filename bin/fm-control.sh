@@ -376,6 +376,10 @@ fm_backend_validate "$BACKEND" || exit 1
 # --- shared helpers ---------------------------------------------------------
 
 agent_state() {
+  if [ "$BACKEND" = herdr-remote ]; then
+    rm -f -- "$STATE/$ID.remote-procs"
+    "$SCRIPT_DIR/fm-remote-task.sh" sync "${T%%:*}" >/dev/null 2>&1 || true
+  fi
   fm_backend_agent_state "$BACKEND" "$T"
 }
 
@@ -1034,6 +1038,14 @@ do_relaunch() {
   local -a spawn_args
 
   require_state_verified_backend relaunch
+  if [ "$BACKEND" = herdr-remote ]; then
+    [ "$HARNESS_SET$MODEL_SET$EFFORT_SET" = 000 ] || die "remote relaunch uses the recorded Claude launch; runtime overrides are unsupported"
+    [ "$NOTE_SET" = 1 ] && [ -n "$NOTE" ] || die "remote relaunch requires a progress note"
+    "$SCRIPT_DIR/fm-send.sh" "$ID" "$NOTE" >/dev/null || die "could not queue the remote relaunch progress note"
+    do_exit >/dev/null || return $?
+    "$SCRIPT_DIR/fm-remote-task.sh" relaunch "$ID"
+    return $?
+  fi
   resolve_relaunch_profile
 
   case "$KIND" in

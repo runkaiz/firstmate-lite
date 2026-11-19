@@ -1215,8 +1215,7 @@ elif [ "$TASK_BACKEND" = herdr-remote ]; then
     missing) emit unknown none "backend target gone: $BACKEND_TARGET" ;;
     dead) emit unknown none "backend target gone: $BACKEND_TARGET (agent gone, pane shell remains)" ;;
     alive)
-      fm_backend_herdr_parse_target "$BACKEND_TARGET" || true
-      case "$(fm_backend_herdr_agent_status_raw "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE")" in
+      case "$(fm_backend_herdr_remote_agent_status_raw "$BACKEND_TARGET")" in
         working) emit working pane "harness busy (herdr-native, remote)" ;;
         blocked)
           case "$LOG_VERB" in

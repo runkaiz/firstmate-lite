@@ -578,6 +578,10 @@ for spawn_arg in "$@"; do
   --machine | --machine=*) export FM_HOME; exec "$SCRIPT_DIR/fm-remote-task.sh" spawn "$@" ;;
   --relaunch)
     if grep -qx 'backend=herdr-remote' "${FM_STATE_OVERRIDE:-$FM_HOME/state}/${1:-}.meta" 2>/dev/null; then
+      [ "$#" -eq 2 ] && [ "$2" = --relaunch ] || {
+        echo "error: remote relaunch accepts only <task-id> --relaunch; runtime overrides are unsupported" >&2
+        exit 1
+      }
       export FM_HOME
       exec "$SCRIPT_DIR/fm-remote-task.sh" relaunch "$1"
     fi

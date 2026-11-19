@@ -7,7 +7,7 @@
 #
 # Usage:
 #   fm-remote-task.sh spawn <task-id> <project-dir> --machine <label> --mode <local-only|direct-PR> --yolo <on|off>
-#                     [--branch-prefix <p>] [--base-branch <b>] [--harness claude] [--model <m>] [--effort <e>]
+#                     [--branch-prefix <p>] [--base-branch <b>] [--harness claude] [--model <m>]
 #       Reached through `bin/fm-spawn.sh ... --machine <label>`. Claude ships only.
 #   fm-remote-task.sh sync <machine-label-or-id>
 #       One courier pass for every live remote task on that machine.
@@ -72,6 +72,7 @@ export FM_HOME
 . "$SCRIPT_DIR/fm-task-inbox-lib.sh"
 # shellcheck source=bin/fm-ff-lib.sh
 . "$SCRIPT_DIR/fm-ff-lib.sh"
+. "$SCRIPT_DIR/fm-role-lib.sh"
 fm_backend_source herdr-remote || { echo "error: the herdr-remote adapter could not be loaded" >&2; exit 1; }
 
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
@@ -165,6 +166,12 @@ link_set() {  # <machine-id> <state> <reason>
 }
 
 alert() {  # <id> <text>
+  if [ "${3:-}" = commit ]; then
+    if [ -s "$STATE/$1.remote-alert" ]; then
+      case "$(cat "$STATE/$1.remote-alert")" in commit:*) ;; *) return 0 ;; esac
+    fi
+    set -- "$1" "commit: $2"
+  fi
   printf '%s\n' "$2" > "$STATE/$1.remote-alert.tmp" && mv -f "$STATE/$1.remote-alert.tmp" "$STATE/$1.remote-alert"
   echo "remote alert for $1: $2" >&2
 }
@@ -184,47 +191,57 @@ remote_git_url() {  # <target> <abs-path>
 # branch and check the copy out on it. A non-fast-forward is never forced.
 import_commit() {  # <branch-sha> <head-sha> <head-detached:0|1>
   local sha=$1 head=$2 detached=$3 url cur wtbranch
-  [ -n "$sha" ] || return 0
+  [ -n "$sha" ] || { alert "$ID" "remote branch has no readable commit" commit; return 1; }
   url=$(remote_git_url "$TARGET" "$RCACHE")
   if [ "$sha" != "$(rec_get last_imported)" ] || ! git -C "$PROJ" cat-file -e "$sha^{commit}" 2>/dev/null; then
     GIT_SSH_COMMAND=$(git_ssh_env) fm_run_timed 60 git -C "$PROJ" fetch --quiet --no-tags --no-write-fetch-head \
       "$url" "refs/heads/$BRANCH:refs/firstmate/remote/$ID" || {
-      alert "$ID" "commit import failed for $BRANCH at $sha (fetch refused or not a fast-forward); nothing was forced"
+      alert "$ID" "commit import failed for $BRANCH at $sha (fetch refused or not a fast-forward); nothing was forced" commit
       return 1
     }
   fi
   if [ "$detached" = 1 ] && [ -n "$head" ] && [ "$head" != "$sha" ]; then
     GIT_SSH_COMMAND=$(git_ssh_env) fm_run_timed 60 git -C "$PROJ" fetch --quiet --no-tags --no-write-fetch-head \
-      "$url" "+refs/firstmate/head/$ID:refs/firstmate/remote/$ID-head" || true
+      "$url" "+refs/firstmate/head/$ID:refs/firstmate/remote/$ID-head" || {
+      alert "$ID" "detached commit import failed for $head" commit
+      return 1
+    }
+    [ "$(git -C "$PROJ" rev-parse --verify --quiet "refs/firstmate/remote/$ID-head")" = "$head" ] || {
+      alert "$ID" "detached custody does not equal $head" commit
+      return 1
+    }
   fi
   [ "$(git -C "$PROJ" rev-parse --verify --quiet "refs/firstmate/remote/$ID")" = "$sha" ] || {
-    alert "$ID" "custody ref refs/firstmate/remote/$ID does not equal the remote branch commit $sha"
+    alert "$ID" "custody ref refs/firstmate/remote/$ID does not equal the remote branch commit $sha" commit
     return 1
   }
   git -C "$PROJ" merge-base --is-ancestor "$BASE" "$sha" || {
-    alert "$ID" "remote branch commit $sha does not contain the recorded base $BASE; not imported into the landing copy"
+    alert "$ID" "remote branch commit $sha does not contain the recorded base $BASE; not imported into the landing copy" commit
     return 1
   }
   cur=$(git -C "$PROJ" rev-parse --verify --quiet "refs/heads/$BRANCH" || true)
   wtbranch=$(git -C "$WT" symbolic-ref --quiet --short HEAD 2>/dev/null || true)
   if [ -z "$cur" ]; then
-    [ -z "$wtbranch" ] || { alert "$ID" "landing copy is on branch $wtbranch, not detached, before the first import"; return 1; }
-    fm_git_worktree_clean "$WT" 2>/dev/null || { alert "$ID" "landing copy $WT is not clean; import refused"; return 1; }
-    git -C "$PROJ" merge-base --is-ancestor "$(git -C "$WT" rev-parse HEAD)" "$sha" || { alert "$ID" "landing copy HEAD is not an ancestor of $sha"; return 1; }
-    git -C "$WT" checkout --quiet -b "$BRANCH" "$sha" -- || { alert "$ID" "could not create $BRANCH in the landing copy"; return 1; }
+    [ -z "$wtbranch" ] || { alert "$ID" "landing copy is on branch $wtbranch, not detached, before the first import" commit; return 1; }
+    fm_git_worktree_clean "$WT" 2>/dev/null || { alert "$ID" "landing copy $WT is not clean; import refused" commit; return 1; }
+    git -C "$PROJ" merge-base --is-ancestor "$(git -C "$WT" rev-parse HEAD)" "$sha" || { alert "$ID" "landing copy HEAD is not an ancestor of $sha" commit; return 1; }
+    git -C "$WT" checkout --quiet -b "$BRANCH" "$sha" -- || { alert "$ID" "could not create $BRANCH in the landing copy" commit; return 1; }
   else
-    [ "$wtbranch" = "$BRANCH" ] || { alert "$ID" "landing copy is not on $BRANCH (found '${wtbranch:-detached}'); import refused"; return 1; }
+    [ "$wtbranch" = "$BRANCH" ] || { alert "$ID" "landing copy is not on $BRANCH (found '${wtbranch:-detached}'); import refused" commit; return 1; }
     if [ "$cur" != "$sha" ]; then
-      git -C "$PROJ" merge-base --is-ancestor "$cur" "$sha" || { alert "$ID" "remote $BRANCH at $sha is not a fast-forward of the landed $cur; nothing was forced"; return 1; }
-      fm_git_worktree_clean "$WT" 2>/dev/null || { alert "$ID" "landing copy $WT is not clean; import refused"; return 1; }
-      git -C "$WT" merge --quiet --ff-only "$sha" || { alert "$ID" "fast-forward of the landing copy to $sha failed"; return 1; }
+      git -C "$PROJ" merge-base --is-ancestor "$cur" "$sha" || { alert "$ID" "remote $BRANCH at $sha is not a fast-forward of the landed $cur; nothing was forced" commit; return 1; }
+      fm_git_worktree_clean "$WT" 2>/dev/null || { alert "$ID" "landing copy $WT is not clean; import refused" commit; return 1; }
+      git -C "$WT" merge --quiet --ff-only "$sha" || { alert "$ID" "fast-forward of the landing copy to $sha failed" commit; return 1; }
     fi
   fi
   [ "$(git -C "$WT" rev-parse HEAD)" = "$sha" ] && [ "$(git -C "$PROJ" rev-parse "refs/heads/$BRANCH")" = "$sha" ] || {
-    alert "$ID" "landing copy does not read back at $sha after import"
+    alert "$ID" "landing copy does not read back at $sha after import" commit
     return 1
   }
   rec_set "last_imported=$sha"
+  if [ -s "$STATE/$ID.remote-alert" ]; then
+    case "$(cat "$STATE/$ID.remote-alert")" in commit:*) rm -f -- "$STATE/$ID.remote-alert" "$STATE/$ID.remote-alert-seen" ;; esac
+  fi
 }
 
 # --- status import (design 6.4) ---------------------------------------------
@@ -441,7 +458,7 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
   fi
   rm -f -- "$STATE/$id.remote-missing"
   # Commits before status, so a line naming a commit always arrives after it.
-  import_commit "$(sec_get branch_sha)" "$(sec_get head_sha)" "$(sec_get detached)" || true
+  import_commit "$(sec_get branch_sha)" "$(sec_get head_sha)" "$(sec_get detached)" || return 1
   while IFS= read -r name; do
     [ -n "$name" ] || continue
     [ ! -f "$DATA/$id/publish/$name" ] || continue
@@ -515,10 +532,15 @@ remote_focus_restore() {  # <mid> <before> <new-tab>
 
 # Find tabs labeled <label> in every workspace; print "<ws>\t<tab>\t<pane>".
 remote_find_token() {  # <mid> <label>
-  local m=$1 label=$2 wsl ws tl
+  local m=$1 label=$2 wsl ws tl wl
   wsl=$(fm_backend_herdr_cli "$m" workspace list 2>/dev/null) || return 1
   for ws in $(printf '%s' "$wsl" | jq -r '.result.workspaces[].workspace_id'); do
     tl=$(fm_backend_herdr_cli "$m" tab list --workspace "$ws" 2>/dev/null) || return 1
+    wl=$(printf '%s' "$wsl" | jq -r --arg w "$ws" '.result.workspaces[] | select(.workspace_id == $w) | .label')
+    if [ "$wl" = "firstmate.$label" ]; then
+      printf '%s' "$tl" | jq -er --arg ws "$ws" '.result.tabs | if length == 1 then .[0] | "\($ws)\t\(.tab_id)\t\(.root_pane_id // .pane_id // "")" else error("ambiguous initial workspace") end' || return 1
+      continue
+    fi
     printf '%s' "$tl" | jq -r --arg l "$label" --arg ws "$ws" '.result.tabs[] | select(.label == $l) | "\($ws)\t\(.tab_id)\t\(.root_pane_id // .pane_id // "")"'
   done
 }
@@ -528,11 +550,27 @@ remote_pane_of_tab() {  # <mid> <ws> <tab>
     | jq -r --arg t "$3" '[.result.panes[] | select(.tab_id == $t)] | if length == 1 then .[0].pane_id else empty end'
 }
 
+remote_record_workspace() {
+  local m=$1 label=$2 wsrec=$3 out wl recorded
+  out=$(fm_backend_herdr_cli "$m" workspace list) || die "remote workspace inventory failed"
+  wl=$(printf '%s' "$out" | jq -r --arg w "$RWS" '.result.workspaces[] | select(.workspace_id == $w) | .label')
+  recorded=$(cat "$wsrec" 2>/dev/null || true)
+  [ -z "$recorded" ] || [ "$recorded" = "$RWS" ] || die "token belongs to a different workspace"
+  case "$wl" in
+    "firstmate.$label"|firstmate) ;;
+    *) die "token workspace no longer belongs to firstmate" ;;
+  esac
+  fm_backend_herdr_cli "$m" tab rename "$RTAB" "$label" >/dev/null || die "could not label remote task tab"
+  printf '%s\n' "$RWS" > "$wsrec"
+  [ "$wl" = firstmate ] || fm_backend_herdr_cli "$m" workspace rename "$RWS" firstmate >/dev/null || die "could not name remote workspace"
+}
+
 # remote_create_tab: create (or adopt after a lost response) the task tab in
 # the machine's recorded `firstmate` workspace. Sets RWS, RTAB, RPANE.
 remote_create_tab() {  # <mid> <label> <cwd> <inbox>
   local m=$1 label=$2 cwd=$3 inbox=$4 wsrec ws out before found n count
   RWS='' RTAB='' RPANE=''
+  wsrec="$STATE/.remote-workspace-$m"
   found=$(remote_find_token "$m" "$label") || die "remote tab inventory is unreadable; refusing to create a tab that might duplicate one"
   n=$(printf '%s' "$found" | grep -c . || true)
   [ "$n" -le 1 ] || die "several remote tabs carry this launch token ($label); refusing"
@@ -540,10 +578,10 @@ remote_create_tab() {  # <mid> <label> <cwd> <inbox>
     IFS=$'\t' read -r RWS RTAB RPANE <<< "$found"
     [ -n "$RPANE" ] || RPANE=$(remote_pane_of_tab "$m" "$RWS" "$RTAB")
     [ -n "$RPANE" ] || die "adopted remote tab $RTAB has no single pane"
+    remote_record_workspace "$m" "$label" "$wsrec"
     echo "adopted remote tab $RTAB from an earlier attempt"
     return 0
   fi
-  wsrec="$STATE/.remote-workspace-$m"
   ws=$(cat "$wsrec" 2>/dev/null || true)
   if [ -n "$ws" ]; then
     out=$(fm_backend_herdr_cli "$m" workspace list 2>/dev/null) || die "remote workspace list failed"
@@ -552,20 +590,24 @@ remote_create_tab() {  # <mid> <label> <cwd> <inbox>
   fi
   if [ -z "$ws" ]; then
     out=$(fm_backend_herdr_cli "$m" workspace list 2>/dev/null) || die "remote workspace list failed"
-    count=$(printf '%s' "$out" | jq -r '[.result.workspaces[] | select(.label == "firstmate")] | length')
+    count=$(printf '%s' "$out" | jq -r '[.result.workspaces[] | select(.label == "firstmate" or (.label | startswith("firstmate.")))] | length')
     [ "$count" = 0 ] || die "the remote machine already has a workspace labeled firstmate that this home did not record; refusing to guess whether it is ours"
   fi
   before=$(fm_remote_focus_snapshot "$m") || die "remote focus is unreadable; refusing to create a tab"
   if [ -z "$ws" ]; then
-    out=$(fm_backend_herdr_cli "$m" workspace create --label firstmate --cwd "$cwd" --env "FM_TASK_INBOX=$inbox" --no-focus 2>/dev/null) || out=
+    out=$(fm_backend_herdr_cli "$m" workspace create --label "firstmate.$label" --cwd "$cwd" --env "FM_TASK_INBOX=$inbox" --no-focus 2>/dev/null) || out=
     RWS=$(printf '%s' "$out" | jq -r '.result.workspace.workspace_id // empty' 2>/dev/null) || RWS=
     RTAB=$(printf '%s' "$out" | jq -r '.result.tab.tab_id // empty' 2>/dev/null) || RTAB=
     RPANE=$(printf '%s' "$out" | jq -r '.result.root_pane.pane_id // empty' 2>/dev/null) || RPANE=
     if [ -z "$RWS" ] || [ -z "$RTAB" ] || [ -z "$RPANE" ]; then
-      die "remote workspace create returned no ids; inspect the remote firstmate workspace before retrying (a lost response may have created it)"
+      found=$(remote_find_token "$m" "$label") || found=
+      n=$(printf '%s' "$found" | grep -c . || true)
+      [ "$n" = 1 ] || die "remote workspace create lost its response and $n token matches exist; refusing"
+      IFS=$'\t' read -r RWS RTAB RPANE <<< "$found"
+      [ -n "$RPANE" ] || RPANE=$(remote_pane_of_tab "$m" "$RWS" "$RTAB")
+      [ -n "$RPANE" ] || die "adopted remote tab has no single pane"
     fi
-    printf '%s\n' "$RWS" > "$wsrec"
-    fm_backend_herdr_cli "$m" tab rename "$RTAB" "$label" >/dev/null 2>&1 || die "could not label remote tab $RTAB with its launch token"
+    remote_record_workspace "$m" "$label" "$wsrec"
   else
     out=$(fm_backend_herdr_cli "$m" tab create --workspace "$ws" --label "$label" --cwd "$cwd" --env "FM_TASK_INBOX=$inbox" --no-focus 2>/dev/null) || out=
     RWS=$ws
@@ -579,6 +621,7 @@ remote_create_tab() {  # <mid> <label> <cwd> <inbox>
       [ -n "$RPANE" ] || RPANE=$(remote_pane_of_tab "$m" "$RWS" "$RTAB")
     fi
   fi
+  [ -n "$RPANE" ] || die "remote task tab has no single pane"
   remote_focus_restore "$m" "$before" "$RTAB"
 }
 
@@ -630,6 +673,7 @@ mkdir -p "$ROOT/repos" "$ROOT/tasks" || exit 1
 C="$ROOT/repos/$PROJECT.git"
 [ -d "$C" ] || git init --quiet --bare "$C" || exit 1
 [ -z "$(git -C "$C" remote)" ] || { echo "error=cache has remotes"; exit 1; }
+git -C "$C" config core.logAllRefUpdates true || exit 1
 T="$ROOT/tasks/$ID"
 mkdir -p "$T/channel/inbox/handled" "$T/channel/inbox/.placed" "$T/channel/publish" || exit 1
 chmod 700 "$T"
@@ -675,12 +719,12 @@ EOF
 }
 
 spawn_main() {
-  local proj='' machine='' mode='' yolo='' prefix=fm/ base_branch='' harness=claude model='' effort='' a want='' pos=()
+  local proj='' machine='' mode='' yolo='' prefix=fm/ base_branch='' harness=claude model='' a want='' pos=()
   for a in "$@"; do
     if [ -n "$want" ]; then
       case "$want" in
         machine) machine=$a ;; mode) mode=$a ;; yolo) yolo=$a ;; branch-prefix) prefix=$a ;;
-        base-branch) base_branch=$a ;; harness) harness=$a ;; model) model=$a ;; effort) effort=$a ;;
+        base-branch) base_branch=$a ;; harness) harness=$a ;; model) model=$a ;;
         ignore) ;;
       esac
       want=; continue
@@ -688,7 +732,7 @@ spawn_main() {
     case "$a" in
       --machine) want=machine ;; --mode) want=mode ;; --yolo) want=yolo ;;
       --branch-prefix) want='branch-prefix' ;; --base-branch) want='base-branch' ;;
-      --harness) want=harness ;; --model) want=model ;; --effort) want=effort ;;
+      --harness) want=harness ;; --model) want=model ;;
       --traceparent) want=ignore ;;
       --machine=*) machine=${a#*=} ;; --mode=*) mode=${a#*=} ;; --yolo=*) yolo=${a#*=} ;;
       --scout|--secondmate|--relaunch|--backend|--backend=*|--upstream-consent|--upstream-consent=*|--herdr-resume-lock-wait)
@@ -704,7 +748,6 @@ spawn_main() {
   case "$mode" in local-only|direct-PR) ;; *) die "a remote worker ships only local-only or direct-PR (got '${mode:-none}'); no-mistakes delivery is not supported for remote tasks yet" ;; esac
   case "$yolo" in on|off) ;; *) die "--yolo <on|off> is required" ;; esac
   case "$harness" in claude) ;; *) die "a remote worker runs Claude Code only (got '$harness')" ;; esac
-  [ -z "$effort" ] || [ "$effort" = default ] || echo "notice: --effort $effort is not applied to remote workers; the launch uses Claude's default effort" >&2
   BRANCH="$prefix$ID"
   git check-ref-format --branch "$BRANCH" >/dev/null 2>&1 || die "invalid branch '$BRANCH'"
   fm_remote_machine_lookup "$machine" "$CONFIG" || exit 1
@@ -730,6 +773,9 @@ spawn_main() {
   grep -qxF "Ship branch: $BRANCH" "$brief" || die "$brief does not record Ship branch: $BRANCH"
   if [ -n "$base_branch" ]; then
     fm_brief_base_branches "$brief" | grep -qxF -- "$base_branch" || die "$brief must record Base branch: $base_branch"
+  fi
+  if [ "$mode" = direct-PR ]; then
+    publication_gate
   fi
   fm_git_worktree_config "$CONFIG" | grep -qx git || die "remote workers need the native task-copy allocator (config/worktree-allocator=git)"
   # shellcheck source=bin/fm-lease-lib.sh
@@ -855,10 +901,17 @@ spawn_main() {
 
 # --- publication (design 6.7) -----------------------------------------------
 
+publication_gate() {
+  local rc=0
+  fm_role_gate_self_publish "$FM_HOME" "$CONFIG" "$PROJ" "$FM_ROOT" || rc=$?
+  case "$rc" in 0|2) ;; *) die "$FM_ROLE_PUB_DENIAL" ;; esac
+}
+
 publish_main() {  # <id> <sha>
   local sha=$2 repo pr url head draft baseref state body title sha12 bodyfile list
   load_task "$1"
   [ "$MODE" = direct-PR ] || die "publish applies only to direct-PR remote ships (task $ID is $MODE)"
+  publication_gate
   case "$sha" in *[!0-9a-f]*|'') die "publish needs a full commit sha" ;; esac
   [ "${#sha}" -eq 40 ] || die "publish needs a full 40-character commit sha"
   [ "$(git -C "$PROJ" rev-parse --verify --quiet "refs/firstmate/remote/$ID")" = "$sha" ] || die "custody ref does not equal $sha; let the courier import it first"
@@ -904,12 +957,46 @@ publish_main() {  # <id> <sha>
 retire_phase() { fm_meta_get "$STATE/$ID.remote-retire" phase; }
 retire_set() { fm_remote_record_set "$STATE/$ID.remote-retire" "phase=$1" "at=$(now)"; }
 
+preserve_remote_work() {
+  local history sha archive digest
+  history=$( { remote_prelude "$RROOT"; printf 'T=%s C=%s ID=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$ID")"; cat <<'EOF'
+set -e -o pipefail
+{ git -C "$T/wt" reflog show --format=%H HEAD || exit 1; git -C "$C" rev-parse --verify --quiet "refs/firstmate/head/$ID" || true; } | sort -u | while IFS= read -r sha; do
+  git -C "$C" update-ref "refs/firstmate/history/$ID/$sha" "$sha"
+  echo "$sha"
+done
+EOF
+  } | fm_remote_ssh "$TARGET" 60 ) || die "REFUSED: could not collect remote commit history"
+  [ -n "$history" ] || die "REFUSED: remote worktree history is unavailable"
+  GIT_SSH_COMMAND=$(git_ssh_env) fm_run_timed 60 git -C "$PROJ" fetch --quiet --no-tags --no-write-fetch-head \
+    "$(remote_git_url "$TARGET" "$RCACHE")" "refs/firstmate/history/$ID/*:refs/firstmate/remote-history/$ID/*" || die "REFUSED: remote history custody failed"
+  for sha in $history; do
+    [ "$(git -C "$PROJ" rev-parse --verify "refs/firstmate/remote-history/$ID/$sha")" = "$sha" ] || die "REFUSED: missing custody of remote history $sha"
+  done
+  mkdir -p "$DATA/$ID/remote-artifacts"
+  archive=$(mktemp "$DATA/$ID/remote-artifacts/.copy.XXXXXX")
+  if ! { remote_prelude "$RROOT"; printf 'tar --format=ustar -cf - -C %s channel launch.sh settings.json\n' "$(q "$RTASK")"; } | fm_remote_ssh "$TARGET" 60 > "$archive"; then
+    rm -f -- "$archive"
+    die "REFUSED: remote channel artifacts could not be copied"
+  fi
+  digest=$(sha256_stdin < "$archive")
+  mv -f -- "$archive" "$DATA/$ID/remote-artifacts/$digest.tar"
+  fm_remote_record_set "$STATE/$ID.remote-retire" "artifacts=$digest"
+}
+
 remote_proof_script() {  # [remove]
   remote_prelude "$RROOT"
-  printf 'T=%s C=%s BR=%s LAST=%s ID=%s REMOVE=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")" "$(q "$(rec_get last_imported)")" "$(q "$ID")" "$(q "${1:-}")"
+  local artifacts history
+  artifacts=$(fm_meta_get "$STATE/$ID.remote-retire" artifacts)
+  [ -n "$artifacts" ] && [ -f "$DATA/$ID/remote-artifacts/$artifacts.tar" ] && [ "$(sha256_stdin < "$DATA/$ID/remote-artifacts/$artifacts.tar")" = "$artifacts" ] || artifacts=
+  history=$(git -C "$PROJ" for-each-ref --format='%(objectname)' "refs/firstmate/remote-history/$ID/")
+  history=$(printf '%s' "$history" | tr '\n' ' ')
+  printf 'T=%s C=%s BR=%s LAST=%s ID=%s REMOVE=%s ARTIFACTS=%s HISTORY=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")" "$(q "$(rec_get last_imported)")" "$(q "$ID")" "$(q "${1:-}")" "$(q "$artifacts")" "$(q "$history")"
   cat <<'EOF'
+set -o pipefail
 bad=""
-[ -d "$T/wt" ] || { echo "proof=missing"; exit 0; }
+bs=$(git -C "$C" rev-parse --verify --quiet "refs/heads/$BR")
+if [ -d "$T/wt" ]; then
 s=$(git -C "$T/wt" status --porcelain --untracked-files=all) || bad="$bad status-unreadable"
 o=$(git -C "$T/wt" ls-files --others) || bad="$bad others-unreadable"
 [ -z "$s$o" ] || bad="$bad dirty:$(printf '%s %s' "$s" "$o" | tr '\n' ' ' | cut -c1-300)"
@@ -918,17 +1005,39 @@ h=$(git -C "$T/wt" symbolic-ref --quiet --short HEAD || echo detached)
 hs=$(git -C "$T/wt" rev-parse HEAD 2>/dev/null)
 bs=$(git -C "$C" rev-parse --verify --quiet "refs/heads/$BR")
 [ -n "$LAST" ] && [ "$hs" = "$bs" ] && [ "$bs" = "$LAST" ] || bad="$bad unimported:head=$hs,branch=$bs,imported=$LAST"
+history=$(git -C "$T/wt" reflog show --format=%H HEAD) || bad="$bad history-unreadable"
+[ -n "$history" ] || bad="$bad history-missing"
+else
+  [ "$REMOVE" = resume ] && [ ! -e "$T/wt" ] || bad="$bad worktree-missing"
+  hs=$LAST h=$BR
+  [ -z "$bs" ] || [ "$bs" = "$LAST" ] || bad="$bad branch-changed"
+  history=
+fi
+refs=$(git -C "$C" for-each-ref --format='%(objectname)' "refs/firstmate/history/$ID/" "refs/firstmate/head/$ID") || bad="$bad refs-unreadable"
+history="$history $refs"
+for sha in $history; do
+  case " $HISTORY " in *" $sha "*) ;; *) bad="$bad history-not-imported:$sha" ;; esac
+done
+[ -n "$ARTIFACTS" ] || bad="$bad artifacts-not-preserved"
+if [ -d "$T" ]; then
+  digest=$(tar --format=ustar -cf - -C "$T" channel launch.sh settings.json | shasum -a 256 | awk '{print $1}') || bad="$bad artifacts-unreadable"
+  [ "$digest" = "$ARTIFACTS" ] || bad="$bad artifacts-changed"
+fi
 git -C "$C" rev-parse --verify --quiet refs/stash >/dev/null && bad="$bad stash"
-for e in "$T"/* "$T"/.[!.]*; do
-  [ -e "$e" ] || continue
+for e in "$T"/* "$T"/.[!.]* "$T"/..?*; do
+  [ -e "$e" ] || [ -L "$e" ] || continue
   case "${e##*/}" in wt|channel|launch.sh|settings.json) ;; *) bad="$bad extra:${e##*/}" ;; esac
 done
 if [ -n "$bad" ]; then echo "proof=refused"; echo "found=$bad"; exit 0; fi
 echo "proof=ok"
 echo "digest=$(printf '%s %s %s' "$hs" "$bs" "$h" | shasum -a 256 | cut -c1-16)"
-if [ "$REMOVE" = remove ]; then
-  git -C "$C" worktree remove "$T/wt" || { echo "removed=0"; exit 0; }
-  [ "$(git -C "$C" rev-parse --verify --quiet "refs/heads/$BR")" = "$LAST" ] && git -C "$C" update-ref -d "refs/heads/$BR"
+if [ "$REMOVE" = remove ] || [ "$REMOVE" = resume ]; then
+  if [ -d "$T/wt" ]; then
+    git -C "$C" worktree remove "$T/wt" || { echo "removed=0"; exit 0; }
+  fi
+  if [ -n "$bs" ]; then
+    git -C "$C" update-ref -d "refs/heads/$BR" "$LAST" || { echo "removed=0"; exit 0; }
+  fi
   git -C "$C" update-ref -d "refs/firstmate/head/$ID" 2>/dev/null || true
   case "$T" in "$ROOT"/tasks/*) rm -rf -- "$T" ;; esac
   [ ! -e "$T" ] && echo "removed=1" || echo "removed=0"
@@ -958,18 +1067,24 @@ retire_main() {  # <id> <prepare|remove>
   local step=$2 out phase pane
   load_task "$1"
   RROOT=$(rec_get root)
-  ( sync_machine "$MID" ) >/dev/null 2>&1 || true
   phase=$(retire_phase)
   if [ "$phase" = removing ] || [ "$phase" = removed ]; then
     out=$( { remote_prelude "$RROOT"; printf 'T=%s C=%s BR=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")"; echo '[ -e "$T" ] && echo present=1 || echo present=0; git -C "$C" rev-parse --verify --quiet "refs/heads/$BR" >/dev/null && echo branch=1 || echo branch=0'; } | fm_remote_ssh "$TARGET") \
       || die "REFUSED: $MLABEL is unreachable; remote removal state for $ID cannot be confirmed; every record kept"
     case "$out" in *present=0*branch=0*) retire_set removed; echo "remote copy for $ID already removed"; return 0 ;; esac
     [ "$phase" = removing ] || die "REFUSED: remote folder for $ID reappeared after removal; inspect $RTASK"
+    out=$(remote_proof_script resume | fm_remote_ssh "$TARGET") || die "REFUSED: remote removal retry lost its response; every record kept"
+    case "$out" in
+      *removed=1*) retire_set removed; echo "remote copy for $ID removed"; return 0 ;;
+      *) die "REFUSED: remote removal retry could not prove remaining contents safe: $out" ;;
+    esac
   fi
+  ( sync_machine "$MID" ) >/dev/null 2>&1 || true
   fm_remote_link_reachable "$STATE" "$MID" || die "REFUSED: remote machine $MLABEL is $(fm_remote_link_state "$STATE" "$MID"); cleanup waits for it with every record intact"
   [ ! -e "$STATE/$ID.remote-missing" ] || die "REFUSED: the remote folder for $ID is missing; last imported commit is $(rec_get last_imported). Firstmate must report this and ask before cleanup."
   case "$step" in
     prepare)
+      preserve_remote_work
       # Read-only proof first: unimported work refuses while the worker is
       # still live to tidy it up, before anything is closed.
       out=$(remote_proof_script | fm_remote_ssh "$TARGET") || die "REFUSED: remote proof for $ID could not run"
@@ -985,6 +1100,7 @@ retire_main() {  # <id> <prepare|remove>
       retire_set transfer
       ( sync_machine "$MID" ) >/dev/null 2>&1 || true
       [ ! -s "$STATE/$ID.remote-alert" ] || die "REFUSED: the final transfer for $ID reported: $(cat "$STATE/$ID.remote-alert")"
+      preserve_remote_work
       retire_set proof
       out=$(remote_proof_script | fm_remote_ssh "$TARGET") || die "REFUSED: remote proof for $ID could not run"
       case "$out" in
@@ -1013,6 +1129,7 @@ relaunch_main() {  # <id>
   local pane gen out i ok=0
   load_task "$1"
   RROOT=$(rec_get root)
+  rm -f -- "$STATE/$ID.remote-procs"
   ( sync_machine "$MID" ) >/dev/null 2>&1 || true
   fm_remote_link_reachable "$STATE" "$MID" || die "REFUSED: $MLABEL is not reachable; nothing relaunched"
   pane=$(fm_meta_get "$META" window)

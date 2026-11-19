@@ -277,7 +277,7 @@ fm_control_relaunch_resume_flag() {  # <harness> <registered-agent>
 fm_control_backend_supports_key() {  # <backend> <key>
   local backend=${1-} key=${2-}
   case "$backend" in
-    tmux|herdr)
+    tmux|herdr|herdr-remote)
       case "$key" in Escape|Enter|C-c|C-u) return 0 ;; esac
       ;;
   esac
@@ -291,7 +291,7 @@ fm_control_backend_supports_key() {  # <backend> <key>
 # transition as success.
 fm_control_backend_state_verified() {  # <backend>
   case "${1-}" in
-    tmux|herdr) return 0 ;;
+    tmux|herdr|herdr-remote) return 0 ;;
   esac
   return 1
 }

@@ -41,6 +41,7 @@ cat > "$STUBS/ssh" <<'SH'
 #!/usr/bin/env bash
 while [ $# -gt 0 ]; do case "$1" in -o|-p|-i|-l) shift 2 ;; -*) shift ;; *) break ;; esac; done
 shift
+case "$*" in *git-upload-pack*) [ ! -e "$FAKE_REMOTE_HOME/.fetch-fails" ] || exit 255 ;; esac
 [ ! -e "$FAKE_REMOTE_HOME/.down" ] || { echo "ssh: connect to host: Operation timed out" >&2; exit 255; }
 mkdir -p "$FAKE_REMOTE_HOME/tmp"
 HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
@@ -66,6 +67,7 @@ printf '%s\n' "$*" >> "$log"
 case "$1 $2" in
   "workspace list")
     if [ -e "$FAKE_HERDR_DB/nofocus" ]; then jq -c '{result:{workspaces:[.ws[]|.focused=false]}}' "$db"; else jq -c '{result:{workspaces:.ws}}' "$db"; fi ;;
+  "workspace rename") upd --arg w "$3" --arg l "$4" '(.ws[]|select(.workspace_id==$w)|.label) = $l'; echo '{"result":{}}' ;;
   "workspace create")
     shift 2; label= cwd=
     while [ $# -gt 0 ]; do case "$1" in --label) label=$2; shift 2 ;; --cwd) cwd=$2; shift 2 ;; --env) shift 2 ;; *) shift ;; esac; done
@@ -102,13 +104,39 @@ case "$1 $2" in
     echo "$!" >> "$FAKE_HERDR_DB/pids.${tab//:/_}"
     echo '{"result":{}}' ;;
   "agent get") echo '{"result":{"agent":{"agent":"claude","agent_status":"idle"}}}' ;;
-  "pane read") printf '\n' ;;
-  "pane send-text"|"pane send-keys") echo '{"result":{}}' ;;
+  "pane read")
+    [ -e "$FAKE_HERDR_DB/control-ui" ] || { printf '\n'; exit 0; }
+    text=$(cat "$FAKE_HERDR_DB/composer.${3//:/_}" 2>/dev/null)
+    printf '  ╭────────────────────────╮\n  │ ❯ %-20s │\n  ╰──────── Composer ──────╯\n' "$text" ;;
+  "pane send-text") printf '%s' "$4" > "$FAKE_HERDR_DB/composer.${3//:/_}"; echo '{"result":{}}' ;;
+  "pane send-keys")
+    f="$FAKE_HERDR_DB/composer.${3//:/_}"
+    if [ "$4" = enter ]; then
+      if [ "$(cat "$f" 2>/dev/null)" = /exit ] && [ ! -e "$FAKE_HERDR_DB/ignore-exit" ]; then
+        tab=$(jq -r --arg p "$3" '.panes[]|select(.pane_id==$p)|.tab_id' "$db")
+        for pid in $(cat "$FAKE_HERDR_DB/pids.${tab//:/_}" 2>/dev/null); do pkill -P "$pid" 2>/dev/null; done
+      fi
+      rm -f "$f"
+    fi
+    echo '{"result":{}}' ;;
   *) echo "{\"error\":{\"code\":\"unsupported\",\"message\":\"$*\"}}"; exit 1 ;;
 esac
 SH
 chmod +x "$STUBS/ssh" "$STUBS/herdr" "$REMOTE_STUBS/claude"
 export PATH="$STUBS:$PATH" FM_REMOTE_SSH="$STUBS/ssh"
+
+cleanup_remote_fixture() {
+  local f pid
+  for f in "$HERDR_DB"/pids.*; do
+    [ -f "$f" ] || continue
+    while IFS= read -r pid; do
+      pkill -P "$pid" 2>/dev/null || true
+      kill "$pid" 2>/dev/null || true
+    done < "$f"
+  done
+  fm_test_cleanup
+}
+trap cleanup_remote_fixture EXIT
 
 RT="$ROOT/bin/fm-remote-task.sh"
 ST="$HOMEDIR/state"
@@ -130,6 +158,13 @@ grep -q 'already on its branch' "$B" || fail 'remote brief still asks the worker
 if "$ROOT/bin/fm-brief.sh" r9 proj --mode no-mistakes --machine pegasus >/dev/null 2>&1; then fail 'a no-mistakes remote brief was scaffolded'; fi
 pass 'fm-brief --machine scaffolds remote paths and refuses no-mistakes'
 sed -i.bak 's/{TASK}/do the pilot/; s/{FIRSTMATE_SPEC}/small change/' "$B"
+
+for option in '--effort high' '--effort=default'; do
+  # shellcheck disable=SC2086
+  OUT=$("$ROOT/bin/fm-spawn.sh" r1 "$PROJ" --machine pegasus --mode local-only --yolo off $option 2>&1) && fail 'remote spawn accepted unsupported effort'
+  case "$OUT" in *"unknown option '--effort"*) ;; *) fail "effort refusal was not explicit: $OUT" ;; esac
+  [ ! -e "$ST/r1.remote" ] || fail 'unsupported effort provisioned a remote task'
+done
 
 # --- spawn ---------------------------------------------------------------------
 OUT=$("$ROOT/bin/fm-spawn.sh" r1 "$PROJ" --machine pegasus --mode local-only --yolo off 2>&1) || fail "remote spawn failed: $OUT"
@@ -175,6 +210,23 @@ WT=$(sed -n 's/^worktree=//p' "$META")
 [ "$(git -C "$WT" rev-parse HEAD)" = "$SHA1" ] && [ "$(git -C "$WT" symbolic-ref --short HEAD)" = fm/r1 ] || fail 'the landing copy was not fast-forwarded onto the named branch'
 [ "$(git -C "$PROJ" rev-parse refs/firstmate/remote/r1)" = "$SHA1" ] || fail 'the custody ref does not hold the imported commit'
 pass 'the courier imports commits before complete status lines, exactly once'
+OFF=$(sed -n 's/^status_offset=//p' "$ST/r1.remote")
+git -C "$RTASK/wt" commit -q --allow-empty -m work2
+SHA2=$(git -C "$RTASK/wt" rev-parse HEAD)
+printf 'done [at=2]: ready after transport recovery\n' >> "$RTASK/channel/status"
+touch "$REMOTE_HOME/.fetch-fails"
+sync_now
+[ "$(sed -n 's/^status_offset=//p' "$ST/r1.remote")" = "$OFF" ] || fail 'failed commit custody advanced the status cursor'
+[ "$(git -C "$WT" rev-parse HEAD)" = "$SHA1" ] || fail 'failed fetch advanced the landing copy'
+! grep -q 'ready after transport recovery' "$ST/r1.status" || fail 'completion arrived before commit custody'
+grep -q '^commit:' "$ST/r1.remote-alert" || fail 'failed custody did not record its condition'
+rm -f "$REMOTE_HOME/.fetch-fails"
+sync_now
+[ "$(git -C "$WT" rev-parse HEAD)" = "$SHA2" ] || fail 'recovery did not import the commit'
+[ "$(grep -c 'ready after transport recovery' "$ST/r1.status")" = 1 ] || fail 'recovery lost or repeated completion'
+[ ! -e "$ST/r1.remote-alert" ] || fail 'successful custody left its resolved alert blocking cleanup'
+pass 'failed commit custody defers completion and resolves its own alert after recovery'
+
 
 for point in after-journal after-append after-receipt; do
   printf 'working [at=3]: %s\n' "$point" >> "$RTASK/channel/status"
@@ -192,7 +244,10 @@ OFF=$(sed -n 's/^status_offset=//p' "$ST/r1.remote")
 sync_now
 grep -q 'replaced or shortened' "$ST/r1.remote-alert" || fail 'a shortened remote status log did not raise a continuity alert'
 [ "$(sed -n 's/^status_offset=//p' "$ST/r1.remote")" = "$OFF" ] || fail 'the status offset moved after a continuity break'
-cp "$T/status.save" "$RTASK/channel/status"; rm -f "$ST/r1.remote-alert"
+cp "$T/status.save" "$RTASK/channel/status"
+sync_now
+grep -q 'replaced or shortened' "$ST/r1.remote-alert" || fail 'successful commit custody cleared an unresolved continuity alert'
+rm -f "$ST/r1.remote-alert"
 pass 'a replaced or shortened remote status log stops import and keeps the offset'
 
 # --- instructions -------------------------------------------------------------
@@ -234,6 +289,8 @@ CS=$(FM_CREW_STATE_NO_FORGE=1 "$ROOT/bin/fm-crew-state.sh" r1 2>/dev/null)
 case "$CS" in "state: done"*unknown*|"state: done"*"not proof of death"*) ;; *) fail "crew state masked the worker's done line during an outage: $CS" ;; esac
 if "$RT" retire r1 prepare >/dev/null 2>&1; then fail 'cleanup ran while the machine was unreachable'; fi
 [ -f "$META" ] && [ -d "$RTASK/wt" ] || fail 'a refused cleanup changed records'
+if "$ROOT/bin/fm-control.sh" r1 interrupt >/dev/null 2>&1; then fail 'interrupt ran during an outage'; fi
+if "$ROOT/bin/fm-control.sh" r1 exit >/dev/null 2>&1; then fail 'exit claimed a stopped worker during an outage'; fi
 rm -f "$REMOTE_HOME/.down"; touch "$HERDR_DB/down"
 sync_now
 [ "$(sed -n 's/^state=//p' "$ST/.remote-link-$MID")" = herdr-unavailable ] || fail 'a down remote Herdr did not read herdr-unavailable'
@@ -247,6 +304,17 @@ printf 'incarnation=999@restarted\n' >> "$ST/.remote-link-$MID"
 herdr --machine "$MID" tab rename w2:t1 reused >/dev/null
 if (. "$ROOT/bin/fm-backend.sh"; fm_backend_kill herdr-remote "$W") 2>/dev/null; then fail 'a close ran on a reused pane id after a server restart'; fi
 hstate | jq -e '.tabs[]|select(.tab_id=="w2:t1")' >/dev/null || fail 'a reused tab was closed'
+sync_now
+: > "$HERDR_DB/log"
+if (. "$ROOT/bin/fm-backend.sh"; fm_backend_capture herdr-remote "$W" 20) >/dev/null 2>&1; then fail 'capture read a reused personal pane'; fi
+if (. "$ROOT/bin/fm-backend.sh"; fm_backend_visible_capture herdr-remote "$W") >/dev/null 2>&1; then fail 'visible capture read a reused personal pane'; fi
+if (. "$ROOT/bin/fm-backend.sh"; fm_backend_target_exists herdr-remote "$W") >/dev/null 2>&1; then fail 'a reused pane was reported as the task target'; fi
+[ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_composer_state herdr-remote "$W" 2>/dev/null)" = unknown ] || fail 'composer read a reused pane'
+[ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_busy_state herdr-remote "$W" 2>/dev/null)" = unknown ] || fail 'activity read a reused pane'
+[ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_agent_state herdr-remote "$W" 2>/dev/null)" = unreadable ] || fail 'reused pane inherited task process evidence'
+FM_CREW_STATE_NO_FORGE=1 "$ROOT/bin/fm-crew-state.sh" r1 >/dev/null 2>&1
+! grep -Eq '^(pane read|agent get)' "$HERDR_DB/log" || fail 'a task read reached an unrelated pane'
+printf 'incarnation=999@restarted\n' >> "$ST/.remote-link-$MID"
 herdr --machine "$MID" tab rename w2:t1 "$LABEL" >/dev/null
 (. "$ROOT/bin/fm-backend.sh"; fm_backend_source herdr-remote; fm_remote_identity_ok "$W") || fail 'a restarted server with the token intact was refused'
 grep -q '^incarnation=999@restarted$' "$ST/r1.remote" || fail 'a proven token match did not re-bind the incarnation'
@@ -263,7 +331,24 @@ rm -f "$HERDR_DB/nofocus"
 hstate | jq -e --arg p "${W#*:}" '.panes[]|select(.pane_id==$p)' >/dev/null || fail 'a deferred close removed the pane'
 pass 'a close is deferred on the focused tab or unreadable focus'
 
+touch "$HERDR_DB/control-ui"
+OUT=$(FM_CONTROL_EXIT_WAIT=1 "$ROOT/bin/fm-control.sh" r1 interrupt 2>&1) || fail "remote interrupt failed: $OUT"
+case "$OUT" in *interrupt-delivered*verified=agent-alive*) ;; *) fail "interrupt did not prove the agent remained running: $OUT" ;; esac
+touch "$HERDR_DB/ignore-exit"
+if FM_CONTROL_EXIT_WAIT=1 "$ROOT/bin/fm-control.sh" r1 exit > "$T/control.out" 2>&1; then fail 'exit claimed success while the remote agent remained running'; fi
+[ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_agent_state herdr-remote "$W")" = alive ] || fail 'the unconfirmed exit test did not keep its agent running'
+rm -f "$HERDR_DB/ignore-exit"
+"$ROOT/bin/fm-control.sh" r1 exit > "$T/control.out" 2>&1 || fail "remote exit failed: $(cat "$T/control.out")"
+grep -q '^stopped r1 ' "$T/control.out" || fail 'exit did not confirm the remote agent stopped'
+grep -q '^agents=0$' "$ST/r1.remote-procs" || fail 'exit used a stale process observation'
+"$ROOT/bin/fm-control.sh" r1 relaunch --note 'Continue after the controlled stop' > "$T/control.out" 2>&1 || fail "remote control relaunch failed: $(cat "$T/control.out")"
+grep -q '^agents=1$' "$ST/r1.remote-procs" || fail 'control relaunch did not observe the replacement agent'
+grep -q 'Continue after the controlled stop' "$RTASK"/channel/inbox/*.msg || fail 'the replacement did not receive its progress note'
+pass 'remote controls interrupt, confirm exit with fresh observations, and relaunch with the progress note'
+
 # --- crash and relaunch ------------------------------------------------------
+if "$ROOT/bin/fm-control.sh" r1 relaunch --harness codex --note 'unsupported' >/dev/null 2>&1; then fail 'remote controls accepted an unsupported runtime override'; fi
+if "$ROOT/bin/fm-spawn.sh" r1 --relaunch --effort high >/dev/null 2>&1; then fail 'direct remote relaunch silently ignored effort'; fi
 GEN1=$(awk '{print $2}' "$RTASK/channel/pane.pid")
 if "$RT" relaunch r1 >/dev/null 2>&1; then fail 'a relaunch ran over a live agent'; fi
 pkill -P "$(awk '{print $1}' "$RTASK/channel/pane.pid")"
@@ -295,9 +380,34 @@ proof_refuses 'an extra file' 'touch "$RTASK/extra"' 'rm -f "$RTASK/extra"'
 hstate | jq -e --arg p "${W#*:}" '.panes[]|select(.pane_id==$p)' >/dev/null || fail 'a refused cleanup closed the worker it refused for'
 pass 'cleanup refuses and preserves ignored, untracked, staged, detached, stashed, and extra work, leaving the worker live'
 
+git -C "$RTASK/wt" checkout -q --detach
+git -C "$RTASK/wt" commit -q --allow-empty -m abandoned-between-copies
+ABANDONED=$(git -C "$RTASK/wt" rev-parse HEAD)
+git -C "$RTASK/wt" checkout -q fm/r1
+! git -C "$PROJ" cat-file -e "$ABANDONED^{commit}" 2>/dev/null || fail 'the abandoned-commit fixture was already imported'
+mkdir -p "$RTASK/channel/scratch"
+printf 'verification evidence\000binary\n' > "$RTASK/channel/scratch/.evidence"
+cp "$RTASK/channel/scratch/.evidence" "$T/evidence.expected"
 "$RT" retire r1 prepare > "$T/retire.out" 2>&1 || fail "cleanup prepare failed on a clean copy: $(cat "$T/retire.out")"
+[ "$(git -C "$PROJ" rev-parse "refs/firstmate/remote-history/r1/$ABANDONED")" = "$ABANDONED" ] || fail 'cleanup lost a commit abandoned between courier passes'
+ARCHIVE=$(sed -n 's/^artifacts=//p' "$ST/r1.remote-retire")
+tar -xOf "$HOMEDIR/data/r1/remote-artifacts/$ARCHIVE.tar" channel/scratch/.evidence > "$T/evidence.actual" || fail 'the saved channel archive omitted scratch evidence'
+cmp -s "$T/evidence.expected" "$T/evidence.actual" || fail 'saved channel evidence changed bytes'
+printf new >> "$RTASK/channel/scratch/.evidence"
+if "$RT" retire r1 remove >/dev/null 2>&1; then fail 'cleanup removed an artifact changed after preservation'; fi
+[ -d "$RTASK/wt" ] || fail 'artifact proof refusal removed the worktree'
+cp "$T/evidence.expected" "$RTASK/channel/scratch/.evidence"
+"$RT" retire r1 prepare > "$T/retire.out" 2>&1 || fail "cleanup could not refresh artifact custody: $(cat "$T/retire.out")"
+
 grep -q '^phase=proven' "$ST/r1.remote-retire" || fail 'the proven phase was not recorded'
-"$RT" retire r1 remove >/dev/null 2>&1 || fail 'remote removal failed'
+sed -i.bak 's/^phase=.*/phase=removing/' "$ST/r1.remote-retire"
+git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" worktree remove "$RTASK/wt"
+IMPORTED=$(sed -n 's/^last_imported=//p' "$ST/r1.remote")
+git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" update-ref refs/heads/fm/r1 "$ABANDONED"
+if "$RT" retire r1 remove >/dev/null 2>&1; then fail 'removal retry deleted a changed remote branch'; fi
+[ -d "$RTASK" ] || fail 'changed-branch refusal removed remaining artifacts'
+git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" update-ref refs/heads/fm/r1 "$IMPORTED"
+"$RT" retire r1 remove > "$T/remove.out" 2>&1 || fail "remote removal did not resume after worktree deletion: $(cat "$T/remove.out")"
 [ ! -e "$RTASK" ] || fail 'the remote task folder survived removal'
 ! git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" rev-parse --verify --quiet refs/heads/fm/r1 >/dev/null || fail 'the cache branch survived removal'
 fm_remote_set() { sed -i.bak "s/^phase=.*/phase=$1/" "$ST/r1.remote-retire"; }
@@ -310,15 +420,11 @@ pass 'proven cleanup removes both remote ends and a rerun after removal finishes
 "$ROOT/bin/fm-brief.sh" r2 proj --mode local-only --machine pegasus >/dev/null
 sed -i.bak 's/{TASK}/two/; s/{FIRSTMATE_SPEC}/two/' "$HOMEDIR/data/r2/brief.md"
 touch "$HERDR_DB/lose-create"
-"$ROOT/bin/fm-spawn.sh" r2 "$PROJ" --machine pegasus --mode local-only --yolo off >/dev/null 2>&1
+OUT=$("$ROOT/bin/fm-spawn.sh" r2 "$PROJ" --machine pegasus --mode local-only --yolo off 2>&1) || fail "lost workspace response was not adopted: $OUT"
 rm -f "$HERDR_DB/lose-create"
-[ ! -e "$ST/r2.meta" ] || fail 'a spawn with a lost workspace response published a record'
-OUT=$("$ROOT/bin/fm-spawn.sh" r2 "$PROJ" --machine pegasus --mode local-only --yolo off 2>&1) && fail 'a retry adopted an unrecorded firstmate workspace'
-case "$OUT" in *'labeled firstmate'*) ;; *) fail "retry after a lost workspace create did not refuse plainly: $OUT" ;; esac
-# The captain removes the orphan; the task then spawns and records its workspace.
-ORPHAN=$(hstate | jq -r '.ws[]|select(.label=="firstmate")|.workspace_id')
-herdr --machine "$MID" tab close "$ORPHAN:t1" >/dev/null
-"$ROOT/bin/fm-spawn.sh" r2 "$PROJ" --machine pegasus --mode local-only --yolo off >/dev/null 2>&1 || fail 'r2 did not spawn after the orphan was removed'
+[ -e "$ST/r2.meta" ] || fail 'adopted initial workspace did not publish a task record'
+[ "$(hstate | jq '[.ws[]|select(.label=="firstmate")]|length')" = 1 ] || fail 'workspace recovery duplicated the workspace'
+[ "$(cat "$ST/.remote-workspace-$MID")" = "$(hstate | jq -r '.ws[]|select(.label=="firstmate")|.workspace_id')" ] || fail 'workspace recovery did not record custody'
 for id in r3 r4; do
   "$ROOT/bin/fm-brief.sh" $id proj --mode local-only --machine pegasus >/dev/null
   sed -i.bak 's/{TASK}/x/; s/{FIRSTMATE_SPEC}/x/' "$HOMEDIR/data/$id/brief.md"
@@ -330,7 +436,7 @@ touch "$HERDR_DB/dup-create"
 if "$ROOT/bin/fm-spawn.sh" r4 "$PROJ" --machine pegasus --mode local-only --yolo off >/dev/null 2>&1; then fail 'a lost create with two token matches was adopted'; fi
 [ ! -e "$ST/r4.meta" ] || fail 'a refused duplicate create published a record'
 rm -f "$HERDR_DB/lose-create" "$HERDR_DB/dup-create"
-pass 'a lost create adopts exactly one token match and refuses an orphan or duplicates'
+pass 'lost workspace and tab responses adopt exactly one token match and refuse duplicates'
 
 # --- publication gates -------------------------------------------------------
 cat > "$STUBS/gh" <<'SH'
@@ -344,6 +450,7 @@ esac
 SH
 chmod +x "$STUBS/gh"
 ORIGIN="$T/origin.git"; git clone -q --bare "$PROJ" "$ORIGIN"
+git -C "$ORIGIN" remote set-url origin https://github.com/acme/proj
 PROJ2="$T/pproj"; git clone -q "$ORIGIN" "$PROJ2"
 git -C "$PROJ2" remote set-url origin https://github.com/acme/proj
 git -C "$PROJ2" config url."$ORIGIN".insteadOf https://github.com/acme/proj
@@ -367,3 +474,27 @@ grep -q "^done \[at=[0-9]*\]: PR https://github.com/acme/proj/pull/7$" "$ST/p1.s
 echo true > "$HERDR_DB/gh.draft"
 if "$RT" publish p1 "$PSHA" >/dev/null 2>&1; then fail 'publish accepted a draft PR'; fi
 pass 'publication pushes only the verified commit, finds a lost PR, and refuses drafts and mismatches'
+
+SELF_ROOT=$(git -C "$ROOT" rev-list --max-parents=0 HEAD | head -n1)
+git -C "$PROJ2" fetch -q "$ROOT" "$SELF_ROOT" || fail 'could not construct self-repository lineage'
+"$ROOT/bin/fm-brief.sh" self1 pproj --mode direct-PR --machine pegasus >/dev/null
+sed -i.bak 's/{TASK}/self/; s/{FIRSTMATE_SPEC}/self/' "$HOMEDIR/data/self1/brief.md"
+OUT=$("$ROOT/bin/fm-spawn.sh" self1 "$PROJ2" --machine pegasus --mode direct-PR --yolo off 2>&1) && fail 'remote dispatch bypassed self-publication authority'
+case "$OUT" in *'no publication authority'*) ;; *) fail "dispatch did not identify the missing authority: $OUT" ;; esac
+[ ! -e "$ST/self1.remote" ] || fail 'unauthorized dispatch provisioned a remote worker'
+BEFORE=$(cat "$HERDR_DB/gh.log")
+OUT=$("$RT" publish p1 "$PSHA" 2>&1) && fail 'remote publication bypassed self-publication authority'
+case "$OUT" in *'no publication authority'*) ;; *) fail "publication did not identify the missing authority: $OUT" ;; esac
+[ "$(cat "$HERDR_DB/gh.log")" = "$BEFORE" ] || fail 'unauthorized publication called GitHub'
+printf 'maintainer github.com/acme/proj\n' > "$HOMEDIR/config/firstmate-role"
+echo false > "$HERDR_DB/gh.draft"
+"$RT" publish p1 "$PSHA" > "$T/pub.out" 2>&1 || fail "authorized self-publication was refused: $(cat "$T/pub.out")"
+pass 'remote dispatch and publication require the existing explicit self-publication authority'
+
+"$RT" retire r3 prepare > "$T/retire.out" 2>&1 || fail "r3 cleanup preparation failed: $(cat "$T/retire.out")"
+sed -i.bak 's/^phase=.*/phase=removing/' "$ST/r3.remote-retire"
+git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" worktree remove "$REMOTE_HOME/firstmate-remote/tasks/r3/wt"
+git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" update-ref -d refs/heads/fm/r3
+"$RT" retire r3 remove > "$T/remove.out" 2>&1 || fail "removal did not resume after branch deletion: $(cat "$T/remove.out")"
+[ ! -e "$REMOTE_HOME/firstmate-remote/tasks/r3" ] || fail 'resumed removal left the remote folder'
+pass 'removal also resumes when both the worktree and task branch are already absent'

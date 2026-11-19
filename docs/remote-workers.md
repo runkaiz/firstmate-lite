@@ -28,9 +28,9 @@ The worker uses the remote machine's own Claude login in `auto` permission mode;
 
 The spawn creates the tab with `--no-focus` in one remote workspace labeled `firstmate`, recorded by exact id; the captain's own workspaces are never addressed or touched.
 If focus moved onto the new tab it is moved back to the exact tab recorded just before; if it moved anywhere else it is left alone and reported.
-A random launch token in the tab label lets a retry after a lost create response adopt exactly one match; several matches, or an unrecorded `firstmate` workspace, refuse.
+A random launch token is carried by the initial workspace creation, then its task tab label, so a lost workspace or tab create response adopts exactly one match; several matches, or an unrecorded `firstmate` workspace, refuse.
 A remote task records `backend=herdr-remote` and `window=<profile-id>:<pane-id>`, so its key can never equal a local `<session>:<pane-id>` key.
-The remote server's incarnation (its socket owner's pid and start time) is recorded at create and re-read by every courier pass; after it changes, pane ids may have been reused, so any close, keystroke, or relaunch proceeds only while the recorded tab still carries the task's launch-token label.
+The remote server's incarnation (its socket owner's pid and start time) is recorded at create and re-read by every courier pass; after it changes, pane ids may have been reused, so any task read, close, keystroke, or relaunch proceeds only while the recorded tab still carries the task's launch-token label.
 
 ## The courier
 
@@ -38,15 +38,16 @@ The remote server's incarnation (its socket owner's pid and start time) is recor
 Each pass imports, in this order:
 
 1. **Commits.** The remote branch is fetched into `refs/firstmate/remote/<id>`, a detached remote `HEAD` into `refs/firstmate/remote/<id>-head`, and the landing copy here is fast-forwarded onto the named branch and checked out on it.
-   A non-fast-forward is never forced; it raises a finding.
+   A failed custody check defers status import until recovery; a non-fast-forward is never forced.
 2. **Status lines.** Only complete lines are imported, exactly once, through a per-task journal that survives a crash at any step.
    A replaced or shortened remote log stops import for that task and raises a finding; the offset is never reset silently.
 3. **Instructions.** `bin/fm-send.sh` only queues a remote steer here.
    The courier places it remotely once (a receipt directory makes a retry harmless), rings the doorbell only after placement is confirmed, and moves the local record to `handled/` when the worker acknowledges it remotely.
-   `bin/fm-send.sh --key` refuses a remote worker; lifecycle keys go only through `bin/fm-control.sh`, and only while the machine reads reachable.
+   `bin/fm-send.sh --key` refuses a remote worker; lifecycle keys go only through `bin/fm-control.sh`, and only while the machine reads reachable; exit and relaunch refresh the remote process evidence before confirming a stop.
 4. **Process rows.** The processes below the pane shell are recorded, so liveness and the agent-free proof come from the remote machine's own process table, never from this machine's.
 
 Every finding lands in `state/<id>.remote-alert` and reaches firstmate as one check notification.
+Successful commit custody clears its own transient finding while leaving unresolved continuity and placement findings intact.
 
 ## When the machine is asleep, offline, or disconnected
 
@@ -69,6 +70,7 @@ Anything the worker did after the last successful pass exists only on the remote
 The worker commits, writes the PR text to `channel/publish/<sha>.md`, and appends a `paused [key=publish-<sha12>]` publication request; it never writes `done:` and never reaches the forge.
 After the courier imports that commit and text, `bin/fm-remote-task.sh publish <id> <sha>` refuses unless the custody ref, the landing copy's branch, and its `HEAD` all equal `<sha>`, the copy is clean, and `<sha>` contains the recorded base.
 It then pushes exactly `<sha>` to the task branch without force, finds or opens one ready PR with explicit `--repo`, `--head`, and `--base`, reads it back, records `pr=` and the `done:` line, and tells the worker the URL.
+Remote dispatch and publication enforce the existing [Firstmate role](configuration.md#firstmate-role-configfirstmate-role) authority for publishing Firstmate itself.
 Merging stays with `bin/fm-pr-merge.sh` under the ordinary merge authority.
 A `local-only` remote ship lands through the unchanged `bin/fm-merge-local.sh`, because its commits are already on the landing copy's named branch.
 
@@ -76,12 +78,13 @@ A `local-only` remote ship lands through the unchanged `bin/fm-merge-local.sh`, 
 
 `bin/fm-teardown.sh` runs the remote phases first and records them in `state/<id>.remote-retire`, so a lost connection resumes safely:
 
-1. **Quiesce:** run the remote proof of step 3 once read-only, so unimported work refuses while the worker is still live to tidy it up; then close the exact recorded tab under the focus rule below and confirm no process works inside the remote task folder.
-2. **Final transfer:** one more courier pass; any finding refuses.
-3. **Remote proof:** no staged, untracked, or ignored file, `HEAD` on the task branch and equal to the last imported commit, no stash, and nothing in the task folder but `wt`, `channel`, `launch.sh`, and `settings.json`.
+1. **Quiesce:** preserve the channel and launch files plus commits reachable through the remote worktree reflog, then run the remote proof of step 3, so remaining unimported work refuses while the worker is still live to tidy it up; then close the exact recorded tab under the focus rule below and confirm no process works inside the remote task folder.
+2. **Final transfer:** one more courier pass and artifact/history copy; any unresolved finding refuses.
+3. **Remote proof:** no staged, untracked, or ignored file, `HEAD` on the task branch and equal to the last imported commit, no stash, nothing in the task folder but `wt`, `channel`, `launch.sh`, and `settings.json`, and verified local custody of the channel artifacts and worktree reflog commits.
 4. **This machine's proof:** the unchanged native landed-work proof on the landing copy.
-5. **Remote removal:** the proof runs again immediately before `git worktree remove` without force, the cache branch is deleted only when it equals the imported commit, and the exact task folder is removed; `removing` and `removed` are recorded around it.
+5. **Remote removal:** the proof runs again immediately before `git worktree remove` without force, the cache branch is deleted only when it equals the imported commit, and the exact task folder is removed; `removing` and `removed` are recorded around it, and a retry verifies and completes remaining operations even after the worktree or branch is gone.
 
+Channel and launch artifacts remain in `data/<id>/remote-artifacts/`, with off-branch commits anchored under `refs/firstmate/remote-history/<id>/`.
 Any unreachable or unproven state refuses with every record intact.
 The close rule has no plain-close fallback: it defers when the tab is the focused tab, when closing would empty the focused workspace, or when focus cannot be read.
 Session start lists remote task folders the last courier pass saw without a record here, and never deletes them; the repository cache outlives tasks and may be deleted by hand once no task uses it.
