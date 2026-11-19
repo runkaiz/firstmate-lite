@@ -869,6 +869,10 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
       "$SCRIPT_DIR/fm-remote-task.sh" retire "$ID" prepare || exit 1
   fi
+  NATIVE_JOURNALED_ROOTS=$(fm_git_worktree_preservation_paths "$DATA/$ID/preserved-artifacts") || {
+    echo 'REFUSED: preservation journal is unreadable; retaining the copy and task records' >&2
+    exit 1
+  }
   if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT"); then
     while IFS= read -r NATIVE_GENERATED_ROOT; do
       [ -z "$NATIVE_GENERATED_ROOT" ] || PRESERVE_PATHS+=("$NATIVE_GENERATED_ROOT")
@@ -878,6 +882,14 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     native_leftover_next_action "$WT"
     exit 1
   fi
+  while IFS= read -r NATIVE_JOURNALED_ROOT; do
+    [ -n "$NATIVE_JOURNALED_ROOT" ] || continue
+    NATIVE_PATH_KNOWN=0
+    for NATIVE_PRESERVE_PATH in ${PRESERVE_PATHS[@]+"${PRESERVE_PATHS[@]}"}; do
+      case "$NATIVE_JOURNALED_ROOT" in "$NATIVE_PRESERVE_PATH"|"$NATIVE_PRESERVE_PATH"/*) NATIVE_PATH_KNOWN=1 ;; esac
+    done
+    [ "$NATIVE_PATH_KNOWN" = 1 ] || PRESERVE_PATHS=("$NATIVE_JOURNALED_ROOT" ${PRESERVE_PATHS[@]+"${PRESERVE_PATHS[@]}"})
+  done <<< "$NATIVE_JOURNALED_ROOTS"
   if [ "$TEARDOWN_WINDOWLESS" != 1 ]; then
     native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
     case "$native_endpoint_state" in

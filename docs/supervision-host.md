@@ -200,8 +200,10 @@ One example is a Cursor park superseded by the return turn's own end, which stop
 ## Captain outcomes
 
 A captain outcome the attended engine records while the captain remains attended wakes main once, through the owner's ordinary wake path, with one `supervision-host: branch-outcome:` line naming its store rows.
-Main drains, and `bin/fm-wake-drain.sh` presents it in its `BRANCH OUTCOMES` section with the exact `bin/fm-branch-outcome.sh mark-processed --through <seq>` acknowledgement.
-When the same drain also prints `WAKE_ACK_REQUIRED`, that one command carries `--outcomes-through <seq>` instead, so main acknowledges the wakes and marks the outcomes processed in a single call; `mark-processed` keeps its own refusals, and a refused mark never blocks the wake acknowledgement.
+Main first runs `bin/fm-wake-drain.sh` for presentation, handles its `BRANCH OUTCOMES`, then runs the one printed acknowledgement.
+When the drain prints `WAKE_ACK_REQUIRED`, the accepted flow is two calls: the drain, then one post-handling `--ack-through` command carrying `--outcomes-through <seq>` to mark the presented outcomes processed and acknowledge the wakes.
+Acknowledgement stays after handling so an interrupted turn remains durable for re-handling; `mark-processed` keeps its own refusals, and a refused mark never blocks the wake acknowledgement.
+With captain outcomes but no wake acknowledgement, the drain instead prints the standalone `bin/fm-branch-outcome.sh mark-processed --through <seq>` command.
 That presentation is what the Pi branch's visible entry is, so it advances the store's read cursor through the rows it presents.
 Every later drain, including the session-start digest, presents unprocessed captain outcomes again until main acknowledges them, so an ignored outcome costs no extra turn and is never lost.
 The drain's header owns the section's bounds; these rules keep it bounded and in order:

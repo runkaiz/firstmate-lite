@@ -409,6 +409,73 @@ retired || fail 'one-pass preservation left the copy or records'
 [ "$(cat "$keep/files/__pycache__/mod.pyc")" = 'bytecode' ] || fail 'one-pass preservation lost __pycache__'
 pass 'teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers'
 
+for scenario in clean partial explicit; do
+  make_case "generated-retry-$scenario" ship local-only
+  keep="$HOME_DIR/data/$ID/preserved-artifacts"
+  mkdir -p "$WT/__pycache__"
+  printf 'bytecode\n' > "$WT/__pycache__/mod.pyc"
+  expected_receipts='__pycache__ '
+  if [ "$scenario" != clean ]; then
+    mkdir -p "$WT/node_modules/pkg"
+    printf 'module\n' > "$WT/node_modules/pkg/index.js"
+    expected_receipts='__pycache__ node_modules '
+  fi
+  real_mv=$(command -v mv)
+  cat > "$FAKE/mv" <<'SH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  if [ "$arg" = "${FM_TEST_FAIL_MV_TARGET:-}" ]; then printf 'fixture interruption\n' >&2; exit 1; fi
+done
+exec "${FM_TEST_REAL_MV:?}" "$@"
+SH
+  chmod +x "$FAKE/mv"
+  if out=$(FM_TEST_REAL_MV="$real_mv" FM_TEST_FAIL_MV_TARGET="$keep/receipt" teardown 2>&1); then
+    fail "$scenario automatic preservation ignored a receipt interruption"
+  fi
+  "$real_mv" "$FAKE/mv" "$CASE/mv-shim"
+  assert_contains "$out" 'fixture interruption' 'fixture did not interrupt receipt publication'
+  retained && [ ! -e "$WT/__pycache__" ] && [ -f "$keep/files/__pycache__/mod.pyc" ] \
+    && [ ! -e "$keep/receipt" ] || fail "$scenario interruption lost custody or retired records"
+  if [ "$scenario" = clean ]; then
+    [ -z "$(git -C "$WT" ls-files --others)" ] || fail 'clean retry still has leftovers'
+  else
+    [ -f "$WT/node_modules/pkg/index.js" ] || fail 'interruption moved past its failed receipt'
+  fi
+  retry_args=()
+  [ "$scenario" != explicit ] || retry_args=(--preserve-untracked node_modules)
+  printf 'corrupted\n' > "$keep/files/__pycache__/mod.pyc"
+  if out=$(teardown "${retry_args[@]+"${retry_args[@]}"}" 2>&1); then
+    fail "$scenario retry retired an unverified journaled artifact"
+  fi
+  assert_contains "$out" 'does not match its journaled manifest' 'retry skipped custody verification'
+  retained && [ ! -e "$keep/receipt" ] || fail 'manifest refusal retired records or published a receipt'
+  printf 'bytecode\n' > "$keep/files/__pycache__/mod.pyc"
+  if [ "$scenario" = clean ]; then
+    printf 'unique tracked edit\n' >> "$WT/README.md"
+    if out=$(teardown 2>&1); then fail 'journal recovery discarded tracked edits'; fi
+    retained && [ ! -e "$keep/receipt" ] || fail 'tracked-edit refusal lost records or receipted artifacts'
+    git -C "$WT" checkout -q -- README.md
+    printf 'unique notes\n' > "$WT/notes.txt"
+    if out=$(teardown 2>&1); then fail 'journal recovery accepted uncertain leftovers'; fi
+    retained && [ -f "$WT/notes.txt" ] && [ ! -e "$keep/receipt" ] || fail 'uncertain-leftover refusal lost work'
+    rm -- "$WT/notes.txt"
+    commit_in "$WT" unique 'unlanded work' 'unlanded work'
+    if out=$(teardown 2>&1); then fail 'journal recovery retired unlanded work'; fi
+    retained && [ ! -e "$keep/receipt" ] || fail 'unlanded refusal lost records or receipted artifacts'
+    git -C "$WT" reset -q --hard "$BASE"
+  fi
+  out=$(teardown "${retry_args[@]+"${retry_args[@]}"}" 2>&1)
+  expect_code 0 "$?" "$scenario automatic preservation did not resume: $out"
+  retired || fail "$scenario preservation retry left the copy or records"
+  [ "$(cat "$keep/files/__pycache__/mod.pyc")" = bytecode ] || fail 'retry lost the already-moved artifact'
+  if [ "$scenario" != clean ]; then
+    [ "$(cat "$keep/files/node_modules/pkg/index.js")" = module ] || fail 'retry lost the remaining artifact'
+  fi
+  [ "$(cut -f3 "$keep/receipt" | sort | tr '\n' ' ')" = "$expected_receipts" ] \
+    || fail "$scenario retry did not receipt each artifact exactly once"
+  pass "$scenario preservation retry verifies moved artifacts before retiring and receipts every path once"
+done
+
 # One-pass stop: a native task whose status reads done is stopped through task
 # control before the endpoint gate; an unfinished task is never stopped, and a
 # failed stop keeps the refusal and names the failure.

@@ -12,9 +12,11 @@
 #
 # Stderr names the exact `handled` command for each presented captured process-event result.
 # When a drain that prints WAKE_ACK_REQUIRED also presents captain BRANCH
-# OUTCOMES, that one printed command carries --outcomes-through <seq>, so main
-# acknowledges the queue and marks those outcomes processed in a single call
-# after handling. The acknowledgement first runs bin/fm-branch-outcome.sh
+# OUTCOMES, use two calls: drain for presentation, then after handling run the
+# one printed --ack-through command carrying --outcomes-through <seq> to mark
+# the outcomes processed and acknowledge the queue. Never acknowledge during
+# the drain: an interrupted handling turn must remain durable for re-handling.
+# The acknowledgement first runs bin/fm-branch-outcome.sh
 # mark-processed --through <seq> unchanged, keeping its refusals, then the
 # queue acknowledgement, which a refused outcome mark never blocks; either
 # failure exits nonzero. A drain with captain outcomes but no queue
@@ -839,7 +841,7 @@ ROWS
     [ "$held" -eq 0 ] || text="${text}BRANCH OUTCOMES: $held newer captain outcome(s) are held back (byte cap); they follow on the next drain once these are acknowledged
 "
     if [ "$COMBINED_OUTCOME_ACK" = true ]; then
-      text="${text}BRANCH OUTCOMES: the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through $target); until it runs every drain presents them again
+      text="${text}BRANCH OUTCOMES: the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through $target); after this drain, handle the entries, then run that one post-handling --ack-through command to mark outcomes processed and acknowledge wakes; until it runs every drain presents them again
 "
     else
       text="${text}BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through $target; until then every drain presents them again

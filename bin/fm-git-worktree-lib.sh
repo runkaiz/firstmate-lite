@@ -186,6 +186,22 @@ fm_git_worktree_generated_roots() { # <copy>
   printf '%s' "$out"
 }
 
+fm_git_worktree_preservation_paths() {
+  local root=$1 journal entry
+  [ -e "$root/journal" ] || [ -L "$root/journal" ] || return 0
+  [ -d "$root/journal" ] && [ ! -L "$root/journal" ] || return 1
+  for journal in "$root"/journal/*; do
+    [ -e "$journal" ] || [ -L "$journal" ] || continue
+    case "$journal" in *.tmp) continue ;; esac
+    [ -f "$journal" ] && [ ! -L "$journal" ] || return 1
+    IFS= read -r entry < "$journal" || return 1
+    case "$entry" in
+      path$'\t'?*) printf '%s\n' "${entry#path$'\t'}" ;;
+      *) return 1 ;;
+    esac
+  done
+}
+
 fm_git_worktree_print_roots() { # reads "<count>\t<root>" lines; prints a bounded summary to stderr
   awk -F '\t' '
     NR <= 20 { printf "  %s (%d file%s)\n", $2, $1, ($1 == 1 ? "" : "s") }
