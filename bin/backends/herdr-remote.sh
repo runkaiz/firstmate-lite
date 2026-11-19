@@ -26,7 +26,9 @@
 #   - no signals at all: a remote pane closes only through Herdr's explicit
 #     tab close, under the focus rule in fm_backend_herdr_remote_kill;
 #   - no server start or restart, no push events, no presentation spaces.
-# Every primitive first reads the machine's link record,
+# Every input or close first proves the pane still belongs to the task
+# (fm_remote_identity_ok: the recorded server incarnation, or else the tab's
+# launch-token label). Every primitive first reads the machine's link record,
 # state/.remote-link-<profile-id> (written only by the courier). Anything but
 # `reachable` makes liveness reads `unreadable`/`unknown` - never dead or
 # missing - and refuses input, so an asleep or disconnected machine is never
@@ -239,12 +241,12 @@ fm_backend_herdr_remote_visible_capture() {  # <target> [label]
 }
 
 fm_backend_herdr_remote_send_key() {  # <target> <key> [label]
-  fm_remote_target_reachable "$1" || return 1
+  fm_remote_target_reachable "$1" && fm_remote_identity_ok "$1" || return 1
   fm_backend_herdr_send_key "$1" "$2"
 }
 
 fm_backend_herdr_remote_send_text_submit() {  # <target> <text> <retries> <enter-sleep> <settle> [label]
-  fm_remote_target_reachable "$1" || { printf 'send-failed'; return 0; }
+  { fm_remote_target_reachable "$1" && fm_remote_identity_ok "$1"; } || { printf 'send-failed'; return 0; }
   fm_backend_herdr_send_text_submit "$1" "$2" "$3" "$4" "$5"
 }
 
@@ -316,6 +318,35 @@ fm_remote_tab_count() {  # <machine-id> <workspace>
   printf '%s' "$out" | jq -er '.result.tabs | length' 2>/dev/null
 }
 
+# fm_remote_identity_ok: before any mutation of <target>, prove the pane still
+# belongs to this task. While the remote server's incarnation (recorded by the
+# courier in the link record) equals the one recorded at create, the recorded
+# ids stand. After a change, or when either is unknown, the recorded tab must
+# still carry this task's launch-token label; a match re-binds the incarnation.
+fm_remote_identity_ok() {  # <target>
+  local target=$1 task meta rec now_inc was_inc tab ws label have state
+  fm_backend_herdr_parse_target "$target" || return 1
+  task=$(fm_remote_task_of_target "$target") || return 1
+  state=$(fm_remote_state_dir)
+  meta="$state/$task.meta" rec="$state/$task.remote"
+  now_inc=$(fm_meta_get "$(fm_remote_link_file "$state" "$FM_BACKEND_HERDR_SESSION")" incarnation)
+  was_inc=$(fm_meta_get "$rec" incarnation)
+  if [ -n "$now_inc" ] && [ "$now_inc" != unknown ] && [ "$now_inc" = "$was_inc" ]; then
+    return 0
+  fi
+  tab=$(fm_meta_get "$meta" herdr_tab_id)
+  ws=$(fm_meta_get "$meta" herdr_workspace_id)
+  label=$(fm_meta_get "$rec" tab_label)
+  [ -n "$tab" ] && [ -n "$ws" ] && [ -n "$label" ] || return 1
+  have=$(fm_backend_herdr_cli "$FM_BACKEND_HERDR_SESSION" tab list --workspace "$ws" 2>/dev/null \
+    | jq -r --arg t "$tab" '.result.tabs[] | select(.tab_id == $t) | .label' 2>/dev/null) || have=
+  [ "$have" = "$label" ] || {
+    echo "error: remote tab $tab no longer carries launch token $label (server incarnation ${was_inc:-unknown} -> ${now_inc:-unknown})" >&2
+    return 1
+  }
+  [ -z "$now_inc" ] || [ "$now_inc" = unknown ] || fm_remote_record_set "$rec" "incarnation=$now_inc"
+}
+
 # fm_backend_herdr_remote_kill: close the exact recorded tab under the focus
 # rule. Deferred (status 1, nothing closed) when focus cannot be read, when the
 # tab is the focused tab of the focused workspace, or when closing it would
@@ -342,6 +373,7 @@ fm_backend_herdr_remote_kill() {  # <target>
     echo "error: remote pane $target no longer belongs to recorded tab ${tab:-?}; nothing closed" >&2
     return 1
   }
+  fm_remote_identity_ok "$target" || { echo "error: remote pane $target identity is unproven; nothing closed" >&2; return 1; }
   focus=$(fm_remote_focus_snapshot "$m") || {
     echo "notice: focus on the remote machine cannot be read; deferring the close of $target" >&2
     return 1

@@ -235,6 +235,18 @@ sync_now
 rm -f "$HERDR_DB/down"; sync_now
 pass 'an outage reads unknown, keeps the worker state, and refuses cleanup intact'
 
+# --- server incarnation -----------------------------------------------------
+LABEL=$(sed -n 's/^tab_label=//p' "$ST/r1.remote")
+[ -n "$LABEL" ] || fail 'spawn did not record the tab launch-token label'
+printf 'incarnation=999@restarted\n' >> "$ST/.remote-link-$MID"
+herdr --machine "$MID" tab rename w2:t1 reused >/dev/null
+if (. "$ROOT/bin/fm-backend.sh"; fm_backend_kill herdr-remote "$W") 2>/dev/null; then fail 'a close ran on a reused pane id after a server restart'; fi
+hstate | jq -e '.tabs[]|select(.tab_id=="w2:t1")' >/dev/null || fail 'a reused tab was closed'
+herdr --machine "$MID" tab rename w2:t1 "$LABEL" >/dev/null
+(. "$ROOT/bin/fm-backend.sh"; fm_backend_source herdr-remote; fm_remote_identity_ok "$W") || fail 'a restarted server with the token intact was refused'
+grep -q '^incarnation=999@restarted$' "$ST/r1.remote" || fail 'a proven token match did not re-bind the incarnation'
+pass 'after a remote server restart only a launch-token match lets a mutation proceed'
+
 # --- focus rule ---------------------------------------------------------------
 herdr --machine "$MID" workspace focus w2 >/dev/null
 herdr --machine "$MID" tab focus w2:t1 >/dev/null

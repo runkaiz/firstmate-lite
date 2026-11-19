@@ -30,6 +30,7 @@ The spawn creates the tab with `--no-focus` in one remote workspace labeled `fir
 If focus moved onto the new tab it is moved back to the exact tab recorded just before; if it moved anywhere else it is left alone and reported.
 A random launch token in the tab label lets a retry after a lost create response adopt exactly one match; several matches, or an unrecorded `firstmate` workspace, refuse.
 A remote task records `backend=herdr-remote` and `window=<profile-id>:<pane-id>`, so its key can never equal a local `<session>:<pane-id>` key.
+The remote server's incarnation (its socket owner's pid and start time) is recorded at create and re-read by every courier pass; after it changes, pane ids may have been reused, so any close, keystroke, or relaunch proceeds only while the recorded tab still carries the task's launch-token label.
 
 ## The courier
 

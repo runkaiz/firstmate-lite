@@ -102,6 +102,17 @@ EOF
   printf 'ROOT=$(fm_root %q)\n' "$1"
 }
 
+# The remote Herdr server's incarnation: the default session socket owner's
+# pid and start time. A changed incarnation means pane ids may have been reused
+# (bin/backends/herdr-remote.sh fm_remote_identity_ok owns the consequence).
+remote_incarnation_snippet() {
+  cat <<'EOF'
+sock="$HOME/.config/herdr/herdr.sock"
+ipid=$(lsof -t -- "$sock" 2>/dev/null | head -n1)
+if [ -n "$ipid" ]; then echo "incarnation=$ipid@$(ps -o lstart= -p "$ipid" 2>/dev/null | tr -s ' ' '_')"; else echo "incarnation=unknown"; fi
+EOF
+}
+
 # Emit `cat > <path>` of <content> with a delimiter that cannot occur in it.
 remote_write_file() {  # <remote-path-expr> <content> <mode>
   local delim
@@ -288,6 +299,7 @@ echo "user=$(id -un)"
 for d in "$ROOT"/tasks/*; do [ -d "$d" ] && echo "taskdir=${d##*/}"; done
 PSF=$(mktemp "${TMPDIR:-/tmp}/fm-ps.XXXXXX") || PSF=
 EOF
+  remote_incarnation_snippet
   for id in "$@"; do
     rec="$STATE/$id.remote"
     rtask=$(fm_meta_get "$rec" remote_task)
@@ -390,6 +402,8 @@ sync_machine_locked() {
   esac
   herdr_ok=0
   fm_backend_herdr_cli "$M" workspace list >/dev/null 2>&1 </dev/null && herdr_ok=1
+  fm_remote_record_set "$(fm_remote_link_file "$STATE" "$M")" \
+    "incarnation=$(printf '%s\n' "$out" | sed -n 's/^incarnation=//p' | head -n1)"
   if [ "$herdr_ok" = 1 ]; then
     link_set "$M" reachable ok
   else
@@ -777,6 +791,8 @@ spawn_main() {
 
   # The tab, under the focus rule; a lost response adopts the one token match.
   remote_create_tab "$MID" "$label" "$RTASK/wt" "$chan/inbox"
+  out=$( { remote_prelude "$RROOT"; remote_incarnation_snippet; } | fm_remote_ssh "$TARGET") || out=
+  rec_set "incarnation=$(printf '%s\n' "$out" | sed -n 's/^incarnation=//p' | head -n1)" "tab_label=$label"
 
   # Publish the task record before launch, as a local spawn does.
   local tmp
@@ -966,6 +982,7 @@ relaunch_main() {  # <id>
   ( sync_machine "$MID" ) >/dev/null 2>&1 || true
   fm_remote_link_reachable "$STATE" "$MID" || die "REFUSED: $MLABEL is not reachable; nothing relaunched"
   pane=$(fm_meta_get "$META" window)
+  fm_remote_identity_ok "$pane" || die "REFUSED: remote pane $pane no longer carries this task's launch token; nothing relaunched"
   case "$(fm_backend_herdr_remote_agent_state "$pane")" in
     dead) ;;
     *) die "REFUSED: remote pane $pane is not proven agent-free by the remote process rows; nothing relaunched" ;;
