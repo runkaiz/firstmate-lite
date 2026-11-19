@@ -66,7 +66,9 @@
 #   - Role partition (fm_lease_forbid_branch): actions MAIN alone owns -
 #     merging a PR, landing local-only work, spawning workers, answering a
 #     decision, retiring a secondmate - refuse the branch actor outright,
-#     lease or no lease, while the home is attended. While a confirmed,
+#     lease or no lease, while the home is attended, except the two attended
+#     routine cases bin/fm-merge-local.sh and bin/fm-send.sh gate themselves
+#     (bin/fm-branch-prompt.sh "Attended routine outcomes"). While a confirmed,
 #     readable, live away record exists (bin/fm-afk-contract.sh validate and
 #     mode, never quiet mode's record, whose captain is present; docs/pi-
 #     supervision-branch.md "Postures"), main is parked and its STANDING authority

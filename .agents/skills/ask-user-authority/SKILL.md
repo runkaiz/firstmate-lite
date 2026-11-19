@@ -55,3 +55,4 @@ Do not relay reviewer labels or gate output as if they settled the decision.
 - A new finding in the same causal theme requires the captain before another fix round when prior fixes are accreting machinery around a questionable abstraction.
 - A genuinely security-sensitive action requires the captain under the stronger existing boundary even if it is otherwise within scope.
 - Complex architecture explicitly requested by the captain stays within scope and does not escalate merely because it is complex.
+- A no-mistakes test finding asking "this change has no live-validatable surface; proceed without live validation?" on a change touching only prose or plain text is firstmate's to decide: accept it with `approve` and a reason, never `skip`; while attended the supervision session answers it itself (`bin/fm-branch-prompt.sh` "Attended routine outcomes").

@@ -255,6 +255,7 @@ The guards are wired into these scripts:
 
 A relaunch through `fm-control` stays branch-legal recovery in both postures.
 Under the away-posture record, the PR merge, a fresh spawn, a decision answer, and a local-only landing relocate to the branch behind each script's own gate.
+While attended, two narrow routine exceptions pass the branch through the same scripts (`bin/fm-branch-prompt.sh` "Attended routine outcomes"): `fm-merge-local.sh` under `--proactive` or the task's recorded `yolo=on`, behind its done and clean-ship-head checks, and `fm-send.sh --resolve-key` approving a gate whose every finding is the no-live-validatable-surface test finding (`fm_ask_user_live_surface_only` in `bin/fm-dod-lib.sh`).
 Second-mate retirement never does ("Postures" below).
 
 ### Autonomy
@@ -264,6 +265,7 @@ No captain grant file is required.
 
 A fleet-wide heartbeat is separately eligible only when every row other than a check or decision-owned signal/stale row is a heartbeat row or a resolvable task-local row (see "Heartbeat routing" below).
 Every other fleet-wide or unresolvable wake, and every watcher-failure alarm, stays on main.
+While attended, `scopeForUnreadWake` also routes two otherwise main-owned row classes to the branch: a built-in CI wait capture classified `monitor-error` for a known task, and a decision row whose every open decision is that live-surface test gate.
 
 #### Pre-drain recheck
 

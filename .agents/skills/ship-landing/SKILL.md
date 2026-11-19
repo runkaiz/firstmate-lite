@@ -23,6 +23,7 @@ At landing time, MAIN and the away session evaluate merge authority in the same 
 A dispatch-time `yolo` snapshot alone does not establish an explicit restriction, and neither actor rewrites it when approval changes.
 Read those records and verify the approval covers the validated head and scope before invoking `bin/fm-merge-local.sh` or `bin/fm-pr-merge.sh`; uncertainty or an explicit restriction holds for the captain, and an existing captain hold must be answered and released through its owner.
 A current captain instruction to merge is explicit authority.
+While attended, the supervision session lands a done local-only branch covered by recorded `yolo=on` or proactive authority itself and reports it as a routine outcome (`bin/fm-branch-prompt.sh` "Attended routine outcomes"); relay that landing in MAIN's next natural reply.
 For any custom `state/<id>.check.sh` you write yourself, keep it an ordinary single-link mode-`0700` file, print one line only when firstmate should wake, print nothing otherwise, finish before `FM_CHECK_TIMEOUT`, then bind its current bytes with `bin/fm-check-register.sh <id>` before the watcher may execute it.
 Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm-teardown.sh` for a spawned task); never hand-compose an `rm` with `$STATE`/`$ID`.
 

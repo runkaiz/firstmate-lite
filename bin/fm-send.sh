@@ -53,7 +53,10 @@
 # Answering a decision is the gate-answer path and is main-owned while
 # attended: when any named key is an open needs-decision or a captain-held task
 # (a blocked: key is ordinary steering and stays lease-guarded only), the Pi
-# supervision branch is refused outright, exactly as its prompt promises. While
+# supervision branch is refused outright, exactly as its prompt promises, except
+# that it may approve the routine live-surface test gate
+# (fm_ask_user_live_surface_only in bin/fm-dod-lib.sh) with an approve response
+# and no skip or fix. While
 # the away-posture record exists main is parked and that one refusal relocates
 # to the branch (contract: bin/fm-lease-lib.sh); which findings firstmate may
 # decide at all remains ask-user-authority's judgment for either actor.
@@ -511,12 +514,28 @@ if [ -n "$RESOLVE_KEYS" ]; then
   # away-posture record the guard passes the branch instead (relocation:
   # bin/fm-lease-lib.sh); which findings firstmate may decide at all stays
   # ask-user-authority's judgment, for either actor.
+  # The one attended exception (bin/fm-branch-prompt.sh "Attended routine
+  # outcomes"): the supervision branch may accept a gate whose every named key
+  # is the routine live-surface test finding (fm_ask_user_live_surface_only in
+  # bin/fm-dod-lib.sh), and only with an approve response - never skip or fix.
+  fm_send_routine_live_surface_answer() {  # <message>
+    local k
+    [ "$(fm_lease_actor 2>/dev/null)" = branch ] && [ -z "$RESOLVE_HOLD_KEYS" ] && [ -n "$RESOLVE_STATUS_KEYS" ] || return 1
+    case "$1" in *'--action approve'*) ;; *) return 1 ;; esac
+    case "$1" in *'--action skip'*|*'--action fix'*) return 1 ;; esac
+    # shellcheck source=bin/fm-dod-lib.sh
+    . "$SCRIPT_DIR/fm-dod-lib.sh"
+    for k in $RESOLVE_STATUS_KEYS; do
+      fm_ask_user_live_surface_only "$RESOLVE_STATUS_FILE" "$k" || return 1
+    done
+    echo "note: the supervision branch accepts the routine live-surface test finding (${RESOLVE_STATUS_KEYS}); every other decision stays main-owned while attended" >&2
+  }
   RESOLVE_IS_DECISION=0
   [ -z "$RESOLVE_HOLD_KEYS" ] || RESOLVE_IS_DECISION=1
   for k in $RESOLVE_STATUS_KEYS; do
     [ "$(_fm_open_set_verb "$resolve_open_set" "$k")" = needs-decision ] && RESOLVE_IS_DECISION=1
   done
-  if [ "$RESOLVE_IS_DECISION" -eq 1 ]; then
+  if [ "$RESOLVE_IS_DECISION" -eq 1 ] && ! fm_send_routine_live_surface_answer "$*"; then
     fm_lease_forbid_branch "decision answer (fm-send --resolve-key)" --away-relocated
   fi
   # Refuse before send when a named status-log key cannot actually close: a

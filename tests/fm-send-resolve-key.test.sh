@@ -807,6 +807,50 @@ test_remote_reserved_pending_reply_key_is_preserved() {
   pass "fm-send: retired remote reserved keys remain durable and cannot be answered"
 }
 
+# The attended routine exception (bin/fm-branch-prompt.sh "Attended routine
+# outcomes"): the branch may accept a pure live-surface test gate with an
+# approve response, while skip, fix, any other finding, or another step stays
+# refused at the partition with nothing sent.
+test_branch_accepts_only_the_routine_live_surface_gate() {
+  local dir fb log home rc out snap q
+  dir="$TMP_ROOT/routine-live"; mkdir -p "$dir"
+  fb=$(make_stubs "$dir"); log="$dir/send.log"
+  home=$(setup_home routine-live)
+  fm_write_meta "$home/state/t1.meta" "window=sess:fm-t1" "kind=ship"
+  snap="$home/data/t1/nm-RUN1-findings.txt"
+  mkdir -p "$home/data/t1"
+  q='this change has no live-validatable surface; proceed without live validation? (0 of 1 scenarios were driven live against the product); docs only'
+  branch_send() {
+    env PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$home" FM_HOME="$home" FM_SEND_LOG="$log" FM_SEND_SETTLE=0 \
+      FM_SUPERVISION_ACTOR=branch "$SEND" t1 "$@" 2>&1
+  }
+  printf 'needs-decision [key=nm-RUN1-test]: ask-user findings=test-1 file=%s\n' "$snap" > "$home/state/t1.status"
+  printf 'id: test-1\nseverity: warning\ndescription: %s\nauthority: ask-user\n' "$q" > "$snap"
+  for answer in "run no-mistakes axi respond --step test --action skip" \
+                "run no-mistakes axi respond --step test --action fix --findings test-1" \
+                "approve it"; do
+    out=$(branch_send --resolve-key nm-RUN1-test "$answer"); rc=$?
+    expect_code 6 "$rc" "the branch must not answer the live-surface gate with: $answer"
+  done
+  printf 'id: test-1\ndescription: %s\nauthority: ask-user\n\nid: test-2\ndescription: live validation verdict: inconclusive\nauthority: ask-user\n' "$q" > "$snap"
+  out=$(branch_send --resolve-key nm-RUN1-test "run no-mistakes axi respond --step test --action approve --reason 'docs only'"); rc=$?
+  expect_code 6 "$rc" "the branch must not accept a gate holding another finding"
+  printf 'id: test-1\ndescription: %s\nauthority: ask-user\n' "$q" > "$snap"
+  printf 'needs-decision [key=nm-RUN1-review]: ask-user findings=test-1 file=%s\n' "$snap" > "$home/state/t1.status"
+  out=$(branch_send --resolve-key nm-RUN1-review "run no-mistakes axi respond --step review --action approve"); rc=$?
+  expect_code 6 "$rc" "the branch must not accept a non-test step"
+  [ ! -e "$home/state/t1.inbox" ] && [ ! -s "$log" ] || fail "a refused routine answer still reached the worker"
+
+  printf 'needs-decision [key=nm-RUN1-test]: ask-user findings=test-1 file=%s\n' "$snap" > "$home/state/t1.status"
+  out=$(branch_send --resolve-key nm-RUN1-test "run no-mistakes axi respond --step test --action approve --reason 'docs only'"); rc=$?
+  expect_code 0 "$rc" "the branch must accept the routine live-surface gate: $out"
+  assert_contains "$out" "routine live-surface test finding" "the routine acceptance did not announce itself"
+  sed -E 's/ \[at=[0-9]+\]//' "$home/state/t1.status" | grep -qF 'resolved [key=nm-RUN1-test]: answered:' \
+    || fail "the routine acceptance did not close the decision:"$'\n'"$(cat "$home/state/t1.status")"
+  grep -qF -- '--action approve' "$home/state/t1.inbox/001.msg" || fail "the routine acceptance did not reach the worker"
+  pass "fm-send --resolve-key: the attended branch accepts only a pure live-surface test gate, and only with approve"
+}
+
 # The decision-answer partition (bin/fm-send.sh header "Answering a decision"):
 # a --resolve-key naming an open needs-decision or a captain-held task is a
 # decision answer, main-owned while attended and refused for the supervision
@@ -1004,3 +1048,4 @@ test_stamped_close_line_stays_within_the_status_line_cap
 test_failed_close_recovery_command_is_shell_safe
 test_remote_reserved_pending_reply_key_is_preserved
 test_decision_answer_partition_relocates_under_the_record
+test_branch_accepts_only_the_routine_live_surface_gate

@@ -38,6 +38,7 @@ If that worker already reported CI-ready done, run `bin/fm-procevent.sh handled 
 Otherwise send the original worker the captured result path once, telling it to read the response and reattach or handle its gate through no-mistakes, then run that same `handled` command after the durable steer succeeds.
 The drain's `--ack-through` only consumes wake rows, so without `handled` the result keeps re-announcing.
 A replay must reconcile the task's steering inbox before sending the same captured source/sequence again.
+While attended, the supervision session routes a `monitor-error` capture this way itself and reports it as a routine outcome (`bin/fm-branch-prompt.sh` "Attended routine outcomes").
 Do not answer a gate, run a parallel CI or merge poll, or turn unchanged registered CI waits into routine status-review turns.
 
 A `no-mistakes CI wait has zero registered checks` wake means the run has been waiting on a PR with nothing reporting, and the wait stays registered in case checks appear.
