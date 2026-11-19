@@ -571,12 +571,15 @@ SH
   printf 'working [at=1792922400]: still implementing\n' > "$HOME_DIR/state/$ID.status"
   if out=$(bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1); then fail 'lab teardown stopped unfinished work'; fi
   assert_contains "$out" 'live or unverified endpoint owner' 'lab unfinished-task refusal reason'
-  [ ! -e "$CASE/control.log" ] && [ -f "$WT/node_modules/pkg/index.js" ] && retained \
-    || fail 'lab unfinished-task refusal changed worker or copy'
+  if ! { [ ! -e "$CASE/control.log" ] && [ -f "$WT/node_modules/pkg/index.js" ] && retained; }; then
+    fail 'lab unfinished-task refusal changed worker or copy'
+  fi
   printf 'done [at=1792922400]: ready in branch fm/x\n' > "$HOME_DIR/state/$ID.status"
   out=$(FM_STATE_OVERRIDE="$HOME_DIR/state" bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1)
   expect_code 3 "$?" 'lab teardown with a caller override must retain the gate refusal'
-  [ ! -e "$CASE/control.log" ] && retained || fail 'caller override was dropped before task control'
+  if ! { [ ! -e "$CASE/control.log" ] && retained; }; then
+    fail 'caller override was dropped before task control'
+  fi
   out=$(bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1)
   expect_code 0 "$?" "marked lab did not stop, preserve and retire in one pass: $out"
   [ "$(cat "$CASE/control.log")" = /quit ] || fail 'lab worker was not stopped exactly once'
