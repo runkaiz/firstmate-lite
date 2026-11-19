@@ -321,7 +321,8 @@ test_proactive_preference_and_instruction_delivery() {
     assert_contains "$out" 'Honor explicit stops, holds' "$harness lost explicit stop policy"
     assert_contains "$out" 'It authorizes no unrelated project' "$harness lost scope limits"
     assert_contains "$out" 'GPU/resource spending grants' "$harness lost resource boundary"
-    assert_contains "$out" 'attended branch no new spawn, merge, or decision-answer authority' "$harness expanded branch authority"
+    assert_contains "$out" 'The supervision branch applies this policy only inside its existing role and posture authority.' "$harness lost branch authority limits"
+    assert_contains "$out" '"Attended routine outcomes" owns the attended exceptions.' "$harness lost the attended exception owner"
   done
   # Empty drains stay silent; actual queued wakes refresh policy on stderr
   # without changing the structured stdout records. No watcher is armed.

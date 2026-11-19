@@ -868,6 +868,39 @@ test_main_owned_actions_refuse_the_branch_actor() {
   pass "PR merge, local landing, and new-task spawn refuse the branch actor and spare main"
 }
 
+# The attended routine landing (bin/fm-branch-prompt.sh "Attended routine
+# outcomes"): the branch lands a local-only ship only under --proactive or a
+# recorded yolo=on, and then only behind the done and clean-ship-head checks.
+test_branch_lands_local_only_only_under_recorded_authority() {
+  local home proj wt out status head
+  home="$TMP_ROOT/routine-land-home"
+  proj="$TMP_ROOT/routine-land-project"
+  wt="$TMP_ROOT/routine-land-copy"
+  mkdir -p "$home/state" "$home/config" "$home/data"
+  git init -q -b main "$proj"
+  git -C "$proj" -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m init
+  git -C "$proj" worktree add -q -b fm/task-y "$wt"
+  git -C "$wt" -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m work
+  head=$(git -C "$wt" rev-parse HEAD)
+  printf 'project=%s\nmode=local-only\nbranch=fm/task-y\nworktree=%s\nkind=ship\nyolo=off\n' "$proj" "$wt" > "$home/state/task-y.meta"
+  printf 'working: implementing\n' > "$home/state/task-y.status"
+  land() { FM_HOME="$home" FM_SUPERVISION_ACTOR=branch "$ROOT/bin/fm-merge-local.sh" task-y 2>&1; }
+
+  out=$(land); status=$?
+  [ "$status" -eq 6 ] || fail "the attended branch landed without recorded authority: $status: $out"
+  assert_contains "$out" "recorded yolo=on" "the routine-landing refusal lost its reason"
+  sed -i.bak 's/^yolo=off$/yolo=on/' "$home/state/task-y.meta"
+  out=$(land); status=$?
+  [ "$status" -ne 0 ] && [ "$status" -ne 6 ] || fail "the attended branch landed an unfinished task: $status: $out"
+  assert_contains "$out" "reconciled done declaration" "an unfinished task must meet the readiness check"
+  [ "$(git -C "$proj" rev-parse main)" != "$head" ] || fail "a refused routine landing moved main"
+  printf 'done [at=1792922400]: ready in branch fm/task-y\n' >> "$home/state/task-y.status"
+  out=$(land); status=$?
+  expect_code 0 "$status" "the attended branch could not land a done task under recorded yolo=on: $out"
+  [ "$(git -C "$proj" rev-parse main)" = "$head" ] || fail "the routine landing did not fast-forward main"
+  pass "the attended branch lands local-only work only under recorded yolo or proactive authority, behind the readiness checks"
+}
+
 test_home_without_branch_is_untouched() {
   local home out status
   home="$TMP_ROOT/untouched-home"
@@ -1692,6 +1725,7 @@ test_outcome_rows_carry_their_recorded_age
 test_lease_exclusivity_release_stale_and_sweep
 test_mutating_scripts_refuse_the_other_actors_lease
 test_main_owned_actions_refuse_the_branch_actor
+test_branch_lands_local_only_only_under_recorded_authority
 test_home_without_branch_is_untouched
 test_unmarked_main_honors_a_live_branch_lease
 test_unmarked_guard_with_a_lease_file_holds_exclusivity_through_mutation

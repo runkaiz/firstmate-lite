@@ -21,7 +21,7 @@ Preserve GPU/resource spending grants, unlanded-work protection, leases, isolati
 Read-only or lock-refused sessions remain read-only.
 Never toggle yolo, waive validation, or take over a worker-owned pipeline.
 
-For MAIN and the away session, ON supplies recorded standing approval under [ship-landing](../ship-landing/SKILL.md) for authorized in-scope ordinary GitHub PR merges and local-only landings even with project yolo off.
+ON supplies recorded standing approval under [ship-landing](../ship-landing/SKILL.md) for authorized in-scope ordinary GitHub PR merges and local-only landings even with project yolo off.
 Treat this as standing approval in that owner's existing authority order, never as a parallel override.
 Land only after validation for the exact current head passes, required PR checks and reviews pass where applicable, and findings are resolved.
 Use `bin/fm-pr-merge.sh <task-id> <pr-url> --proactive` or `bin/fm-merge-local.sh <task-id> --proactive`; their headers own action-time preference and landing guards.
@@ -32,5 +32,5 @@ OFF withdraws this additional authority immediately for subsequent actions; base
 Non-GitHub PR merges retain their baseline authority.
 
 The supervision branch applies this policy only inside its existing role and posture authority.
-For a handoff or decision reserved to MAIN, report it once so MAIN can continue; this mode gives an attended branch no new spawn, merge, or decision-answer authority.
+For a handoff or decision reserved to MAIN, report it once so MAIN can continue; `bin/fm-branch-prompt.sh` "Attended routine outcomes" owns the attended exceptions.
 `bin/fm-branch-prompt.sh` "Postures" owns continuing authority and additional away instructions; proactive mode never wakes parked MAIN.

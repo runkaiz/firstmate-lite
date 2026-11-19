@@ -328,6 +328,42 @@ fm_ask_user_escalation_block() {  # <data-dir> <task-id>
 EOF
 }
 
+# The routine live-surface gate: no-mistakes' test step asks "this change has
+# no live-validatable surface; proceed without live validation?" when nothing
+# executable changed, and accepting it (approve, never skip) is the one obvious
+# answer for a text-only change, so an attended supervision session may give it
+# (bin/fm-branch-prompt.sh "Attended routine outcomes", gated in bin/fm-send.sh).
+# Succeed only when <key> is an open needs-decision in <status-file> shaped
+# nm-<run>-test, whose newest opening line names a regular snapshot file= (the
+# format fm_ask_user_escalation_block above mandates) in which every finding is
+# authority ask-user with that exact question opening its description.
+# Callers source bin/fm-classify-lib.sh. .pi/extensions/lib/fm-branch-dispatch.ts
+# mirrors this predicate to route such a row to the supervision session.
+FM_ASK_USER_LIVE_SURFACE_QUESTION='this change has no live-validatable surface; proceed without live validation?'
+fm_ask_user_live_surface_only() {  # <status-file> <key>
+  local status=$1 key=$2 open line verb file=''
+  case "$key" in nm-?*-test) ;; *) return 1 ;; esac
+  [ -f "$status" ] && [ ! -L "$status" ] || return 1
+  open=$(status_open_decisions "$status") || return 1
+  [ "$(_fm_open_set_verb "$open" "$key")" = needs-decision ] || return 1
+  while IFS= read -r line || [ -n "$line" ]; do
+    status_line_verb "$line" verb
+    [ "$verb" = needs-decision ] && [ "$(_fm_decision_key "$line")" = "$key" ] || continue
+    file=$(status_line_note "$line" | sed -n 's/.*[[:space:]]file=\([^[:space:]]*\).*/\1/p')
+  done < "$status"
+  [ -n "$file" ] && [ -f "$file" ] && [ ! -L "$file" ] || return 1
+  awk -v q="$FM_ASK_USER_LIVE_SURFACE_QUESTION" '
+    function finish() {
+      if (open) { n++; if (auth != "ask-user" || index(desc, q) != 1) bad = 1 }
+      open = 0; auth = ""; desc = ""
+    }
+    /^id:/ { finish(); open = 1; next }
+    open && /^authority:/ { sub(/^authority:[[:space:]]*/, ""); auth = $0; next }
+    open && /^description:/ { sub(/^description:[[:space:]]*"?/, ""); desc = $0; next }
+    END { finish(); exit !(n > 0 && !bad) }
+  ' "$file"
+}
+
 fm_nm_driving_block() {  # <forge> <task-id>
   local pr_return_line='' pr_reattach_clause=';' drive_block wait_cfg ci_command
   printf -v ci_command 'FM_HOME=%q FM_STATE_OVERRIDE=%q %q arm %q' "${FM_HOME:-${FM_ROOT:-}}" "${STATE:-${FM_HOME:-${FM_ROOT:-}}/state}" "${BASH_SOURCE[0]%/*}/fm-procevent-ci.sh" "${2:-}"

@@ -173,17 +173,16 @@ const UNSAFE_SCOPE: UnreadWakeScope = {
 //
 // A check-kind row - merge-confirmation polls, Relay mentions, credential/auth
 // failures, and every other legitimately main-only class - never vetoes a scan
-// in either mode. It is simply excluded from eligibleSeqs and left queued for
-// main, which is woken for it on that check's own watcher cycle
-// (fm-primary-pi-watch.ts forces every check-kind TRIGGER to main), so nothing
-// starves by being left behind.
+// in either mode. While attended, outside the routine exceptions below, it is
+// excluded from eligibleSeqs and left queued for main, which is woken on that
+// check's own watcher cycle, so nothing starves by being left behind.
 //
 // A signal row marked "needs-decision:" by the watcher, a second-mate signal
 // whose presented span owns a decision (spanIsDecisionOwned), or a stale row
 // for a task with an open needs-decision or a current captain-held declaration
-// gets the identical treatment: excluded from eligibleSeqs, never a scan veto,
-// and forced to main on its own triggering close (fm-primary-pi-watch.ts's
-// offerWakeToBranch). Heartbeat handling remains independent.
+// gets the identical attended treatment outside those routine exceptions:
+// excluded from eligibleSeqs, never a scan veto, and forced to main on its own
+// triggering close. Heartbeat handling remains independent.
 //
 // That applies to a heartbeat review too, and it is the whole point: a
 // heartbeat used to be deferred to main merely because some unrelated check
@@ -263,6 +262,7 @@ interface StaleDecisionCacheEntry {
   version: string;
   config: string;
   decisionOwned: boolean;
+  routine: boolean;
 }
 
 const staleDecisionCache = new Map<string, StaleDecisionCacheEntry>();
@@ -365,6 +365,114 @@ function spanIsDecisionOwned(
   return false;
 }
 
+// Attended routine rows (bin/fm-branch-prompt.sh "Attended routine outcomes").
+// Two otherwise main-owned row classes have one obvious handling the
+// supervision session performs itself, so while attended they are routed to
+// it instead of waking main; every other check and decision row stays main's.
+
+// A built-in `ci` process-event capture whose classification is
+// `monitor-error`: read the way bin/fm-procevent-lib.sh's
+// fm_procevent_result_adapter reads the captured adapter (a regular one-line
+// sidecar; an `.extension` sidecar marks a non-built-in result) and the way
+// bin/fm-procevent-ci.sh classify reads the `ci_wait:` line. Returns the
+// capture's task, or null for anything else or any read failure.
+function routineCiMonitorErrorTask(state: string, key: string): string | null {
+  const match = key.match(/^procevent:([A-Za-z0-9._-]+):([0-9]+)$/);
+  if (!match) return null;
+  const base = `${state}/procevent-inbox/${match[1]}.${match[2]}`;
+  try {
+    if (!lstatSync(`${base}.result`).isFile() || !lstatSync(`${base}.adapter`).isFile()) return null;
+    if (readFileSync(`${base}.adapter`, "utf8").replace(/\n$/, "") !== "ci") return null;
+    try {
+      lstatSync(`${base}.extension`);
+      return null;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") return null;
+    }
+    const lines = readFileSync(`${base}.result`, "utf8").split("\n");
+    const verdict = lines.find((line) => line.startsWith("ci_wait: "))?.slice("ci_wait: ".length);
+    const task = lines.find((line) => line.startsWith("task: "))?.slice("task: ".length) ?? "";
+    return verdict === "monitor-error" && /^[A-Za-z0-9._-]+$/.test(task) ? task : null;
+  } catch {
+    return null;
+  }
+}
+
+// bin/fm-dod-lib.sh's fm_ask_user_live_surface_only owns this predicate; this
+// mirror routes the row, and bin/fm-send.sh re-checks the owner before any
+// answer. True only when every open decision of the task is a needs-decision
+// keyed nm-<run>-test whose newest opening line names a snapshot file= in which
+// every finding is authority ask-user opening with the live-surface question,
+// and the task is not captain-held.
+const LIVE_SURFACE_QUESTION = "this change has no live-validatable surface; proceed without live validation?";
+function liveSurfaceSnapshot(path: string): boolean {
+  try {
+    if (!lstatSync(path).isFile()) return false;
+    let count = 0;
+    let open = false;
+    let authority = "";
+    let description = "";
+    let bad = false;
+    const finish = () => {
+      if (open) {
+        count++;
+        if (authority !== "ask-user" || !description.startsWith(LIVE_SURFACE_QUESTION)) bad = true;
+      }
+      open = false;
+      authority = "";
+      description = "";
+    };
+    for (const line of readFileSync(path, "utf8").split("\n")) {
+      if (line.startsWith("id:")) {
+        finish();
+        open = true;
+      } else if (open && line.startsWith("authority:")) {
+        authority = line.slice("authority:".length).replace(/^\s+/, "");
+      } else if (open && line.startsWith("description:")) {
+        description = line.slice("description:".length).replace(/^\s*"?/, "");
+      }
+    }
+    finish();
+    return count > 0 && !bad;
+  } catch {
+    return false;
+  }
+}
+
+function liveSurfaceOnlyDecisions(
+  lines: readonly string[],
+  open: ReadonlyMap<string, string>,
+  heldVerb: string,
+): boolean {
+  if (open.size === 0 || statusLineVerb(lines.at(-1) ?? "") === heldVerb) return false;
+  for (const [key, verb] of open) {
+    if (verb !== "needs-decision" || !/^nm-.+-test$/.test(key)) return false;
+    let file = "";
+    for (const line of lines) {
+      if (statusLineVerb(line) !== "needs-decision" || decisionKey(line) !== key) continue;
+      const files = [...statusLineNote(line).matchAll(/\sfile=(\S+)/g)];
+      file = files.at(-1)?.[1] ?? "";
+    }
+    if (!file || !liveSurfaceSnapshot(file)) return false;
+  }
+  return true;
+}
+
+function routineLiveSurfaceTask(
+  statusPath: string,
+  resolveVerb: string,
+  heldVerb: string,
+  reservedPrefixes: readonly string[],
+): boolean {
+  try {
+    if (!lstatSync(statusPath).isFile()) return false;
+    const lines = nonBlankLines(readFileSync(statusPath, "utf8"));
+    return liveSurfaceOnlyDecisions(lines, openDecisions(lines, resolveVerb, heldVerb, reservedPrefixes), heldVerb);
+  } catch {
+    return false;
+  }
+}
+
 export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = false, attendedHost = false): UnreadWakeScope {
   let queue = "";
   try {
@@ -411,6 +519,7 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
   const checkSeqs: string[] = [];
   const heartbeatSeqs: string[] = [];
   const staleDecisionOwnership = new Map<string, boolean>();
+  const staleDecisionRoutine = new Map<string, boolean>();
   const resolveVerb = process.env.FM_CLASSIFY_RESOLVE_VERB || "resolved";
   const heldVerb = process.env.FM_CLASSIFY_CAPTAIN_HELD_VERB || "captain-held";
   const reservedPrefixes = (process.env.FM_CLASSIFY_RESERVED_KEY_PREFIXES || "pending-reply-")
@@ -433,22 +542,31 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
       }
       continue;
     }
+    let project = "";
+    let task = "";
     if (kind === "check") {
       // Main-owned while attended: excluded from what the branch may claim,
       // never a reason to reject the rest of the queue and never a reason to
       // send an otherwise-eligible heartbeat review to main. Away, the branch
-      // is the only actor, so the row is claimed unscoped.
+      // is the only actor, so the row is claimed unscoped. The one attended
+      // exception is a routine CI monitor-error capture for a known task,
+      // claimed task-scoped.
       if (afk) {
         eligibleSeqs.push(seq);
         checkSeqs.push(seq);
+        continue;
       }
-      continue;
-    }
-    let project = "";
-    let task = "";
-    if (kind === "signal") {
+      task = routineCiMonitorErrorTask(state, key) ?? "";
+      project = task ? metadata.get(task) ?? "" : "";
+      if (!project) continue;
+    } else if (kind === "signal") {
       const payload = fields[4] ?? "";
-      if (/^needs-decision:/.test(payload)) {
+      const signalTask = key.replace(/\.(?:status|turn-ended)$/, "");
+      if (/^needs-decision:/.test(payload) && !afk && !secondmates.has(signalTask)
+        && routineLiveSurfaceTask(`${state}/${signalTask}.status`, resolveVerb, heldVerb, reservedPrefixes)) {
+        // The routine live-surface gate (above) is the supervision session's
+        // to accept while attended; it is not a main-owned decision row.
+      } else if (/^needs-decision:/.test(payload)) {
         // Main-owned exactly like a check-kind row above while attended: a
         // needs-decision status append surfaced through the actionable signal
         // path is excluded from what the branch may claim without vetoing the
@@ -484,6 +602,7 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
           return UNSAFE_SCOPE;
         }
         let decisionOwned = false;
+        let routine = false;
         if (version) {
           let cursor: { ident: string; offset: number } | null | undefined;
           if (spanRule) {
@@ -494,6 +613,7 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
           const cached = staleDecisionCache.get(ownershipKey);
           if (cached?.version === version && cached.config === config) {
             decisionOwned = cached.decisionOwned;
+            routine = cached.routine;
           } else {
             let contents: Buffer;
             let spanOffset = 0;
@@ -522,7 +642,8 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
                 reservedPrefixes,
               )
               : [...open.values()].includes("needs-decision") || statusLineVerb(statusLines.at(-1) ?? "") === heldVerb;
-            staleDecisionCache.set(ownershipKey, { version, config, decisionOwned });
+            routine = !spanRule && decisionOwned && liveSurfaceOnlyDecisions(statusLines, open, heldVerb);
+            staleDecisionCache.set(ownershipKey, { version, config, decisionOwned, routine });
             if (staleDecisionCache.size > 512) {
               staleDecisionCache.delete(staleDecisionCache.keys().next().value!);
             }
@@ -531,8 +652,9 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
           staleDecisionCache.delete(ownershipKey);
         }
         staleDecisionOwnership.set(ownershipKey, decisionOwned);
+        staleDecisionRoutine.set(ownershipKey, routine);
       }
-      if (staleDecisionOwnership.get(ownershipKey)) {
+      if (staleDecisionOwnership.get(ownershipKey) && (afk || !staleDecisionRoutine.get(ownershipKey))) {
         needsDecisionKeys.push(key);
         if (!afk) continue;
       }
@@ -601,8 +723,12 @@ export interface BranchOfferVerdict {
 // (scopeForUnreadWake owns the per-row rule).
 export function branchOfferForWake(state: string, message: string, afk: boolean, attendedHost = false): BranchOfferVerdict {
   const heartbeat = /^heartbeat($|:)/.test(message);
-  const isCheckTrigger = /^check:/.test(message);
   const scope = scopeForUnreadWake(state, heartbeat, afk, attendedHost && !afk);
+  // A routine CI monitor-error capture the scan claimed task-scoped is the one
+  // check trigger that may reach the branch while attended.
+  const procevent = message.match(/^check: procevent ci ([A-Za-z0-9._-]+) ([0-9]+)\s*$/);
+  const routineTask = procevent && !afk ? routineCiMonitorErrorTask(state, `procevent:${procevent[1]}:${procevent[2]}`) : null;
+  const isCheckTrigger = /^check:/.test(message) && !(routineTask && scope.eligibleTasks.includes(routineTask));
   const triggerKeys = /^signal:/.test(message)
     ? message
       .slice("signal:".length)

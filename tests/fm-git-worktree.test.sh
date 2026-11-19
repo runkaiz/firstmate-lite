@@ -185,6 +185,31 @@ if remove_copy content; then fail 'unlanded committed work was discarded'; fi
 [ -d "$WT" ] && [ -f "$HOME_DIR/state/content.git-worktree" ] || fail 'refusal lost copy/record'
 pass 'native cleanup preserves untracked, ignored, dirty and unlanded content'
 
+# Generated-output classification names nested and file-pattern roots and
+# refuses a clean copy, an unrecognised root, or a tracked change.
+make_case generated
+allocate generated || fail 'generated fixture allocation failed'
+WT=$FM_GIT_WORKTREE_PATH
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'a clean copy classified as generated leftovers'; fi
+mkdir -p "$WT/docs" "$WT/docs/.next/cache" "$WT/pkg.egg-info"
+printf 'tracked\n' > "$WT/docs/index.md"
+git -C "$WT" add docs/index.md
+git -C "$WT" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid commit -qm docs
+printf 'page\n' > "$WT/docs/.next/cache/page"
+printf 'meta\n' > "$WT/pkg.egg-info/PKG-INFO"
+printf 'build\n' > "$WT/docs/app.tsbuildinfo"
+roots=$(fm_git_worktree_generated_roots "$WT") || fail 'recognised generated leftovers were not classified'
+[ "$roots" = "$(printf '%s\n' docs/.next docs/app.tsbuildinfo pkg.egg-info)" ] || fail "unexpected generated roots: $roots"
+fm_git_init_commit "$WT/docs/.next/cache/clone"
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'a recognised root holding a nested repository was classified as generated'; fi
+rm -rf -- "${WT:?}/docs/.next/cache/clone"
+printf 'mine\n' > "$WT/docs/draft.md"
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'an unrecognised leftover root was classified as generated'; fi
+rm "$WT/docs/draft.md"
+printf 'edit\n' >> "$WT/docs/index.md"
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'generated leftovers beside a tracked change were classified'; fi
+pass 'native generated-output classification names recognised roots and refuses clean, unrecognised, or tracked-change copies'
+
 for source in local remote; do
   make_case "replaced-base-$source"
   ref="refs/heads/$MAIN"

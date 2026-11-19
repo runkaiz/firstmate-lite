@@ -526,6 +526,53 @@ test_branch_outcomes_put_captain_first_and_collapse_routine_overflow() {
   pass "drain: captain outcomes come first, and routine overflow collapses into a count one drain clears"
 }
 
+# A drain that both acknowledges queued wakes and presents captain outcomes
+# prints one command for both: the WAKE_ACK_REQUIRED line carries the outcome
+# target, running it consumes the wake and marks the outcome processed, and a
+# replay keeps mark-processed's refusal while the queue acknowledgement stays
+# idempotent. Only main acknowledges outcomes.
+test_branch_outcomes_ride_the_wake_acknowledgement() {
+  local home drained ack out status
+  home="$TMP_ROOT/drain-combined-ack"
+  mkdir -p "$home/state" "$home/config"
+  : > "$home/config/supervision-host"
+  FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append --task demo --verdict captain --summary 'ready in branch' >/dev/null \
+    || fail "fixture: could not record the captain outcome"
+  FM_HOME="$home" bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_append check combined-ack "check: combined-ack"' _ "$ROOT" \
+    || fail "fixture: could not queue a wake"
+
+  drained=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" 2>&1; exit $?'  "$ROOT/bin/fm-wake-drain.sh")
+  assert_contains "$drained" "check: combined-ack" "the queued wake must be presented"
+  assert_contains "$drained" "the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through 1)" \
+    "the section must point at the combined acknowledgement"
+  assert_not_contains "$drained" "mark-processed --through 1;" "a drain with a combined acknowledgement must not ask for a second command"
+  ack=$(printf '%s\n' "$drained" | sed -n 's/^WAKE_ACK_REQUIRED: after handling completes run bin\/fm-wake-drain.sh //p' | tail -1)
+  case "$ack" in
+    '--ack-through '[0-9]*' --recovery-generation '*' --outcomes-through 1') ;;
+    *) fail "the acknowledgement must carry the outcome target: '$ack'" ;;
+  esac
+
+  drained=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" 2>&1; exit $?'  "$ROOT/bin/fm-wake-drain.sh")
+  [ "$(printf '%s\n' "$drained" | sed -n 's/^WAKE_ACK_REQUIRED: after handling completes run bin\/fm-wake-drain.sh //p' | tail -1)" = "$ack" ] \
+    || fail "a drain re-presenting an already-read outcome must print the same combined acknowledgement: $drained"
+
+  out=$(FM_SUPERVISION_ACTOR=branch FM_HOME="$home" "$ROOT/bin/fm-wake-drain.sh" --ack-through 1 --recovery-generation g --outcomes-through 1 2>&1); status=$?
+  expect_code 2 "$status" "a branch actor must not acknowledge branch outcomes: $out"
+
+  # shellcheck disable=SC2086 # The printed acknowledgement is word-split exactly as main runs it.
+  out=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" "$@" 2>&1; exit $?' "$ROOT/bin/fm-wake-drain.sh" $ack); status=$?
+  expect_code 0 "$status" "the combined acknowledgement must succeed: $out"
+  assert_no_grep 'combined-ack' "$home/state/.wake-queue" "the combined acknowledgement must consume the wake"
+  drained=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" 2>&1; exit $?'  "$ROOT/bin/fm-wake-drain.sh")
+  assert_not_contains "$drained" "BRANCH OUTCOMES" "the combined acknowledgement must mark the outcome processed"
+
+  # shellcheck disable=SC2086 # The printed acknowledgement is word-split exactly as main runs it.
+  out=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" "$@" 2>&1; exit $?' "$ROOT/bin/fm-wake-drain.sh" $ack); status=$?
+  [ "$status" -ne 0 ] || fail "a replayed outcome mark must keep mark-processed's refusal: $out"
+  assert_contains "$out" "were not marked processed" "a refused outcome mark must say so"
+  pass "drain: one printed acknowledgement consumes the wake and marks presented captain outcomes processed"
+}
+
 # Repeated captain outcomes for one task collapse to its newest, one line per
 # task; when the byte cap holds rows back, the section shows only the oldest
 # contiguous run its acknowledgement covers - a shown task's newer row that
@@ -936,7 +983,8 @@ test_attended_captain_outcome_reaches_main_through_branch_outcomes() {
   assert_contains "$drained" "BRANCH OUTCOMES (captain outcomes the supervision session recorded for you" "main's drain must present the captain outcome"
   assert_contains "$drained" "[seq 1, recorded " "the section must carry the outcome's row and when it was recorded"
   assert_contains "$drained" " ago] demo: stub escalated: " "the section must carry the outcome's task and summary"
-  assert_contains "$drained" "run bin/fm-branch-outcome.sh mark-processed --through 1" "the section must print its exact acknowledgement"
+  assert_contains "$drained" "the WAKE_ACK_REQUIRED command also marks them processed (--outcomes-through 1)" "the section must name its acknowledgement"
+  assert_re '^WAKE_ACK_REQUIRED: .* --outcomes-through 1$' <(printf '%s\n' "$drained") "the one acknowledgement must carry the outcome target"
   drained=$(FM_HOME="$home" "$FAKE_CLAUDE" -c '"$0" 2>&1; exit $?'  "$ROOT/bin/fm-wake-drain.sh")
   assert_contains "$drained" " ago] demo: stub escalated: " "an unacknowledged captain outcome must be presented again"
   FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" mark-processed --through 1 >/dev/null \

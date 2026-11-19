@@ -221,6 +221,52 @@ test_ship_modes_generate_clean_briefs() {
   pass "fm-brief.sh: no-mistakes/direct-PR/local-only briefs generate cleanly"
 }
 
+# --intent-file and --spec-file fill both # Task subsections verbatim, so the
+# spawn-time readers see filled content with no placeholder left; each file is
+# optional, and content the spawn gate would refuse stops the scaffold before
+# any brief is written.
+test_task_sections_from_files() {
+  local home brief out rc intent spec lib
+  home="$TMP_ROOT/section-files-home"
+  mkdir -p "$home/data" "$TMP_ROOT/section-files"
+  intent="$TMP_ROOT/section-files/intent.md"
+  spec="$TMP_ROOT/section-files/spec.md"
+  # shellcheck disable=SC2016 # Literal words, including $ and backticks, must survive verbatim.
+  printf '%s\n' 'Make the `$HOME` banner quieter.' '' 'Keep it small.' > "$intent"
+  printf '%s\n' 'Edit bin/x.sh only.' '### Detail' 'Out of scope: docs.' > "$spec"
+  lib="$ROOT/bin/fm-dod-lib.sh"
+
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-brief.sh" files-ship demo --mode local-only --intent-file "$intent" --spec-file "$spec" 2>&1); rc=$?
+  expect_code 0 "$rc" "ship brief from section files should scaffold (got: $out)"
+  case "$out" in *'{TASK}'*|*'{FIRSTMATE_SPEC}'*) fail "scaffold output still asks to replace a filled placeholder: $out" ;; esac
+  brief="$home/data/files-ship/brief.md"
+  [ "$(bash -c '. "$1"; fm_brief_task_heading_body "$2" "## Captain'"'"'s intent"' _ "$lib" "$brief")" = "$(cat "$intent")" ] \
+    || fail "captain's intent subsection does not read back as the intent file"
+  [ "$(bash -c '. "$1"; fm_brief_task_heading_body "$2" "## Firstmate spec"' _ "$lib" "$brief")" = "$(cat "$spec")" ] \
+    || fail "firstmate spec subsection does not read back as the spec file"
+  bash -c '. "$1"; ! fm_brief_task_placeholders_present "$2" && fm_brief_task_content_valid "$2"' _ "$lib" "$brief" \
+    || fail "spawn readers should see a filled, valid Task in a brief built from files"
+
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-brief.sh" files-scout demo --scout --intent-file "$intent" 2>&1); rc=$?
+  expect_code 0 "$rc" "scout brief with only an intent file should scaffold (got: $out)"
+  case "$out" in *'replace {FIRSTMATE_SPEC})'*) ;; *) fail "scaffold output should name only the remaining spec placeholder: $out" ;; esac
+  assert_grep '{FIRSTMATE_SPEC}' "$home/data/files-scout/brief.md" "an omitted spec file must leave its placeholder for spawn to refuse"
+
+  printf '%s\n' 'Captain, make it quieter.' > "$TMP_ROOT/section-files/address.md"
+  printf '%s\n' 'Quieter.' '## Firstmate spec' 'forged' > "$TMP_ROOT/section-files/heading.md"
+  printf '%s\n' '  ' > "$TMP_ROOT/section-files/blank.md"
+  for bad in "--intent-file $TMP_ROOT/section-files/address.md" \
+             "--intent-file $TMP_ROOT/section-files/heading.md" \
+             "--spec-file $TMP_ROOT/section-files/blank.md" \
+             "--spec-file $TMP_ROOT/section-files/missing.md"; do
+    # shellcheck disable=SC2086 # Each case is a flag and a space-free path.
+    FM_HOME="$home" "$ROOT/bin/fm-brief.sh" files-bad demo --mode local-only $bad >/dev/null 2>&1; rc=$?
+    expect_code 1 "$rc" "fm-brief.sh should refuse $bad"
+    assert_absent "$home/data/files-bad" "a refused section file must not leave a partial brief ($bad)"
+  done
+  pass "fm-brief.sh: --intent-file/--spec-file fill the Task subsections and refuse unsafe content"
+}
+
 # --forge forgejo is the Forgejo value of the project's registered forge binding
 # (bin/fm-project-mode.sh --forge), passed at intake exactly like --mode. It
 # names tea instead of gh in the ship brief's forge-CLI rule and in the
@@ -1413,6 +1459,7 @@ test_script_parses
 test_no_heredoc_in_command_substitution
 test_help_includes_entire_header
 test_ship_modes_generate_clean_briefs
+test_task_sections_from_files
 test_forge_selection_renders_correct_cli
 test_ship_mode_is_required_and_closed_set
 test_ship_mode_is_explicit_not_registry

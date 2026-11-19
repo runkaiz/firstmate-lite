@@ -4618,6 +4618,73 @@ EOF
   pass "an extension rebind re-mirrors undelivered dialog instead of dropping it"
 }
 
+# Attended routine rows (bin/fm-branch-prompt.sh "Attended routine outcomes"):
+# a built-in CI monitor-error capture for a known task and a pure live-surface
+# test gate route to the branch, while near misses stay main-owned.
+test_branch_dispatch_routes_attended_routine_rows() {
+  local home out status
+  home="$TMP_ROOT/dispatch-routine-home"
+  mkdir -p "$home/state/procevent-inbox" "$home/projects/approved"
+  printf 'project=%s/projects/approved\nwindow=fm-task-a\n' "$home" > "$home/state/task-a.meta"
+  LIB="$ROOT/.pi/extensions/lib/fm-branch-dispatch.ts" FM_HOME="$home" \
+    node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+import { pathToFileURL } from "node:url";
+import { rmSync, writeFileSync } from "node:fs";
+const { scopeForUnreadWake, branchOfferForWake } = await import(pathToFileURL(process.env.LIB).href);
+const state = `${process.env.FM_HOME}/state`;
+const inbox = `${state}/procevent-inbox`;
+const expect = (ok, what) => { if (!ok) throw new Error(what); };
+
+const ciRow = "1\t1\tcheck\tprocevent:ci-task-a:7\tcheck: procevent ci ci-task-a 7";
+const ciWake = "check: procevent ci ci-task-a 7";
+writeFileSync(`${state}/.wake-queue`, ciRow);
+writeFileSync(`${inbox}/ci-task-a.7.adapter`, "ci\n");
+writeFileSync(`${inbox}/ci-task-a.7.result`, "ci_wait: monitor-error\ntask: task-a\nrun_id: r\npr: p\nevidence:\nx\n");
+let scope = scopeForUnreadWake(state, false);
+expect(scope.eligibleSeqs.join(",") === "1" && scope.eligibleTasks.join(",") === "task-a", `a CI monitor-error capture was not routed task-scoped: ${JSON.stringify(scope)}`);
+expect(branchOfferForWake(state, ciWake, false).eligible, "the CI monitor-error trigger was forced to main");
+for (const [label, mutate] of [
+  ["an action capture", () => writeFileSync(`${inbox}/ci-task-a.7.result`, "ci_wait: action\ntask: task-a\n")],
+  ["a non-ci adapter", () => writeFileSync(`${inbox}/ci-task-a.7.adapter`, "when\n")],
+  ["an extension result", () => writeFileSync(`${inbox}/ci-task-a.7.extension`, "x\n")],
+  ["an unknown task", () => writeFileSync(`${inbox}/ci-task-a.7.result`, "ci_wait: monitor-error\ntask: task-z\n")],
+]) {
+  writeFileSync(`${inbox}/ci-task-a.7.adapter`, "ci\n");
+  writeFileSync(`${inbox}/ci-task-a.7.result`, "ci_wait: monitor-error\ntask: task-a\n");
+  rmSync(`${inbox}/ci-task-a.7.extension`, { force: true });
+  mutate();
+  scope = scopeForUnreadWake(state, false);
+  expect(!scope.eligible && !scope.corrupted, `${label} must stay main-owned without corrupting the scan: ${JSON.stringify(scope)}`);
+  expect(!branchOfferForWake(state, ciWake, false).eligible, `${label} trigger reached the branch`);
+}
+rmSync(`${inbox}/ci-task-a.7.extension`, { force: true });
+
+const snapshot = `${state}/nm-findings.txt`;
+const question = "this change has no live-validatable surface; proceed without live validation? (0 of 2 scenarios were driven live against the product); docs only";
+writeFileSync(`${state}/task-a.status`, `working: implementing\nneeds-decision [at=1792922400] [key=nm-RUN1-test]: ask-user findings=test-1 file=${snapshot}\n`);
+writeFileSync(snapshot, `id: test-1\nseverity: warning\nfile:\nline:\ndescription: ${question}\nauthority: ask-user\n`);
+writeFileSync(`${state}/.wake-queue`, "1\t1\tsignal\ttask-a.status\tneeds-decision: task-a.status");
+scope = scopeForUnreadWake(state, false);
+expect(scope.eligibleSeqs.join(",") === "1" && scope.needsDecisionKeys.length === 0, `a live-surface test gate was not routed to the branch: ${JSON.stringify(scope)}`);
+expect(branchOfferForWake(state, `signal: ${state}/task-a.status`, false).eligible, "the live-surface gate trigger was forced to main");
+for (const [label, status, findings] of [
+  ["a second, ordinary finding", null, `id: test-1\ndescription: ${question}\nauthority: ask-user\n\nid: test-2\ndescription: live validation verdict: inconclusive\nauthority: ask-user\n`],
+  ["a review-step key", `needs-decision [key=nm-RUN1-review]: ask-user findings=test-1 file=${snapshot}\n`, null],
+  ["a captain-held task", `needs-decision [key=nm-RUN1-test]: ask-user findings=test-1 file=${snapshot}\ncaptain-held [key=route]: awaiting the captain\n`, null],
+  ["a missing snapshot", `needs-decision [key=nm-RUN1-test]: ask-user findings=test-1 file=${snapshot}.gone\n`, null],
+]) {
+  writeFileSync(`${state}/task-a.status`, status ?? `needs-decision [key=nm-RUN1-test]: ask-user findings=test-1 file=${snapshot}\n`);
+  writeFileSync(snapshot, findings ?? `id: test-1\ndescription: ${question}\nauthority: ask-user\n`);
+  scope = scopeForUnreadWake(state, false);
+  expect(!scope.eligible && scope.needsDecisionKeys.join(",") === "task-a.status", `${label} must stay a main-owned decision: ${JSON.stringify(scope)}`);
+}
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "attended routine routing failed: $out"
+  pass "dispatch routes a CI monitor-error capture and a pure live-surface test gate to the attended branch, and nothing else"
+}
+
 # Direct unit coverage of fm-branch-dispatch.ts's classification, independent
 # of the Pi SDK stub: every legitimately main-only class (docs/pi-supervision-
 # branch.md) stays excluded from eligibleSeqs no matter its check-kind key,
@@ -5993,6 +6060,7 @@ test_queued_actions_recheck_lock_ownership
 test_stale_generation_boundaries_are_side_effect_free
 test_secondary_session_stays_inert
 test_rebind_remirrors_undelivered_dialog_from_durable_cursor
+test_branch_dispatch_routes_attended_routine_rows
 test_delivery_keeps_the_event_loop_live_and_ordered
 test_session_replacement_during_delivery_neither_loses_nor_duplicates
 test_store_failure_during_delivery_neither_loses_nor_duplicates

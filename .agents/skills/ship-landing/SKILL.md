@@ -23,12 +23,14 @@ At landing time, MAIN and the away session evaluate merge authority in the same 
 A dispatch-time `yolo` snapshot alone does not establish an explicit restriction, and neither actor rewrites it when approval changes.
 Read those records and verify the approval covers the validated head and scope before invoking `bin/fm-merge-local.sh` or `bin/fm-pr-merge.sh`; uncertainty or an explicit restriction holds for the captain, and an existing captain hold must be answered and released through its owner.
 A current captain instruction to merge is explicit authority.
+While attended, the supervision session lands a done local-only branch covered by recorded `yolo=on` or proactive authority itself and reports it as a routine outcome (`bin/fm-branch-prompt.sh` "Attended routine outcomes"); relay that landing in MAIN's next natural reply.
 For any custom `state/<id>.check.sh` you write yourself, keep it an ordinary single-link mode-`0700` file, print one line only when firstmate should wake, print nothing otherwise, finish before `FM_CHECK_TIMEOUT`, then bind its current bytes with `bin/fm-check-register.sh <id>` before the watcher may execute it.
 Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm-teardown.sh` for a spawned task); never hand-compose an `rm` with `$STATE`/`$ID`.
 
 Retire a ship copy only through `bin/fm-teardown.sh`'s landing proof or its explicit captain-approved branch-retention path.
 A teardown refusal for uncommitted or unlanded work is a stop-and-investigate result, never an obstacle to bypass.
-When a native copy refuses only for untracked or ignored leftovers, inspect each listed root read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, run the exact `--preserve-untracked` command the refusal printed, whose script header owns the move, custody check and resume.
+Native teardown handles the routine cases in one pass: it stops a worker whose status reads done through task control and preserves leftovers it positively recognises as generated output, as its header defines.
+When a native copy still refuses only for untracked or ignored leftovers, inspect each listed root read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, run the exact `--preserve-untracked` command the refusal printed, whose script header owns the move, custody check and resume.
 Ignored status alone never proves an artifact disposable: tracked edits, unlanded commits, anything that could be unique work or session evidence, and uncertain ownership stay stop-and-escalate.
 With proactive mode on, take that preservation as part of the approved wrap-up without asking; with it off, report the classification and the exact command as the proposed next action.
 Never force teardown without explicit discard authority.

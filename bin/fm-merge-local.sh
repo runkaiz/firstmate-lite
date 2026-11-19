@@ -33,6 +33,10 @@
 # in either posture. It rechecks config/proactive under the toggle's lock and
 # holds that lock through the synchronous fast-forward; off/malformed refuses.
 # Without --proactive, existing explicit/standing/registry authority is unchanged.
+# Attended, the supervision branch lands only as its one routine exception
+# (bin/fm-branch-prompt.sh "Attended routine outcomes"): with --proactive, or
+# for a task whose record carries yolo=on, and always behind the same done,
+# clean-ship-head and captain-hold checks; anything else stays main-owned.
 # Usage: fm-merge-local.sh <task-id> [--proactive]
 set -eu
 
@@ -71,7 +75,26 @@ META="$STATE/$ID.meta"
 # actor is refused for its role whatever it says.
 # shellcheck source=bin/fm-lease-lib.sh
 . "$SCRIPT_DIR/fm-lease-lib.sh"
-fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
+# The attended branch's routine exception: only --proactive or the task's
+# recorded yolo=on passes, and the readiness checks below then apply to it.
+BRANCH_ROUTINE=false
+branch_routine_or_forbid() {
+  local record=$STATE/$ID.meta yolo=
+  if [ "$(fm_lease_actor)" = branch ] && ! fm_lease_away_relocated; then
+    [ -f "$record" ] || record=$STATE/$ID.retained
+    [ ! -f "$record" ] || [ -L "$record" ] \
+      || yolo=$(awk -F= '$1 == "yolo" { n++; v = substr($0, 6) } END { if (n == 1) print v }' "$record")
+    if [ "$PROACTIVE" = true ] || [ "$yolo" = on ]; then
+      BRANCH_ROUTINE=true
+      return 0
+    fi
+    echo "error: local-only landing (fm-merge-local) refused - while attended the supervision branch lands only under proactive mode (--proactive) or the task's recorded yolo=on; report the ready branch and leave it to main" >&2
+    exit "$FM_LEASE_REFUSE_EXIT"
+  fi
+  BRANCH_ROUTINE=false
+  fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
+}
+branch_routine_or_forbid
 # shellcheck source=bin/fm-afk-contract.sh
 . "$SCRIPT_DIR/fm-afk-contract.sh"
 
@@ -162,18 +185,18 @@ if fm_afk_contract_present "$STATE"; then
   }
 fi
 # Archive/refresh may have occurred since the early actor check.
-fm_lease_forbid_branch "local-only landing (fm-merge-local)" --away-relocated
-if [ "$PROACTIVE" = true ] || fm_afk_contract_away_present "$STATE"; then
+branch_routine_or_forbid
+if [ "$PROACTIVE" = true ] || [ "$BRANCH_ROUTINE" = true ] || fm_afk_contract_away_present "$STATE"; then
   READY_LINE=$(status_current_line "$STATE/$ID.status" ship)
   [ "$(status_line_verb "$READY_LINE")" = 'done' ] || {
-    echo "error: local merge while away or proactive requires a reconciled done declaration; validation failures and decision waits must be resolved" >&2
+    echo "error: local merge while away, proactive, or by the supervision branch requires a reconciled done declaration; validation failures and decision waits must be resolved" >&2
     exit 1
   }
   WORKTREE=$(awk '/^worktree=/{n++; value=substr($0,10)} END{if(n==1) print value}' "$META")
   SHIP_HEAD=$MERGE_HEAD
   WORKER_HEAD=$(git -C "$WORKTREE" rev-parse --verify HEAD 2>/dev/null || true)
   [ "$WORKER_HEAD" = "$SHIP_HEAD" ] && [ -z "$(git -C "$WORKTREE" status --porcelain 2>/dev/null)" ] || {
-    echo "error: local merge while away or proactive requires a clean worker copy at the exact ship head" >&2
+    echo "error: local merge while away, proactive, or by the supervision branch requires a clean worker copy at the exact ship head" >&2
     exit 1
   }
 fi
