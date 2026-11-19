@@ -62,7 +62,9 @@ if [ "$*" = 'axi status' ]; then
 fi
 if [ "$*" = 'axi run --wait 1s' ]; then
   drive_identity() {
-    printf 'run:\n  id: RUN1\n  branch: fm/ci\n  status: running\n  head_sha: %s\n  pr: https://github.com/example/repo/pull/1\n' "$CI_TEST_HEAD"
+    local pr=https://github.com/example/repo/pull/1
+    [ "$CI_SCENARIO" != wrong-pr ] || pr=https://github.com/example/repo/pull/2
+    printf 'run:\n  id: RUN1\n  branch: fm/ci\n  status: running\n  head_sha: %s\n  pr: %s\n' "$CI_TEST_HEAD" "$pr"
   }
   count=$((count+1)); printf '%s\n' "$count" > "$CI_TEST_LAB/drives"
   if [ "$CI_SCENARIO" = hold ]; then
@@ -74,6 +76,10 @@ if [ "$*" = 'axi run --wait 1s' ]; then
     printf 'error: wait of 1s elapsed while driving the run\nhelp[1]:\n  This bounded hold ended; it is not a pipeline failure and does not mean the daemon is dead.\n'
     exit 1
   fi
+  case "$CI_SCENARIO" in
+    stderr-progress) printf 'run: running\n  intent: completed\n  pr: completed\n  ci: running\n' >&2 ;;
+    stderr-error) printf 'daemon socket refused on stderr\n' >&2; exit 1 ;;
+  esac
   case "$CI_SCENARIO" in error|near-elapsed) ;; *) drive_identity ;; esac
   case "$CI_SCENARIO" in
     gate|revalidate) printf 'gate: ci\nfindings[1]{id,severity,file,line,action,description}:\n  c1,error,file,1,ask-user,CI failed; approval required\n' ;;
@@ -151,6 +157,22 @@ check 'controlled clock advances without real CI wait' test "$(cat "$LAB/clock")
 check 'zero worker/supervisor model dispatches during pending holds' test ! -e "$LAB/model-dispatches"
 check 'only pipeline drive supplies green evidence' contains "$out" "outcome: checks-passed"
 check 'forge verification only at actionable green return' test "$(line_count "$LAB/forge-calls")" = 1
+
+reset_counts; export CI_SCENARIO=stderr-progress CI_AFTER=1
+poll > "$LAB/stderr-progress.result"
+check 'stderr progress cannot shadow the structured PR identity' test "$("$ADAPTER" classify "$LAB/stderr-progress.result")" = action
+check 'noisy green return preserves the pipeline outcome' grep -Fxq 'outcome: checks-passed' "$LAB/stderr-progress.result"
+check 'noisy green return verifies the forge head once' test "$(line_count "$LAB/forge-calls")" = 1
+
+reset_counts; export CI_SCENARIO=stderr-error
+poll > "$LAB/stderr-error.result"
+check 'stderr-only drive failure remains a monitoring error' test "$("$ADAPTER" classify "$LAB/stderr-error.result")" = monitor-error
+check 'stderr-only failure retains its diagnostic' grep -Fxq 'daemon socket refused on stderr' "$LAB/stderr-error.result"
+
+reset_counts; export CI_SCENARIO=wrong-pr
+out=$(poll)
+check 'wrong PR in structured stdout remains a monitoring error' contains "$out" 'ci_wait: monitor-error'
+check 'wrong structured PR is rejected before the forge head check' test ! -e "$LAB/forge-calls"
 
 for scenario in gate failed error near-elapsed stale-green skips revalidate other-run other-branch broken missing-required changed-head post-return-rebase; do
   reset_counts; export CI_SCENARIO=$scenario CI_AFTER=1

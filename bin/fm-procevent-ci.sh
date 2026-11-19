@@ -107,6 +107,13 @@ result() {
   printf 'ci_wait: %s\ntask: %s\nrun_id: %s\npr: %s\n' "$1" "$TASK" "$RUN" "$PR"
   printf 'evidence:\n%s\n' "${2:-$SNAPSHOT}"
 }
+drive_monitor_error() {
+  local evidence=$DRIVE
+  if [ -z "$(fm_nm_strip_quotes "$(fm_nm_field "$DRIVE" error)")" ] && [ -s "$DRIVE_STDERR" ]; then
+    evidence=${DRIVE:+$DRIVE$'\n'}$(< "$DRIVE_STDERR")
+  fi
+  result monitor-error "$evidence"
+}
 
 case "${1:-}" in
   arm)
@@ -155,14 +162,19 @@ case "${1:-}" in
     TASK=$2 WT=$3 RUN=$4 BRANCH=$5 PR=$6
     if ! fm_pr_task_id_valid "$TASK" || ! fm_pr_url_parse "$PR"; then die 'invalid CI identity'; fi
     SNAPSHOT=
+    DRIVE_STDERR=$(mktemp "${TMPDIR:-/tmp}/fm-ci-drive.XXXXXX") \
+      || { result monitor-error 'cannot capture drive stderr'; exit 0; }
+    trap 'rm -f -- "$DRIVE_STDERR"' EXIT
+    trap 'exit 143' TERM
     while :; do
       if ! snapshot; then result monitor-error 'bound run/branch/PR unavailable or changed'; break; fi
       if ! fm_nm_run_is_executing "$SNAPSHOT"; then result action; break; fi
       rc=0
-      DRIVE=$(fm_nm_run_bounded "$WT" 20 axi run --wait 1s 2>&1) || rc=$?
+      # AXI writes its structured response to stdout and progress to stderr.
+      DRIVE=$(fm_nm_run_bounded "$WT" 20 axi run --wait 1s 2>"$DRIVE_STDERR") || rc=$?
       # A gate, failure, revalidation, or unreadable daemon must reach the
       # original driver. Never respond, restart, or turn a CLI error into green.
-      if ! snapshot; then result monitor-error "$DRIVE"; break; fi
+      if ! snapshot; then drive_monitor_error; break; fi
       # v1.84.0 (4822244), emitAxiWaitElapsed/emitError: an elapsed
       # supported hold is error:<message>, exit 1, not a run-shaped success.
       # Match only our exact requested bound; all other errors stay visible.
@@ -196,11 +208,11 @@ case "${1:-}" in
             ;;
         esac
         if [ -z "$OUTCOME" ] && ! printf '%s\n' "$DRIVE" | grep -Eq '^[[:space:]]*gate:'; then
-          result monitor-error "$DRIVE"; break
+          drive_monitor_error; break
         fi
         result action "$DRIVE"; break
       fi
-      if [ "$rc" -ne 0 ] || [ -z "$DRIVE" ]; then result monitor-error "$DRIVE"; break; fi
+      if [ "$rc" -ne 0 ] || [ -z "$DRIVE" ]; then drive_monitor_error; break; fi
       # A pipeline-owned rebase or repair may return to Review. Keep holding
       # its same run without waking a worker merely to observe active work.
       if ! fm_nm_run_is_executing "$SNAPSHOT"; then result action "$SNAPSHOT"; break; fi
