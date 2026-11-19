@@ -1,0 +1,46 @@
+Adapter: target
+Dependencies: disposable AXI and forge protocol fakes; this is NOT live pipeline evidence.
+
+Scenario: quiet
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: eaad3dd0df4759650a4de21d0b40cc9253fa429f
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Scenario: stderr-progress
+ci_wait: action
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+run:
+  id: RUN1
+  branch: fm/ci
+  status: running
+  head_sha: eaad3dd0df4759650a4de21d0b40cc9253fa429f
+  pr: https://github.com/example/repo/pull/1
+outcome: checks-passed
+
+Scenario: stderr-error
+ci_wait: monitor-error
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+daemon socket refused on stderr
+
+Scenario: wrong-pr
+ci_wait: monitor-error
+task: task
+run_id: RUN1
+pr: https://github.com/example/repo/pull/1
+evidence:
+green drive return lacks bound run/head/PR evidence
