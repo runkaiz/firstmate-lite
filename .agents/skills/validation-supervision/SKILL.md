@@ -36,7 +36,7 @@ On a `procevent ci` result, read the exact capture and its adapter classificatio
 It is a drive response or monitoring error for the original worker, never independent authority to declare a run passed.
 If that worker already reported CI-ready done, run `bin/fm-procevent.sh handled <source-id> <sequence>` and retire the captured wait without waking the completed worker.
 Otherwise send the original worker the captured result path once, telling it to read the response and reattach or handle its gate through no-mistakes, then run that same `handled` command after the durable steer succeeds.
-The drain's `--ack-through` only consumes wake rows, so without `handled` the result keeps re-announcing.
+The drain's `--ack-through` does not mark captured process-event results handled, so without `handled` the result keeps re-announcing.
 A replay must reconcile the task's steering inbox before sending the same captured source/sequence again.
 While attended, the supervision session routes a `monitor-error` capture this way itself and reports it as a routine outcome (`bin/fm-branch-prompt.sh` "Attended routine outcomes").
 Do not answer a gate, run a parallel CI or merge poll, or turn unchanged registered CI waits into routine status-review turns.

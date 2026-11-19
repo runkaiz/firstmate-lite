@@ -96,7 +96,7 @@ A successful row grant transfers ownership of exactly the currently branch-eligi
 
 What is never offered, or falls back to main:
 
-- While attended, a check-kind triggering close is never offered, even when other rows are eligible.
+- While attended, a check-kind triggering close outside the [routine exceptions](#autonomy) is never offered, even when other rows are eligible.
   Check-kind closes are merge-confirmation polls, Relay mentions, credential/auth failures, and every other legitimately main-only class.
 - When a triggering close has no acceptor (extension absent, branch broken), it keeps today's wake-to-main path.
 - Watcher-failure alarms always go to main, because only main can repair the watcher cycle.
@@ -113,7 +113,7 @@ A decision-owned event surfaced by `bin/fm-watch.sh`'s signal path gets the same
 - A `captain-held` declaration surfaced through the no-verb fallback.
 - A pending-reply second-mate escalation.
 
-`scopeForUnreadWake` excludes every marked row from what the branch may claim, as well as second-mate signals classified by the span rule below.
+`scopeForUnreadWake` excludes marked rows outside the [routine exception](#autonomy) from what the branch may claim, as well as second-mate signals classified by the span rule below.
 
 A second mate's status log is one shared channel carrying many independently keyed decisions, so its signal row is judged by the lines presented since the last drain rather than by the whole log.
 The row is excluded when one of those lines is a decision, blocked, or captain-held line, resolves a decision open just before it, or declares, in the status parser's key positions, the key of a decision still open in that log.
@@ -123,14 +123,14 @@ The status-presentation cursor bounds that span, and a missing or unmatched curs
 Single-task crewmate signals keep their existing Pi payload and attended-host whole-log rules, except that the TypeScript decision fold now ignores bare transition words without a colon or complete key token, matching `bin/fm-classify-lib.sh` on both crewmate and second-mate logs.
 
 For a stale row, `scopeForUnreadWake` folds the mapped task's status log.
-It excludes the row when any `needs-decision` remains open or the current meaningful declaration is `captain-held`.
+Outside that same routine exception, it excludes the row when any `needs-decision` remains open or the current meaningful declaration is `captain-held`.
 An unreadable or symlinked status log fails the scope closed rather than influencing routing.
 
 Before cross-referencing them, the dispatcher resolves trigger keys and every currently unread excluded decision row to task identity.
 The cross-reference then applies two rules:
 
 - Any signal or stale trigger containing a decision-owned task goes wholly to main, including a batch that also contains routine rows.
-- An unread decision for one task keeps every later signal or stale trigger for that same task on main until the decision row is read.
+- An unread main-owned decision for one task keeps every later signal or stale trigger for that same task on main until the decision row is read.
   This holds regardless of whether the rows use its status-file key or window alias.
 
 Other tasks remain independently eligible.
@@ -181,10 +181,11 @@ A settled provider error, or a settled prompt with no report, releases the grant
 
 #### Report scoping
 
-While a signal or stale prompt is open, `fm_branch_report` accepts only the tasks that prompt's claimed rows resolve to:
+While a task-scoped prompt is open, `fm_branch_report` accepts only the tasks that prompt's claimed rows resolve to:
 
 - A signal row resolves by its status-log key.
 - A stale row resolves through the task record naming that endpoint.
+- An attended routine CI capture resolves through its captured task.
 
 A report for any other task id, `fleet` included, is refused before the store is touched.
 That way, a task remembered from an earlier wake cannot become a delivered outcome.
@@ -251,11 +252,11 @@ The guards are wired into these scripts:
 | Scripts | Guard behavior |
 | --- | --- |
 | `fm-send.sh`, `fm-control.sh`, and `fm-teardown.sh` | Overlap, lease-checked, with claim serialization retained through the mutation. |
-| `fm-pr-merge.sh`, `fm-merge-local.sh`, `fm-spawn.sh`, `fm-send.sh --resolve-key` for a decision key, and `fm-teardown.sh` for a second mate | Main-owned while attended; branch refused. |
+| `fm-pr-merge.sh`, `fm-merge-local.sh`, `fm-spawn.sh`, `fm-send.sh --resolve-key` for a decision key, and `fm-teardown.sh` for a second mate | Main-owned while attended, subject to the routine exceptions below. |
 
 A relaunch through `fm-control` stays branch-legal recovery in both postures.
 Under the away-posture record, the PR merge, a fresh spawn, a decision answer, and a local-only landing relocate to the branch behind each script's own gate.
-While attended, two narrow routine exceptions pass the branch through the same scripts (`bin/fm-branch-prompt.sh` "Attended routine outcomes"): `fm-merge-local.sh` under `--proactive` or the task's recorded `yolo=on`, behind its done and clean-ship-head checks, and `fm-send.sh --resolve-key` approving a gate whose every finding is the no-live-validatable-surface test finding (`fm_ask_user_live_surface_only` in `bin/fm-dod-lib.sh`).
+While attended, only the narrow exceptions in `bin/fm-branch-prompt.sh` "Attended routine outcomes" pass the branch through these guards.
 Second-mate retirement never does ("Postures" below).
 
 ### Autonomy
@@ -265,7 +266,7 @@ No captain grant file is required.
 
 A fleet-wide heartbeat is separately eligible only when every row other than a check or decision-owned signal/stale row is a heartbeat row or a resolvable task-local row (see "Heartbeat routing" below).
 Every other fleet-wide or unresolvable wake, and every watcher-failure alarm, stays on main.
-While attended, `scopeForUnreadWake` also routes two otherwise main-owned row classes to the branch: a built-in CI wait capture classified `monitor-error` for a known task, and a decision row whose every open decision is that live-surface test gate.
+While attended, `scopeForUnreadWake` also routes two otherwise main-owned row classes to the branch: a built-in CI wait capture classified `monitor-error` for a known task, and a decision row whose every open decision satisfies `fm_ask_user_live_surface_only` in `bin/fm-dod-lib.sh`.
 
 #### Pre-drain recheck
 
@@ -474,10 +475,11 @@ The branch accepts it without a project only when every branch-ownable row obser
 
 - Heartbeat-kind.
 - A resolvable task-local signal or stale event.
+- A task-scoped routine CI capture under [Autonomy](#autonomy).
 
 ### Co-present main-owned rows
 
-A heartbeat is never vetoed or ridden into main by a co-present check row or decision-owned signal/stale row.
+A heartbeat is never vetoed or ridden into main by a co-present main-owned check row or decision-owned signal/stale row.
 Those rows are main-owned while attended.
 They are excluded from what the branch may claim and left queued for main.
 Main is woken for each on its own watcher cycle, so nothing starves by being left behind.

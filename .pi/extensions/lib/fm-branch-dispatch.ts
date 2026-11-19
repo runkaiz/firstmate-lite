@@ -173,17 +173,16 @@ const UNSAFE_SCOPE: UnreadWakeScope = {
 //
 // A check-kind row - merge-confirmation polls, Relay mentions, credential/auth
 // failures, and every other legitimately main-only class - never vetoes a scan
-// in either mode. It is simply excluded from eligibleSeqs and left queued for
-// main, which is woken for it on that check's own watcher cycle
-// (fm-primary-pi-watch.ts forces every check-kind TRIGGER to main), so nothing
-// starves by being left behind.
+// in either mode. While attended, outside the routine exceptions below, it is
+// excluded from eligibleSeqs and left queued for main, which is woken on that
+// check's own watcher cycle, so nothing starves by being left behind.
 //
 // A signal row marked "needs-decision:" by the watcher, a second-mate signal
 // whose presented span owns a decision (spanIsDecisionOwned), or a stale row
 // for a task with an open needs-decision or a current captain-held declaration
-// gets the identical treatment: excluded from eligibleSeqs, never a scan veto,
-// and forced to main on its own triggering close (fm-primary-pi-watch.ts's
-// offerWakeToBranch). Heartbeat handling remains independent.
+// gets the identical attended treatment outside those routine exceptions:
+// excluded from eligibleSeqs, never a scan veto, and forced to main on its own
+// triggering close. Heartbeat handling remains independent.
 //
 // That applies to a heartbeat review too, and it is the whole point: a
 // heartbeat used to be deferred to main merely because some unrelated check

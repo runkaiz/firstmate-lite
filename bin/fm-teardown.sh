@@ -6,7 +6,7 @@
 # library's source/base proof; local-only ships use teardown_native_local_landed
 # (unchanged base, local ancestry, or identical patch ids in local history,
 # also for legacy origin-recorded reservations). --force is unsupported.
-# A live/unverified owner refuses.
+# A live/unverified owner remaining after the one-pass stop below refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
 # for leftovers the caller inspected and classified as task-owned generated
@@ -15,14 +15,16 @@
 # fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
 # A refusal or interruption leaves the copy, task records and journal in place,
 # and rerunning the same command completes the preservation idempotently.
+# Journaled paths re-enter custody verification even when already moved and
+# the copy is otherwise clean; no new --preserve-untracked arguments are needed.
 # When none is named and every leftover root is recognised generated output
 # (fm_git_worktree_generated_roots), teardown names those roots itself in the
 # same pass; anything uncertain, tracked, or unlanded still refuses.
 # One-pass stop: a native ship or scout whose current status reads done, with
 # no open decision, is first stopped through bin/fm-control.sh exit (which
 # preserves the endpoint, copy, and every uncommitted change) before teardown
-# takes its locks; a failed stop changes nothing and the live-endpoint
-# refusal below names it. Unfinished tasks and --force never stop a worker.
+# takes its locks; if a live/unverified endpoint remains, teardown refuses
+# and names any stop failure. Unfinished tasks and --force never stop a worker.
 # A leftover refusal summarizes by root and prints the exact preserve command
 # (native_leftover_next_action); a named directory holding tracked content
 # stands for the leftover roots beneath it.

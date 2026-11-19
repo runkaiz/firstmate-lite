@@ -45,9 +45,9 @@
 #   confirms the legacy board-compatibility floor; otherwise it asks for a text report.
 #   --herdr-lab is mandatory when the task will issue Herdr lifecycle commands.
 #   It adds the hard isolation contract backed by bin/fm-herdr-lab.sh.
-#   The flag must be explicit because {TASK} and {FIRSTMATE_SPEC} are filled
-#   after scaffolding and the caller-supplied repo string cannot reliably
-#   identify this repo. Briefs made without it carry a loud declaration so an
+#   The flag stays explicit even with section-file input: task prose and the
+#   caller-supplied repo string do not select the isolation contract.
+#   Briefs made without it carry a loud declaration so an
 #   omitted contract cannot be silent.
 # For ship tasks, --mode is REQUIRED and shapes the definition of done. Firstmate
 # resolves it per task at intake (AGENTS.md section 7); data/projects.md holds the
