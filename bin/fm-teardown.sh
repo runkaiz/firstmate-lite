@@ -517,8 +517,7 @@ teardown_stop_finished_native_worker() {
   case "${kind:-ship}" in ship|scout) ;; *) return 0 ;; esac
   current=$(status_current_line "$STATE/$ID.status" "${kind:-ship}")
   [ "$(status_line_verb "$current")" = "done" ] || return 0
-  if out=$(FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
-      "$SCRIPT_DIR/fm-control.sh" "$ID" exit 2>&1); then
+  if out=$(FM_HOME="$FM_HOME" "$SCRIPT_DIR/fm-control.sh" "$ID" exit 2>&1); then
     printf 'teardown: finished worker stopped through task control: %s\n' "${out##*$'\n'}" >&2
   else
     TEARDOWN_STOP_NOTE=${out##*$'\n'}

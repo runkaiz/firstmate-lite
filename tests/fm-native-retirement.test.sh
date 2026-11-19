@@ -527,6 +527,67 @@ expect_code 0 "$?" "a finished task's live worker was not stopped and retired in
 retired || fail 'one-pass stop left the copy or records'
 pass 'teardown stops a finished native worker through task control in one pass and never stops an unfinished one'
 
+test_stop_marked_lab() (
+  # Exercise the real control entrypoint with its gate guard enabled. Only the
+  # terminal transport is modelled; no lifecycle or authorization code is stubbed.
+  local var out keep
+  for var in "${!FM_@}"; do
+    case "$var" in *_OVERRIDE) unset "$var" ;; esac
+  done
+  unset FM_GATE_REFUSE_BYPASS
+  export NO_MISTAKES_GATE=1
+  bash "$ROOT/bin/fm-lab-home.sh" create "$TMP_ROOT/stop-lab/home" >/dev/null || fail 'lab creation failed'
+  make_case stop-lab ship local-only
+  printf 'harness=codex\n' >> "$HOME_DIR/state/$ID.meta"
+  mkdir -p "$WT/node_modules/pkg"
+  printf 'module\n' > "$WT/node_modules/pkg/index.js"
+  cat > "$FAKE/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$1" in
+  list-windows)
+    printf 'main\n'
+    [ -f "$FM_TEST_CASE/closed" ] || printf 'fm-%s\n' "$FM_TEST_ID" ;;
+  display-message)
+    case "${*: -1}" in
+      *pane_current_command*)
+        if [ -f "$FM_TEST_CASE/stopped" ]; then printf 'bash\n'; else printf 'codex\n'; fi ;;
+      *pane_current_path*) printf '%s\n' "$FM_TEST_WORKTREE" ;;
+      *pane_pid*) printf '%s\n' "$$" ;;
+      *cursor_y*) printf '1\n' ;;
+      *) exit 1 ;;
+    esac ;;
+  capture-pane) printf '╭────╮\n│    │\n╰────╯\n' ;;
+  send-keys)
+    if [ "${*: -1}" = /quit ]; then
+      printf '/quit\n' >> "$FM_TEST_CASE/control.log"
+      touch "$FM_TEST_CASE/stopped"
+    fi ;;
+  kill-window) touch "$FM_TEST_CASE/closed" ;;
+  *) exit 1 ;;
+esac
+SH
+  export FM_HOME="$HOME_DIR" FM_TEST_CASE="$CASE" FM_TEST_ID="$ID" FM_TEST_WORKTREE="$WT"
+  export PATH="$FAKE:$PATH"
+  printf 'working [at=1792922400]: still implementing\n' > "$HOME_DIR/state/$ID.status"
+  if out=$(bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1); then fail 'lab teardown stopped unfinished work'; fi
+  assert_contains "$out" 'live or unverified endpoint owner' 'lab unfinished-task refusal reason'
+  [ ! -e "$CASE/control.log" ] && [ -f "$WT/node_modules/pkg/index.js" ] && retained \
+    || fail 'lab unfinished-task refusal changed worker or copy'
+  printf 'done [at=1792922400]: ready in branch fm/x\n' > "$HOME_DIR/state/$ID.status"
+  out=$(FM_STATE_OVERRIDE="$HOME_DIR/state" bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1)
+  expect_code 3 "$?" 'lab teardown with a caller override must retain the gate refusal'
+  [ ! -e "$CASE/control.log" ] && retained || fail 'caller override was dropped before task control'
+  out=$(bash "$ROOT/bin/fm-teardown.sh" "$ID" 2>&1)
+  expect_code 0 "$?" "marked lab did not stop, preserve and retire in one pass: $out"
+  [ "$(cat "$CASE/control.log")" = /quit ] || fail 'lab worker was not stopped exactly once'
+  keep="$HOME_DIR/data/$ID/preserved-artifacts"
+  [ "$(cat "$keep/files/node_modules/pkg/index.js")" = module ] && [ -s "$keep/receipt" ] \
+    || fail 'lab one-pass stop lost generated output or its receipt'
+  retired || fail 'lab one-pass stop left the copy or records'
+  pass 'marked stock-layout lab stops only finished workers and preserves generated output in one pass'
+)
+test_stop_marked_lab || exit 1
+
 SHELL_PIDS=()
 SHELL_SUPERVISORS=()
 cleanup_shells() {
