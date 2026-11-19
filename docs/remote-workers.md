@@ -43,7 +43,7 @@ Each pass imports, in this order:
    A replaced or shortened remote log stops import for that task and raises a finding; the offset is never reset silently.
 3. **Instructions.** `bin/fm-send.sh` only queues a remote steer here.
    The courier places it remotely once (a receipt directory makes a retry harmless), rings the doorbell only after placement is confirmed, and moves the local record to `handled/` when the worker acknowledges it remotely.
-   Keys are never sent to a remote worker.
+   `bin/fm-send.sh --key` refuses a remote worker; lifecycle keys go only through `bin/fm-control.sh`, and only while the machine reads reachable.
 4. **Process rows.** The processes below the pane shell are recorded, so liveness and the agent-free proof come from the remote machine's own process table, never from this machine's.
 
 Every finding lands in `state/<id>.remote-alert` and reaches firstmate as one check notification.
