@@ -44,7 +44,26 @@ shift
 case "$*" in *git-upload-pack*) [ ! -e "$FAKE_REMOTE_HOME/.fetch-fails" ] || exit 255 ;; esac
 [ ! -e "$FAKE_REMOTE_HOME/.down" ] || { echo "ssh: connect to host: Operation timed out" >&2; exit 255; }
 mkdir -p "$FAKE_REMOTE_HOME/tmp"
-HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
+if [ "$*" = '/bin/bash -s' ]; then
+  {
+    cat <<'HOOK'
+git() {
+  if [ "$*" = 'rev-parse --verify --quiet refs/heads/fm/r1' ] && [ -e "$HOME/.snapshot-race" ]; then
+    rm -f "$HOME/.snapshot-race"
+    command git "$@" || return $?
+    command git commit -q --allow-empty -m snapshot-race || return $?
+    command git rev-parse HEAD > "$HOME/snapshot-race-head"
+    printf 'done [at=2]: snapshot race completion\n' >> "$HOME/firstmate-remote/tasks/r1/channel/status"
+  else
+    command git "$@"
+  fi
+}
+HOOK
+    cat
+  } | HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH bash -s
+else
+  HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
+fi
 SH
 cat > "$REMOTE_STUBS/claude" <<'SH'
 #!/usr/bin/env bash
@@ -143,6 +162,44 @@ ST="$HOMEDIR/state"
 sync_now() { "$RT" sync pegasus >>"$T/sync.log" 2>&1; }
 hstate() { cat "$HERDR_DB/state.json"; }
 
+FM_REAL_AWK=$(command -v awk)
+FM_RACE_RECORD="$ST/concurrent.remote"
+export FM_REAL_AWK FM_RACE_RECORD
+printf 'status_offset=0\nincarnation=old\n' > "$FM_RACE_RECORD"
+cat > "$STUBS/awk" <<'SH'
+#!/usr/bin/env bash
+last=
+for arg in "$@"; do last=$arg; done
+if [ "$last" = "$FM_RACE_RECORD" ]; then
+  if [ "${FM_RACE_ROLE:-}" = first ]; then
+    "$FM_REAL_AWK" "$@" || exit $?
+    touch "$FM_RACE_RECORD.first-read"
+    for i in $(seq 1 1000); do
+      [ ! -e "$FM_RACE_RECORD.release" ] || exit 0
+      sleep 0.01
+    done
+    exit 1
+  fi
+fi
+exec "$FM_REAL_AWK" "$@"
+SH
+chmod +x "$STUBS/awk"
+FM_RACE_ROLE=first bash -c '. "$1/bin/fm-backend.sh"; fm_backend_source herdr-remote; fm_remote_record_set "$FM_RACE_RECORD" incarnation=new' _ "$ROOT" &
+WRITER_FIRST=$!
+for i in $(seq 1 300); do [ ! -e "$FM_RACE_RECORD.first-read" ] || break; sleep 0.01; done
+[ -e "$FM_RACE_RECORD.first-read" ] || fail 'first record writer did not reach its paused read'
+bash -c '. "$1/bin/fm-backend.sh"; fm_backend_source herdr-remote; touch "$FM_RACE_RECORD.second-started"; fm_remote_record_set "$FM_RACE_RECORD" status_offset=120 && touch "$FM_RACE_RECORD.second-done"' _ "$ROOT" &
+WRITER_SECOND=$!
+for i in $(seq 1 300); do [ ! -e "$FM_RACE_RECORD.second-started" ] || break; sleep 0.01; done
+[ -e "$FM_RACE_RECORD.second-started" ] || fail 'second record writer did not start'
+for i in $(seq 1 100); do [ ! -e "$FM_RACE_RECORD.second-done" ] || break; sleep 0.01; done
+touch "$FM_RACE_RECORD.release"
+wait "$WRITER_FIRST" || fail 'first record update failed'
+wait "$WRITER_SECOND" || fail 'second record update failed'
+grep -qx 'status_offset=120' "$FM_RACE_RECORD" && grep -qx 'incarnation=new' "$FM_RACE_RECORD" || fail 'concurrent record updates lost a field'
+rm -f "$STUBS/awk"
+pass 'concurrent incarnation and cursor updates preserve both fields'
+
 # A local-only project with one commit.
 PROJ="$T/proj"
 git init -q -b main "$PROJ"
@@ -210,16 +267,40 @@ WT=$(sed -n 's/^worktree=//p' "$META")
 [ "$(git -C "$WT" rev-parse HEAD)" = "$SHA1" ] && [ "$(git -C "$WT" symbolic-ref --short HEAD)" = fm/r1 ] || fail 'the landing copy was not fast-forwarded onto the named branch'
 [ "$(git -C "$PROJ" rev-parse refs/firstmate/remote/r1)" = "$SHA1" ] || fail 'the custody ref does not hold the imported commit'
 pass 'the courier imports commits before complete status lines, exactly once'
+touch "$REMOTE_HOME/.snapshot-race"
+sync_now
+RACE_SHA=$(cat "$REMOTE_HOME/snapshot-race-head")
+[ "$RACE_SHA" != "$SHA1" ] || fail 'snapshot interleaving did not create a later commit'
+[ "$(git -C "$WT" rev-parse HEAD)" = "$SHA1" ] || fail 'snapshot interleaving did not retain the sampled branch head'
+! grep -q 'snapshot race completion' "$ST/r1.status" || fail 'a status written after the commit sample arrived before its commit'
+sync_now
+[ "$(git -C "$WT" rev-parse HEAD)" = "$RACE_SHA" ] || fail 'the next snapshot did not import the later commit'
+[ "$(grep -c 'snapshot race completion' "$ST/r1.status")" = 1 ] || fail 'the bounded snapshot lost or repeated completion'
+SHA1=$RACE_SHA
+pass 'status snapshots exclude lines written after their sampled commit'
+
+"$ROOT/bin/fm-send.sh" r1 'acknowledge during fetch failure' 2>/dev/null
+sync_now
+ACK_MSG=$(ls "$ST/r1.inbox"/*.msg); ACK_NAME=${ACK_MSG##*/}
+mv "$RTASK/channel/inbox/$ACK_NAME" "$RTASK/channel/inbox/handled/$ACK_NAME"
+"$ROOT/bin/fm-send.sh" r1 'place during fetch failure' 2>/dev/null
+PLACE_MSG=$(ls "$ST/r1.inbox"/*.msg | tail -n1); PLACE_NAME=${PLACE_MSG##*/}
 OFF=$(sed -n 's/^status_offset=//p' "$ST/r1.remote")
 git -C "$RTASK/wt" commit -q --allow-empty -m work2
 SHA2=$(git -C "$RTASK/wt" rev-parse HEAD)
 printf 'done [at=2]: ready after transport recovery\n' >> "$RTASK/channel/status"
 touch "$REMOTE_HOME/.fetch-fails"
+rm -f "$ST/r1.remote-procs"
 sync_now
 [ "$(sed -n 's/^status_offset=//p' "$ST/r1.remote")" = "$OFF" ] || fail 'failed commit custody advanced the status cursor'
 [ "$(git -C "$WT" rev-parse HEAD)" = "$SHA1" ] || fail 'failed fetch advanced the landing copy'
 ! grep -q 'ready after transport recovery' "$ST/r1.status" || fail 'completion arrived before commit custody'
 grep -q '^commit:' "$ST/r1.remote-alert" || fail 'failed custody did not record its condition'
+grep -q '^agents=1$' "$ST/r1.remote-procs" || fail 'failed custody suppressed fresh process evidence'
+[ -f "$ST/r1.inbox/handled/$ACK_NAME" ] && [ ! -e "$ACK_MSG" ] || fail 'failed custody suppressed an acknowledgement'
+[ -e "$ST/r1.remote-placed/$PLACE_NAME" ] && [ -f "$RTASK/channel/inbox/$PLACE_NAME" ] || fail 'failed custody suppressed an instruction placement receipt'
+mv "$RTASK/channel/inbox/$PLACE_NAME" "$RTASK/channel/inbox/handled/$PLACE_NAME"
+
 rm -f "$REMOTE_HOME/.fetch-fails"
 sync_now
 [ "$(git -C "$WT" rev-parse HEAD)" = "$SHA2" ] || fail 'recovery did not import the commit'
@@ -334,6 +415,9 @@ pass 'a close is deferred on the focused tab or unreadable focus'
 touch "$HERDR_DB/control-ui"
 OUT=$(FM_CONTROL_EXIT_WAIT=1 "$ROOT/bin/fm-control.sh" r1 interrupt 2>&1) || fail "remote interrupt failed: $OUT"
 case "$OUT" in *interrupt-delivered*verified=agent-alive*) ;; *) fail "interrupt did not prove the agent remained running: $OUT" ;; esac
+git -C "$RTASK/wt" commit -q --allow-empty -m control-without-fetch
+printf 'working [at=4]: control while fetch unavailable\n' >> "$RTASK/channel/status"
+touch "$REMOTE_HOME/.fetch-fails"
 touch "$HERDR_DB/ignore-exit"
 if FM_CONTROL_EXIT_WAIT=1 "$ROOT/bin/fm-control.sh" r1 exit > "$T/control.out" 2>&1; then fail 'exit claimed success while the remote agent remained running'; fi
 [ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_agent_state herdr-remote "$W")" = alive ] || fail 'the unconfirmed exit test did not keep its agent running'
@@ -344,6 +428,8 @@ grep -q '^agents=0$' "$ST/r1.remote-procs" || fail 'exit used a stale process ob
 "$ROOT/bin/fm-control.sh" r1 relaunch --note 'Continue after the controlled stop' > "$T/control.out" 2>&1 || fail "remote control relaunch failed: $(cat "$T/control.out")"
 grep -q '^agents=1$' "$ST/r1.remote-procs" || fail 'control relaunch did not observe the replacement agent'
 grep -q 'Continue after the controlled stop' "$RTASK"/channel/inbox/*.msg || fail 'the replacement did not receive its progress note'
+rm -f "$REMOTE_HOME/.fetch-fails"
+sync_now
 pass 'remote controls interrupt, confirm exit with fresh observations, and relaunch with the progress note'
 
 # --- crash and relaunch ------------------------------------------------------
@@ -399,6 +485,18 @@ if "$RT" retire r1 remove >/dev/null 2>&1; then fail 'cleanup removed an artifac
 cp "$T/evidence.expected" "$RTASK/channel/scratch/.evidence"
 "$RT" retire r1 prepare > "$T/retire.out" 2>&1 || fail "cleanup could not refresh artifact custody: $(cat "$T/retire.out")"
 
+python3 - "$RTASK/channel/status" <<'PYDATA'
+import sys
+with open(sys.argv[1], 'a') as stream:
+    for i in range(3000):
+        stream.write(f'working [at=8]: proof backlog {i}\n')
+    stream.write('done [at=8]: status after proof\n')
+PYDATA
+if "$RT" retire r1 remove > "$T/remove.out" 2>&1; then fail 'removal discarded an undelivered complete status line'; fi
+grep -q 'status-not-delivered' "$T/remove.out" || fail 'the removal proof did not check the status boundary'
+[ -d "$RTASK/wt" ] || fail 'the status proof refusal removed the remote copy'
+"$RT" retire r1 prepare > "$T/retire.out" 2>&1 || fail "cleanup could not finish the new status line: $(cat "$T/retire.out")"
+grep -q 'status after proof' "$ST/r1.status" || fail 'cleanup did not import the new complete status line'
 grep -q '^phase=proven' "$ST/r1.remote-retire" || fail 'the proven phase was not recorded'
 sed -i.bak 's/^phase=.*/phase=removing/' "$ST/r1.remote-retire"
 git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" worktree remove "$RTASK/wt"
@@ -490,8 +588,61 @@ printf 'maintainer github.com/acme/proj\n' > "$HOMEDIR/config/firstmate-role"
 echo false > "$HERDR_DB/gh.draft"
 "$RT" publish p1 "$PSHA" > "$T/pub.out" 2>&1 || fail "authorized self-publication was refused: $(cat "$T/pub.out")"
 pass 'remote dispatch and publication require the existing explicit self-publication authority'
+for route in upstream gh-default pushurl multiple-pushurls; do
+  case "$route" in
+    upstream)
+      git -C "$PROJ2" remote add upstream https://github.com/acme/upstream
+      printf 'maintainer github.com/acme/upstream\n' > "$HOMEDIR/config/firstmate-role" ;;
+    gh-default)
+      git -C "$PROJ2" config remote.origin.gh-resolved acme/upstream
+      printf 'maintainer github.com/acme/upstream\n' > "$HOMEDIR/config/firstmate-role"
+      printf 'maintainer github.com/acme/upstream\n' > "$HOMEDIR/config/firstmate-role" ;;
+    pushurl) git -C "$PROJ2" remote set-url --push origin https://github.com/acme/elsewhere ;;
+    multiple-pushurls)
+      git -C "$PROJ2" remote set-url --add --push origin https://github.com/acme/proj
+      git -C "$PROJ2" remote set-url --add --push origin https://github.com/acme/elsewhere ;;
+  esac
+  BEFORE=$(cat "$HERDR_DB/gh.log")
+  if "$ROOT/bin/fm-spawn.sh" self1 "$PROJ2" --machine pegasus --mode direct-PR --yolo off > "$T/route.out" 2>&1; then fail "dispatch accepted mismatched $route destinations"; fi
+  if "$RT" publish p1 "$PSHA" > "$T/route.out" 2>&1; then fail "publication accepted mismatched $route destinations"; fi
+  case "$(cat "$T/route.out")" in *'differs from'*|*'exactly one origin'*) ;; *) fail "destination mismatch was not explicit for $route: $(cat "$T/route.out")" ;; esac
+  [ ! -e "$ST/self1.remote" ] || fail "mismatched $route dispatch provisioned a worker"
+  [ "$(cat "$HERDR_DB/gh.log")" = "$BEFORE" ] || fail "mismatched $route publication reached GitHub"
+  [ "$(git -C "$ORIGIN" rev-parse refs/heads/fm/p1)" = "$PSHA" ] || fail "mismatched $route publication moved the branch"
+  case "$route" in
+    upstream) git -C "$PROJ2" remote remove upstream ;;
+    gh-default) git -C "$PROJ2" config --unset remote.origin.gh-resolved ;;
+    pushurl|multiple-pushurls) git -C "$PROJ2" config --unset-all remote.origin.pushurl ;;
+  esac
+  printf 'maintainer github.com/acme/proj\n' > "$HOMEDIR/config/firstmate-role"
+done
+"$RT" publish p1 "$PSHA" > "$T/pub.out" 2>&1 || fail "matching publication destinations were refused: $(cat "$T/pub.out")"
+pass 'dispatch and publication reject authority, GitHub, and Git push destination mismatches'
 
+
+R3_TASK="$REMOTE_HOME/firstmate-remote/tasks/r3"
+python3 - "$R3_TASK/channel/status" <<'PYDATA'
+import sys
+with open(sys.argv[1], 'a') as stream:
+    for i in range(12000):
+        stream.write(f'working [at=9]: backlog event {i}\n')
+    stream.write('done [at=10]: backlog final\npartial tail')
+PYDATA
+if "$RT" retire r3 prepare > "$T/retire.out" 2>&1; then fail 'cleanup accepted an incomplete status transfer'; fi
+grep -q 'status-not-delivered' "$T/retire.out" || fail 'backlog refusal did not identify undelivered status'
+[ -d "$R3_TASK/wt" ] || fail 'backlog refusal removed the remote copy'
+R3_WINDOW=$(sed -n 's/^window=//p' "$ST/r3.meta")
+hstate | jq -e --arg p "${R3_WINDOW#*:}" '.panes[] | select(.pane_id==$p)' >/dev/null || fail 'incomplete status delivery closed the worker'
+for i in $(seq 1 12); do
+  sync_now
+  grep -q 'backlog final' "$ST/r3.status" && break
+done
+[ "$(grep -c 'backlog event' "$ST/r3.status")" = 12000 ] || fail 'courier backlog delivery lost or repeated status lines'
+[ "$(grep -c 'backlog final' "$ST/r3.status")" = 1 ] || fail 'the complete status tail did not reach supervision'
+! grep -q 'partial tail' "$ST/r3.status" || fail 'an incomplete status tail became an event'
 "$RT" retire r3 prepare > "$T/retire.out" 2>&1 || fail "r3 cleanup preparation failed: $(cat "$T/retire.out")"
+pass 'cleanup requires complete status delivery while preserving an incomplete tail as an artifact'
+
 sed -i.bak 's/^phase=.*/phase=removing/' "$ST/r3.remote-retire"
 git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" worktree remove "$REMOTE_HOME/firstmate-remote/tasks/r3/wt"
 git -C "$REMOTE_HOME/firstmate-remote/repos/proj.git" update-ref -d refs/heads/fm/r3

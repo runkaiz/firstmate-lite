@@ -171,24 +171,35 @@ fm_remote_link_reachable() {  # <state-dir> <machine-id>
 
 # fm_remote_record_set: atomically replace or add key=value pairs in a
 # key=value record, keeping every other line.
-fm_remote_record_set() {  # <record> <key=value>...
-  local rec=$1 tmp pair key
+fm_remote_record_set() (  # <record> <key=value>...
+  local rec=$1 tmp='' pair key lock
   shift
+  for pair in "$@"; do
+    key=${pair%%=*}
+    case "$key" in ''|*[!A-Za-z0-9_]*) return 1 ;; esac
+    case "$pair" in *$'\n'*) return 1 ;; esac
+  done
+  if ! declare -F fm_lock_acquire_wait >/dev/null 2>&1; then
+    . "$FM_BACKEND_HERDR_REMOTE_ROOT/bin/fm-wake-lib.sh"
+  fi
+  case "$rec" in
+    *.meta) lock=$(fm_meta_lock_path "$rec") || return 1 ;;
+    *) lock="$rec.lock" ;;
+  esac
+  fm_lock_acquire_wait "$lock" || return 1
+  trap '[ -z "$tmp" ] || rm -f -- "$tmp"; fm_lock_release "$lock"' EXIT
   tmp=$(mktemp "${rec%/*}/.${rec##*/}.XXXXXX") || return 1
   {
     [ ! -f "$rec" ] || awk -v keys="$(for pair in "$@"; do printf '%s ' "${pair%%=*}"; done)" '
       BEGIN { n = split(keys, k, " "); for (i = 1; i <= n; i++) drop[k[i]] = 1 }
       { split($0, f, "="); if (!(f[1] in drop)) print }
-    ' "$rec"
+    ' "$rec" || return 1
     for pair in "$@"; do
-      key=${pair%%=*}
-      case "$key" in ''|*[!A-Za-z0-9_]*) return 1 ;; esac
-      case "$pair" in *$'\n'*) return 1 ;; esac
       printf '%s\n' "$pair"
     done
-  } > "$tmp" || { rm -f -- "$tmp"; return 1; }
-  mv -f -- "$tmp" "$rec" || { rm -f -- "$tmp"; return 1; }
-}
+  } > "$tmp" || return 1
+  mv -f -- "$tmp" "$rec"
+)
 
 # fm_remote_task_of_target: the task id whose meta records <target>.
 fm_remote_task_of_target() {  # <target>

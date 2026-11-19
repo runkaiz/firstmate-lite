@@ -350,10 +350,6 @@ EOF
     cat <<'EOF'
 for h in "$I"/handled/*.msg; do [ -f "$h" ] && echo "acked=${h##*/}"; done
 cd "$T/wt" 2>/dev/null || cd /
-echo "branch_sha=$(git rev-parse --verify --quiet "refs/heads/$BR" || true)"
-echo "head_sha=$(git rev-parse --verify --quiet HEAD || true)"
-if git symbolic-ref --quiet HEAD >/dev/null; then echo "head_ref=$(git symbolic-ref --quiet --short HEAD)"; echo "detached=0"; else echo "detached=1"; git update-ref "refs/firstmate/head/$ID" HEAD 2>/dev/null || true; fi
-for p in "$T"/channel/publish/*.md; do [ -f "$p" ] && echo "publish=${p##*/}"; done
 perl -MDigest::SHA=sha256_hex -MMIME::Base64 -e '
   my ($file, $genfile, $gen, $off, $prefix) = @ARGV;
   my $g = ""; if (open(my $gf, "<", $genfile)) { local $/; $g = <$gf> // ""; $g =~ s/\s+\z//; }
@@ -367,6 +363,10 @@ perl -MDigest::SHA=sha256_hex -MMIME::Base64 -e '
   my $to = $off + length($chunk);
   print "status=ok\nstatus_to=$to\nstatus_prefix=", sha256_hex(substr($all, 0, $to)), "\nstatus_b64=", encode_base64($chunk, ""), "\n";
 ' "$T/channel/status" "$T/channel/status.gen" "$GEN" "$OFF" "$PREFIX"
+echo "branch_sha=$(git rev-parse --verify --quiet "refs/heads/$BR" || true)"
+echo "head_sha=$(git rev-parse --verify --quiet HEAD || true)"
+if git symbolic-ref --quiet HEAD >/dev/null; then echo "head_ref=$(git symbolic-ref --quiet --short HEAD)"; echo "detached=0"; else echo "detached=1"; git update-ref "refs/firstmate/head/$ID" HEAD 2>/dev/null || true; fi
+for p in "$T"/channel/publish/*.md; do [ -f "$p" ] && echo "publish=${p##*/}"; done
 pid=""; [ -f "$T/channel/pane.pid" ] && pid=$(awk '{print $1; exit}' "$T/channel/pane.pid")
 if [ -n "$pid" ] && [ -n "$PSF" ] && ps -A -o pid=,ppid=,command= > "$PSF" 2>/dev/null; then
   awk -v root="$pid" '
@@ -446,7 +446,7 @@ sec_get() { printf '%s' "$SECTION" | sed -n "s/^$1=//p" | head -n1; }
 sec_all() { printf '%s' "$SECTION" | sed -n "s/^$1=//p"; }
 
 sync_apply_task() {  # <id> <herdr-ok> <section>
-  local id=$1 herdr_ok=$2 name tmp label target to ring_rc
+  local id=$1 herdr_ok=$2 name tmp label target to ring_rc custody_ok=0
   SECTION=$3
   load_task "$id"
   while IFS= read -r name; do
@@ -458,7 +458,7 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
   fi
   rm -f -- "$STATE/$id.remote-missing"
   # Commits before status, so a line naming a commit always arrives after it.
-  import_commit "$(sec_get branch_sha)" "$(sec_get head_sha)" "$(sec_get detached)" || return 1
+  if import_commit "$(sec_get branch_sha)" "$(sec_get head_sha)" "$(sec_get detached)"; then custody_ok=1; fi
   while IFS= read -r name; do
     [ -n "$name" ] || continue
     [ ! -f "$DATA/$id/publish/$name" ] || continue
@@ -467,15 +467,17 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
   done < <(sec_all publish)
   case "$(sec_get status)" in
     ok)
-      if [ -z "$(rec_get status_gen)" ] && [ -n "$(sec_get status_gen)" ]; then rec_set "status_gen=$(sec_get status_gen)"; fi
-      to=$(sec_get status_to)
-      if [ -n "$to" ] && [ "$to" != "$(rec_get status_offset)" ]; then
-        tmp=$(mktemp "$STATE/.$id.remote-bytes.XXXXXX")
-        sec_get status_b64 | base64 -d > "$tmp"
-        status_apply "$(sec_get status_gen)" "$(rec_get status_offset)" "$to" "$(sec_get status_prefix)" "$tmp" || true
-        rm -f -- "$tmp"
-      else
-        status_journal_recover || true
+      if [ "$custody_ok" = 1 ]; then
+        if [ -z "$(rec_get status_gen)" ] && [ -n "$(sec_get status_gen)" ]; then rec_set "status_gen=$(sec_get status_gen)"; fi
+        to=$(sec_get status_to)
+        if [ -n "$to" ] && [ "$to" != "$(rec_get status_offset)" ]; then
+          tmp=$(mktemp "$STATE/.$id.remote-bytes.XXXXXX")
+          sec_get status_b64 | base64 -d > "$tmp"
+          status_apply "$(sec_get status_gen)" "$(rec_get status_offset)" "$to" "$(sec_get status_prefix)" "$tmp" || true
+          rm -f -- "$tmp"
+        else
+          status_journal_recover || true
+        fi
       fi
       ;;
     generation|continuity)
@@ -902,13 +904,26 @@ spawn_main() {
 # --- publication (design 6.7) -----------------------------------------------
 
 publication_gate() {
-  local rc=0
+  local rc=0 url destination push actual
+  url=$(git -C "$PROJ" config --get remote.origin.url) || die "the project has no origin"
+  destination=$(fm_role_remote_identity "$url" "$PROJ")
+  case "$destination" in github.com/*/*) ;; *) die "origin $url is not a GitHub repository" ;; esac
+  PUBLICATION_REPO=${destination#github.com/}
+  case "$PUBLICATION_REPO" in /*|*/|*[!A-Za-z0-9._/-]*|*/*/*) die "origin $url is not a GitHub repository" ;; esac
+  push=$(git -C "$PROJ" remote get-url --push --all origin) || die "origin's push destination is unreadable"
+  case "$push" in ''|*$'\n'*) die "remote publication requires exactly one origin push destination" ;; esac
+  actual=$(fm_role_remote_identity "$push" "$PROJ")
+  [ "$actual" = "$destination" ] || die "origin push destination $actual differs from publication repository $destination"
   fm_role_gate_self_publish "$FM_HOME" "$CONFIG" "$PROJ" "$FM_ROOT" || rc=$?
-  case "$rc" in 0|2) ;; *) die "$FM_ROLE_PUB_DENIAL" ;; esac
+  case "$rc" in
+    0) [ "$FM_ROLE_PUB_TARGET" = "$destination" ] || die "publication authority target $FM_ROLE_PUB_TARGET differs from origin destination $destination" ;;
+    2) ;;
+    *) die "$FM_ROLE_PUB_DENIAL" ;;
+  esac
 }
 
 publish_main() {  # <id> <sha>
-  local sha=$2 repo pr url head draft baseref state body title sha12 bodyfile list
+  local sha=$2 repo pr head draft baseref state body title sha12 bodyfile list
   load_task "$1"
   [ "$MODE" = direct-PR ] || die "publish applies only to direct-PR remote ships (task $ID is $MODE)"
   publication_gate
@@ -921,9 +936,7 @@ publish_main() {  # <id> <sha>
   git -C "$PROJ" merge-base --is-ancestor "$BASE" "$sha" || die "$sha does not contain the recorded base $BASE"
   baseref=$(fm_meta_get "$META" base_branch)
   [ -n "$baseref" ] || baseref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref | sed 's#^refs/remotes/origin/##; s#^refs/heads/##')
-  url=$(git -C "$PROJ" config --get remote.origin.url) || die "the project has no origin"
-  repo=$(printf '%s' "$url" | sed -E 's#^(git@|ssh://git@|https://)github\.com[:/]##; s#\.git$##')
-  case "$repo" in */*) ;; *) die "origin $url is not a GitHub repository" ;; esac
+  repo=$PUBLICATION_REPO
   sha12=${sha:0:12}
   bodyfile="$DATA/$ID/publish/$sha.md"
   [ -f "$bodyfile" ] || die "no imported PR text at $bodyfile; the worker writes channel/publish/<sha>.md"
@@ -992,9 +1005,21 @@ remote_proof_script() {  # [remove]
   history=$(git -C "$PROJ" for-each-ref --format='%(objectname)' "refs/firstmate/remote-history/$ID/")
   history=$(printf '%s' "$history" | tr '\n' ' ')
   printf 'T=%s C=%s BR=%s LAST=%s ID=%s REMOVE=%s ARTIFACTS=%s HISTORY=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")" "$(q "$(rec_get last_imported)")" "$(q "$ID")" "$(q "${1:-}")" "$(q "$artifacts")" "$(q "$history")"
+  printf 'STATUS_GEN=%s STATUS_OFFSET=%s STATUS_PREFIX=%s\n' "$(q "$(rec_get status_gen)")" "$(q "$(rec_get status_offset)")" "$(q "$(rec_get status_prefix)")"
   cat <<'EOF'
 set -o pipefail
 bad=""
+if [ -d "$T" ]; then
+  perl -MDigest::SHA=sha256_hex -e '
+    my ($file, $genfile, $gen, $off, $prefix) = @ARGV;
+    open(my $gf, "<", $genfile) or exit 1;
+    local $/; my $g = <$gf> // ""; $g =~ s/\s+\z//;
+    open(my $fh, "<", $file) or exit 1; binmode $fh;
+    my $all = <$fh> // "";
+    exit !( $g eq $gen && $off =~ /\A[0-9]+\z/ && $off == rindex($all, "\n") + 1
+      && sha256_hex(substr($all, 0, $off)) eq $prefix );
+  ' "$T/channel/status" "$T/channel/status.gen" "$STATUS_GEN" "$STATUS_OFFSET" "$STATUS_PREFIX" || bad="$bad status-not-delivered"
+fi
 bs=$(git -C "$C" rev-parse --verify --quiet "refs/heads/$BR")
 if [ -d "$T/wt" ]; then
 s=$(git -C "$T/wt" status --porcelain --untracked-files=all) || bad="$bad status-unreadable"

@@ -80,7 +80,7 @@ A `local-only` remote ship lands through the unchanged `bin/fm-merge-local.sh`, 
 
 1. **Quiesce:** preserve the channel and launch files plus commits reachable through the remote worktree reflog, then run the remote proof of step 3, so remaining unimported work refuses while the worker is still live to tidy it up; then close the exact recorded tab under the focus rule below and confirm no process works inside the remote task folder.
 2. **Final transfer:** one more courier pass and artifact/history copy; any unresolved finding refuses.
-3. **Remote proof:** no staged, untracked, or ignored file, `HEAD` on the task branch and equal to the last imported commit, no stash, nothing in the task folder but `wt`, `channel`, `launch.sh`, and `settings.json`, and verified local custody of the channel artifacts and worktree reflog commits.
+3. **Remote proof:** no staged, untracked, or ignored file, `HEAD` on the task branch and equal to the last imported commit, no stash, nothing in the task folder but `wt`, `channel`, `launch.sh`, and `settings.json`, verified local custody of the channel artifacts and worktree reflog commits, and delivery of every complete status line.
 4. **This machine's proof:** the unchanged native landed-work proof on the landing copy.
 5. **Remote removal:** the proof runs again immediately before `git worktree remove` without force, the cache branch is deleted only when it equals the imported commit, and the exact task folder is removed; `removing` and `removed` are recorded around it, and a retry verifies and completes remaining operations even after the worktree or branch is gone.
 
