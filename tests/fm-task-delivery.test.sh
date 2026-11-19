@@ -1365,16 +1365,16 @@ test_proactive_local_landing() {
         esac
         if out=$(FM_HOME="$home" FM_CONFIG_OVERRIDE="$home/config" FM_SUPERVISION_ACTOR="$actor" \
           "$MERGE_LOCAL" task-local --proactive 2>&1); then
-          if [ "$scenario" != green ] || { [ "$actor" != main ] && [ "$posture" != away ]; }; then
+          if [ "$scenario" != green ]; then
             fail "$actor $posture $scenario unexpectedly landed"
           fi
           [ "$(git -C "$proj" rev-parse HEAD)" = "$head" ] || fail 'proactive landing missed validated head'
         else
-          if [ "$scenario" = green ] && { [ "$actor" = main ] || [ "$posture" = away ]; }; then
+          if [ "$scenario" = green ]; then
             fail "$actor $posture proactive green local landing refused: $out"
           fi
           [ "$(git -C "$proj" rev-parse HEAD)" = "$initial" ] || fail 'refused proactive landing advanced main'
-          if [ "$scenario" = restriction ] && { [ "$actor" = main ] || [ "$posture" = away ]; }; then
+          if [ "$scenario" = restriction ]; then
             assert_contains "$out" 'still held for the captain' 'explicit review-first hold lost its guard'
           fi
         fi
@@ -1382,7 +1382,7 @@ test_proactive_local_landing() {
       done
     done
   done
-  pass 'proactive local landing admits validated yolo-off work for MAIN and away, while off, malformed, restrictions, invalid readiness and attended branch refuse'
+  pass 'proactive local landing admits validated yolo-off work for MAIN and branch in both postures, while off, malformed, restrictions and invalid readiness refuse'
 }
 
 test_proactive_local_landing

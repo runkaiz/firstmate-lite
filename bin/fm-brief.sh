@@ -277,9 +277,9 @@ for a in "$@"; do
     --project) want_value="project" ;;
     --machine) want_value=machine ;;
     --project=*) PROJECT_DIR=${a#--project=}; PROJECT_DIR_SET=1 ;;
-    --intent-file) want_value=intent-file ;;
+    --intent-file) want_value="intent-file" ;;
     --intent-file=*) INTENT_FILE=${a#--intent-file=}; INTENT_FILE_SET=1 ;;
-    --spec-file) want_value=spec-file ;;
+    --spec-file) want_value="spec-file" ;;
     --spec-file=*) SPEC_FILE=${a#--spec-file=}; SPEC_FILE_SET=1 ;;
     --quote) want_value=quote ;;
     --quote=*) QUOTES+=("${a#--quote=}"); QUOTE_SET=1 ;;
