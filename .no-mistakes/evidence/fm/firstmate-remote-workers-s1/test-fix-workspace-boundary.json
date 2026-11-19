@@ -1,0 +1,22 @@
+{
+  "tested_head_sha": "9631eb1464edb598ae982b1b24d6e29d67b70206",
+  "verdict": "inconclusive",
+  "code_changes": false,
+  "focused_command": "TMPDIR=\"$PWD/.test-live/tmp\" bash bin/fm-test-run.sh --jobs 1 tests/fm-remote-task.test.sh tests/fm-remote-watch.test.sh",
+  "focused_result": "2 scripts passed; 0 failures; 0 skips; exit 0",
+  "live_prerequisites": {
+    "ssh_pegasus_true": "exit 0; BatchMode, no control socket, strict host checking, no host-key updates",
+    "herdr_machine_list": "existing pegasus profile enabled in session default",
+    "herdr_remote_workspace_list": "exit 0; valid result; no API error"
+  },
+  "selected_finding": "test-2",
+  "blocker": "The current worktree-only write boundary forbids the requested remote pilot folder and Claude trust/session data, and local saved test profile and SSH alias. Earlier pilot instructions remain metadata and do not override this boundary.",
+  "not_exercised_live": [
+    "remote Claude launch and focus preservation",
+    "courier cursor recovery and commit ordering",
+    "10-minute outage and instruction recovery",
+    "remote preservation, interrupted removal, local landing and two-sided cleanup"
+  ],
+  "publication_limitation": "Direct-PR publication is covered by portable tests only, as selected by the operator.",
+  "outcome": "No failing automated test reproduced. No code or tests changed. The selected live validation finding remains unresolved."
+}

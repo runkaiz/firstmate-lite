@@ -1,0 +1,25 @@
+{
+  "duration_seconds": 86.19957065582275,
+  "remote": {
+    "machine_id": "6e538398aac4af6239cd4554a09b6eeb",
+    "machine_label": "fm-pilot",
+    "target": "fm-pilot-pegasus",
+    "session": "default",
+    "root": "~/firstmate-remote-pilot",
+    "token": "3f9a19b78f2a3560",
+    "branch": "fm/pilot",
+    "base": "392341fde9a657cf867973c06332fff0664e506a",
+    "project_name": "repo",
+    "remote_user": "runkai",
+    "remote_task": "/Users/runkai/firstmate-remote-pilot/tasks/pilot",
+    "remote_cache": "/Users/runkai/firstmate-remote-pilot/repos/repo.git",
+    "incarnation": "65740@Mon_Nov_2_15:16:03_2026_",
+    "tab_label": "fm-pilot.3f9a19b78f2a3560",
+    "status_gen": "2e020370c6184d2d",
+    "status_offset": "409",
+    "status_prefix": "7480794dd00074de33048143d0851671f63c58fb37ad4320f7037c4e2ee04a01",
+    "last_imported": "a50d8c51779ccc4b6128da048b764d971c99d1ed"
+  },
+  "link": "incarnation=65740@Mon_Nov_2_15:16:03_2026_\nlast_ok=1795054989\nstate=unreachable\nsince=1795055004\nreason=ssh to fm-pilot-pegasus failed (status 255)\n",
+  "queued_marker_instruction": "schema=fm-task-inbox.v1\nat=2026-11-19T02:23:24Z\n--\nFor the approved outage pilot, append exactly one line PILOT_OUTAGE_ACK to /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/outage-markers.txt, acknowledge this inbox record by moving it to handled, and add one done status when finished. Do not change the repository. Handle this instruction exactly once."
+}

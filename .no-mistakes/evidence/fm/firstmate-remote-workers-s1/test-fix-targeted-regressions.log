@@ -1,0 +1,36 @@
+FM_TEST_BEGIN 2026-11-19T02:10:40Z tests/fm-remote-task.test.sh family=unclassified expected_gate_skip=none
+ok - concurrent incarnation and cursor updates preserve both fields
+ok - fm-brief --machine scaffolds remote paths and refuses no-mistakes
+ok - spawn provisions the remote copy, trust, and token tab without moving focus
+ok - a remote endpoint is keyed by its profile id and never by a local session
+ok - the courier imports commits before complete status lines, exactly once
+ok - status snapshots exclude lines written after their sampled commit
+ok - failed commit custody defers completion and resolves its own alert after recovery
+ok - local answers recover every interrupted import before appending their close events
+ok - fetched status stays bound to its original cursor across concurrent recovery
+ok - a replaced or shortened remote status log stops import and keeps the offset
+ok - instructions are queued, placed once, rung after placement, and never resurrected
+ok - an outage reads unknown, keeps the worker state, and refuses cleanup intact
+ok - after a remote server restart only a launch-token match lets a mutation proceed
+ok - a close is deferred on the focused tab or unreadable focus
+ok - remote controls interrupt, confirm exit with fresh observations, and relaunch with the progress note
+ok - an ended agent reads dead from remote rows and relaunches into the same copy
+ok - cleanup refuses and preserves ignored, untracked, staged, detached, stashed, and extra work, leaving the worker live
+ok - proven cleanup removes both remote ends and a rerun after removal finishes
+ok - lost workspace and tab responses adopt exactly one token match and refuse duplicates
+ok - publication recovers each interrupted import before recording its local events
+ok - publication pushes only the verified commit, finds a lost PR, and refuses drafts and mismatches
+ok - remote dispatch and publication require the existing explicit self-publication authority
+ok - dispatch and publication reject authority, GitHub, and Git push destination mismatches
+ok - cleanup requires complete status delivery while preserving an incomplete tail as an artifact
+ok - removal also resumes when both the worktree and task branch are already absent
+FM_TEST_END 2026-11-19T02:11:40Z tests/fm-remote-task.test.sh exit=0 duration_ms=60243 gate_skip=false
+FM_TEST_BEGIN 2026-11-19T02:11:40Z tests/fm-remote-watch.test.sh family=unclassified expected_gate_skip=none
+ok - an unreachable machine stays silent until one grace-period check notification, never touching the pane
+ok - a courier finding surfaces once and the outage notification does not repeat
+ok - a returning machine raises one reachable-again notification
+FM_TEST_END 2026-11-19T02:11:46Z tests/fm-remote-watch.test.sh exit=0 duration_ms=6288 gate_skip=false
+FM_TEST_SUMMARY total=2 failed=0 skipped_gate=0 duration_ms=66571
+FM_TEST_SUMMARY_FAMILY family=unclassified count=2 duration_ms=66531 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-remote-task.test.sh duration_ms=60243
+FM_TEST_SLOWEST rank=2 script=tests/fm-remote-watch.test.sh duration_ms=6288

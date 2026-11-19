@@ -1,0 +1,69 @@
+{
+  "tested_head_sha": "9631eb1464edb598ae982b1b24d6e29d67b70206",
+  "verdict": "pass",
+  "summary": "Required pegasus pilot and focused portable regressions passed; no product changes needed.",
+  "root_cause": "Previous findings concerned missing live evidence rather than a reproduced product defect. The operator-approved boundary exception allowed the real pegasus/default pilot to run.",
+  "source_changes": [],
+  "portable_tests": {
+    "command": "TMPDIR=\"$PWD/.test-remote-pilot/portable-tmp\" bash bin/fm-test-run.sh --jobs 1 tests/fm-remote-task.test.sh tests/fm-remote-watch.test.sh",
+    "scripts": 2,
+    "failures": 0,
+    "gate_skips": 0,
+    "log": "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/final-portable-regressions.log"
+  },
+  "scenarios": [
+    {
+      "name": "Launch and identity",
+      "result": "pass",
+      "live": true,
+      "evidence": "Real Claude v2.1.327 in pegasus personal Herdr default session; namespaced endpoint; token-labelled workspace recovered after deliberate loss of real create response; no trust prompt; actual worker committed a50d8c51779ccc4b6128da048b764d971c99d1ed; captain focus unchanged immediately, after a minute, and after cleanup."
+    },
+    {
+      "name": "Commit/status custody and concurrent journal recovery",
+      "result": "pass",
+      "live": true,
+      "evidence": "Real courier imported worker commit and completion; injected after-journal interruption; held real SSH response while fm-send recovered journal and resolved decision; stale response discarded without advancing cursor or reopening decision; next pass imported remaining line once with no continuity alert."
+    },
+    {
+      "name": "Outage and exactly-once recovery",
+      "result": "pass",
+      "live": true,
+      "duration_seconds": 113.372,
+      "grace_seconds": 8,
+      "evidence": "Only fm-pilot-pegasus alias pointed at 192.0.2.1. Real monitoring ran during the cut; one grace notice and one return notice; no stale or transition notification during cut; interrupt, exit, relaunch and cleanup refused; records and original queued instructions retained; remote status imported once in order; Claude handled the queued message and wrote PILOT_OUTAGE_ACK once, with imported acknowledgement and no resurrection across repeated passes."
+    },
+    {
+      "name": "Preservation, landing, interrupted removal and two-sided cleanup",
+      "result": "pass",
+      "live": true,
+      "evidence": "Ignored file refused before stopping worker; genuinely distinct detached commit 355401d18c6d362dbeab3b8130a16d68756e5432 refused and preserved under local remote-history ref; channel/scratch/evidence.txt preserved in artifact archive; returned to task branch; fm-merge-local fast-forwarded throwaway main; prepared proof; injected abort after successful remote git worktree remove; phase remained removing with channel present and worktree absent; retry finished remote removal; fm-teardown completed local cleanup."
+    },
+    {
+      "name": "Direct-PR publication",
+      "result": "pass",
+      "live": false,
+      "evidence": "Portable behavioral tests passed for verified-commit publication, custody and destination mismatches, role authority, draft refusal and lost PR response recovery.",
+      "limitation": "Live publication is explicitly reserved for slice 2 by operator decision; no real GitHub operation was attempted."
+    }
+  ],
+  "cleanup": {
+    "verified": true,
+    "remote": "Removed firstmate-remote-pilot root, pilot workspace, three pilot Claude project entries, two matching project directories and matching session-env directory; no fm-ps temp files remained. Other Claude project entries unchanged.",
+    "local": "Removed test-only fm-pilot profile and newly-created SSH config. Original pegasus profile matches baseline; original ssh pegasus and Herdr API succeed; captain focus unchanged. Disposable local home, copies, repository, drivers and test temp state removed."
+  },
+  "test_driver_corrections": [
+    "Used the existing fixture-only gate bypass only in the disposable pilot environment; production fleet untouched.",
+    "Corrected monitor receipt parsing and relaunch refusal assertion to match their generated contracts.",
+    "Disabled Git signing for only the synthetic detached-history test commit; reran with distinct-hash assertion after initial inherited signing failure.",
+    "Corrected two transient fault-injection/cleanup driver quoting errors before completing those checks."
+  ],
+  "artifacts": [
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/pegasus-final-pilot.log",
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/pegasus-supervision.log",
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/pegasus-held-courier.log",
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/pegasus-outage-custody.json",
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/pegasus-lost-create-response.json",
+    "/home/runkai/.no-mistakes/evidence/01M7RND5YJKT5A6WVSCF8K461C/final-portable-regressions.log"
+  ],
+  "scope": "No complete suite, linters, formatters, static analysis, pipeline control, push, PR, or CI phases were executed. No screenshots, Xcode, build VM, real sleep/Wi-Fi drill, or GitHub from pegasus."
+}

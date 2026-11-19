@@ -1,0 +1,9 @@
+ok - concurrent incarnation and cursor updates preserve both fields
+ok - fm-brief --machine scaffolds remote paths and refuses no-mistakes
+ok - spawn provisions the remote copy, trust, and token tab without moving focus
+ok - a remote endpoint is keyed by its profile id and never by a local session
+ok - the courier imports commits before complete status lines, exactly once
+ok - status snapshots exclude lines written after their sampled commit
+ok - failed commit custody defers completion and resolves its own alert after recovery
+ok - local answers recover every interrupted import before appending their close events
+not ok - a stale response advanced the recovered cursor

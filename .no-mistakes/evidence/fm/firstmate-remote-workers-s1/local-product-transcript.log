@@ -1,0 +1,84 @@
+$ bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+[exit=0]
+$ git init -q -b main /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-repo
+[exit=0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-repo -c user.name=Pilot -c user.email=pilot@example.invalid commit -q --allow-empty -m base
+[exit=0]
+$ bin/fm-brief.sh unopted manual-repo --mode local-only --machine unopted --herdr-lab
+error: machine 'unopted' is not configured exactly once in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/config/remote-machines
+[exit=1]
+$ bin/fm-spawn.sh unopted /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-repo --machine unopted --mode local-only --yolo off
+error: machine 'unopted' is not configured exactly once in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/config/remote-machines
+[exit=1]
+$ bin/fm-brief.sh malformed manual-repo --mode local-only --machine pegasus --herdr-lab
+error: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/config/remote-machines: remote root for extra must be absolute or start with ~/
+[exit=1]
+$ bin/fm-brief.sh draft manual-repo --mode local-only --machine pegasus --herdr-lab
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/data/draft/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+[exit=0]
+Generated brief (public output, selected routing lines):
+   `echo "{state} [at=<epoch>]: {one short line}" >> /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/remote/tasks/draft/channel/status`
+Delivery contract: mode=local-only
+Ship branch: fm/draft
+Remote machine: pegasus
+$ bin/fm-brief.sh unsupported manual-repo --mode no-mistakes --machine pegasus
+error: a remote worker ships only local-only or direct-PR; no-mistakes delivery is not supported for remote tasks yet
+[exit=1]
+$ bin/fm-spawn.sh unsupported /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-repo --machine pegasus --mode no-mistakes --yolo off
+error: a remote worker ships only local-only or direct-PR (got 'no-mistakes'); no-mistakes delivery is not supported for remote tasks yet
+[exit=1]
+$ bin/fm-spawn.sh unsupported /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-repo --machine pegasus --mode local-only --yolo off --harness codex
+error: a remote worker runs Claude Code only (got 'codex')
+[exit=1]
+SCENARIO PASS: explicit opt-in, malformed configuration, supported routing, unsupported delivery/runtime guards
+$ bin/fm-crew-state.sh offline
+state: done · source: status-log · ready in branch fm/offline · machine pegasus unreachable; worker state unknown (not proof of death)
+[exit=0]
+$ bin/fm-crew-state.sh offline
+state: parked · source: status-log · choose continuation · machine pegasus unreachable; worker state unknown (not proof of death)
+[exit=0]
+Driver correction: an open decision maps to parked, matching the product state vocabulary.
+$ bin/fm-crew-state.sh offline
+state: parked · source: status-log · choose continuation · machine pegasus unreachable; worker state unknown (not proof of death)
+[exit=0]
+$ bin/fm-send.sh offline 'queue during disconnected link'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-send: queued at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/state/offline.inbox/001.msg; delivered when pegasus is reachable
+[exit=0]
+Durable queued instruction:
+schema=fm-task-inbox.v1
+at=2026-11-19T02:15:04Z
+--
+queue during disconnected link
+$ bin/fm-send.sh offline --key C-c
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: keys are not sent to remote workers; steer with a text instruction, or use bin/fm-control.sh for lifecycle (docs/remote-workers.md)
+[exit=1]
+$ bin/fm-send.sh offline --resolve-key local-answer 'continue with the recorded plan'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: queued at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/state/offline.inbox/002.msg; delivered when pegasus is reachable
+[exit=0]
+$ bin/fm-send.sh offline --resolve-key local-answer 'duplicate answer'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: --resolve-key 'local-answer': no open decision or blocker with that key in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-validation/manual-home/state/offline.status, and no captain-held task 'local-answer' or 'offline-decision-local-answer' still open (already closed or mistyped). Re-check the OPEN DECISIONS listing, then resend without that key or with the right one; nothing was sent.
+[exit=1]
+Recovered status and cursor (persisted public protocol):
+needs-decision [at=4] [key=local-answer]: choose continuation
+working [at=5]: remote progress before local answer
+resolved [key=local-answer] [at=1795054505]: answered: continue with the recorded plan
+status_gen=manual-gen
+status_offset=52
+status_prefix=56d9af45259f912bd681881874241f3ee03f18ddd119c46cb7d3e9369b8e551f
+SCENARIO PASS: disconnected task retains its declaration, queues steering locally, and refuses raw keys
+SCENARIO PASS: local answer recovers pending journal exactly once before resolved event and refuses duplicate resolution

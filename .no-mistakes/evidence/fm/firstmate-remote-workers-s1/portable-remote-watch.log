@@ -1,0 +1,3 @@
+ok - an unreachable machine stays silent until one grace-period check notification, never touching the pane
+ok - a courier finding surfaces once and the outage notification does not repeat
+ok - a returning machine raises one reachable-again notification

@@ -1,0 +1,18 @@
+$ bash bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-live/guard-home
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-live/guard-home
+exit=0
+$ bash bin/fm-spawn.sh guard1 /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-live/throwaway --machine not-opted-in --mode local-only --yolo off
+error: machine 'not-opted-in' is not configured exactly once in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-live/guard-home/config/remote-machines
+exit=1
+Observed: unconfigured machine refused before task records or remote provisioning.
+$ bash bin/fm-brief.sh guard2 throwaway --mode local-only --machine loop --herdr-lab
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-live/guard-home/data/guard2/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+Observed: local-only remote brief generated with configured remote channel and fm/guard2 branch.
+$ bash bin/fm-brief.sh guard3 throwaway --mode no-mistakes --machine loop --herdr-lab
+error: a remote worker ships only local-only or direct-PR; no-mistakes delivery is not supported for remote tasks yet
+exit=1
+$ bash bin/fm-brief.sh guard4 throwaway --scout --machine loop --herdr-lab
+error: --machine applies only to ship briefs
+exit=1
+Observed: unsupported no-mistakes and scout remote briefs refused without generating task briefs.

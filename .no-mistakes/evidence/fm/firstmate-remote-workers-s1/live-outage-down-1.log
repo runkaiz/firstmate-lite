@@ -1,0 +1,1 @@
+check: remote machine fm-pilot has been unreachable for 4 min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up (ssh to fm-pilot-pegasus failed (status 255))

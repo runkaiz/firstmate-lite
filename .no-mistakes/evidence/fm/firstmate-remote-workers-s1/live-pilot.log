@@ -1,0 +1,699 @@
+$ bin/fm-lab-home.sh create /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+
+exit=0
+$ git init -b main /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway
+Initialized empty Git repository in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway/.git/
+
+exit=0
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway config user.name Pilot
+
+exit=0
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway config user.email pilot@example.invalid
+
+exit=0
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway add README.md
+
+exit=0
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway commit -m Initial pilot
+[main (root-commit) 2287abc] Initial pilot
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+
+exit=0
+$ bin/fm-brief.sh pilot /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --mode local-only --machine fm-pilot --herdr-lab
+scaffolded: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/data/pilot/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+
+exit=0
+$ bin/fm-spawn.sh pilot /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --mode local-only --yolo off
+Preparing worktree (detached HEAD 2287abc)
+HEAD is now at 2287abc Initial pilot
+spawned pilot harness=claude kind=ship mode=local-only yolo=off machine=fm-pilot window=966df3cddb5e527a693a675d66d27109:w1W:p1 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/copies/pilot/worktree remote=/Users/runkai/firstmate-remote-pilot/tasks/pilot
+
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+
+exit=0
+$ bin/fm-peek.sh pilot 45
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ ▐▛███▛█   Claude Code v2.1.328
+▝▜██████▀  Opus 5.5 with high effort · Claude Max
+ ▝▝   ▝▝   ~/firstmate-remote-pilot/tasks/pilot/wt
+
+
+❯ Read your launch brief at /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/launch-brief.md and follow it
+  exactly.
+
+  Running 1 shell command…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+✽ Transfiguring…
+                                                                                                     ● high · /effort
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle) · esc to interrupt · ← for agents
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1W:t1","agent_status":"done","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1W"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-peek.sh pilot 32
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+      user.email=pilot@example.invalid commit -q -m "Add hello.txt for remote pi…)
+  ⎿  0bde7e4 Add hello.txt for remote pilot
+     2287abc Initial pilot
+     working [at=1795055491]: hello.txt committed on fm/pilot
+     … +2 lines
+  ⎿  Created hello.txt +1
+  ⎿  (a git step in this command can move the working tree, so these may be its changes, not edits)
+  ⎿  (files that changed while this command ran, by the command or by another process; a convenience view, not a
+     review or audit of the command)
+  ⎿  Allowed by auto mode
+
+  Listed 1 directory
+
+⏺ I created hello.txt with the text remote pilot and committed it on fm/pilot as 0bde7e4 ("Add hello.txt for remote
+  pilot"), under the Pilot identity the spec gave.
+
+  - Isolation check: this is the disposable worktree /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt, separate from
+    the main checkout. The worktree is clean, with no stash.
+  - Not done, as instructed: nothing pushed, no pull request opened, and no Herdr commands used.
+  - Status lines added:
+    - working [at=1795055491]: hello.txt committed on fm/pilot
+    - paused [at=1795055491] [key=pilot-ready]: hello.txt committed on fm/pilot; waiting for firstmate instruction to
+      continue
+
+  The steering inbox is empty. I'm waiting for firstmate's next instruction there.
+
+✻ Crunched for 16s · done 6:31 PM
+
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)exit=0
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/copies/pilot/worktree rev-parse HEAD
+0bde7e459a293b99b5d64c8ffd00c427c09b0080
+exit=0
+CUSTODY VERIFIED: remote Claude commit imported onto landing branch before paused status
+$ ssh -o BatchMode=yes fm-pilot-pegasus printf 'needs-decision [at=3] [key=live-race]: choose continuation\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus printf 'needs-decision [at=3] [key=live-race]: live pending journal payload\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=99
+$ ssh -o BatchMode=yes fm-pilot-pegasus printf 'working [at=4]: live after concurrent recovery\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+$ bin/fm-send.sh pilot --resolve-key live-race The journal-race probe is resolved. Keep waiting for the completion instruction.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/001.msg; delivered when fm-pilot is reachable
+exit=0
+STALE RESPONSE DISCARDED: original fetched cursor rejected after local answer recovered journal
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+EXACTLY ONCE VERIFIED after recovery:
+working [at=1795055491]: hello.txt committed on fm/pilot
+paused [at=1795055491] [key=pilot-ready]: hello.txt committed on fm/pilot; waiting for firstmate instruction to continue
+needs-decision [at=3] [key=live-race]: choose continuation
+needs-decision [at=3] [key=live-race]: live pending journal payload
+resolved [key=live-race] [at=1795055543]: answered: The journal-race probe is resolved. Keep waiting for the completion instruction.
+working [at=4]: live after concurrent recovery
+
+$ bash -c . bin/fm-classify-lib.sh; status_open_decisions "$FM_HOME/state/pilot.status"
+exit=0
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-send.sh pilot This is the outage steering probe. Append working status with token outage-ack-once, acknowledge this inbox file once, and remain waiting.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/002.msg; delivered when fm-pilot is reachable
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+CONNECTION RESTORED: only pilot alias restored
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+$ bin/fm-control.sh pilot exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+CONNECTION RESTORED: only pilot alias restored
+$ bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/boundary-home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/boundary-home
+exit=0
+$ bin/fm-spawn.sh not-opted-in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --mode local-only --yolo off
+error: machine 'fm-pilot' is not configured exactly once in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/boundary-home/config/remote-machines
+exit=1
+$ bin/fm-spawn.sh unsupported /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --yolo off --mode no-mistakes
+error: a remote worker ships only local-only or direct-PR (got 'no-mistakes'); no-mistakes delivery is not supported for remote tasks yet
+exit=1
+$ bin/fm-spawn.sh unsupported /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --yolo off --mode local-only --harness codex
+error: a remote worker runs Claude Code only (got 'codex')
+exit=1
+$ bin/fm-spawn.sh unsupported /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --yolo off --mode local-only --scout
+error: a remote worker (--machine) supports only a fresh claude ship spawn; '--scout' is not supported
+exit=1
+$ bin/fm-remote-task.sh sync fm-pilot
+error: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/boundary-home/config/remote-machines: remote root for entry must be absolute or start with ~/
+exit=1
+BOUNDARIES VERIFIED: saved Herdr profile alone does not authorize dispatch; unsupported mode/harness/scout and malformed opt-in refuse before provisioning
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+$ bin/fm-control.sh pilot exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-control.sh pilot relaunch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: remote relaunch requires a progress note
+exit=1
+CONNECTION RESTORED: only pilot alias restored
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+$ bin/fm-control.sh pilot exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-control.sh pilot relaunch --note Outage probe: preserve the existing task and remain waiting.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/003.msg; delivered when fm-pilot is reachable
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: remote machine fm-pilot is unreachable; cleanup waits for it with every record intact
+exit=1
+$ ssh -o BatchMode=yes pegasus printf 'working [at=7]: written-during-cut-one\nworking [at=8]: written-during-cut-two\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+SUPERVISION down:
+
+CONNECTION RESTORED: only pilot alias restored
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+$ bin/fm-control.sh pilot exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-control.sh pilot relaunch --note Outage probe: preserve the existing task and remain waiting.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 35s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/004.msg; delivered when fm-pilot is reachable
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: remote machine fm-pilot is unreachable; cleanup waits for it with every record intact
+exit=1
+$ ssh -o BatchMode=yes pegasus grep -q written-during-cut-one /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status || printf 'working [at=7]: written-during-cut-one\nworking [at=8]: written-during-cut-two\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+SUPERVISION down:
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.status
+
+CONNECTION RESTORED: only pilot alias restored
+CONNECTION CUT: only fm-pilot-pegasus alias points to 192.0.2.1
+$ bin/fm-remote-task.sh sync fm-pilot
+ssh: connect to host 192.0.2.1 port 22: Connection timed out
+exit=0
+$ bin/fm-crew-state.sh pilot
+state: working · source: status-log · live after concurrent recovery · machine fm-pilot unreachable; worker state unknown (not proof of death)
+exit=0
+$ bin/fm-control.sh pilot exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-control.sh pilot relaunch --note Outage probe: preserve the existing task and remain waiting.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: 39s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/005.msg; delivered when fm-pilot is reachable
+error: task pilot's endpoint reads 'unreadable' rather than a positively classified state; refusing to send a lifecycle command into an unattributed endpoint
+exit=1
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: remote machine fm-pilot is unreachable; cleanup waits for it with every record intact
+exit=1
+$ ssh -o BatchMode=yes pegasus grep -q written-during-cut-one /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status || printf 'working [at=7]: written-during-cut-one\nworking [at=8]: written-during-cut-two\n' >> /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/status
+exit=0
+SUPERVISION down-0:
+check: rearm-resurface
+
+$ bin/fm-wake-drain.sh
+1795055833	2	signal	pilot.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3100590.1795055833.WseDvy
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: working [at=1795055491]: hello.txt committed on fm/pilot
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: paused [at=1795055491] [key=pilot-ready]: hello.txt committed on fm/pilot; waiting for firstmate instruction to continue
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-race]: choose continuation
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-race]: live pending journal payload
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: resolved [key=live-race] [at=1795055543]: answered: The journal-race probe is resolved. Keep waiting for the completion instruction.
+wake annotation: latest wake-EVENT observed at drain, not current state: pilot.status: working [at=4]: live after concurrent recovery
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+exit=0
+$ bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3100590.1795055833.WseDvy
+exit=0
+SUPERVISION down-1:
+check: remote machine fm-pilot has been unreachable for 4 min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up (ssh to fm-pilot-pegasus failed (status 255))
+
+$ bin/fm-wake-drain.sh
+1795055883	3	check	remote-link-966df3cddb5e527a693a675d66d27109	check: remote machine fm-pilot has been unreachable for 4 min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up (ssh to fm-pilot-pegasus failed (status 255))
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 3115131.1795055883.qO6auD
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 0s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+exit=0
+$ bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 3115131.1795055883.qO6auD
+exit=0
+SUPERVISION still-down:
+
+OUTAGE VERIFIED: unknown link, worker declaration preserved, lifecycle/cleanup refused, records intact, one grace notice, no stale or retry budget changes
+CONNECTION RESTORED: only pilot alias restored
+$ ssh -o BatchMode=yes fm-pilot-pegasus true
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+SUPERVISION return-0:
+check: remote machine fm-pilot is reachable again; queued instructions are being placed and status lines and commits are catching up
+
+$ bin/fm-wake-drain.sh
+1795055913	4	check	remote-link-966df3cddb5e527a693a675d66d27109	check: remote machine fm-pilot is reachable again; queued instructions are being placed and status lines and commits are catching up
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 3129044.1795055913.GuSRSm
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 2s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+exit=0
+$ bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 3129044.1795055913.GuSRSm
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+RETURN STATUS:
+working [at=1795055491]: hello.txt committed on fm/pilot
+paused [at=1795055491] [key=pilot-ready]: hello.txt committed on fm/pilot; waiting for firstmate instruction to continue
+needs-decision [at=3] [key=live-race]: choose continuation
+needs-decision [at=3] [key=live-race]: live pending journal payload
+resolved [key=live-race] [at=1795055543]: answered: The journal-race probe is resolved. Keep waiting for the completion instruction.
+working [at=4]: live after concurrent recovery
+working [at=7]: written-during-cut-one
+working [at=8]: written-during-cut-two
+working [at=1795055904]: outage-ack-once
+
+$ ssh -o BatchMode=yes fm-pilot-pegasus ls -1 /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/inbox/handled; ls -1 /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/inbox/.placed
+001.msg
+002.msg
+003.msg
+004.msg
+005.msg
+001.msg
+002.msg
+003.msg
+004.msg
+005.msg
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+RETURN VERIFIED: status in order once, queued instructions acknowledged once and not resurrected
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1W:t1","agent_status":"working","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1W"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1W:t1","agent_status":"done","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1W"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus printf 'ignored.txt\n' >> /Users/runkai/firstmate-remote-pilot/repos/throwaway.git/info/exclude; printf 'unique ignored pilot data\n' > /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: the remote copy for pilot holds work not imported here (worker left running):  dirty: ignored.txt
+exit=1
+$ ssh -o BatchMode=yes fm-pilot-pegasus test -d /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt; test -f /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus cat /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+unique ignored pilot data
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus rm /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt checkout --detach -q; git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt -c user.name=Pilot -c user.email=pilot@example.invalid commit --allow-empty -q -m detached-pilot-proof
+error: Couldn't get agent socket?
+
+fatal: failed to write commit object
+exit=128
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1W:t1","agent_status":"done","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1W"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus printf 'ignored.txt\n' >> /Users/runkai/firstmate-remote-pilot/repos/throwaway.git/info/exclude; printf 'unique ignored pilot data\n' > /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: the remote copy for pilot holds work not imported here (worker left running):  dirty: ignored.txt head-not-on-branch:detached
+exit=1
+$ ssh -o BatchMode=yes fm-pilot-pegasus test -d /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt; test -f /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus cat /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+unique ignored pilot data
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus rm /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt/ignored.txt
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt checkout --detach -q; git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt -c user.name=Pilot -c user.email=pilot@example.invalid -c commit.gpgsign=false commit --allow-empty -q -m detached-pilot-proof
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt rev-parse HEAD
+d052ee1d714606de8be08e2ce50f5929eb4e6677
+exit=0
+$ bin/fm-remote-task.sh retire pilot prepare
+error: REFUSED: the remote copy for pilot holds work not imported here (worker left running):  head-not-on-branch:detached unimported:head=d052ee1d714606de8be08e2ce50f5929eb4e6677,branch=0bde7e459a293b99b5d64c8ffd00c427c09b0080,imported=0bde7e459a293b99b5d64c8ffd00c427c09b0080
+exit=1
+$ ssh -o BatchMode=yes fm-pilot-pegasus git -C /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt checkout -q fm/pilot; mkdir -p /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/scratch; printf 'unique channel artifact
+' > /Users/runkai/firstmate-remote-pilot/tasks/pilot/channel/scratch/proof.txt
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+PRESERVATION GUARDS VERIFIED: ignored unique file and detached HEAD refuse before closing the real Claude worker
+$ bin/fm-send.sh pilot --resolve-key pilot-ready The pilot is complete. Do not change files further. Append done status saying ready in branch fm/pilot at the current commit. Remain available without running tools after that.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: 65s ago, grace 300s) - full banner already printed this episode.
+error: --resolve-key 'pilot-ready': no open decision or blocker with that key in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.status, and no captain-held task 'pilot-ready' or 'pilot-decision-pilot-ready' still open (already closed or mistyped). Re-check the OPEN DECISIONS listing, then resend without that key or with the right one; nothing was sent.
+exit=1
+$ bin/fm-send.sh pilot The pilot is complete. Do not change files further. Append done status saying ready in branch fm/pilot at the current commit. Remain available without running tools after that.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: 79s ago, grace 300s) - full banner already printed this episode.
+fm-send: queued at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/state/pilot.inbox/006.msg; delivered when fm-pilot is reachable
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1W:t1","agent_status":"done","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1W"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-merge-local.sh pilot
+WARNING: watcher still down (same stale episode; last beat: 91s ago, grace 300s) - full banner already printed this episode.
+merged fm/pilot into local main (2287abc -> 0bde7e4) in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway log -2 --oneline
+0bde7e4 Add hello.txt for remote pilot
+2287abc Initial pilot
+exit=0
+$ bin/fm-remote-task.sh retire pilot prepare
+remote copy for pilot quiesced, imported, and proven
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway cat-file -t d052ee1d714606de8be08e2ce50f5929eb4e6677
+commit
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway rev-parse refs/firstmate/remote-history/pilot/d052ee1d714606de8be08e2ce50f5929eb4e6677
+d052ee1d714606de8be08e2ce50f5929eb4e6677
+exit=0
+PRESERVATION VERIFIED: detached commit remains in local custody ref; scratch bytes match custody archive; every complete status delivered before proof
+$ bin/fm-remote-task.sh retire pilot remove
+error: REFUSED: remote machine fm-pilot is herdr-unavailable; cleanup waits for it with every record intact
+exit=1
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh retire pilot remove
+error: REFUSED: remote removal for pilot lost its response; rerun to confirm
+exit=1
+$ ssh -o BatchMode=yes fm-pilot-pegasus test ! -e /Users/runkai/firstmate-remote-pilot/tasks/pilot/wt && test -d /Users/runkai/firstmate-remote-pilot/tasks/pilot
+exit=0
+INTERRUPTION INJECTED: actual git worktree remove completed, remote shell exited before branch/folder removal
+$ bin/fm-remote-task.sh retire pilot remove
+remote copy for pilot removed
+exit=0
+$ ssh -o BatchMode=yes fm-pilot-pegasus test ! -e /Users/runkai/firstmate-remote-pilot/tasks/pilot
+exit=0
+$ bin/fm-teardown.sh pilot
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: 133s ago, grace 300s) - full banner already printed this episode.
+remote copy for pilot already removed
+remote copy for pilot already removed
+teardown pilot complete (window 966df3cddb5e527a693a675d66d27109:w1W:p1, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/copies/pilot/worktree)
+Backlog: pilot just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/data/backlog.md - move pilot to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+RESUME VERIFIED: remaining remote branch and folder removed, local cleanup completed, landing commit retained
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-brief.sh pilot-retry /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --mode local-only --machine fm-pilot --herdr-lab
+scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/data/pilot-retry/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-spawn.sh pilot-retry /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway --machine fm-pilot --mode local-only --yolo off
+Preparing worktree (detached HEAD 0bde7e4)
+HEAD is now at 0bde7e4 Add hello.txt for remote pilot
+spawned pilot-retry harness=claude kind=ship mode=local-only yolo=off machine=fm-pilot window=966df3cddb5e527a693a675d66d27109:w1X:p1 worktree=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/copies/pilot-retry/worktree remote=/Users/runkai/firstmate-remote-pilot/tasks/pilot-retry
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1X:t1","agent_status":"unknown","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1X"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1X
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":false,"label":"fm-pilot-retry.114fc6f165633b6d","number":1,"pane_count":1,"tab_id":"w1X:t1","workspace_id":"w1X"}],"type":"tab_list"}}
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"},{"active_tab_id":"w1X:t1","agent_status":"unknown","focused":false,"label":"firstmate","number":2,"pane_count":1,"tab_count":1,"workspace_id":"w1X"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-remote-task.sh sync fm-pilot
+exit=0
+$ bin/fm-peek.sh pilot-retry 25
+WARNING: watcher still down (same stale episode; last beat: 173s ago, grace 300s) - full banner already printed this episode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+✻ Photosynthesizing… (12s · ↓ 738 tokens)
+                                    You've used 84% of your weekly limit · resets Nov 19 at 7pm (America/Los_Angeles)
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle) · esc to interruptexit=0
+LOST RESPONSE VERIFIED: real Herdr creation succeeded, transport dropped its response, launch token adopted exactly one tab without duplication or focus change
+$ bin/fm-teardown.sh pilot-retry
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home
+WARNING: watcher still down (same stale episode; last beat: 173s ago, grace 300s) - full banner already printed this episode.
+remote copy for pilot-retry quiesced, imported, and proven
+remote copy for pilot-retry removed
+teardown pilot-retry complete (window 966df3cddb5e527a693a675d66d27109:w1X:p1, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/copies/pilot-retry/worktree)
+Backlog: pilot-retry just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/home/data/backlog.md - move pilot-retry to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ herdr --machine fm-pilot workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+exit=0
+$ herdr --machine fm-pilot tab list --workspace w1R
+{"id":"cli:tab:list","result":{"tabs":[{"agent_status":"unknown","focused":true,"label":"1","number":1,"pane_count":1,"tab_id":"w1R:t1","workspace_id":"w1R"}],"type":"tab_list"}}
+exit=0
+FOCUS VERIFIED: original captain workspace and tab unchanged
+$ ssh -o BatchMode=yes fm-pilot-pegasus python3 - <<'PYREMOTE'
+import os,json,pathlib,shutil,tempfile,glob
+base=pathlib.Path.home(); root=base/'firstmate-remote-pilot'; prefix=str(root)+'/'
+assert not (root/'tasks/pilot').exists() and not (root/'tasks/pilot-retry').exists(), 'product cleanup incomplete'
+store=base/'.claude.json'; obj=json.loads(store.read_text()); projects=obj.get('projects',{}); keys=[k for k in projects if k.startswith(prefix)]; ids=set()
+for k in keys:
+ row=projects[k]
+ for field in ('lastSessionId','sessionId'):
+  if isinstance(row.get(field),str): ids.add(row[field])
+for p in (base/'.claude/projects').glob('*firstmate-remote-pilot*'):
+ for f in p.glob('*.jsonl'): ids.add(f.stem)
+ shutil.rmtree(p)
+for sid in ids:
+ p=base/'.claude/session-env'/sid
+ if p.exists(): shutil.rmtree(p)
+for k in keys: del projects[k]
+mode=store.stat().st_mode & 0o777
+fd,tmp=tempfile.mkstemp(prefix='.claude.json.fm-pilot-cleanup.',dir=base)
+with os.fdopen(fd,'w') as f: json.dump(obj,f,indent=2)
+os.chmod(tmp,mode); os.replace(tmp,store)
+if root.exists(): shutil.rmtree(root)
+assert not root.exists()
+assert not [k for k in json.loads(store.read_text()).get('projects',{}) if k.startswith(prefix)]
+assert not list((base/'.claude/projects').glob('*firstmate-remote-pilot*'))
+assert not any((base/'.claude/session-env'/s).exists() for s in ids)
+remaining=glob.glob(os.path.join(os.environ.get('TMPDIR','/tmp'),'fm-ps.*'))
+print('REMOTE CLEANUP VERIFIED: pilot repository/task/channel absent; '+str(len(keys))+' pilot trust entries and '+str(len(ids))+' pilot sessions removed; unrelated entries retained')
+print('Courier temporary files remaining: '+str(len(remaining)))
+assert not remaining
+
+PYREMOTE
+REMOTE CLEANUP VERIFIED: pilot repository/task/channel absent; 5 pilot trust entries and 2 pilot sessions removed; unrelated entries retained
+Courier temporary files remaining: 0
+exit=0
+$ herdr machine remove 966df3cddb5e527a693a675d66d27109
+Removed SSH machine 966df3cddb5e527a693a675d66d27109.
+exit=0
+$ herdr machine list --json
+[
+  {
+    "id": "248d057f7775de814ce72fd4fa4a4370",
+    "label": "pegasus",
+    "target": "pegasus",
+    "session": "default",
+    "enabled": true,
+    "selected": false
+  }
+]
+exit=0
+$ ssh -o BatchMode=yes pegasus true
+exit=0
+$ herdr machine status pegasus --json
+[
+  {
+    "id": "248d057f7775de814ce72fd4fa4a4370",
+    "label": "pegasus",
+    "status": "reachable",
+    "error": null
+  }
+]
+exit=0
+$ herdr --machine pegasus workspace list
+{"id":"cli:workspace:list","result":{"type":"workspace_list","workspaces":[{"active_tab_id":"w1R:t1","agent_status":"unknown","focused":true,"label":"~","number":1,"pane_count":1,"tab_count":1,"workspace_id":"w1R"}]}}
+exit=0
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.pilot-validation/throwaway log -2 --oneline
+0bde7e4 Add hello.txt for remote pilot
+2287abc Initial pilot
+exit=0
+FINAL CLEANUP VERIFIED: captain pegasus profile unchanged and reachable; ssh pegasus works; pilot alias/profile/workspaces absent; original focus unchanged; local disposable folder will now be removed
+LOCAL CLEANUP VERIFIED: .pilot-validation and both disposable homes/repositories removed

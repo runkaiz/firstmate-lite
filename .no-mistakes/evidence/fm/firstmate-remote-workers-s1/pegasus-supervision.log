@@ -1,0 +1,89 @@
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+
+1795054961	2	signal	pilot.status	needs-decision: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: done [at=1795054828]: ready in branch fm/pilot
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-cursor]: pilot protocol decision
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-cursor]: journal recovery request
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: working [at=3]: after live concurrent recovery
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-cursor-2]: pilot protocol decision
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: needs-decision [at=3] [key=live-cursor-2]: journal recovery second request
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: resolved [key=live-cursor-2] [at=1795054932]: answered: Pilot protocol decision resolved. Acknowledge once; remain available for the outage drill. Do not change the repository.
+wake annotation: latest wake-EVENT observed at drain, not current state: pilot.status: working [at=3]: after live recovery retry
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+pilot [key=live-cursor] needs-decision: journal recovery request
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 2723968.1795054961.AO06Wh
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+check: remote machine fm-pilot has been unreachable for 0 min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up (ssh to fm-pilot-pegasus failed (status 255))
+
+1795055012	3	check	remote-link-6e538398aac4af6239cd4554a09b6eeb	check: remote machine fm-pilot has been unreachable for 0 min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up (ssh to fm-pilot-pegasus failed (status 255))
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 3 --recovery-generation 2740847.1795055012.RmfMsP
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+ACK 0 
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+
+1795055110	5	signal	pilot.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: working [at=4]: outage sequence 1
+wake annotation: unread wake-EVENT since last drain, not current state: pilot.status: working [at=5]: outage sequence 2
+wake annotation: latest wake-EVENT observed at drain, not current state: pilot.status: working [at=6]: outage sequence 3
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 5 --recovery-generation 2742168.1795055110.aOhAaE
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+ACK 0 
+check: remote machine fm-pilot is reachable again; queued instructions are being placed and status lines and commits are catching up
+
+1795055111	6	check	remote-link-6e538398aac4af6239cd4554a09b6eeb	check: remote machine fm-pilot is reachable again; queued instructions are being placed and status lines and commits are catching up
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 6 --recovery-generation 2790143.1795055111.LclKDT
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 1s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+ACK 0 
+signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+
+1795055123	8	signal	pilot.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7RND5YJKT5A6WVSCF8K461C/.test-remote-pilot/home/state/pilot.status
+wake annotation: latest wake-EVENT observed at drain, not current state: pilot.status: done [at=1795055119]: outage marker PILOT_OUTAGE_ACK appended; inbox 003-005 handled; repo unchanged
+STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+pilot done [at=1795055119]: outage marker PILOT_OUTAGE_ACK appended; inbox 003-005 handled; repo unchanged
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 8 --recovery-generation 2791606.1795055123.rezR2V
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 2s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+ACK 0 
+stale: 6e538398aac4af6239cd4554a09b6eeb:w1V:p1
+
+1795055133	9	stale	6e538398aac4af6239cd4554a09b6eeb:w1V:p1	stale: 6e538398aac4af6239cd4554a09b6eeb:w1V:p1
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 9 --recovery-generation 2800671.1795055133.21P89n
+PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WARNING: watcher still down (same stale episode; last beat: 3s ago, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+ACK 0 
+
