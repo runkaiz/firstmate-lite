@@ -15,9 +15,11 @@
 # into handled/ acknowledges reading; bin/fm-task-inbox-lib.sh owns the format
 # and the watcher's re-ring/escalation policy. A repeat send is a NEW record.
 # A failed enqueue is loud and never claims delivery.
+# Remote workers use the queue-only path owned by docs/remote-workers.md.
 #
-# TYPED: leading slash invocations, a leading dollar sign for Codex, and explicit
-# backend endpoints reach the harness parser through its verified submit core.
+# TYPED (local tasks): leading slash invocations, a leading dollar sign for
+# Codex, and explicit backend endpoints reach the harness parser through its
+# verified submit core.
 # Text is typed once and Enter may be retried; exit 0 confirms submission,
 # exit 3 means typed but unconfirmed (inspect before retrying, never blindly
 # retype), and any other nonzero means no delivery may be assumed.
@@ -656,6 +658,10 @@ if [ "${1:-}" = "--key" ]; then
     ;;
   esac
   key=$2
+  if [ "$TARGET_BACKEND" = herdr-remote ]; then
+    echo "error: keys are not sent to remote workers; steer with a text instruction, or use bin/fm-control.sh for lifecycle (docs/remote-workers.md)" >&2
+    exit 1
+  fi
   semantic_key=$(fm_send_normalize_key "$key")
   fm_send_require_active_worker || exit 1
   if ! fm_backend_send_key "$TARGET_BACKEND" "$T" "$key" "$EXPECTED_LABEL"; then
@@ -691,7 +697,7 @@ else
   # command: the pre-existing marker-first wire bytes are retained in stage 1.
   INBOX_PLANE=0
   if [ -n "$TARGET_SELECTOR" ]; then
-    if [ -n "$FIRE_AND_FORGET_ID" ] || [ "$TARGET_BACKEND" = remote ]; then
+    if [ -n "$FIRE_AND_FORGET_ID" ] || [ "$TARGET_BACKEND" = remote ] || [ "$TARGET_BACKEND" = herdr-remote ]; then
       INBOX_PLANE=1
     else
       case "$RESOLVE_ANSWER_TEXT" in
@@ -755,6 +761,13 @@ else
     # Ring the doorbell, best-effort: no ring outcome changes the exit status,
     # because the watcher owns loss detection from here, either through its
     # bounded re-ring ladder or direct unavailable-endpoint recovery.
+    # A remote worker's steer is queue-only here: the courier
+    # (bin/fm-remote-task.sh sync) places it on the worker's machine and rings
+    # only after placement is confirmed.
+    if [ "$TARGET_BACKEND" = herdr-remote ]; then
+      echo "fm-send: queued at $INBOX_RECORD; delivered when $(fm_meta_get "$TARGET_META" machine_label) is reachable" >&2
+      exit 0
+    fi
     ring_rc=0
     fm_task_inbox_ring "$TARGET_BACKEND" "$T" "$INBOX_RECORD" "$EXPECTED_LABEL" || ring_rc=$?
     ring_retry="the watcher will re-ring"

@@ -8,6 +8,7 @@
 # refs/heads/<base/default>, without an origin fetch. Other native tasks keep
 # origin freshness semantics; relaunch never reallocates or refreshes its copy.
 # Usage: fm-spawn.sh <task-id> <project-dir> --mode <no-mistakes|direct-PR|local-only> --yolo <on|off> [--branch-prefix <prefix>] [--base-branch <branch>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>] [--herdr-resume-lock-wait]
+#        fm-spawn.sh <task-id> <project-dir> --machine <label> --mode <local-only|direct-PR> --yolo <on|off> [--branch-prefix <prefix>] [--base-branch <branch>]
 #        fm-spawn.sh <task-id> <project-dir> --scout [--base-branch <branch>] [--harness <name>|harness|launch-command] [--model <name>] [--effort <level>] [--backend <name>] [--herdr-resume-lock-wait]
 #   --mode and --yolo are this task's delivery contract, REQUIRED for every ship
 #   spawn and refused on --scout spawns. Firstmate resolves both
@@ -41,6 +42,10 @@
 #   Local-only ships start at the current committed local default branch in
 #   the project clone, without fetching origin. PR delivery retains the origin
 #   freshness path below. Slot ownership and clean-copy checks precede either.
+#   --machine <label> launches a remote worker on a machine listed in
+#   config/remote-machines instead (Claude ships, local-only or direct-PR only);
+#   this script hands the whole spawn to bin/fm-remote-task.sh, whose header and
+#   docs/remote-workers.md own that contract.
 #   --base-branch is the optional branch selected at intake for a ship or scout
 #   to start from and target instead of origin's default branch. A fresh launch
 #   resets its pooled copy to origin/<branch>, refusing when the project has no
@@ -564,6 +569,25 @@ esac
 
 FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
+
+# A remote worker (--machine <label>) is a separate, much smaller launch path:
+# bin/fm-remote-task.sh owns it and refuses every option it does not support.
+# A relaunch of a recorded remote task is that script's relaunch.
+for spawn_arg in "$@"; do
+  case "$spawn_arg" in
+  --machine | --machine=*) export FM_HOME; exec "$SCRIPT_DIR/fm-remote-task.sh" spawn "$@" ;;
+  --relaunch)
+    if grep -qx 'backend=herdr-remote' "${FM_STATE_OVERRIDE:-$FM_HOME/state}/${1:-}.meta" 2>/dev/null; then
+      [ "$#" -eq 2 ] && [ "$2" = --relaunch ] || {
+        echo "error: remote relaunch accepts only <task-id> --relaunch; runtime overrides are unsupported" >&2
+        exit 1
+      }
+      export FM_HOME
+      exec "$SCRIPT_DIR/fm-remote-task.sh" relaunch "$1"
+    fi
+    ;;
+  esac
+done
 
 # shellcheck source=bin/fm-tasks-axi-lib.sh
 . "$SCRIPT_DIR/fm-tasks-axi-lib.sh"

@@ -832,6 +832,14 @@ native_leftover_next_action() {  # <copy>
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
   fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
+  # A remote worker's copy is quiesced, transferred, and proven to hold nothing
+  # unique on its machine before this machine's proofs read the landing copy
+  # (bin/fm-remote-task.sh retire owns the recorded, resumable phases; any
+  # unreachable or unproven state refuses with every record intact).
+  if [ "$BACKEND" = herdr-remote ]; then
+    FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+      "$SCRIPT_DIR/fm-remote-task.sh" retire "$ID" prepare || exit 1
+  fi
   if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
     native_leftover_next_action "$WT"
     exit 1
@@ -2567,6 +2575,10 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
   NATIVE_PROOF_ACCEPTED=1
+  if [ "$BACKEND" = herdr-remote ]; then
+    FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+      "$SCRIPT_DIR/fm-remote-task.sh" retire "$ID" remove || exit 1
+  fi
 fi
 
 if teardown_owns_worktree && [ -d "$WT" ] && [ "$FORCE" != "--force" ]; then
@@ -2834,6 +2846,11 @@ rm -f "$STATE/$ID.turn-ended" "$STATE/$ID.progress" \
 # read-only by its installer.
 chmod u+w "$STATE/$ID.git-hooks" 2>/dev/null || true
 rm -rf "$STATE/$ID.inbox" "$STATE/$ID.git-hooks"
+# Remote-worker records (bin/fm-remote-task.sh) retire with the task; the
+# remote copy itself was removed by the recorded retire phases above.
+rm -rf "$STATE/$ID.remote" "$STATE/$ID.remote-journal" "$STATE/$ID.remote-journal.bytes" \
+  "$STATE/$ID.remote-placed" "$STATE/$ID.remote-procs" "$STATE/$ID.remote-alert" \
+  "$STATE/$ID.remote-alert-seen" "$STATE/$ID.remote-missing" "$STATE/$ID.remote-retire"
 # A presentation journal the close path left behind is orphaned once the
 # recorded pane is proven gone (the Herdr gate above) unless it still names a
 # live projected workspace - a version 2 binding of some other pane, or a

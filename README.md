@@ -121,11 +121,10 @@ The old `/bearings` alias and `/ahoy file` mode are retired.
 
 ## Honest limits
 
-Current Firstmate-lite evidence covers CPU-only Linux fixtures.
-That does not prove a fresh install, provider login or service-tier behavior, live worker lifecycles, or macOS compatibility.
-Inherited [verification records](docs/verification/runtime-backends.md) apply only to their stated versions and scopes.
+[Verification records](docs/verification/runtime-backends.md) cover only their stated versions and scopes, including the remote-worker pilot.
+They do not establish general macOS compatibility, fresh-install behavior, or provider login and service-tier behavior.
 Nested supervision, Relay, alternate forges, and the bundled dashboard are outside this fork's scope.
-The retained [remote command transport](docs/configuration.md#remote-commands-configremote-routes) does not provide standalone remote coding-agent dispatch.
+[Remote workers](docs/remote-workers.md) have their own opt-in setup and supported limits, separate from the retained remote command transport.
 How well it runs still depends on your agent, your terminal backend, and the tools above; it is lean, not dependency-free.
 If something breaks, tell the first mate what you saw - diagnosing its own setup is part of the job.
 

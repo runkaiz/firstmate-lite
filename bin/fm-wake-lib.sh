@@ -2635,11 +2635,26 @@ fm_wake_status_mark_current() {  # <state> <status-file>
 # compare exact bytes.
 # Returns 0 appended and self-announced, 1 appended but left for the watcher
 # (the safe direction), 2 the append itself failed.
-fm_wake_status_append_self_announced() {  # <state> <status-file> <line>...
-  local state=$1 file=$2 line appended=0 pre_size='' pre_ident='' post_size post_ident
-  local classified folded lag span_rc=0
+fm_wake_status_append_self_announced() (  # <state> <status-file> <line>...
+  local append_state=$1 file=$2 line appended=0 pre_size='' pre_ident='' post_size post_ident
+  local classified folded lag span_rc=0 id append_lock
   local LC_ALL=C stamped=()
   shift 2
+  id=${file##*/}
+  id=${id%.status}
+  if [ "$file" = "$append_state/$id.status" ] && { [ -f "$append_state/$id.remote" ] || [ -f "$append_state/$id.remote-journal" ]; }; then
+    if ! declare -F fm_remote_status_recover_locked >/dev/null 2>&1; then
+      # Linted as its own canonical root; following this lazy subshell import
+      # misattributes backend path initialization to the caller (SC2031).
+      # shellcheck source=/dev/null
+      . "$FM_WAKE_LIB_DIR/fm-backend.sh" || return 2
+      fm_backend_source herdr-remote || return 2
+    fi
+    append_lock="$append_state/.remote-import-$id.lock"
+    fm_lock_acquire_wait "$append_lock" || return 2
+    trap 'fm_lock_release "$append_lock"' EXIT
+    fm_remote_status_recover_locked "$append_state" "$id" || return 2
+  fi
   _fm_wake_require_classify || return 1
   for line in "$@"; do
     stamped+=("$(status_stamp_line "$line")")
@@ -2657,7 +2672,7 @@ fm_wake_status_append_self_announced() {  # <state> <status-file> <line>...
   for line in "${stamped[@]}"; do appended=$((appended + ${#line} + 1)); done
   [ "$post_size" -eq $((pre_size + appended)) ] || return 1
   status_home_appends_record "$file" "$pre_size" "$post_size" || return 1
-  classified=$(fm_wake_signal_seen_size "$state" "$file")
+  classified=$(fm_wake_signal_seen_size "$append_state" "$file")
   if [ "$classified" != "$pre_size" ]; then
     folded=$(status_open_decisions_cursor_offset "$file") || folded=0
     [ "$folded" = "$pre_size" ] && [ "$classified" -lt "$pre_size" ] || return 1
@@ -2676,9 +2691,9 @@ EOF
   fi
   status_span_first_actionable_record "$file" "$classified" >/dev/null || span_rc=$?
   [ "$span_rc" -eq 1 ] || return 1
-  fm_wake_status_seen_commit "$state" "$file" "$post_size" "$post_ident" || return 1
+  fm_wake_status_seen_commit "$append_state" "$file" "$post_size" "$post_ident" || return 1
   return 0
-}
+)
 
 # Map one structurally valid signal key to its home-local status filename.
 # Queue payload text is intentionally ignored: it is display data, not a path

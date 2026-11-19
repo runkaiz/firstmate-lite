@@ -315,6 +315,28 @@ TASK_BACKEND=$(fm_backend_of_meta "$META")
 BACKEND_TARGET=$(fm_backend_target_of_meta "$META")
 EXPECTED_LABEL="fm-$ID"
 
+# --- remote worker: an unreachable machine is unknown, never dead -----------
+# A herdr-remote task's link record (bin/backends/herdr-remote.sh) decides
+# whether its endpoint can be read at all. While the machine is not reachable,
+# or its task folder is missing, the worker's own last status line still stands
+# (a done: or an open decision is not masked) and nothing reads as dead.
+if [ "$TASK_BACKEND" = herdr-remote ]; then
+  REMOTE_MID=$(meta_value machine_id)
+  REMOTE_LINK=$(fm_meta_get "$STATE/.remote-link-$REMOTE_MID" state)
+  REMOTE_DETAIL=
+  if [ "$REMOTE_LINK" != reachable ]; then
+    REMOTE_DETAIL="machine $(meta_value machine_label) ${REMOTE_LINK:-not yet seen}; worker state unknown (not proof of death)"
+  elif [ -e "$STATE/$ID.remote-missing" ]; then
+    REMOTE_DETAIL="remote task folder missing on $(meta_value machine_label); records preserved"
+  fi
+  if [ -n "$REMOTE_DETAIL" ]; then
+    if [ -n "$LOG_VERB" ] && [ "$(map_log_state "$LOG_LINE")" != unknown ]; then
+      emit "$(map_log_state "$LOG_LINE")" status-log "$(status_line_note "$LOG_LINE")${SEP}$REMOTE_DETAIL"
+    fi
+    emit unknown remote-endpoint "$REMOTE_DETAIL"
+  fi
+fi
+
 # tmux supplies the pane tail for harness-specific checks, including the
 # launch-prompt backstop in fm_busy_classify.
 crew_busy_verdict() {  # <target>
@@ -1181,6 +1203,32 @@ if [ "$TASK_BACKEND" = herdr ]; then
       case "$LOG_VERB" in
         needs-decision|blocked|done|failed|"${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}") ;;
         *) emit unknown none "backend unreachable (Herdr agent state unavailable)" ;;
+      esac
+      ;;
+  esac
+elif [ "$TASK_BACKEND" = herdr-remote ]; then
+  # The machine is reachable here (the outage arm above already answered).
+  # Liveness comes from the remote process rows, activity from Herdr's own
+  # agent status forwarded through the machine profile.
+  fm_backend_source herdr-remote || emit unknown none "backend unreachable (remote adapter unavailable)"
+  case "$(fm_backend_agent_state herdr-remote "$BACKEND_TARGET")" in
+    missing) emit unknown none "backend target gone: $BACKEND_TARGET" ;;
+    dead) emit unknown none "backend target gone: $BACKEND_TARGET (agent gone, pane shell remains)" ;;
+    alive)
+      case "$(fm_backend_herdr_remote_agent_status_raw "$BACKEND_TARGET")" in
+        working) emit working pane "harness busy (herdr-native, remote)" ;;
+        blocked)
+          case "$LOG_VERB" in
+            needs-decision|blocked) ;;
+            *) emit blocked pane "remote Herdr agent is waiting for input" ;;
+          esac
+          ;;
+      esac
+      ;;
+    *)
+      case "$LOG_VERB" in
+        needs-decision|blocked|done|failed|"${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}") ;;
+        *) emit unknown none "backend unreachable (remote agent state unavailable)" ;;
       esac
       ;;
   esac

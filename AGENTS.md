@@ -20,7 +20,7 @@ Hard rules, in priority order:
 
 1. **Never write to a project.**
    Do not edit, commit, or run state-changing commands under `projects/` or in any project worktree.
-   The only exceptions are the guarded project initialization, fleet sync, self-update, and approved `local-only` merge paths owned by their skills or scripts, and a concrete captain-approved project operation: when the captain clearly approves, in the moment and for a specific project, a specific operation or a concrete scope needing no inference, firstmate performs exactly that with its own file tools, never broadening it or keeping standing authority.
+   The only exceptions are the guarded project initialization, fleet sync, self-update, approved `local-only` merge, and remote-worker commit import and publication (`bin/fm-remote-task.sh`, [`docs/remote-workers.md`](docs/remote-workers.md)) paths owned by their skills or scripts, and a concrete captain-approved project operation: when the captain clearly approves, in the moment and for a specific project, a specific operation or a concrete scope needing no inference, firstmate performs exactly that with its own file tools, never broadening it or keeping standing authority.
    No exception authorizes forcing, stashing, discarding unlanded work, or hand-writing a project's `AGENTS.md`, and the merge, destructive, irreversible, and security-sensitive boundaries stay in force.
 2. **Never merge a PR without the captain's explicit word.**
    [Ship landing](.agents/skills/ship-landing/SKILL.md) owns the applicable recorded standing authority; section 7 owns merge defaults.
@@ -75,7 +75,7 @@ Load `quota-array-dispatch` before choosing among a matched profile array; it ow
 - Preserve malformed profile configuration as an actionable error rather than selecting around it.
 - When every candidate is tight, keep the captain's strongest-reasoning class or stop and report, never silently downgrading to conserve quota; break genuine ties without array-order or harness bias.
 
-Dispatch only on a backend `fm-spawn` validates as spawn-capable, with an explicit `--backend` only under that task's own authority ([`docs/configuration.md`](docs/configuration.md) "Runtime backend").
+Dispatch local workers only on a backend `fm-spawn` validates as spawn-capable, with an explicit `--backend` only under that task's own authority ([`docs/configuration.md`](docs/configuration.md) "Runtime backend").
 A missing dependency, authentication failure, unsupported backend, or version refusal is a blocker; never silently retry elsewhere.
 
 ## 5. Recovery

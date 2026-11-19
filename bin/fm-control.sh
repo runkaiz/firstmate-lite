@@ -52,7 +52,7 @@
 #              endpoint, so this verb cannot tell a destroyed window from one on
 #              a tmux server it cannot address, and it will not claim a stop it
 #              cannot see.
-#   relaunch   Transactionally replace the running agent with a new one, in the
+#   relaunch   For local workers, transactionally replace the agent, in the
 #              SAME worktree - and the same endpoint whenever that endpoint
 #              still exists - on the same or a newly chosen
 #              harness/model/effort - so switching harness is one ordinary use
@@ -90,6 +90,8 @@
 #              the prior durable record in place and reports the concrete
 #              state; it never leaves a half-transitioned task claiming to be
 #              running.
+#              Remote workers refuse --harness, --model, and --effort overrides;
+#              docs/remote-workers.md owns their separate lifecycle contract.
 #
 # Teardown and discard are NOT verbs here and never will be. `exit` stops an
 # agent and preserves everything else; removing a worktree, killing an
@@ -116,7 +118,7 @@
 #     is refused rather than guessed at.
 #   - A backend that cannot deliver the harness's interrupt key is refused.
 #   - `exit` and `relaunch` require a backend with a recovery-grade agent-state
-#     classifier (tmux, herdr), because without one the "the agent stopped"
+#     classifier, because without one the "the agent stopped"
 #     postcondition cannot be proven.
 #   - An ambiguous or unreadable endpoint state refuses; only a positively
 #     classified state acts.
@@ -376,6 +378,10 @@ fm_backend_validate "$BACKEND" || exit 1
 # --- shared helpers ---------------------------------------------------------
 
 agent_state() {
+  if [ "$BACKEND" = herdr-remote ]; then
+    rm -f -- "$STATE/$ID.remote-procs"
+    "$SCRIPT_DIR/fm-remote-task.sh" sync "${T%%:*}" >/dev/null 2>&1 || true
+  fi
   fm_backend_agent_state "$BACKEND" "$T"
 }
 
@@ -1034,6 +1040,14 @@ do_relaunch() {
   local -a spawn_args
 
   require_state_verified_backend relaunch
+  if [ "$BACKEND" = herdr-remote ]; then
+    [ "$HARNESS_SET$MODEL_SET$EFFORT_SET" = 000 ] || die "remote relaunch uses the recorded Claude launch; runtime overrides are unsupported"
+    [ "$NOTE_SET" = 1 ] && [ -n "$NOTE" ] || die "remote relaunch requires a progress note"
+    "$SCRIPT_DIR/fm-send.sh" "$ID" "$NOTE" >/dev/null || die "could not queue the remote relaunch progress note"
+    do_exit >/dev/null || return $?
+    "$SCRIPT_DIR/fm-remote-task.sh" relaunch "$ID"
+    return $?
+  fi
   resolve_relaunch_profile
 
   case "$KIND" in

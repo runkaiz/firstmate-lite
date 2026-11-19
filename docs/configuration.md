@@ -13,6 +13,7 @@ Start with the directory layout, then use the setting reference for the behavior
 | Backlog, preferences, and memory | [Backlog backend](#backlog-backend-taskstoml--configbacklog-backend), [captain preferences](#captain-preferences-datacaptainmd--datacaptain-sharedmd), [external memory tiers](#external-memory-tiers-memory-layering-section), and [startup memory budget](#startup-memory-budget-configstartup-memory-budget) |
 | Supervision and presentation | [Pi supervision branch](#pi-supervision-branch), [supervision host](#supervision-host-configsupervision-host), and [Calm preference](#calm-preference-configcalm) |
 | Remote command routes | [Remote command routes](#remote-commands-configremote-routes) |
+| Workers on another machine | [`docs/remote-workers.md`](remote-workers.md) (`config/remote-machines`) |
 | Per-run overrides and tuning | [Environment variables](#environment-variables) |
 
 ## FM_HOME
@@ -402,7 +403,7 @@ Neither a configuration compatibility check nor merging this code authorizes rew
 
 The default remains Treehouse for new task copies.
 Set `config/worktree-allocator` to `git` only after reviewing a native candidate and approving activation for that home.
-The native allocator supports tmux and Herdr, whose endpoint ownership checks are verified.
+The native allocator supports local tmux and Herdr tasks; [remote workers](remote-workers.md) use it for their landing copies here.
 Native reservation recovery and cleanup require `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
 
 Native allocation also requires `config/git-worktree-root`, containing one absolute directory path outside the project, its primary checkout and the active Firstmate home.
@@ -431,12 +432,13 @@ For spawn-capable adapters, the runtime session-provider backend controls where 
 | --- | --- | --- |
 | `herdr` | Default and recommended; has its own required CI lane | [`docs/herdr-backend.md`](herdr-backend.md) |
 | `tmux` | Simple fallback; verified reference backend | [`docs/tmux-backend.md`](tmux-backend.md) |
+| `herdr-remote` | A worker in another machine's Herdr, opted in per machine by `config/remote-machines` and per task by `--machine`; never selected by the order below | [`docs/remote-workers.md`](remote-workers.md) |
 
 Worktree providers are selected separately as described in [Task worktree allocator](#task-worktree-allocator-configworktree-allocator).
 
 ### Backend selection order
 
-New spawns choose the backend in this order:
+Local spawns choose the backend in this order:
 
 1. An explicit `--backend` flag authorized for that exact task by a present captain instruction or the task's own accepted brief.
    A later task cannot inherit that authority by analogy.
@@ -450,7 +452,8 @@ Every step is silent; select a backend by putting its name in a local `config/ba
 
 ### Accepted backends
 
-`fm-spawn.sh` accepts `herdr` and `tmux`; any other value is rejected.
+The local backend selector accepts `herdr` and `tmux`; any other value is rejected.
+The separate [remote-worker dispatch path](remote-workers.md#dispatch) selects `herdr-remote`.
 The Zellij, Orca, and cmux backends were removed; a home still configured for one gets a message to switch to `herdr` or `tmux`, and a task record left on one is preserved and refused rather than cleaned up, so close its endpoint by hand before removing the record.
 
 `codex-app` is not an accepted runtime backend yet; [`docs/codex-app-backend.md`](codex-app-backend.md) owns the Codex App boundary.

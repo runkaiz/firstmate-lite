@@ -32,7 +32,7 @@ FM_MERGE_OUTCOME_ALREADY_RECORDED=false
 # A caller that has already merged must report a non-zero return rather
 # than treat it as success: the merge landed and the record did not.
 fm_merge_outcome_report() {  # <home> <state> <task-id> <pr-url> <origin> [authority]
-  local home=$1 state=$2 id=$3 url=$4 origin=$5
+  local home=$1 outcome_state=$2 id=$3 url=$4 origin=$5
   local authority=${6-} suffix=
   local lock status=0
   local provider host path number
@@ -51,14 +51,14 @@ fm_merge_outcome_report() {  # <home> <state> <task-id> <pr-url> <origin> [autho
   host=$FM_PR_HOST
   path=$FM_PR_PATH
   number=$FM_PR_NUMBER
-  [ -d "$state" ] && [ ! -L "$state" ] || return 1
+  [ -d "$outcome_state" ] && [ ! -L "$outcome_state" ] || return 1
 
-  STATE=$state
+  STATE=$outcome_state
   # shellcheck source=bin/fm-wake-lib.sh
   . "$_FM_MERGE_OUTCOME_LIB_DIR/fm-wake-lib.sh"
-  lock="$state/$id.pr-poll-merge-notified.lock"
+  lock="$outcome_state/$id.pr-poll-merge-notified.lock"
   fm_lock_acquire_wait "$lock" || return 1
-  if fm_pr_poll_merge_already_notified "$state" "$id" \
+  if fm_pr_poll_merge_already_notified "$outcome_state" "$id" \
     "$provider" "$host" "$path" "$number"; then
     # shellcheck disable=SC2034 # Public result consumed by sourcing callers.
     FM_MERGE_OUTCOME_ALREADY_RECORDED=true
@@ -71,11 +71,11 @@ fm_merge_outcome_report() {  # <home> <state> <task-id> <pr-url> <origin> [autho
       "check: merge landed: $id $FM_PR_URL$suffix" || status=1
   fi
   if [ "$status" -eq 0 ]; then
-    fm_pr_poll_merge_mark_notified "$state" "$id" \
+    fm_pr_poll_merge_mark_notified "$outcome_state" "$id" \
       "$provider" "$host" "$path" "$number" || status=1
   fi
   fm_lock_release "$lock"
   # Opt-in fleet activity ledger (docs/fleet-ledger.md); off costs one file test.
-  [ ! -e "${FM_CONFIG_OVERRIDE:-$home/config}/fleet-ledger" ] || [ "$status" -ne 0 ] || FM_HOME=$home FM_STATE_OVERRIDE=$state "$_FM_MERGE_OUTCOME_LIB_DIR/fm-fleet-ledger.sh" merged "$id" pr "$FM_PR_URL" || true
+  [ ! -e "${FM_CONFIG_OVERRIDE:-$home/config}/fleet-ledger" ] || [ "$status" -ne 0 ] || FM_HOME=$home FM_STATE_OVERRIDE=$outcome_state "$_FM_MERGE_OUTCOME_LIB_DIR/fm-fleet-ledger.sh" merged "$id" pr "$FM_PR_URL" || true
   return "$status"
 }
