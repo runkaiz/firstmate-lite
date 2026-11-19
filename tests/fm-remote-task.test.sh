@@ -210,7 +210,9 @@ for i in $(seq 1 100); do [ ! -e "$FM_RACE_RECORD.second-done" ] || break; sleep
 touch "$FM_RACE_RECORD.release"
 wait "$WRITER_FIRST" || fail 'first record update failed'
 wait "$WRITER_SECOND" || fail 'second record update failed'
-grep -qx 'status_offset=120' "$FM_RACE_RECORD" && grep -qx 'incarnation=new' "$FM_RACE_RECORD" || fail 'concurrent record updates lost a field'
+if ! grep -qx 'status_offset=120' "$FM_RACE_RECORD" || ! grep -qx 'incarnation=new' "$FM_RACE_RECORD"; then
+  fail 'concurrent record updates lost a field'
+fi
 rm -f "$STUBS/awk"
 pass 'concurrent incarnation and cursor updates preserve both fields'
 
@@ -298,7 +300,9 @@ sync_now
 ACK_MSG=$(ls "$ST/r1.inbox"/*.msg); ACK_NAME=${ACK_MSG##*/}
 mv "$RTASK/channel/inbox/$ACK_NAME" "$RTASK/channel/inbox/handled/$ACK_NAME"
 "$ROOT/bin/fm-send.sh" r1 'place during fetch failure' 2>/dev/null
-PLACE_MSG=$(ls "$ST/r1.inbox"/*.msg | tail -n1); PLACE_NAME=${PLACE_MSG##*/}
+for PLACE_MSG in "$ST/r1.inbox"/*.msg; do
+  PLACE_NAME=${PLACE_MSG##*/}
+done
 OFF=$(sed -n 's/^status_offset=//p' "$ST/r1.remote")
 git -C "$RTASK/wt" commit -q --allow-empty -m work2
 SHA2=$(git -C "$RTASK/wt" rev-parse HEAD)

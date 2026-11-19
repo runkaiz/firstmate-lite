@@ -308,20 +308,29 @@ fm_backend_herdr_remote_send_text_submit() {  # <target> <text> <retries> <enter
 }
 
 fm_backend_herdr_remote_composer_state() {  # <target> [label]
-  fm_remote_target_reachable "$1" && fm_remote_identity_ok "$1" || { printf 'unknown'; return 0; }
+  if ! fm_remote_target_reachable "$1" || ! fm_remote_identity_ok "$1"; then
+    printf 'unknown'
+    return 0
+  fi
   fm_backend_herdr_composer_state "$1"
 }
 
 # Herdr's own agent status, demoted to unknown unless the remote process rows
 # still show a process under the pane shell.
 fm_backend_herdr_remote_agent_status_raw() {
-  fm_remote_target_reachable "$1" && fm_remote_identity_ok "$1" || { printf 'unknown'; return 0; }
+  if ! fm_remote_target_reachable "$1" || ! fm_remote_identity_ok "$1"; then
+    printf 'unknown'
+    return 0
+  fi
   fm_backend_herdr_agent_status_raw "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE"
 }
 
 fm_backend_herdr_remote_busy_state() {  # <target>
   local verdict task
-  fm_remote_target_reachable "$1" && fm_remote_identity_ok "$1" || { printf 'unknown'; return 0; }
+  if ! fm_remote_target_reachable "$1" || ! fm_remote_identity_ok "$1"; then
+    printf 'unknown'
+    return 0
+  fi
   verdict=$(fm_backend_herdr_classify_agent_status \
     "$(fm_backend_herdr_remote_agent_status_raw "$1")")
   if [ "$verdict" = busy ]; then
