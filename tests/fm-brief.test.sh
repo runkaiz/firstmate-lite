@@ -800,6 +800,12 @@ test_ship_and_scout_teach_validation_round_pause() {
       "$kind brief incorrectly promised to suppress the first alert"
     assert_grep 'Do not declare active implementation or reasoning as a wait' "$brief" \
       "$kind brief did not limit the declaration to actual waits"
+    assert_grep 'post no progress or "still waiting" text between waits; report once when the result arrives' "$brief" \
+      "$kind brief did not forbid repeated still-waiting chatter during a long wait"
+    assert_grep 'with one blocking tool call at the longest timeout your shell tool allows' "$brief" \
+      "$kind brief did not require a single long blocking wait"
+    assert_grep 'make any paused declaration once before the first blocking wait; if that call times out, your very next tool call must be the identical wait (same command and arguments), with no text, status append, or other check in between, even if you forgot the initial paused declaration - never catch up on pause bookkeeping after a timeout' "$brief" \
+      "$kind brief did not require silent timeout retries without redeclaring the pause"
   done
   pass "fm-brief.sh: ship and scout scaffolds declare a validation-round pause once, then hold it"
 }
