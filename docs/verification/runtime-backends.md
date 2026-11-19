@@ -192,6 +192,28 @@ The [stow skill](../../.agents/skills/stow/SKILL.md#pi-command-and-automatic-pre
 The [ahoy skill](../../.agents/skills/ahoy/SKILL.md) owns the unified catch-up command; other harnesses consume the skill without Pi's native handlers.
 Runtime backends are not driven by these fixtures.
 
+## Remote worker liveness and launch
+
+Verified on 2026-11-19 with Herdr 0.9.5 (protocol 22) on both machines, Claude Code 2.1.327 on a macOS 27.2 remote reached through a saved Herdr machine profile, and Bash 3.2.57 as the remote `/bin/bash`.
+Remote liveness is harness-dependent: the courier counts processes below the recorded pane shell whose command line names `claude`, and that count alone decides `alive` versus agent-free `dead`.
+The portable regression pins the classifier with a stand-in agent; the live check is the pilot procedure in [`docs/remote-workers.md`](../remote-workers.md), run against a throwaway repository.
+
+```sh
+bash bin/fm-test-run.sh tests/fm-remote-task.test.sh tests/fm-remote-watch.test.sh
+```
+
+Observed on the live machine:
+
+```text
+child:  9265  8720 claude --permission-mode auto --add-dir .../tasks/pilot1/channel --settings ...
+after ending only that process: shell=alive descendants=0 agents=0 -> agent_state=dead
+after relaunch into the same copy: shell=alive descendants=2 agents=1 -> alive
+```
+
+A fresh launch registers Claude workspace trust for both the copy and its `--add-dir` channel; trusting only the copy left Claude on its "Adding a new directory" prompt, whose default answer exits.
+Every generated remote script was checked with the remote machine's own `/bin/bash -n` (3.2), which rejects a `case` pattern inside a command substitution that Bash 5 accepts.
+There is no installed-harness live guard for this classifier yet; refresh this record by rerunning the pilot after a Claude Code or Herdr upgrade on the remote machine.
+
 ## Herdr shell execution before allocation
 
 Verified on 2026-10-03 with Herdr 0.9.3 and Bash 5.3.9 on Linux, including a real attached viewer and interactive Bazzite startup banner.

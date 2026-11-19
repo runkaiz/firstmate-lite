@@ -94,5 +94,5 @@ This is the same trust a local worker already holds, extended to that machine; a
 
 ## Verification
 
-`tests/fm-remote-task.test.sh` covers the portable contract with SSH, Herdr, and gh stand-ins.
-The live pilot evidence for the first machine lives in that task's private report.
+`tests/fm-remote-task.test.sh` covers the portable contract with SSH, Herdr, and gh stand-ins, and `tests/fm-remote-watch.test.sh` covers the outage notifications through the real supervision loop.
+The live liveness and launch record is [Remote worker liveness and launch](verification/runtime-backends.md#remote-worker-liveness-and-launch).
