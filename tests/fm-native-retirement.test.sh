@@ -375,6 +375,91 @@ retired || fail 'pipeline preservation left the copy or records'
 [ "$(cat "$keep/files/.cache/cache")" = 'ignored cache' ] || fail 'pipeline preservation lost ignored cache'
 pass 'pipeline delivery proof permits covered leftovers while tracked edits and incorrect bindings refuse'
 
+# One-pass cleanup: leftovers that are all recognised generated output are
+# preserved in the same teardown, while an unrecognised, tracked, or symlinked
+# leftover keeps the ordinary refusal with nothing moved.
+make_case generated ship local-only
+keep="$HOME_DIR/data/$ID/preserved-artifacts"
+mkdir -p "$WT/node_modules/pkg" "$WT/__pycache__"
+printf 'module\n' > "$WT/node_modules/pkg/index.js"
+printf 'bytecode\n' > "$WT/__pycache__/mod.pyc"
+printf 'notes\n' > "$WT/notes.txt"
+if out=$(teardown 2>&1); then fail 'an unrecognised leftover was preserved automatically'; fi
+assert_contains "$out" '--preserve-untracked' 'unrecognised leftovers lost the guarded next action'
+retained && [ -f "$WT/notes.txt" ] && [ -f "$WT/node_modules/pkg/index.js" ] && [ ! -e "$keep" ] \
+  || fail 'an unrecognised-leftover refusal moved artifacts or removed records'
+rm -f -- "$WT/notes.txt"
+git -C "$WT" ls-files --error-unmatch README.md >/dev/null || fail 'fixture lost its tracked README.md'
+printf 'unique tracked edit\n' >> "$WT/README.md"
+if out=$(teardown 2>&1); then fail 'generated leftovers beside a tracked edit were preserved automatically'; fi
+assert_contains "$out" 'tracked changes are unique work' 'tracked-edit refusal reason'
+[ -f "$WT/node_modules/pkg/index.js" ] && [ ! -e "$keep" ] || fail 'a tracked-edit refusal moved artifacts'
+git -C "$WT" checkout -q -- .
+mv "$WT/node_modules" "$CASE/real_modules"
+ln -s "$CASE/real_modules" "$WT/node_modules"
+if out=$(teardown 2>&1); then fail 'a symlinked node_modules was preserved automatically'; fi
+retained && [ ! -e "$keep" ] || fail 'a symlink refusal moved artifacts or removed records'
+rm -f -- "$WT/node_modules"
+mv "$CASE/real_modules" "$WT/node_modules"
+out=$(teardown 2>&1)
+expect_code 0 "$?" "recognised generated leftovers were not preserved in one pass: $out"
+assert_contains "$out" 'preserving recognised generated output' 'one-pass preservation was not announced'
+retired || fail 'one-pass preservation left the copy or records'
+[ "$(cat "$keep/files/node_modules/pkg/index.js")" = 'module' ] || fail 'one-pass preservation lost node_modules'
+[ "$(cat "$keep/files/__pycache__/mod.pyc")" = 'bytecode' ] || fail 'one-pass preservation lost __pycache__'
+pass 'teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers'
+
+# One-pass stop: a native task whose status reads done is stopped through task
+# control before the endpoint gate; an unfinished task is never stopped, and a
+# failed stop keeps the refusal and names the failure.
+stop_case() { # <name> <status-line>
+  make_case "$1" ship local-only
+  rm -rf -- "${CASE:?}/root"
+  mkdir -p "$CASE/root"
+  cp -R "$ROOT/bin" "$CASE/root/bin"
+  cat > "$CASE/root/bin/fm-control.sh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$FM_TEST_CASE/control.log"
+if [ "${FM_TEST_CONTROL_FAIL:-0}" = 1 ]; then echo 'error: stub control refused' >&2; exit 1; fi
+: > "$FM_TEST_CASE/stopped"
+echo 'stopped'
+SH
+  chmod +x "$CASE/root/bin/fm-control.sh"
+  cat > "$FAKE/tmux" <<'SH'
+#!/usr/bin/env bash
+case "$1" in
+  list-windows) printf 'main\n'; [ -f "$FM_TEST_CASE/stopped" ] || printf 'fm-%s\n' "$FM_TEST_ID" ;;
+  *) exit 1 ;;
+esac
+SH
+  chmod +x "$FAKE/tmux"
+  printf '%s\n' "$2" > "$HOME_DIR/state/$ID.status"
+}
+stop_teardown() {
+  env PATH="$FAKE:$PATH" FM_HOME="$HOME_DIR" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
+    FM_CONFIG_OVERRIDE="$HOME_DIR/config" FM_TEARDOWN_GUARD_DONE=1 \
+    FM_TEST_CASE="$CASE" FM_TEST_ID="$ID" \
+    bash "$CASE/root/bin/fm-teardown.sh" "$ID" "$@"
+}
+stop_case stop-working 'working [at=1792922400]: still implementing'
+if out=$(stop_teardown 2>&1); then fail 'teardown retired a live endpoint of an unfinished task'; fi
+assert_contains "$out" 'live or unverified endpoint owner' 'unfinished-task refusal reason'
+[ ! -e "$CASE/control.log" ] || fail 'teardown stopped an unfinished worker'
+retained || fail 'unfinished-task refusal lost the copy'
+stop_case stop-failed 'done [at=1792922400]: ready in branch fm/x'
+if out=$(FM_TEST_CONTROL_FAIL=1 stop_teardown 2>&1); then fail 'teardown retired a live endpoint after a failed stop'; fi
+assert_contains "$out" 'stub control refused' 'a failed stop was not named in the refusal'
+retained || fail 'failed-stop refusal lost the copy'
+if out=$(stop_teardown --force 2>&1); then :; fi
+[ "$(wc -l < "$CASE/control.log")" = 1 ] || fail 'a forced teardown stopped the worker through task control'
+stop_case stop-done 'done [at=1792922400]: ready in branch fm/x'
+out=$(stop_teardown 2>&1)
+expect_code 0 "$?" "a finished task's live worker was not stopped and retired in one pass: $out"
+[ "$(cat "$CASE/control.log")" = "$ID exit" ] || fail 'teardown did not stop the finished worker exactly once through task control'
+retired || fail 'one-pass stop left the copy or records'
+pass 'teardown stops a finished native worker through task control in one pass and never stops an unfinished one'
+
 SHELL_PIDS=()
 SHELL_SUPERVISORS=()
 cleanup_shells() {

@@ -28,7 +28,8 @@ Retire a custom check only through `bin/fm-check-unregister.sh <id>` (or `bin/fm
 
 Retire a ship copy only through `bin/fm-teardown.sh`'s landing proof or its explicit captain-approved branch-retention path.
 A teardown refusal for uncommitted or unlanded work is a stop-and-investigate result, never an obstacle to bypass.
-When a native copy refuses only for untracked or ignored leftovers, inspect each listed root read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, run the exact `--preserve-untracked` command the refusal printed, whose script header owns the move, custody check and resume.
+Native teardown handles the routine cases in one pass: it stops a worker whose status reads done through task control and preserves leftovers it positively recognises as generated output, as its header defines.
+When a native copy still refuses only for untracked or ignored leftovers, inspect each listed root read-only; if every one is a task-owned generated artifact (build output, bytecode, a tool or dependency cache the task created) and nothing else blocks, run the exact `--preserve-untracked` command the refusal printed, whose script header owns the move, custody check and resume.
 Ignored status alone never proves an artifact disposable: tracked edits, unlanded commits, anything that could be unique work or session evidence, and uncertain ownership stay stop-and-escalate.
 With proactive mode on, take that preservation as part of the approved wrap-up without asking; with it off, report the classification and the exact command as the proposed next action.
 Never force teardown without explicit discard authority.

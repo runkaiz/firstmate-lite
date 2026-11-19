@@ -15,6 +15,14 @@
 # fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
 # A refusal or interruption leaves the copy, task records and journal in place,
 # and rerunning the same command completes the preservation idempotently.
+# When none is named and every leftover root is recognised generated output
+# (fm_git_worktree_generated_roots), teardown names those roots itself in the
+# same pass; anything uncertain, tracked, or unlanded still refuses.
+# One-pass stop: a native ship or scout whose current status reads done, with
+# no open decision, is first stopped through bin/fm-control.sh exit (which
+# preserves the endpoint, copy, and every uncommitted change) before teardown
+# takes its locks; a failed stop changes nothing and the live-endpoint
+# refusal below names it. Unfinished tasks and --force never stop a worker.
 # A leftover refusal summarizes by root and prints the exact preserve command
 # (native_leftover_next_action); a named directory holding tracked content
 # stands for the leftover roots beneath it.
@@ -496,6 +504,27 @@ if [ "$FORCE" = --force ] && [ "$(fm_lease_actor)" = branch ]; then
   echo "error: forced teardown refused - the supervision branch cannot discard work" >&2
   exit "$FM_LEASE_REFUSE_EXIT"
 fi
+# One-pass stop (see the header). It runs before the lease guard and the
+# control and metadata locks below, which bin/fm-control.sh takes itself.
+TEARDOWN_STOP_NOTE=
+teardown_stop_finished_native_worker() {
+  local meta="$STATE/$ID.meta" allocator kind current out
+  [ -z "$FORCE" ] || return 0
+  [ -f "$meta" ] && [ ! -L "$meta" ] || return 0
+  allocator=$(fm_git_worktree_meta_allocator "$meta" "$STATE/$ID.git-worktree" 2>/dev/null) || return 0
+  [ "$allocator" = git ] || return 0
+  kind=$(fm_meta_get "$meta" kind)
+  case "${kind:-ship}" in ship|scout) ;; *) return 0 ;; esac
+  current=$(status_current_line "$STATE/$ID.status" "${kind:-ship}")
+  [ "$(status_line_verb "$current")" = "done" ] || return 0
+  if out=$(FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
+      "$SCRIPT_DIR/fm-control.sh" "$ID" exit 2>&1); then
+    printf 'teardown: finished worker stopped through task control: %s\n' "${out##*$'\n'}" >&2
+  else
+    TEARDOWN_STOP_NOTE=${out##*$'\n'}
+  fi
+}
+teardown_stop_finished_native_worker
 fm_lease_guard "$ID" "teardown (fm-teardown)"
 
 META="$STATE/$ID.meta"
@@ -840,7 +869,12 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_DATA_OVERRIDE="$DATA" FM_CONFIG_OVERRIDE="$CONFIG" \
       "$SCRIPT_DIR/fm-remote-task.sh" retire "$ID" prepare || exit 1
   fi
-  if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
+  if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT"); then
+    while IFS= read -r NATIVE_GENERATED_ROOT; do
+      [ -z "$NATIVE_GENERATED_ROOT" ] || PRESERVE_PATHS+=("$NATIVE_GENERATED_ROOT")
+    done <<< "$NATIVE_GENERATED_ROOTS"
+    printf 'teardown: preserving recognised generated output after the landing proofs: %s\n' "${PRESERVE_PATHS[*]}" >&2
+  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
     native_leftover_next_action "$WT"
     exit 1
   fi
@@ -848,7 +882,10 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     native_endpoint_state=$(fm_backend_agent_state "$BACKEND" "$T")
     case "$native_endpoint_state" in
       dead|missing) ;;
-      *) echo 'REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first' >&2; exit 1 ;;
+      *)
+        echo 'REFUSED: native copy has a live or unverified endpoint owner; stop it through task control first' >&2
+        [ -z "$TEARDOWN_STOP_NOTE" ] || printf 'teardown: the finished-worker stop through task control failed: %s\n' "$TEARDOWN_STOP_NOTE" >&2
+        exit 1 ;;
     esac
     if [ "$native_endpoint_state" = dead ] && [ "$BACKEND" = herdr ]; then
       fm_backend_herdr_parse_target "$T" || exit 1

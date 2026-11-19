@@ -418,9 +418,10 @@ Startup reports orphan native reservations through the existing bootstrap diagno
 After branch-retaining cleanup, [`fm-merge-local.sh`](../bin/fm-merge-local.sh) can still land a local-only branch after authority is evaluated under [`ship-landing`](../.agents/skills/ship-landing/SKILL.md), retaining its clean fast-forward guards.
 
 Native cleanup preserves dirty or untracked content, including ignored files, even for scouts; its removal proofs are owned by `bin/fm-git-worktree-lib.sh` and the existing landed-work gate in `bin/fm-teardown.sh`.
-It refuses a live or unverified endpoint, preserves foreign processes, and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
+It refuses a live or unverified endpoint unless the task's status reads done, in which case it first stops the worker through `bin/fm-control.sh exit`; it preserves foreign processes and does not support forced discard; task-owned browser MCP server shutdown follows `bin/fm-teardown.sh`'s `stop_owned_browser_mcp` ownership checks.
 Copies with worktree-local generated hooks or ignored dependencies also remain until those artifacts are deliberately reconciled; the native path does not seed or scrub them, and `bin/fm-teardown.sh --preserve-untracked` moves inspected generated leftovers into the task's data directory rather than deleting them.
-Teardown summarizes leftover roots and offers a preservation command; its header and referenced helpers own the full-list location, directory expansion and custody mechanics.
+When every leftover root is recognised generated output, such as `node_modules`, `__pycache__`, or `.next`, teardown preserves it in the same pass; otherwise it summarizes leftover roots and offers a preservation command.
+Its header and referenced helpers own the recognised set, the full-list location, directory expansion and custody mechanics.
 Use the existing guarded entry points and the [runtime verification record](verification/runtime-backends.md#native-git-task-copies) to assess a candidate before activation.
 
 ## Runtime backend (config/backend / FM_BACKEND)

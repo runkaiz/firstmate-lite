@@ -154,6 +154,38 @@ fm_git_worktree_leftover_roots() { # <copy> [<paths-file>] [<full-list-file>]
   return "$rc"
 }
 
+# Print the leftover roots of <copy>, one per line, and succeed only when the
+# copy has leftovers, no tracked change, and every root is recognised
+# generated output: a real directory named node_modules, __pycache__, .next,
+# .nuxt, .svelte-kit, .turbo, .parcel-cache, .cache, .pytest_cache,
+# .mypy_cache, .ruff_cache, .hypothesis, .tox, .nox, .venv, .gradle, or
+# *.egg-info, or a regular file named *.pyc, *.pyo, *.tsbuildinfo, or
+# .eslintcache. A recognised directory holding a nested repository (any .git
+# entry) is uncertain, since it can carry unique commits. Anything else, or an
+# unreadable copy, fails. Read-only.
+fm_git_worktree_generated_roots() { # <copy>
+  local copy=$1 changes roots count root name nested out=''
+  changes=$(git -C "$copy" status --porcelain --untracked-files=no) || return 1
+  [ -z "$changes" ] || return 1
+  roots=$(fm_git_worktree_leftover_roots "$copy") || return 1
+  [ -n "$roots" ] || return 1
+  while IFS=$'\t' read -r count root; do
+    [ -n "$root" ] || return 1
+    name=${root##*/}
+    case "$name" in
+      node_modules|__pycache__|.next|.nuxt|.svelte-kit|.turbo|.parcel-cache|.cache|.pytest_cache|.mypy_cache|.ruff_cache|.hypothesis|.tox|.nox|.venv|.gradle|*.egg-info)
+        [ -d "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
+        nested=$(find "$copy/$root" -name .git -print -quit) || return 1
+        [ -z "$nested" ] || return 1 ;;
+      *.pyc|*.pyo|*.tsbuildinfo|.eslintcache)
+        [ -f "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1 ;;
+      *) return 1 ;;
+    esac
+    out="$out$root"$'\n'
+  done <<< "$roots"
+  printf '%s' "$out"
+}
+
 fm_git_worktree_print_roots() { # reads "<count>\t<root>" lines; prints a bounded summary to stderr
   awk -F '\t' '
     NR <= 20 { printf "  %s (%d file%s)\n", $2, $1, ($1 == 1 ? "" : "s") }
