@@ -881,7 +881,13 @@ for meta in "$STATE"/*.meta; do
 
   window=$(fm_meta_get "$meta" window)
   target=$(fm_backend_target_of_meta "$meta")
-  if [ -n "$window" ]; then
+  if [ -n "$window" ] && [ "$(fm_backend_of_meta "$meta")" = herdr-remote ] \
+    && [ "$(fm_meta_get "$STATE/.remote-link-$(fm_meta_get "$meta" machine_id)" state)" != reachable ]; then
+    # docs/remote-workers.md: an unreachable remote machine is never a dead
+    # endpoint and licenses no recovery.
+    printf 'endpoint: machine unreachable (backend=herdr-remote machine=%s window=%s - state unknown, not dead; no recovery)\n' \
+      "$(fm_meta_get "$meta" machine_label)" "$window"
+  elif [ -n "$window" ]; then
     backend=$(fm_backend_of_meta "$meta")
     endpoint_rc=0
     fm_session_start_endpoint_read "$backend" "${target:-$window}" "fm-$id" || endpoint_rc=$?
@@ -908,6 +914,12 @@ for meta in "$STATE"/*.meta; do
   fi
 done
 [ "$META_FOUND" -eq 1 ] || printf '(none)\n'
+
+if [ -e "$CONFIG/remote-machines" ]; then
+  subsection "Remote task folders without a record here"
+  FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_CONFIG_OVERRIDE="$CONFIG" \
+    "$SCRIPT_DIR/fm-remote-task.sh" orphans 2>/dev/null | grep . || printf '(none seen by the last courier pass)\n'
+fi
 
 subsection "Orphan status logs (state/*.status without matching .meta)"
 ORPHAN_STATUS_FOUND=0

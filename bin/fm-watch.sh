@@ -475,6 +475,82 @@ window_key() {  # <window>
   printf '%s' "${key//./_}"
 }
 
+# --- remote workers (bin/fm-remote-task.sh, docs/remote-workers.md) --------
+# Once per pass, for each configured machine with a live remote task: start the
+# courier in the background at most every FM_REMOTE_SYNC_SECS (default 30) and
+# never wait for it; its results are ordinary file changes a later pass reads.
+# The link record it keeps gates every remote task below: anything but
+# `reachable` skips that machine's tasks entirely (no stale, transition, or
+# inbox-ladder wake, no ring), never reading the outage as a dead worker. One
+# check wake fires after FM_REMOTE_DOWN_GRACE_SECS (default 600) down, one on
+# return, and one per distinct courier finding (state/<id>.remote-alert).
+FM_REMOTE_SYNC_SECS=${FM_REMOTE_SYNC_SECS:-30}
+FM_REMOTE_DOWN_GRACE_SECS=${FM_REMOTE_DOWN_GRACE_SECS:-600}
+
+remote_machines_live() {
+  local meta
+  for meta in "$STATE"/*.meta; do
+    [ -f "$meta" ] || continue
+    [ "$(fm_meta_get "$meta" backend)" = herdr-remote ] || continue
+    fm_meta_get "$meta" machine_id
+    printf '\n'
+  done | sort -u | sed '/^$/d'
+}
+
+remote_machines_pass() {
+  local mid link state since label marker t reason meta id alert seen
+  while IFS= read -r mid; do
+    [ -n "$mid" ] || continue
+    if [ "$(age_of "$STATE/.remote-sync-$mid.last")" -ge "$FM_REMOTE_SYNC_SECS" ]; then
+      touch "$STATE/.remote-sync-$mid.last"
+      FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" FM_CONFIG_OVERRIDE="$CONFIG" \
+        nohup "$FM_ROOT/bin/fm-remote-task.sh" sync "$mid" </dev/null >/dev/null 2>&1 &
+    fi
+    link="$STATE/.remote-link-$mid"
+    [ -f "$link" ] || continue
+    state=$(fm_meta_get "$link" state)
+    since=$(fm_meta_get "$link" since)
+    marker="$STATE/.remote-link-$mid.alerted"
+    label=$mid
+    for meta in "$STATE"/*.meta; do
+      [ "$(fm_meta_get "$meta" machine_id 2>/dev/null)" = "$mid" ] || continue
+      label=$(fm_meta_get "$meta" machine_label); break
+    done
+    t=$(date +%s)
+    case "$since" in ''|*[!0-9]*) since=$t ;; esac
+    if [ "$state" != reachable ] && [ $((t - since)) -ge "$FM_REMOTE_DOWN_GRACE_SECS" ] && [ ! -e "$marker" ]; then
+      reason="check: remote machine $label has been $state for $(( (t - since) / 60 )) min with live remote tasks; their state is unknown, nothing was relaunched or cleaned up ($(fm_meta_get "$link" reason))"
+      fm_wake_append check "remote-link-$mid" "$reason" || exit 1
+      : > "$marker"
+      wake "$reason"
+    elif [ "$state" = reachable ] && [ -e "$marker" ]; then
+      reason="check: remote machine $label is reachable again; queued instructions are being placed and status lines and commits are catching up"
+      fm_wake_append check "remote-link-$mid" "$reason" || exit 1
+      rm -f "$marker"
+      wake "$reason"
+    fi
+  done < <(remote_machines_live)
+  for alert in "$STATE"/*.remote-alert; do
+    [ -f "$alert" ] || continue
+    id=${alert##*/}; id=${id%.remote-alert}
+    seen="$STATE/$id.remote-alert-seen"
+    [ "$(cat "$alert")" != "$(cat "$seen" 2>/dev/null)" ] || continue
+    reason="check: remote task $id: $(head -n1 "$alert")"
+    fm_wake_append check "remote-alert-$id" "$reason" || exit 1
+    cp -f "$alert" "$seen"
+    wake "$reason"
+  done
+}
+
+# 0 when the remote task behind <window> may be supervised this pass: its
+# machine reads reachable and its remote folder is not missing.
+remote_task_supervisable() {  # <window> <task>
+  local mid
+  mid=$(fm_meta_get "$STATE/$2.meta" machine_id)
+  [ "$(fm_meta_get "$STATE/.remote-link-$mid" state)" = reachable ] || return 1
+  [ ! -e "$STATE/$2.remote-missing" ]
+}
+
 inbox_steer_escalate_unavailable() {  # <window> <task> <record>
   local w=$1 task=$2 rec=$3 reason
   reason="stale: $w (unread firstmate instruction: $rec is unhandled and the worker's agent has exited or its endpoint is missing, so the doorbell was not typed; recover the worker)"
@@ -514,6 +590,10 @@ inbox_steer_check() {  # <window> <task>
       ;;
   esac
   backend=$(window_backend "$w")
+  # A remote record rings only once the courier confirmed it placed remotely.
+  if [ "$backend" = herdr-remote ] && [ ! -e "$STATE/$task.remote-placed/${rec##*/}" ]; then
+    return 0
+  fi
   agent_state=$(fm_backend_agent_state "$backend" "$w" 2>/dev/null || true)
   case "$agent_state" in
     dead|missing)
@@ -2839,6 +2919,8 @@ EOF
     fi
   fi
 
+  remote_machines_pass
+
   # Herdr uses agent status and the native blocked transition handler.
   # The tmux fallback uses pane staleness. Two consecutive identical hashes with no busy
   # signature means the crewmate finished, is waiting, or is wedged. Each distinct
@@ -2848,6 +2930,12 @@ EOF
   while IFS= read -r w; do
     kind=$(window_kind "$w")
     task=$(window_to_task "$w" "$STATE")
+    # A remote task whose machine is not reachable is skipped whole: no inbox,
+    # stale, or transition check reads an outage as a stopped worker. A
+    # reachable one takes the pane-staleness path below like a tmux pane.
+    if [ "$(window_backend "$w")" = herdr-remote ] && ! remote_task_supervisable "$w" "$task"; then
+      continue
+    fi
     # Steering-inbox loss detection runs before the secondmate stale
     # exemption below, because a mate's steers land in an inbox too.
     [ -z "$task" ] || inbox_steer_check "$w" "$task"

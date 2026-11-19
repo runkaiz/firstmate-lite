@@ -63,6 +63,8 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-agent-process-lib.sh` | Backend-neutral harness-process name classifier shared by the tmux and herdr adapters |
 | `backends/herdr.sh`      | Herdr session-provider adapter, the default backend, with its own required CI lane   |
 | `backends/tmux.sh`       | Verified tmux session-provider adapter, the fallback backend                         |
+| `backends/herdr-remote.sh` | Remote-worker adapter: `config/remote-machines`, machine-routed Herdr calls, remote liveness, and the focus-safe close |
+| `fm-remote-task.sh`      | Remote-worker spawn, courier sync, guarded publication, resumable remote retirement, and relaunch |
 | `fm-project-mode.sh`     | Resolve a project's registered delivery posture, forge binding, or ship-branch prefix from `data/projects.md`, or check its clone's origin for CI workflows, for fleet sync, home seeding, and the forge agreement a ship spawn or scout promotion applies |
 | `fm-merge-local.sh`      | Fast-forward a `local-only` project's local default branch after approval            |
 | `fm-review-diff.sh`      | Review a crewmate branch or resolved PR head against the authoritative base          |

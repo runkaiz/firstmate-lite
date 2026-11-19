@@ -16,7 +16,7 @@
 # --delivery-surface <internal-only|product-facing|mixed|unknown> records the
 # per-task semantic intake result (default unknown); never infer it from paths.
 # bin/fm-delivery-record.py owns the conditional PR record and trust limits.
-# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--herdr-lab] [--quote <report-path>#<heading> ...]
+# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--delivery-surface <internal-only|product-facing|mixed|unknown>] [--branch-prefix <prefix>] [--base-branch <branch>] [--machine <label>] [--herdr-lab] [--quote <report-path>#<heading> ...]
 #        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab] [--quote <report-path>#<heading> ...]
 # --quote is repeatable and embeds a named Markdown section verbatim under
 # "# Source quotes", outside captain intent and Firstmate specification.
@@ -71,6 +71,11 @@
 # Definition of done then targets that branch with its pull request.
 # bin/fm-dod-lib.sh's fm_base_branch_valid owns which deliveries accept one.
 # --forge accepts only none; alternate hosting integrations are unsupported.
+# --machine <label> scaffolds a remote worker's ship brief for a machine in
+# config/remote-machines (local-only or direct-PR only): its status file, inbox,
+# and scratch paths are on that machine, the copy is already on the task branch,
+# and bin/fm-dod-lib.sh's fm_remote_dod_block owns its delivery contract.
+# docs/remote-workers.md owns the remote-worker contract.
 # --upstream-consent <host>/<owner>/<repo> records the captain's one-off
 # approval for this one task to publish to that repository when it is
 # firstmate's own upstream. It renders as an `upstream-consent=` token on the
@@ -212,6 +217,7 @@ UPSTREAM_CONSENT=
 UPSTREAM_CONSENT_SET=0
 PROJECT_DIR=
 PROJECT_DIR_SET=0
+MACHINE=
 QUOTES=()
 QUOTE_SET=0
 POS=()
@@ -230,6 +236,7 @@ for a in "$@"; do
       shape) SHAPE_SET=1 ;;
       upstream-consent) UPSTREAM_CONSENT=$a; UPSTREAM_CONSENT_SET=1 ;;
       project) PROJECT_DIR=$a; PROJECT_DIR_SET=1 ;;
+      machine) MACHINE=$a ;;
       quote) QUOTES+=("$a"); QUOTE_SET=1 ;;
       *) echo "error: internal parser state for --$want_value" >&2; exit 1 ;;
     esac
@@ -256,6 +263,7 @@ for a in "$@"; do
     --upstream-consent) want_value="upstream-consent" ;;
     --upstream-consent=*) UPSTREAM_CONSENT=${a#--upstream-consent=}; UPSTREAM_CONSENT_SET=1 ;;
     --project) want_value="project" ;;
+    --machine) want_value=machine ;;
     --project=*) PROJECT_DIR=${a#--project=}; PROJECT_DIR_SET=1 ;;
     --quote) want_value=quote ;;
     --quote=*) QUOTES+=("${a#--quote=}"); QUOTE_SET=1 ;;
@@ -362,7 +370,26 @@ if [ "$KIND" = ship ] && [ "$MODE" != local-only ] && [ "$PROJECT_DIR_SET" -eq 1
       ;;
   esac
 fi
+REMOTE_CHANNEL=
+if [ -n "$MACHINE" ]; then
+  [ "$KIND" = ship ] || { echo "error: --machine applies only to ship briefs" >&2; exit 1; }
+  case "$MODE" in local-only|direct-PR) ;; *) echo "error: a remote worker ships only local-only or direct-PR; no-mistakes delivery is not supported for remote tasks yet" >&2; exit 1 ;; esac
+  [ "$UPSTREAM_CONSENT_SET" -eq 0 ] || { echo "error: --upstream-consent is not supported for remote workers" >&2; exit 1; }
+  # shellcheck source=bin/fm-backend.sh
+  FM_CONFIG_OVERRIDE="$CONFIG" . "$SCRIPT_DIR/fm-backend.sh"
+  FM_CONFIG_OVERRIDE="$CONFIG" fm_backend_source herdr-remote || { echo "error: the remote-worker adapter could not be loaded" >&2; exit 1; }
+  fm_remote_machine_lookup "$MACHINE" "$CONFIG" || exit 1
+  MACHINE=$FM_REMOTE_MACHINE_LABEL
+  # The brief names remote paths as shell text the worker's own shell expands.
+  # shellcheck disable=SC2016,SC2088
+  case "$FM_REMOTE_MACHINE_ROOT" in
+    '~') REMOTE_ROOT_SH='"$HOME"' ;;
+    '~/'*) REMOTE_ROOT_SH="\"\$HOME\"/${FM_REMOTE_MACHINE_ROOT#\~/}" ;;
+    *) REMOTE_ROOT_SH=$FM_REMOTE_MACHINE_ROOT ;;
+  esac
+fi
 ID=${POS[0]}
+[ -z "$MACHINE" ] || REMOTE_CHANNEL="$REMOTE_ROOT_SH/tasks/$ID/channel"
 BRANCH="$BRANCH_PREFIX$ID"
 if ! git check-ref-format --branch "$BRANCH" >/dev/null 2>&1; then
   echo "error: --branch-prefix and task id must form a valid git branch (got '$BRANCH')" >&2
@@ -413,6 +440,8 @@ if [ "$KIND" != secondmate ]; then
 fi
 
 append_resource_locks() {
+  # A remote worker's machine has no copy of this machine's lock wrappers.
+  [ -z "${MACHINE:-}" ] || return 0
   [ -n "$RESOURCE_LOCKS_SECTION" ] || return 0
   printf '\n%s\n' "$RESOURCE_LOCKS_SECTION" >> "$BRIEF"
 }
@@ -446,6 +475,15 @@ STATUS_FILE=$(shell_quote "$STATE/$ID.status")
 # second mate's, runs only the append; the watcher capture is the backstop.
 STATUS_APPEND="echo \"{state} [at=<epoch>]: {one short line}\" >> $STATUS_FILE && { [ ! -e $(shell_quote "$CONFIG/fleet-ledger") ] || $(shell_quote "$FM_ROOT/bin/fm-fleet-ledger.sh") appended $(shell_quote "$CONFIG") $STATUS_FILE >/dev/null 2>&1 || true; }"
 INBOX_DIR=$(shell_quote "$STATE/$ID.inbox")
+SCRATCH_DIR="$DATA/$ID/"
+if [ -n "$REMOTE_CHANNEL" ]; then
+  # A remote worker's channel lives on its machine; the courier imports the
+  # status lines, so the remote append carries no ledger hook.
+  STATUS_FILE="$REMOTE_CHANNEL/status"
+  STATUS_APPEND="echo \"{state} [at=<epoch>]: {one short line}\" >> $STATUS_FILE"
+  INBOX_DIR="$REMOTE_CHANNEL/inbox"
+  SCRATCH_DIR="$REMOTE_CHANNEL/scratch/"
+fi
 
 # The receive-and-ack half of the steering-inbox contract, included in every
 # scaffold kind. The record format, doorbell line, and re-ring ladder are
@@ -577,6 +615,11 @@ else
   SETUP_BASE="You are in a disposable git worktree of $REPO, at a detached HEAD on a clean default branch."
 fi
 
+if [ -n "$MACHINE" ]; then
+  SETUP_BASE="You are in a disposable git worktree of $REPO on remote machine $MACHINE, on your task branch at a clean copy of its base.${BASE_BRANCH:+
+Base branch: $BASE_BRANCH}"
+fi
+
 if [ "$KIND" = scout ]; then
 if "$SCRIPT_DIR/fm-bootstrap.sh" lavish-compatible >/dev/null 2>&1; then
   LAVISH_LINE='If your deliverable is a visual artifact the captain will review and iterate on, use the lavish-axi rule: arm your board with bin/fm-procevent-lavish.sh arm <artifact.html> --for <task-id>; never run lavish-axi poll yourself. Re-arm with the reply after each nonterminal round to acknowledge it, route the board feedback through your steering inbox, write needs-decision [key=board-review] with the live board URL when the captain owes a decision, and stop at session_ended or an empty End without re-arming - acknowledge that final round with bin/fm-procevent.sh handled <source-id> <sequence> to conclude and retire your board.'
@@ -655,8 +698,16 @@ case "$MODE" in
 2. Run \`no-mistakes doctor\`; if it reports the repo is not initialized here, run \`no-mistakes init\`."
     ;;
 esac
+SETUP_STEP1="1. First action: create your branch: \`git checkout -b $BRANCH_Q --\`"
+if [ -n "$MACHINE" ]; then
+  SETUP_STEP1="1. Your copy is already on its branch \`$BRANCH\` and has no remote; confirm with \`git status\` and commit only there."
+  FORGE_RULE_LINE="Do not use gh, git push, or any other forge access from this machine; firstmate does every forge operation. There is no browser tool here; report a needed browser action instead of installing one."
+  RULE1=$(fm_remote_ship_rule_one "$MODE" "$BRANCH") || exit 1
+  DOD=$(fm_remote_dod_block "$MODE" "$BRANCH" "$MACHINE" "$REMOTE_CHANNEL") || exit 1
+else
 RULE1=$(fm_ship_rule_one "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH") || exit 1
 DOD=$(fm_dod_block "$MODE" "$ID" "$BRANCH" "$FORGE" "$BASE_BRANCH" "$UPSTREAM_CONSENT" "$DELIVERY_SURFACE") || exit 1
+fi
 
 cat > "$BRIEF" <<EOF
 You are a crewmate: an autonomous worker agent managed by firstmate. Work on your own; do not wait for a human.
@@ -674,11 +725,11 @@ $SETUP_BASE
 The path check is authoritative: \`git rev-parse --git-dir\` and \`git rev-parse --git-common-dir\` can help inspect the repo, but they do not prove you are outside the primary checkout.
 If the top-level path is the primary checkout or not the worktree you were launched in, STOP - do not branch or commit here - append \`blocked [at=<epoch>]: launched in primary checkout, not an isolated worktree\` to the status file and stop.
 
-1. First action: create your branch: \`git checkout -b $BRANCH_Q --\`$SETUP2
+$SETUP_STEP1$SETUP2
 
 # Rules
 $RULE1
-2. Keep project edits inside this worktree; keep proof and scratch output outside it, under \`$DATA/$ID/\` or a temporary directory.
+2. Keep project edits inside this worktree; keep proof and scratch output outside it, under \`$SCRATCH_DIR\` or a temporary directory.
    Outside the worktree, write only that task material and the status and steering-inbox records authorized below.
    Leave the worktree clean before reporting done.
    When clearing scratch folders, use a guarded explicit path such as \`rm -rf -- "\${DIR:?}/sub"\`, never \`cd\` then \`rm -rf\` with a relative glob.

@@ -57,9 +57,9 @@
 # restating the rule.
 # Every heredoc here stays outside a command substitution: `VAR=$(cat <<EOF ...)`
 # breaks parsing of the whole file on Bash 3.2 (tests/fm-brief.test.sh).
-# fm_brief_worker_role owns the ship/scout role scope. bin/fm-spawn.sh is its one
+# fm_brief_worker_role owns the ship/scout role scope. bin/fm-spawn.sh is its
 # emitter, supplying it first in every ship/scout launch brief and never to a
-# secondmate charter. It names the one task-owned steering inbox without
+# secondmate charter; bin/fm-remote-task.sh passes a remote worker's own inbox. It names the one task-owned steering inbox without
 # relaxing isolation from every other home's endpoint namespace. Like
 # fm_brief_intent_overlay it is a distinctly titled launch section that states
 # its own precedence, so a brief or project instruction that authors a
@@ -84,15 +84,15 @@
 # shellcheck source=bin/fm-brief-heading-lib.sh
 . "$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd "${d:-/}" && pwd)/fm-brief-heading-lib.sh"
 
-fm_brief_worker_role() {  # <state-dir> <task-id> <code-root>
-  local state=$1 task_id=$2 root=$3
+fm_brief_worker_role() {  # <state-dir> <task-id> <code-root> [inbox-path]
+  local root=$3 inbox=${4:-$1/$2.inbox}
   cat <<'EOF'
 # Current worker role contract
 You are a crewmate: an autonomous worker agent managed by firstmate.
 This section establishes your current identity before every project or task instruction below and supersedes any conflicting role identity in those instructions.
 Do the assigned work yourself and report only to firstmate; do not adopt a firstmate or secondmate supervisor identity, delegate the task, run fleet supervision, or address the captain.
 EOF
-  printf "Your steering inbox is \`%s/%s.inbox\`; this exact path belongs to your current task even when it is outside the worktree or under the supervising firstmate home, so read and acknowledge its messages and do not reject it as another home's state.\n" "$state" "$task_id"
+  printf "Your steering inbox is \`%s\`; this exact path belongs to your current task even when it is outside the worktree or under the supervising firstmate home, so read and acknowledge its messages and do not reject it as another home's state.\n" "$inbox"
   cat <<'EOF'
 Never inspect or change any other home's endpoint namespace; this authorization is limited to the exact task paths named by this brief.
 When this task works on Firstmate itself, the repository root `AGENTS.md` (also imported by `CLAUDE.md`) is project content and the supervisor contract for the firstmate managing you: follow this brief instead of that supervisor contract.
@@ -171,6 +171,50 @@ fm_ship_rule_one() {  # <no-mistakes|direct-PR|local-only> <task-id> [branch] [<
       echo "error: fm_ship_rule_one: unknown delivery mode '$mode'" >&2
       return 1
       ;;
+  esac
+}
+
+# fm_remote_ship_rule_one and fm_remote_dod_block own the delivery contract of a
+# remote worker (docs/remote-workers.md): its copy has no remote, firstmate
+# imports every commit as a fast-forward, and only firstmate publishes. The
+# Delivery contract and Ship branch lines match an ordinary ship brief, and the
+# `Remote machine:` line is what bin/fm-remote-task.sh spawn requires.
+fm_remote_ship_rule_one() {  # <direct-PR|local-only> <branch>
+  case "$1" in
+    local-only) printf '%s\n' "1. Your copy has no remote: never push, never open a PR, never merge. Work only on your \`$2\` branch; firstmate imports your commits and handles the merge into local \`main\`." ;;
+    direct-PR) printf '%s\n' "1. Your copy has no remote: never push, never open or merge a PR, and never reach the forge from this machine. Firstmate publishes exactly the commit you request (Definition of done)." ;;
+    *) echo "error: fm_remote_ship_rule_one: unsupported remote delivery mode '$1'" >&2; return 1 ;;
+  esac
+}
+
+fm_remote_dod_block() {  # <direct-PR|local-only> <branch> <machine-label> <channel-dir-shell-expr>
+  local mode=$1 branch=$2 label=$3 channel=$4
+  cat <<EOF
+# Definition of done
+Delivery contract: mode=$mode
+Ship branch: $branch
+Remote machine: $label
+The task is complete only when committed on your branch \`$branch\`, which your copy is already on.
+Never rewrite its history (no rebase, amend, squash, or reset of a commit): firstmate imports every commit as a fast-forward and refuses anything else. If the base moved, firstmate tells you what to do; merge, never rebase.
+Before any completion line, leave the copy clean - no staged, untracked, or ignored files, no stash, still on \`$branch\` - because cleanup refuses work that exists only on this machine.
+EOF
+  case "$mode" in
+    local-only)
+      cat <<EOF
+When it is implemented and committed, append \`done [at=<epoch>]: ready in branch $branch\` to the status file and stop.
+The configured merge authority approves the ready branch, then firstmate merges it into local \`main\` through the guarded fast-forward path.
+EOF
+      ;;
+    direct-PR)
+      cat <<EOF
+When it is implemented and committed, write the PR text to \`$channel/publish/<sha>.md\`, where \`<sha>\` is the full \`git rev-parse HEAD\`: the PR title on the first line, a blank line, then the body.
+Then append \`paused [at=<epoch>] [key=publish-<first 12 characters of sha>]: publication requested for <sha>\` to the status file and stop.
+Never write \`done:\` yourself: firstmate imports that exact commit, pushes it, opens the ready PR, records the done line, and tells you the PR URL.
+For a review fix, commit, write a new \`publish/<sha>.md\`, and request publication again the same way.
+The configured merge authority decides whether to merge the PR; firstmate relays the outcome.
+EOF
+      ;;
+    *) echo "error: fm_remote_dod_block: unsupported remote delivery mode '$mode'" >&2; return 1 ;;
   esac
 }
 

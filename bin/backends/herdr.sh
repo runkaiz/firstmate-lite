@@ -387,9 +387,26 @@ fm_backend_herdr_workspace_label() {
 # compatible if a future herdr build honors it. Never used by
 # fm_backend_herdr_version_check, which is intentionally session-independent
 # (reads only .client.* fields).
+# A <session> listed in FM_BACKEND_HERDR_MACHINES is instead a saved Herdr
+# machine profile id (bin/backends/herdr-remote.sh owns that list and the
+# remote-worker contract): the call becomes a bounded `herdr --machine <id>`
+# forward, never combined with --session, and never starts a server.
+fm_backend_herdr_is_machine() {  # <session>
+  case "$1" in ''|*[[:space:]]*) return 1 ;; esac
+  case " ${FM_BACKEND_HERDR_MACHINES:-} " in
+    *" $1 "*) return 0 ;;
+  esac
+  return 1
+}
+
 fm_backend_herdr_cli() {  # <session> <herdr-subcommand-and-args...>
   local session=$1 rc=0 err failed_bin selected_bin client_bin=herdr
   shift
+  if fm_backend_herdr_is_machine "$session"; then
+    [ "${1:-}" != server ] || return 1
+    fm_run_timed "${FM_REMOTE_HERDR_TIMEOUT:-15}" herdr --machine "$session" "$@"
+    return $?
+  fi
   local -a runner=()
   # A desktop notice must not delay delivery of its durable wake.
   [ "${1:-}" != notification ] || runner=(fm_run_timed 2)
@@ -3062,11 +3079,15 @@ fm_backend_herdr_parse_target() {  # <target>
 # and fail fast on inactive or bad targets without starting a new server.
 fm_backend_herdr_target_observable() {  # <target>
   fm_backend_herdr_parse_target "$1" || return 1
+  ! fm_backend_herdr_is_machine "$FM_BACKEND_HERDR_SESSION" || return 0
   [ "$(fm_backend_herdr_server_running_state "$FM_BACKEND_HERDR_SESSION")" = running ]
 }
 
+# A machine target is never ensured: forwarding cannot start a remote server,
+# so the forwarded call itself is the only reachability evidence.
 fm_backend_herdr_target_ready() {  # <target>
   fm_backend_herdr_parse_target "$1" || return 1
+  ! fm_backend_herdr_is_machine "$FM_BACKEND_HERDR_SESSION" || return 0
   fm_backend_herdr_server_ensure "$FM_BACKEND_HERDR_SESSION" || return 1
 }
 

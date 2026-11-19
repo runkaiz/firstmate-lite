@@ -40,8 +40,11 @@ FM_BACKEND_CONFIG_DIR="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
 # section 4's harness-verification discipline. herdr has its own required CI
 # lane, with current coverage in docs/herdr-backend.md and
 # docs/verification/runtime-backends.md.
-FM_BACKEND_KNOWN="tmux herdr"
+FM_BACKEND_KNOWN="tmux herdr herdr-remote"
 FM_BACKEND_SPAWN="tmux herdr"
+# herdr-remote (bin/backends/herdr-remote.sh, docs/remote-workers.md) is known
+# but not in the spawn list: a remote task is created only through
+# `bin/fm-spawn.sh --machine`, which hands it to bin/fm-remote-task.sh.
 # Backends Firstmate-lite once shipped and removed. Only fm_backend_validate
 # reads this list, to turn a stale selection into a plain switch message.
 FM_BACKEND_REMOVED="zellij cmux orca"
@@ -152,6 +155,7 @@ fm_backend_required_tools() {  # <backend>
   case "$1" in
     tmux)   printf '%s' 'tmux treehouse' ;;
     herdr)  printf '%s' 'herdr jq treehouse' ;;
+    herdr-remote) printf '%s' 'herdr jq ssh git' ;;
     *) return 1 ;;
   esac
 }
@@ -305,6 +309,22 @@ fm_backend_validate_task_endpoint() {  # <meta-file> <task-id>
         return 1
       fi
       ;;
+    herdr-remote)
+      recorded_session=$(fm_backend_meta_exact_value "$meta" machine_id) || recorded_session=
+      workspace=$(fm_backend_meta_exact_value "$meta" herdr_workspace_id) || workspace=
+      tab=$(fm_backend_meta_exact_value "$meta" herdr_tab_id) || tab=
+      pane=$(fm_backend_meta_exact_value "$meta" herdr_pane_id) || pane=
+      if [ "$binding" != "$id" ] || [ -z "$recorded_session" ] || [ -z "$workspace" ] \
+        || [ -z "$tab" ] || [ -z "$pane" ] \
+        || [ "$window" != "$recorded_session:$pane" ] \
+        || ! fm_backend_endpoint_atom_valid "$recorded_session" \
+        || ! fm_backend_endpoint_atom_valid "$workspace" \
+        || ! fm_backend_endpoint_atom_valid "${tab//:/_}" \
+        || ! fm_backend_endpoint_atom_valid "${pane//:/_}"; then
+        echo "REFUSED: remote Herdr endpoint metadata for task $id is malformed or inconsistent; preserving task state." >&2
+        return 1
+      fi
+      ;;
   esac
   # shellcheck disable=SC2034 # Output globals are consumed by sourcing callers.
   FM_BACKEND_VALIDATED_BACKEND=$backend
@@ -391,8 +411,8 @@ fm_backend_source() {  # <name>
     tmux)
       set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
       ;;
-    herdr)
-      set -- fm-composer-lib.sh fm-transition-lib.sh fm-agent-process-lib.sh fm-session-lock-lib.sh fm-gemini-lib.sh
+    herdr|herdr-remote)
+      set -- fm-composer-lib.sh fm-transition-lib.sh fm-agent-process-lib.sh fm-session-lock-lib.sh fm-gemini-lib.sh backends/herdr.sh
       ;;
     *)
       return 1
@@ -416,6 +436,14 @@ fm_backend_source() {  # <name>
         # shellcheck source=/dev/null
         . "$adapter" || return 1
         _FM_BACKEND_HERDR_SOURCED=1
+      fi
+      ;;
+    herdr-remote)
+      if [ -z "${_FM_BACKEND_HERDR_REMOTE_SOURCED:-}" ]; then
+        # shellcheck source=/dev/null
+        . "$adapter" || return 1
+        _FM_BACKEND_HERDR_SOURCED=1
+        _FM_BACKEND_HERDR_REMOTE_SOURCED=1
       fi
       ;;
   esac
@@ -484,6 +512,7 @@ fm_backend_capture() {  # <backend> <target> <lines> [expected-label]
   case "$backend" in
     tmux) fm_backend_tmux_capture "$@" ;;
     herdr) fm_backend_herdr_capture "$@" ;;
+    herdr-remote) fm_backend_herdr_remote_capture "$@" ;;
     *) echo "error: no capture implementation for backend '$backend'" >&2; return 1 ;;
   esac
 }
@@ -491,7 +520,7 @@ fm_backend_capture() {  # <backend> <target> <lines> [expected-label]
 # FM_BACKEND_VISIBLE_CAPTURE: backends with a verified viewport-only read, each
 # implementing fm_backend_<name>_visible_capture. This one list answers both the
 # capability question and the dispatch, so they cannot disagree.
-FM_BACKEND_VISIBLE_CAPTURE="tmux herdr"
+FM_BACKEND_VISIBLE_CAPTURE="tmux herdr herdr-remote"
 
 # fm_backend_visible_capture_supported: whether <backend> can read the visible
 # viewport WITHOUT scrollback. Callers that must not mistake a scrolled-away
@@ -511,7 +540,7 @@ fm_backend_visible_capture() {  # <backend> <target> [expected-label]
     return 1
   }
   fm_backend_source "$backend" || return 1
-  "fm_backend_${backend}_visible_capture" "$@"
+  "fm_backend_${backend//-/_}_visible_capture" "$@"
 }
 
 # fm_backend_send_key: one backend-supported named special key.
@@ -522,6 +551,7 @@ fm_backend_send_key() {  # <backend> <target> <key> [expected-label]
   case "$backend" in
     tmux) fm_backend_tmux_send_key "$@" ;;
     herdr) fm_backend_herdr_send_key "$@" ;;
+    herdr-remote) fm_backend_herdr_remote_send_key "$@" ;;
     *) echo "error: no send-key implementation for backend '$backend'" >&2; return 1 ;;
   esac
 }
@@ -559,6 +589,7 @@ fm_backend_send_text_submit() {  # <backend> <target> <text> <retries> <enter-sl
   case "$backend" in
     tmux) fm_backend_tmux_send_text_submit "$@" || rc=$? ;;
     herdr) fm_backend_herdr_send_text_submit "$@" || rc=$? ;;
+    herdr-remote) fm_backend_herdr_remote_send_text_submit "$@" || rc=$? ;;
     *) echo "error: no send-text implementation for backend '$backend'" >&2; rc=1 ;;
   esac
   fm_composer_dialog_sink_release
@@ -584,6 +615,7 @@ fm_backend_kill() {  # <backend> <target>
   case "$backend" in
     tmux) fm_backend_tmux_kill "$@" ;;
     herdr) fm_backend_herdr_kill "$@" ;;
+    herdr-remote) fm_backend_herdr_remote_kill "$@" ;;
     *) echo "error: no kill implementation for backend '$backend'" >&2; return 1 ;;
   esac
 }
@@ -596,6 +628,7 @@ fm_backend_busy_state() {  # <backend> <target>
   fm_backend_source "$backend" || { printf 'unknown'; return 0; }
   case "$backend" in
     herdr) fm_backend_herdr_busy_state "$@" ;;
+    herdr-remote) fm_backend_herdr_remote_busy_state "$@" ;;
     *) printf 'unknown' ;;
   esac
 }
@@ -618,6 +651,7 @@ fm_backend_composer_state() {  # <backend> <target> [expected-label] -> empty|pe
   case "$backend" in
     tmux) fm_tmux_composer_state "$@" ;;
     herdr) fm_backend_herdr_composer_state "$@" ;;
+    herdr-remote) fm_backend_herdr_remote_composer_state "$@" ;;
     *) printf 'unknown' ;;
   esac
 }
@@ -654,6 +688,10 @@ fm_backend_target_exists() {  # <backend> <target>
       # a DIFFERENT one than the target's.
       fm_backend_herdr_cli "$session" pane get "$pane" >/dev/null 2>&1
       ;;
+    herdr-remote)
+      fm_backend_source herdr-remote || return 1
+      fm_backend_herdr_remote_target_exists "$target"
+      ;;
     *)
       return 1
       ;;
@@ -684,6 +722,7 @@ fm_backend_agent_state() {  # <backend> <target>
   case "$backend" in
     tmux) fm_backend_tmux_agent_state "$target" ;;
     herdr) fm_backend_herdr_agent_state "$target" ;;
+    herdr-remote) fm_backend_herdr_remote_agent_state "$target" ;;
     *) printf 'unverified' ;;
   esac
 }

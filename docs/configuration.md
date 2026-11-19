@@ -13,6 +13,7 @@ Start with the directory layout, then use the setting reference for the behavior
 | Backlog, preferences, and memory | [Backlog backend](#backlog-backend-taskstoml--configbacklog-backend), [captain preferences](#captain-preferences-datacaptainmd--datacaptain-sharedmd), [external memory tiers](#external-memory-tiers-memory-layering-section), and [startup memory budget](#startup-memory-budget-configstartup-memory-budget) |
 | Supervision and presentation | [Pi supervision branch](#pi-supervision-branch), [supervision host](#supervision-host-configsupervision-host), and [Calm preference](#calm-preference-configcalm) |
 | Remote command routes | [Remote command routes](#remote-commands-configremote-routes) |
+| Workers on another machine | [`docs/remote-workers.md`](remote-workers.md) (`config/remote-machines`) |
 | Per-run overrides and tuning | [Environment variables](#environment-variables) |
 
 ## FM_HOME
@@ -431,6 +432,7 @@ For spawn-capable adapters, the runtime session-provider backend controls where 
 | --- | --- | --- |
 | `herdr` | Default and recommended; has its own required CI lane | [`docs/herdr-backend.md`](herdr-backend.md) |
 | `tmux` | Simple fallback; verified reference backend | [`docs/tmux-backend.md`](tmux-backend.md) |
+| `herdr-remote` | A worker in another machine's Herdr, opted in per machine by `config/remote-machines` and per task by `--machine`; never selected by the order below | [`docs/remote-workers.md`](remote-workers.md) |
 
 Worktree providers are selected separately as described in [Task worktree allocator](#task-worktree-allocator-configworktree-allocator).
 
