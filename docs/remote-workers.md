@@ -40,6 +40,7 @@ Each pass imports, in this order:
 1. **Commits.** The remote branch is fetched into `refs/firstmate/remote/<id>`, a detached remote `HEAD` into `refs/firstmate/remote/<id>-head`, and the landing copy here is fast-forwarded onto the named branch and checked out on it.
    A failed custody check defers status import until recovery; a non-fast-forward is never forced.
 2. **Status lines.** Only complete lines are imported, exactly once, through a per-task journal that survives a crash at any step.
+   Local answer and publication events finish any interrupted import before appending their own events.
    A replaced or shortened remote log stops import for that task and raises a finding; the offset is never reset silently.
 3. **Instructions.** `bin/fm-send.sh` only queues a remote steer here.
    The courier places it remotely once (a receipt directory makes a retry harmless), rings the doorbell only after placement is confirmed, and moves the local record to `handled/` when the worker acknowledges it remotely.

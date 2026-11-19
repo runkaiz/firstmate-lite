@@ -2635,11 +2635,23 @@ fm_wake_status_mark_current() {  # <state> <status-file>
 # compare exact bytes.
 # Returns 0 appended and self-announced, 1 appended but left for the watcher
 # (the safe direction), 2 the append itself failed.
-fm_wake_status_append_self_announced() {  # <state> <status-file> <line>...
+fm_wake_status_append_self_announced() (  # <state> <status-file> <line>...
   local state=$1 file=$2 line appended=0 pre_size='' pre_ident='' post_size post_ident
-  local classified folded lag span_rc=0
+  local classified folded lag span_rc=0 id lock
   local LC_ALL=C stamped=()
   shift 2
+  id=${file##*/}
+  id=${id%.status}
+  if [ "$file" = "$state/$id.status" ] && { [ -f "$state/$id.remote" ] || [ -f "$state/$id.remote-journal" ]; }; then
+    if ! declare -F fm_remote_status_recover_locked >/dev/null 2>&1; then
+      . "$FM_WAKE_LIB_DIR/fm-backend.sh" || return 2
+      fm_backend_source herdr-remote || return 2
+    fi
+    lock="$state/.remote-import-$id.lock"
+    fm_lock_acquire_wait "$lock" || return 2
+    trap 'fm_lock_release "$lock"' EXIT
+    fm_remote_status_recover_locked "$state" "$id" || return 2
+  fi
   _fm_wake_require_classify || return 1
   for line in "$@"; do
     stamped+=("$(status_stamp_line "$line")")
@@ -2678,7 +2690,7 @@ EOF
   [ "$span_rc" -eq 1 ] || return 1
   fm_wake_status_seen_commit "$state" "$file" "$post_size" "$post_ident" || return 1
   return 0
-}
+)
 
 # Map one structurally valid signal key to its home-local status filename.
 # Queue payload text is intentionally ignored: it is display data, not a path

@@ -79,10 +79,6 @@ die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 q() { printf '%q' "$1"; }
 now() { date +%s; }
 
-sha256_stdin() {
-  if command -v sha256sum >/dev/null 2>&1; then sha256sum | awk '{print $1}'; else shasum -a 256 | awk '{print $1}'; fi
-}
-
 valid_id() { case "$1" in ''|.|..|*[!A-Za-z0-9._-]*) return 1 ;; esac; }
 
 rand_token() {
@@ -246,39 +242,13 @@ import_commit() {  # <branch-sha> <head-sha> <head-detached:0|1>
 
 # --- status import (design 6.4) ---------------------------------------------
 
-status_ledger_hook() {
-  [ ! -e "$CONFIG/fleet-ledger" ] || "$SCRIPT_DIR/fm-fleet-ledger.sh" appended "$CONFIG" "$STATE/$ID.status" >/dev/null 2>&1 || true
-}
-
-# Finish an interrupted append: the bytes found at the recorded local size
-# decide whether step 2 already happened.
-status_journal_recover() {
-  local j="$STATE/$ID.remote-journal" b="$STATE/$ID.remote-journal.bytes" size to prefix digest have status="$STATE/$ID.status" len
-  [ -f "$j" ] || return 0
-  [ -f "$b" ] || { rm -f -- "$j"; return 0; }
-  size=$(fm_meta_get "$j" local_size) to=$(fm_meta_get "$j" to) prefix=$(fm_meta_get "$j" prefix) digest=$(fm_meta_get "$j" digest)
-  len=$(wc -c < "$b" | tr -d ' ')
-  have=$( { [ -f "$status" ] && tail -c +"$((size + 1))" "$status" | head -c "$len"; } | sha256_stdin)
-  if [ "$have" != "$digest" ]; then
-    [ "$(wc -c < "$status" 2>/dev/null | tr -d ' ' || echo 0)" -ge "$size" ] || return 1
-    if [ "$(wc -c < "$status" | tr -d ' ')" -ne "$size" ]; then
-      alert "$ID" "status journal finds unexpected bytes after local offset $size; import stopped"
-      return 1
-    fi
-    cat "$b" >> "$status"
-    status_ledger_hook
-  fi
-  rec_set "status_offset=$to" "status_prefix=$prefix"
-  rm -f -- "$b" "$j"
-}
-
 # status_apply <gen> <from> <to> <prefix> <bytes-file>
 status_apply() {
   local gen=$1 from=$2 to=$3 prefix=$4 bytes=$5 status="$STATE/$ID.status" size digest lock
   lock="$STATE/.remote-import-$ID.lock"
   fm_lock_acquire_wait "$lock" || return 1
-  status_journal_recover || { fm_lock_release "$lock"; return 1; }
-  if [ "$from" != "$(rec_get status_offset)" ]; then
+  fm_remote_status_recover_locked "$STATE" "$ID" || { fm_lock_release "$lock"; return 1; }
+  if [ "$from" != "$(rec_get status_offset)" ] || [ "$from" = "$to" ]; then
     fm_lock_release "$lock"
     return 0
   fi
@@ -287,14 +257,14 @@ status_apply() {
     printf '\n' >> "$status"
   fi
   size=$(wc -c < "$status" | tr -d ' ')
-  digest=$(sha256_stdin < "$bytes")
+  digest=$(fm_remote_sha256_stdin < "$bytes")
   cp -f -- "$bytes" "$STATE/$ID.remote-journal.bytes"
   printf 'gen=%s\nfrom=%s\nto=%s\nprefix=%s\nlocal_size=%s\ndigest=%s\n' "$gen" "$from" "$to" "$prefix" "$size" "$digest" > "$STATE/$ID.remote-journal.tmp"
   mv -f -- "$STATE/$ID.remote-journal.tmp" "$STATE/$ID.remote-journal"
   [ -z "${FM_REMOTE_TEST_CRASH:-}" ] || [ "$FM_REMOTE_TEST_CRASH" != after-journal ] || exit 99
   cat "$bytes" >> "$status"
   [ -z "${FM_REMOTE_TEST_CRASH:-}" ] || [ "$FM_REMOTE_TEST_CRASH" != after-append ] || exit 99
-  status_ledger_hook
+  fm_remote_status_ledger_hook "$STATE" "$ID"
   rec_set "status_offset=$to" "status_prefix=$prefix"
   [ -z "${FM_REMOTE_TEST_CRASH:-}" ] || [ "$FM_REMOTE_TEST_CRASH" != after-receipt ] || exit 99
   rm -f -- "$STATE/$ID.remote-journal.bytes" "$STATE/$ID.remote-journal"
@@ -470,13 +440,11 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
       if [ "$custody_ok" = 1 ]; then
         if [ -z "$(rec_get status_gen)" ] && [ -n "$(sec_get status_gen)" ]; then rec_set "status_gen=$(sec_get status_gen)"; fi
         to=$(sec_get status_to)
-        if [ -n "$to" ] && [ "$to" != "$(rec_get status_offset)" ]; then
+        if [ -n "$to" ]; then
           tmp=$(mktemp "$STATE/.$id.remote-bytes.XXXXXX")
           sec_get status_b64 | base64 -d > "$tmp"
           status_apply "$(sec_get status_gen)" "$(rec_get status_offset)" "$to" "$(sec_get status_prefix)" "$tmp" || true
           rm -f -- "$tmp"
-        else
-          status_journal_recover || true
         fi
       fi
       ;;
@@ -959,8 +927,16 @@ publish_main() {  # <id> <sha>
   read -r head draft baseref_got state < <(gh pr view "$pr" --repo "$repo" --json headRefOid,isDraft,baseRefName,state --jq '"\(.headRefOid) \(.isDraft) \(.baseRefName) \(.state)"') || die "PR read-back failed"
   [ "$head" = "$sha" ] && [ "$draft" = false ] && [ "$baseref_got" = "$baseref" ] && [ "$state" = OPEN ] || die "PR $pr read back head=$head draft=$draft base=$baseref_got state=$state; expected head $sha, not draft, base $baseref"
   printf 'pr=%s\n' "$pr" >> "$META"
-  printf 'resolved [at=%s] [key=publish-%s]: published %s\n' "$(now)" "$sha12" "$sha" >> "$STATE/$ID.status"
-  printf 'done [at=%s]: PR %s\n' "$(now)" "$pr" >> "$STATE/$ID.status"
+  (
+    lock="$STATE/.remote-import-$ID.lock"
+    fm_lock_acquire_wait "$lock" || exit 1
+    trap 'fm_lock_release "$lock"' EXIT
+    fm_remote_status_recover_locked "$STATE" "$ID" || exit 1
+    {
+      printf 'resolved [at=%s] [key=publish-%s]: published %s\n' "$(now)" "$sha12" "$sha"
+      printf 'done [at=%s]: PR %s\n' "$(now)" "$pr"
+    } >> "$STATE/$ID.status"
+  ) || die "PR $pr was published, but its local status events could not be recorded"
   FM_HOME="$FM_HOME" "$SCRIPT_DIR/fm-send.sh" "$ID" "Firstmate published $sha as $pr (ready for review). Keep the task open for review fixes; request a new publication for any fix commit." >/dev/null 2>&1 || true
   echo "published $ID $sha as $pr"
 }
@@ -992,7 +968,7 @@ EOF
     rm -f -- "$archive"
     die "REFUSED: remote channel artifacts could not be copied"
   fi
-  digest=$(sha256_stdin < "$archive")
+  digest=$(fm_remote_sha256_stdin < "$archive")
   mv -f -- "$archive" "$DATA/$ID/remote-artifacts/$digest.tar"
   fm_remote_record_set "$STATE/$ID.remote-retire" "artifacts=$digest"
 }
@@ -1001,7 +977,7 @@ remote_proof_script() {  # [remove]
   remote_prelude "$RROOT"
   local artifacts history
   artifacts=$(fm_meta_get "$STATE/$ID.remote-retire" artifacts)
-  [ -n "$artifacts" ] && [ -f "$DATA/$ID/remote-artifacts/$artifacts.tar" ] && [ "$(sha256_stdin < "$DATA/$ID/remote-artifacts/$artifacts.tar")" = "$artifacts" ] || artifacts=
+  [ -n "$artifacts" ] && [ -f "$DATA/$ID/remote-artifacts/$artifacts.tar" ] && [ "$(fm_remote_sha256_stdin < "$DATA/$ID/remote-artifacts/$artifacts.tar")" = "$artifacts" ] || artifacts=
   history=$(git -C "$PROJ" for-each-ref --format='%(objectname)' "refs/firstmate/remote-history/$ID/")
   history=$(printf '%s' "$history" | tr '\n' ' ')
   printf 'T=%s C=%s BR=%s LAST=%s ID=%s REMOVE=%s ARTIFACTS=%s HISTORY=%s\n' "$(q "$RTASK")" "$(q "$RCACHE")" "$(q "$BRANCH")" "$(q "$(rec_get last_imported)")" "$(q "$ID")" "$(q "${1:-}")" "$(q "$artifacts")" "$(q "$history")"

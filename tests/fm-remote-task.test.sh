@@ -310,14 +310,36 @@ pass 'failed commit custody defers completion and resolves its own alert after r
 
 
 for point in after-journal after-append after-receipt; do
+  printf 'needs-decision [at=3] [key=journal-%s]: choose the continuation\n' "$point" >> "$RTASK/channel/status"
+  sync_now
   printf 'working [at=3]: %s\n' "$point" >> "$RTASK/channel/status"
   FM_REMOTE_TEST_CRASH=$point "$RT" sync pegasus >/dev/null 2>&1
   rm -rf "$ST/.remote-sync-$MID.lock" "$ST/.remote-sync-$MID".lock* 2>/dev/null
   for l in "$ST"/*.lock "$ST"/.*.lock; do [ -e "$l" ] && rm -rf "$l"; done
+  "$ROOT/bin/fm-send.sh" r1 --resolve-key "journal-$point" 'continue with the recorded plan' > "$T/resolve.out" 2>&1 || fail "local answer could not recover $point: $(cat "$T/resolve.out")"
+  [ ! -e "$ST/r1.remote-journal" ] && [ ! -e "$ST/r1.remote-journal.bytes" ] || fail "local answer left its $point journal pending"
+  python3 - "$ST/r1.status" "$point" <<'PYORDER' || fail 'local answer overtook or duplicated imported status'
+import sys
+lines = open(sys.argv[1]).read().splitlines()
+point = sys.argv[2]
+worker = [i for i, line in enumerate(lines) if line == f'working [at=3]: {point}']
+answer = [i for i, line in enumerate(lines) if line.startswith('resolved ') and f'[key=journal-{point}]' in line]
+assert len(worker) == len(answer) == 1 and worker[0] < answer[0]
+PYORDER
   sync_now
   [ "$(grep -c "working \[at=3\]: $point" "$ST/r1.status")" = 1 ] || fail "a crash $point lost or repeated the line"
+  for msg in "$RTASK"/channel/inbox/*.msg; do
+    [ -f "$msg" ] && mv "$msg" "$RTASK/channel/inbox/handled/"
+  done
+  sync_now
 done
-pass 'a crash at every import step neither loses nor repeats a status line'
+pass 'local answers recover every interrupted import before appending their close events'
+printf 'working: local task\n' > "$ST/local-append.status"
+APPEND_RC=0
+bash -c '. "$1/bin/fm-wake-lib.sh"; fm_wake_status_append_self_announced "$2" "$2/local-append.status" "resolved [key=local]: acknowledged"' _ "$ROOT" "$ST" || APPEND_RC=$?
+[ "$APPEND_RC" -le 1 ] || fail 'the ordinary local status append failed'
+[ "$(grep -c '^resolved .*\[key=local\]' "$ST/local-append.status")" = 1 ] || fail 'ordinary local append lost or repeated its event'
+
 
 cp "$RTASK/channel/status" "$T/status.save"
 head -n1 "$T/status.save" > "$RTASK/channel/status"
@@ -569,6 +591,23 @@ echo "$PSHA" > "$HERDR_DB/gh.head"; touch "$HERDR_DB/gh.lose"
 grep -q -- '--repo acme/proj --head fm/p1 --base main' "$HERDR_DB/gh.log" || fail "publish did not pass explicit --repo, --head, and --base: $(cat "$HERDR_DB/gh.log")"
 [ "$(git -C "$ORIGIN" rev-parse refs/heads/fm/p1)" = "$PSHA" ] || fail 'publish did not push exactly the verified commit'
 grep -q "^done \[at=[0-9]*\]: PR https://github.com/acme/proj/pull/7$" "$ST/p1.status" || fail 'publish did not record the done line'
+for point in after-journal after-append after-receipt; do
+  printf 'working [at=6]: publication recovery %s\n' "$point" >> "$PT/channel/status"
+  FM_REMOTE_TEST_CRASH=$point "$RT" sync pegasus >/dev/null 2>&1
+  for l in "$ST"/*.lock "$ST"/.*.lock; do [ -e "$l" ] && rm -rf "$l"; done
+  "$RT" publish p1 "$PSHA" > "$T/pub.out" 2>&1 || fail "publication could not recover $point: $(cat "$T/pub.out")"
+  [ ! -e "$ST/p1.remote-journal" ] && [ ! -e "$ST/p1.remote-journal.bytes" ] || fail "publication left its $point journal pending"
+  python3 - "$ST/p1.status" "$point" <<'PYORDER' || fail 'publication overtook or duplicated imported status'
+import sys
+lines = open(sys.argv[1]).read().splitlines()
+worker = [i for i, line in enumerate(lines) if line == f'working [at=6]: publication recovery {sys.argv[2]}']
+completed = [i for i, line in enumerate(lines) if line.startswith('done ') and 'PR https://github.com/acme/proj/pull/7' in line]
+assert len(worker) == 1 and completed and worker[0] < completed[-1]
+PYORDER
+  sync_now
+  [ "$(grep -c "publication recovery $point" "$ST/p1.status")" = 1 ] || fail 'courier replayed a journal recovered by publication'
+done
+pass 'publication recovers each interrupted import before recording its local events'
 echo true > "$HERDR_DB/gh.draft"
 if "$RT" publish p1 "$PSHA" >/dev/null 2>&1; then fail 'publish accepted a draft PR'; fi
 pass 'publication pushes only the verified commit, finds a lost PR, and refuses drafts and mismatches'

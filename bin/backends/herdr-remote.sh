@@ -201,6 +201,40 @@ fm_remote_record_set() (  # <record> <key=value>...
   mv -f -- "$tmp" "$rec"
 )
 
+fm_remote_sha256_stdin() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum | awk '{print $1}'; else shasum -a 256 | awk '{print $1}'; fi
+}
+
+fm_remote_status_ledger_hook() {
+  local state=$1 id=$2 config
+  config=$(fm_remote_config_dir)
+  [ ! -e "$config/fleet-ledger" ] || "$FM_BACKEND_HERDR_REMOTE_ROOT/bin/fm-fleet-ledger.sh" appended "$config" "$state/$id.status" >/dev/null 2>&1 || true
+}
+
+fm_remote_status_recover_locked() {
+  local state=$1 id=$2 j b size to prefix digest have status len note
+  j="$state/$id.remote-journal" b="$state/$id.remote-journal.bytes" status="$state/$id.status"
+  [ -f "$j" ] || return 0
+  [ -f "$state/$id.remote" ] || return 1
+  [ -f "$b" ] || { rm -f -- "$j"; return 0; }
+  size=$(fm_meta_get "$j" local_size) to=$(fm_meta_get "$j" to) prefix=$(fm_meta_get "$j" prefix) digest=$(fm_meta_get "$j" digest)
+  len=$(wc -c < "$b" | tr -d ' ')
+  have=$( { [ -f "$status" ] && tail -c +"$((size + 1))" "$status" | head -c "$len"; } | fm_remote_sha256_stdin)
+  if [ "$have" != "$digest" ]; then
+    [ "$(wc -c < "$status" 2>/dev/null | tr -d ' ' || echo 0)" -ge "$size" ] || return 1
+    if [ "$(wc -c < "$status" | tr -d ' ')" -ne "$size" ]; then
+      note="status journal finds unexpected bytes after local offset $size; import stopped"
+      printf '%s\n' "$note" > "$state/$id.remote-alert.tmp" && mv -f "$state/$id.remote-alert.tmp" "$state/$id.remote-alert"
+      printf 'remote alert for %s: %s\n' "$id" "$note" >&2
+      return 1
+    fi
+    cat "$b" >> "$status" || return 1
+  fi
+  fm_remote_status_ledger_hook "$state" "$id"
+  fm_remote_record_set "$state/$id.remote" "status_offset=$to" "status_prefix=$prefix" || return 1
+  rm -f -- "$b" "$j"
+}
+
 # fm_remote_task_of_target: the task id whose meta records <target>.
 fm_remote_task_of_target() {  # <target>
   local meta state
