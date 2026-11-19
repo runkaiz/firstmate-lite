@@ -15,9 +15,11 @@
 # into handled/ acknowledges reading; bin/fm-task-inbox-lib.sh owns the format
 # and the watcher's re-ring/escalation policy. A repeat send is a NEW record.
 # A failed enqueue is loud and never claims delivery.
+# Remote workers use the queue-only path owned by docs/remote-workers.md.
 #
-# TYPED: leading slash invocations, a leading dollar sign for Codex, and explicit
-# backend endpoints reach the harness parser through its verified submit core.
+# TYPED (local tasks): leading slash invocations, a leading dollar sign for
+# Codex, and explicit backend endpoints reach the harness parser through its
+# verified submit core.
 # Text is typed once and Enter may be retried; exit 0 confirms submission,
 # exit 3 means typed but unconfirmed (inspect before retrying, never blindly
 # retype), and any other nonzero means no delivery may be assumed.

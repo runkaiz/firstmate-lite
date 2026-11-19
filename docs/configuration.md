@@ -403,7 +403,7 @@ Neither a configuration compatibility check nor merging this code authorizes rew
 
 The default remains Treehouse for new task copies.
 Set `config/worktree-allocator` to `git` only after reviewing a native candidate and approving activation for that home.
-The native allocator supports tmux and Herdr, whose endpoint ownership checks are verified.
+The native allocator supports local tmux and Herdr tasks; [remote workers](remote-workers.md) use it for their landing copies here.
 Native reservation recovery and cleanup require `lsof`; tmux additionally uses `pgrep` to refuse a shell with child processes.
 
 Native allocation also requires `config/git-worktree-root`, containing one absolute directory path outside the project, its primary checkout and the active Firstmate home.
@@ -438,7 +438,7 @@ Worktree providers are selected separately as described in [Task worktree alloca
 
 ### Backend selection order
 
-New spawns choose the backend in this order:
+Local spawns choose the backend in this order:
 
 1. An explicit `--backend` flag authorized for that exact task by a present captain instruction or the task's own accepted brief.
    A later task cannot inherit that authority by analogy.
@@ -452,7 +452,8 @@ Every step is silent; select a backend by putting its name in a local `config/ba
 
 ### Accepted backends
 
-`fm-spawn.sh` accepts `herdr` and `tmux`; any other value is rejected.
+The local backend selector accepts `herdr` and `tmux`; any other value is rejected.
+The separate [remote-worker dispatch path](remote-workers.md#dispatch) selects `herdr-remote`.
 The Zellij, Orca, and cmux backends were removed; a home still configured for one gets a message to switch to `herdr` or `tmux`, and a task record left on one is preserved and refused rather than cleaned up, so close its endpoint by hand before removing the record.
 
 `codex-app` is not an accepted runtime backend yet; [`docs/codex-app-backend.md`](codex-app-backend.md) owns the Codex App boundary.

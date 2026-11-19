@@ -196,7 +196,7 @@ Runtime backends are not driven by these fixtures.
 
 Verified on 2026-11-19 with Herdr 0.9.5 (protocol 22) on both machines, Claude Code 2.1.327 on a macOS 27.2 remote reached through a saved Herdr machine profile, and Bash 3.2.57 as the remote `/bin/bash`.
 Remote liveness is harness-dependent: the courier counts processes below the recorded pane shell whose command line names `claude`, and that count alone decides `alive` versus agent-free `dead`.
-The portable regression pins the classifier with a stand-in agent; the live check is the pilot procedure in [`docs/remote-workers.md`](../remote-workers.md), run against a throwaway repository.
+The portable regression pins the classifier with a stand-in agent; [`docs/remote-workers.md`](../remote-workers.md) owns operator setup and dispatch for a throwaway-repository live pilot.
 
 ```sh
 bash bin/fm-test-run.sh tests/fm-remote-task.test.sh tests/fm-remote-watch.test.sh
@@ -213,6 +213,7 @@ after relaunch into the same copy: shell=alive descendants=2 agents=1 -> alive
 A fresh launch registers Claude workspace trust for both the copy and its `--add-dir` channel; trusting only the copy left Claude on its "Adding a new directory" prompt, whose default answer exits.
 Every generated remote script was checked with the remote machine's own `/bin/bash -n` (3.2), which rejects a `case` pattern inside a command substitution that Bash 5 accepts.
 There is no installed-harness live guard for this classifier yet; refresh this record by rerunning the pilot after a Claude Code or Herdr upgrade on the remote machine.
+Direct-PR publication remains covered by portable tests only; this live record does not establish forge publication behavior.
 
 ## Herdr shell execution before allocation
 

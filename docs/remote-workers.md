@@ -1,7 +1,7 @@
 # Remote workers
 
 A remote worker runs in a tab of another machine's Herdr server, next to that machine's tools, while its task records, the one supervision loop, the backlog, and landing stay on this machine.
-Nothing is installed on the remote machine and it makes no decisions: it holds a bare repository cache, one folder per task, and the worker's own Claude login.
+No Firstmate installation is needed on the remote machine and it makes no supervision decisions: it holds a bare repository cache, one folder per task, and uses that account's existing Claude Code installation and login.
 This page owns the operator contract; `bin/fm-remote-task.sh` (provisioning, the courier, publication, retirement) and `bin/backends/herdr-remote.sh` (machine configuration, endpoint identity, backend primitives) own the mechanics in their headers.
 
 ## What is supported
@@ -15,8 +15,8 @@ This page owns the operator contract; `bin/fm-remote-task.sh` (provisioning, the
 
 1. Save the machine in Herdr on this machine (`herdr machine add`), and confirm `herdr machine status <label> --json` reads `reachable`.
    Firstmate never adds, removes, enables, or reconnects a profile, and never starts, restarts, or replaces the remote Herdr server.
-2. List it in the private `config/remote-machines`, one line per machine: `<herdr-profile-id> <label> [<remote-root>]`.
-   The root defaults to `~/firstmate-remote`; `#` starts a comment, and a malformed line refuses every read rather than being skipped.
+2. List it in the private `config/remote-machines`; the [adapter header](../bin/backends/herdr-remote.sh) owns its row format and validation.
+   The configured id and label must match exactly one enabled saved Herdr profile.
    Firstmate never dispatches to a machine merely because Herdr knows it.
 3. The remote account needs `git`, `perl`, `python3`, `lsof`, and `ps`, a Claude Code login usable from its Herdr panes, and SSH access from this machine without a prompt.
 
@@ -25,6 +25,11 @@ This page owns the operator contract; `bin/fm-remote-task.sh` (provisioning, the
 Scaffold the brief with `bin/fm-brief.sh <id> <repo> --mode <local-only|direct-PR> --machine <label>` and spawn with `bin/fm-spawn.sh <id> <project> --machine <label> --mode <mode> --yolo <on|off>`.
 The brief's status file, inbox, and scratch space are on the remote machine, its copy is already on the task branch with no git remote, and `bin/fm-dod-lib.sh`'s `fm_remote_dod_block` owns its delivery contract.
 The worker uses the remote machine's own Claude login in `auto` permission mode; this machine's worker account pin and quota checks do not apply.
+Spawn registers Claude workspace trust for both the task copy and its channel in the remote account's `~/.claude.json`.
+
+Lifecycle actions use `bin/fm-control.sh` and require a reachable machine; exit and relaunch refresh remote process evidence before confirming a stop.
+Remote relaunch reuses the recorded Claude launch, pane, copy, and launch brief; its required progress note is queued through the steering inbox before stopping the old agent.
+The local profile-switching transaction and rollback do not apply, and a missing remote pane is not recreated.
 
 The spawn creates the tab with `--no-focus` in one remote workspace labeled `firstmate`, recorded by exact id; the captain's own workspaces are never addressed or touched.
 If focus moved onto the new tab it is moved back to the exact tab recorded just before; if it moved anywhere else it is left alone and reported.
@@ -34,7 +39,8 @@ The remote server's incarnation (its socket owner's pid and start time) is recor
 
 ## The courier
 
-`bin/fm-remote-task.sh sync <machine>` makes one SSH call per machine per pass, and the watcher starts it in the background at most every 30 seconds while that machine has live remote tasks.
+The courier batches status, instruction placement, and process observations into one SSH script per machine per pass; commit and PR-text transfers use additional connections.
+The watcher starts a pass in the background at most every 30 seconds while that machine has live remote tasks; the [courier header](../bin/fm-remote-task.sh) owns its command interface.
 Each pass imports, in this order:
 
 1. **Commits.** The remote branch is fetched into `refs/firstmate/remote/<id>`, a detached remote `HEAD` into `refs/firstmate/remote/<id>-head`, and the landing copy here is fast-forwarded onto the named branch and checked out on it.
@@ -44,7 +50,7 @@ Each pass imports, in this order:
    A replaced or shortened remote log stops import for that task and raises a finding; the offset is never reset silently.
 3. **Instructions.** `bin/fm-send.sh` only queues a remote steer here.
    The courier places it remotely once (a receipt directory makes a retry harmless), rings the doorbell only after placement is confirmed, and moves the local record to `handled/` when the worker acknowledges it remotely.
-   `bin/fm-send.sh --key` refuses a remote worker; lifecycle keys go only through `bin/fm-control.sh`, and only while the machine reads reachable; exit and relaunch refresh the remote process evidence before confirming a stop.
+   `bin/fm-send.sh --key` refuses a remote worker; see [Dispatch](#dispatch) for lifecycle control.
 4. **Process rows.** The processes below the pane shell are recorded, so liveness and the agent-free proof come from the remote machine's own process table, never from this machine's.
 
 Every finding lands in `state/<id>.remote-alert` and reaches firstmate as one check notification.
@@ -72,6 +78,7 @@ The worker commits, writes the PR text to `channel/publish/<sha>.md`, and append
 After the courier imports that commit and text, `bin/fm-remote-task.sh publish <id> <sha>` refuses unless the custody ref, the landing copy's branch, and its `HEAD` all equal `<sha>`, the copy is clean, and `<sha>` contains the recorded base.
 It then pushes exactly `<sha>` to the task branch without force, finds or opens one ready PR with explicit `--repo`, `--head`, and `--base`, reads it back, records `pr=` and the `done:` line, and tells the worker the URL.
 Remote dispatch and publication enforce the existing [Firstmate role](configuration.md#firstmate-role-configfirstmate-role) authority for publishing Firstmate itself.
+This remote path does not accept per-task contribution consent, so publishing Firstmate requires the maintainer opt-in.
 Merging stays with `bin/fm-pr-merge.sh` under the ordinary merge authority.
 A `local-only` remote ship lands through the unchanged `bin/fm-merge-local.sh`, because its commits are already on the landing copy's named branch.
 

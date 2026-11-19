@@ -75,7 +75,7 @@ Load `quota-array-dispatch` before choosing among a matched profile array; it ow
 - Preserve malformed profile configuration as an actionable error rather than selecting around it.
 - When every candidate is tight, keep the captain's strongest-reasoning class or stop and report, never silently downgrading to conserve quota; break genuine ties without array-order or harness bias.
 
-Dispatch only on a backend `fm-spawn` validates as spawn-capable, with an explicit `--backend` only under that task's own authority ([`docs/configuration.md`](docs/configuration.md) "Runtime backend").
+Dispatch local workers only on a backend `fm-spawn` validates as spawn-capable, with an explicit `--backend` only under that task's own authority ([`docs/configuration.md`](docs/configuration.md) "Runtime backend").
 A missing dependency, authentication failure, unsupported backend, or version refusal is a blocker; never silently retry elsewhere.
 
 ## 5. Recovery
