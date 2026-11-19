@@ -95,6 +95,7 @@ rand_token() {
 remote_prelude() {  # <root>
   cat <<'EOF'
 set -u
+umask 077
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin:$PATH
 export PATH LC_ALL=C
 fm_root() { case "$1" in '~') printf '%s' "$HOME" ;; '~/'*) printf '%s/%s' "$HOME" "${1#\~/}" ;; *) printf '%s' "$1" ;; esac; }
@@ -364,6 +365,7 @@ fi
 echo "end=$ID"
 EOF
   done
+  echo '[ -z "$PSF" ] || rm -f -- "$PSF"'
 }
 
 sync_machine() {  # <label-or-id>
@@ -427,7 +429,7 @@ sec_get() { printf '%s' "$SECTION" | sed -n "s/^$1=//p" | head -n1; }
 sec_all() { printf '%s' "$SECTION" | sed -n "s/^$1=//p"; }
 
 sync_apply_task() {  # <id> <herdr-ok> <section>
-  local id=$1 herdr_ok=$2 name tmp label target to
+  local id=$1 herdr_ok=$2 name tmp label target to ring_rc
   SECTION=$3
   load_task "$id"
   while IFS= read -r name; do
@@ -479,8 +481,11 @@ sync_apply_task() {  # <id> <herdr-ok> <section>
     [ ! -e "$STATE/$id.remote-placed/$name" ] || continue
     : > "$STATE/$id.remote-placed/$name"
     if [ "$herdr_ok" = 1 ]; then
-      fm_task_inbox_ring herdr-remote "$target" "$STATE/$id.inbox/$name" "$label" >/dev/null 2>&1 || true
-      fm_task_inbox_record_ring "$STATE" "$id" "$STATE/$id.inbox/$name" || true
+      # A ring that could not be sent (the link dropped mid-pass) spends no
+      # ladder budget; the reachable-only ladder rings the placed record later.
+      ring_rc=0
+      fm_task_inbox_ring herdr-remote "$target" "$STATE/$id.inbox/$name" "$label" >/dev/null 2>&1 || ring_rc=$?
+      [ "$ring_rc" = 2 ] || fm_task_inbox_record_ring "$STATE" "$id" "$STATE/$id.inbox/$name" || true
     fi
   done < <(sec_all placed)
   {
@@ -577,6 +582,45 @@ remote_create_tab() {  # <mid> <label> <cwd> <inbox>
   remote_focus_restore "$m" "$before" "$RTAB"
 }
 
+# Register Claude's workspace trust on the remote machine for exactly the task's
+# copy and its channel (the --add-dir grant), with the read-check-replace rule
+# bin/fm-claude-trust.sh applies here; runs inside a script that set $T.
+remote_trust_snippet() {
+  cat <<'EOF'
+WT_REAL=$(cd "$T/wt" && pwd -P)
+CH_REAL=$(cd "$T/channel" && pwd -P)
+python3 - "$HOME/.claude.json" "$WT_REAL" "$CH_REAL" <<'PY' || { echo "error=trust"; exit 1; }
+import json, os, sys, hashlib, tempfile
+store, targets = sys.argv[1], sys.argv[2:]
+def read():
+    try:
+        with open(store, "rb") as f: return f.read()
+    except FileNotFoundError: return None
+for attempt in range(3):
+    raw = read()
+    before = hashlib.sha256(raw).hexdigest() if raw is not None else "absent"
+    root = json.loads(raw.decode("utf-8")) if raw and raw.strip() else {}
+    if not isinstance(root, dict): sys.exit("store is not a JSON object")
+    projects = root.setdefault("projects", {})
+    if not isinstance(projects, dict): sys.exit("projects is not an object")
+    for target in targets:
+        entry = projects.get(target)
+        if not isinstance(entry, dict): entry = {}
+        entry["hasTrustDialogAccepted"] = True
+        projects[target] = entry
+    fd, tmp = tempfile.mkstemp(prefix=".claude.json.fm-trust.", dir=os.path.dirname(store))
+    with os.fdopen(fd, "w") as f: f.write(json.dumps(root, indent=2, ensure_ascii=False) + "\n")
+    now = read()
+    if (hashlib.sha256(now).hexdigest() if now is not None else "absent") != before:
+        os.unlink(tmp); continue
+    os.replace(tmp, store)
+    back = json.loads(open(store).read())
+    if all(back.get("projects", {}).get(t, {}).get("hasTrustDialogAccepted") is True for t in targets): sys.exit(0)
+sys.exit("trust was not retained")
+PY
+EOF
+}
+
 provision_dirs_script() {  # <project-name>
   remote_prelude "$RROOT"
   printf 'ID=%s PROJECT=%s\n' "$(q "$ID")" "$(q "$1")"
@@ -624,36 +668,8 @@ EOF
     remote_write_file '"$T/channel/launch-brief.md"' "$1" 600
     remote_write_file '"$T/settings.json"' "$2" 600
     remote_write_file '"$T/launch.sh"' "$3" 700
-    cat <<'EOF'
-WT_REAL=$(cd "$T/wt" && pwd -P)
-python3 - "$HOME/.claude.json" "$WT_REAL" <<'PY' || { echo "error=trust"; exit 1; }
-import json, os, sys, hashlib, tempfile
-store, target = sys.argv[1], sys.argv[2]
-def read():
-    try:
-        with open(store, "rb") as f: return f.read()
-    except FileNotFoundError: return None
-for attempt in range(3):
-    raw = read()
-    before = hashlib.sha256(raw).hexdigest() if raw is not None else "absent"
-    root = json.loads(raw.decode("utf-8")) if raw and raw.strip() else {}
-    if not isinstance(root, dict): sys.exit("store is not a JSON object")
-    projects = root.setdefault("projects", {})
-    if not isinstance(projects, dict): sys.exit("projects is not an object")
-    entry = projects.get(target)
-    if not isinstance(entry, dict): entry = {}
-    entry["hasTrustDialogAccepted"] = True
-    projects[target] = entry
-    fd, tmp = tempfile.mkstemp(prefix=".claude.json.fm-trust.", dir=os.path.dirname(store))
-    with os.fdopen(fd, "w") as f: f.write(json.dumps(root, indent=2, ensure_ascii=False) + "\n")
-    now = read()
-    if (hashlib.sha256(now).hexdigest() if now is not None else "absent") != before:
-        os.unlink(tmp); continue
-    os.replace(tmp, store)
-    back = json.loads(open(store).read())
-    if back.get("projects", {}).get(target, {}).get("hasTrustDialogAccepted") is True: sys.exit(0)
-sys.exit("trust was not retained")
-PY
+  remote_trust_snippet
+  cat <<'EOF'
 echo "wt=$WT_REAL"
 EOF
 }
@@ -920,6 +936,24 @@ fi
 EOF
 }
 
+# Wait up to ten seconds for every process working inside the remote task
+# folder to leave (lsof's cwd rows), then print any that remain.
+quiesce_check_script() {
+  remote_prelude "$RROOT"
+  printf 'T=%s\n' "$(q "$RTASK")"
+  cat <<'EOF'
+in_task() { while IFS= read -r d; do case "$d" in "$T"|"$T"/*) echo "cwd=$d" ;; esac; done; }
+found=
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  found=$(lsof -a -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | in_task)
+  [ -n "$found" ] || break
+  sleep 1
+done
+printf '%s\n' "$found"
+echo done=1
+EOF
+}
+
 retire_main() {  # <id> <prepare|remove>
   local step=$2 out phase pane
   load_task "$1"
@@ -946,7 +980,7 @@ retire_main() {  # <id> <prepare|remove>
       retire_set quiesce
       pane=$(fm_meta_get "$META" window)
       fm_backend_herdr_remote_kill "$pane" || die "REFUSED: the remote pane for $ID could not be closed yet (deferred or failed); rerun cleanup"
-      out=$( { remote_prelude "$RROOT"; printf 'T=%s\n' "$(q "$RTASK")"; echo 'for i in 1 2 3 4 5 6 7 8 9 10; do found=$(lsof -a -d cwd -Fn 2>/dev/null | sed -n "s/^n//p" | while IFS= read -r d; do case "$d" in "$T"|"$T"/*) echo "cwd=$d" ;; esac; done); [ -n "$found" ] || break; sleep 1; done; printf "%s\n" "$found"; echo done=1'; } | fm_remote_ssh "$TARGET" 30) || die "REFUSED: could not check remote processes for $ID"
+      out=$(quiesce_check_script | fm_remote_ssh "$TARGET" 30) || die "REFUSED: could not check remote processes for $ID"
       case "$out" in *cwd=*) die "REFUSED: processes still run inside the remote task folder: $(printf '%s' "$out" | grep '^cwd=' | head -3 | tr '\n' ' ')" ;; esac
       retire_set transfer
       ( sync_machine "$MID" ) >/dev/null 2>&1 || true
@@ -987,6 +1021,8 @@ relaunch_main() {  # <id>
     dead) ;;
     *) die "REFUSED: remote pane $pane is not proven agent-free by the remote process rows; nothing relaunched" ;;
   esac
+  out=$( { remote_prelude "$RROOT"; printf 'T=%s\n' "$(q "$RTASK")"; remote_trust_snippet; } | fm_remote_ssh "$TARGET" 30) \
+    || die "REFUSED: Claude trust for the remote copy could not be re-registered: $out"
   gen="s$(now).$$.$RANDOM"
   fm_backend_herdr_cli "$MID" pane run "${pane#*:}" ". $(q "$RTASK/launch.sh") $gen" >/dev/null 2>&1 || die "could not type the relaunch line"
   for i in $(seq 1 20); do
@@ -995,6 +1031,8 @@ relaunch_main() {  # <id>
   done
   [ "$ok" = 1 ] || die "the relaunch did not start within 20s"
   fm_remote_record_set "$META" "spawn_gen=$gen"
+  rm -f -- "$STATE/$ID.remote-procs"
+  ( sync_machine "$MID" ) >/dev/null 2>&1 || true
   echo "relaunched $ID in remote pane $pane"
 }
 

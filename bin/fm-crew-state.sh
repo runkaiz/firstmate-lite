@@ -1206,6 +1206,33 @@ if [ "$TASK_BACKEND" = herdr ]; then
       esac
       ;;
   esac
+elif [ "$TASK_BACKEND" = herdr-remote ]; then
+  # The machine is reachable here (the outage arm above already answered).
+  # Liveness comes from the remote process rows, activity from Herdr's own
+  # agent status forwarded through the machine profile.
+  fm_backend_source herdr-remote || emit unknown none "backend unreachable (remote adapter unavailable)"
+  case "$(fm_backend_agent_state herdr-remote "$BACKEND_TARGET")" in
+    missing) emit unknown none "backend target gone: $BACKEND_TARGET" ;;
+    dead) emit unknown none "backend target gone: $BACKEND_TARGET (agent gone, pane shell remains)" ;;
+    alive)
+      fm_backend_herdr_parse_target "$BACKEND_TARGET" || true
+      case "$(fm_backend_herdr_agent_status_raw "$FM_BACKEND_HERDR_SESSION" "$FM_BACKEND_HERDR_PANE")" in
+        working) emit working pane "harness busy (herdr-native, remote)" ;;
+        blocked)
+          case "$LOG_VERB" in
+            needs-decision|blocked) ;;
+            *) emit blocked pane "remote Herdr agent is waiting for input" ;;
+          esac
+          ;;
+      esac
+      ;;
+    *)
+      case "$LOG_VERB" in
+        needs-decision|blocked|done|failed|"${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}") ;;
+        *) emit unknown none "backend unreachable (remote agent state unavailable)" ;;
+      esac
+      ;;
+  esac
 elif [ "$TASK_BACKEND" != tmux ]; then
   emit unknown none "unsupported backend: $TASK_BACKEND"
 elif ! tmux display-message -p -t "$BACKEND_TARGET" '#{pane_id}' >/dev/null 2>&1; then

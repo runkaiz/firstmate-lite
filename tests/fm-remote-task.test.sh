@@ -42,7 +42,8 @@ cat > "$STUBS/ssh" <<'SH'
 while [ $# -gt 0 ]; do case "$1" in -o|-p|-i|-l) shift 2 ;; -*) shift ;; *) break ;; esac; done
 shift
 [ ! -e "$FAKE_REMOTE_HOME/.down" ] || { echo "ssh: connect to host: Operation timed out" >&2; exit 255; }
-HOME=$FAKE_REMOTE_HOME PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
+mkdir -p "$FAKE_REMOTE_HOME/tmp"
+HOME=$FAKE_REMOTE_HOME TMPDIR=$FAKE_REMOTE_HOME/tmp PATH=$FAKE_REMOTE_PATH exec bash -c "$*"
 SH
 cat > "$REMOTE_STUBS/claude" <<'SH'
 #!/usr/bin/env bash
@@ -141,7 +142,7 @@ RTASK="$REMOTE_HOME/firstmate-remote/tasks/r1"
 [ -z "$(git -C "$RTASK/wt" remote)" ] || fail 'remote copy has a git remote'
 [ "$(git -C "$RTASK/wt" symbolic-ref --short HEAD)" = fm/r1 ] || fail 'remote copy is not on the task branch'
 grep -qF "$RTASK/channel/inbox" "$RTASK/channel/launch-brief.md" || fail 'launch brief does not name the remote inbox'
-jq -e --arg p "$RTASK/wt" '.projects[$p].hasTrustDialogAccepted == true' "$REMOTE_HOME/.claude.json" >/dev/null || fail 'remote Claude trust was not registered'
+jq -e --arg p "$RTASK/wt" --arg c "$RTASK/channel" '.projects[$p].hasTrustDialogAccepted == true and .projects[$c].hasTrustDialogAccepted == true' "$REMOTE_HOME/.claude.json" >/dev/null || fail 'remote Claude trust was not registered for the copy and its channel'
 [ "$(hstate | jq -r '.ws[]|select(.focused)|.workspace_id')" = w1 ] && [ "$(hstate | jq -r '.tabs[]|select(.focused and .workspace_id=="w1")|.tab_id')" = w1:t1 ] || fail 'the captain focus moved during spawn'
 grep -q "^tab rename w2:t1 fm-r1\." "$HERDR_DB/log" || fail 'the task tab does not carry its launch token'
 pass 'spawn provisions the remote copy, trust, and token tab without moving focus'
@@ -157,6 +158,9 @@ sync_now
 [ "$(sed -n 's/^state=//p' "$ST/.remote-link-$MID")" = reachable ] || fail "a reachable machine did not read reachable: $(cat "$T/sync.log")" 
 grep -q '^agents=1$' "$ST/r1.remote-procs" || fail 'the remote process rows did not show the launched agent'
 [ "$(. "$ROOT/bin/fm-backend.sh"; fm_backend_agent_state herdr-remote "$W")" = alive ] || fail 'a live remote agent did not read alive'
+CS=$(FM_CREW_STATE_NO_FORGE=1 "$ROOT/bin/fm-crew-state.sh" r1 2>/dev/null)
+case "$CS" in *unsupported*|*"target gone"*) fail "crew state misread a reachable live remote task: $CS" ;; esac
+[ -z "$(ls "$REMOTE_HOME/tmp" 2>/dev/null)" ] || fail "the courier left temporary files on the remote machine: $(ls "$REMOTE_HOME/tmp")"
 printf 'working [at=1]: started\npartial' >> "$RTASK/channel/status"
 sync_now
 [ "$(cat "$ST/r1.status")" = 'working [at=1]: started' ] || fail "status import was not exactly the complete line: $(cat "$ST/r1.status")"
@@ -201,6 +205,7 @@ sync_now
 [ -f "$RTASK/channel/inbox/$NAME" ] && [ -d "$RTASK/channel/inbox/.placed/$NAME" ] || fail 'the courier did not place the instruction'
 [ -e "$ST/r1.remote-placed/$NAME" ] || fail 'placement was not recorded locally'
 grep -q '^agent get' "$HERDR_DB/log" || fail 'no doorbell was attempted after confirmed placement'
+[ ! -e "$ST/r1.inbox/.ring-state" ] || fail 'a doorbell that could not be sent spent ladder budget'
 mv "$RTASK/channel/inbox/$NAME" "$RTASK/channel/inbox/handled/$NAME"
 sync_now
 [ -f "$ST/r1.inbox/handled/$NAME" ] && [ ! -e "$REC" ] || fail 'the remote acknowledgement did not move the local record to handled'
