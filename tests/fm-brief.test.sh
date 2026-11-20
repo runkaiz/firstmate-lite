@@ -852,6 +852,10 @@ test_ship_and_scout_teach_validation_round_pause() {
       "$kind brief did not require a single long blocking wait"
     assert_grep 'make any paused declaration once before the first blocking wait; if that call times out, your very next tool call must be the identical wait (same command and arguments), with no text, status append, or other check in between, even if you forgot the initial paused declaration - never catch up on pause bookkeeping after a timeout' "$brief" \
       "$kind brief did not require silent timeout retries without redeclaring the pause"
+    assert_grep "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait - with the Bash tool's \`run_in_background\`, append the \`paused\` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile" "$brief" \
+      "$kind brief did not teach Claude Code workers to background long jobs and wait for the exit wake"
+    assert_grep "though the Definition of done still owns how you drive the no-mistakes pipeline" "$brief" \
+      "$kind brief's Claude Code background rule did not exempt the no-mistakes drive"
   done
   pass "fm-brief.sh: ship and scout scaffolds declare a validation-round pause once, then hold it"
 }
@@ -945,8 +949,10 @@ test_workers_wait_without_spending_turns() {
     assert_grep "a \`timeout\` of at most 2700 seconds" "$brief" "$id: the Pi ceiling is missing"
     assert_grep "its maximum \`timeout\` of 600000 ms" "$brief" "$id: the Claude Code ceiling is missing"
     assert_grep "empty \`write_stdin\` polls of up to 300000 ms" "$brief" "$id: the Codex ceiling is missing"
-    assert_grep "is the sanctioned foreground wait" "$brief" \
-      "$id: the wait a Claude Code worker may use is not named"
+    assert_grep "In Claude Code, run any such command expected to outlast one tool call - the \`until\` loop included - with \`run_in_background\` and end your turn" "$brief" \
+      "$id: a Claude Code worker is not told to background a long wait and end its turn"
+    assert_no_grep "is the sanctioned foreground wait" "$brief" \
+      "$id: a Claude Code worker is still told to hold a long wait in the foreground"
     assert_grep "reattach with \`no-mistakes axi run --wait\` instead, and never send the same \`respond\` again" "$brief" \
       "$id: a timed-out respond must reattach with axi run, never resend its answer"
     assert_grep "Do not poll or list the inbox while waiting; a waiting instruction rings." "$brief" \
@@ -976,6 +982,8 @@ test_wait_no_turns_absent_keeps_the_previous_brief() {
   assert_grep "background the drive call" "$brief" "an absent flag replaced the backgrounded drive text"
   assert_no_grep "issue the same foreground call again" "$brief" \
     "an absent flag still asked for the foreground reattach"
+  assert_grep "In Claude Code, this brief says to background such a job" "$brief" \
+    "an absent flag dropped the Claude Code background-wait rule"
   pass "fm-brief: without config/wait-no-turns the brief and drive text stay as they were"
 }
 

@@ -585,6 +585,7 @@ The optional local, gitignored `config/wait-no-turns` presence flag opts this ho
 With it present, ship and scout briefs gain the `# Waiting` section and the foreground no-mistakes drive text, every brief's inbox section keeps the natural-checkpoint check and adds that a waiting worker does not poll or list its inbox because a waiting instruction rings, a pending-reply recovery waits while that mate has its own open decision or blocker, and a fire-and-forget steer whose doorbell did not land gets one later ring.
 With the file absent, generated briefs omit the waiting section and the no-poll inbox line, the drive text backgrounds the call, recovery sends during an open decision, and a fire-and-forget steer is not owed a retry ring.
 The flag is a home-local preference; the shared [pause rules](../bin/fm-brief.sh) for silent long-command waits and timeout retries apply with or without it.
+Those rules also tell a Claude Code worker to start a job expected to outlast one tool call with the Bash tool's `run_in_background` and end its turn, because Claude Code wakes it when the command exits; other harnesses keep the blocking-wait rule.
 The [CI-only worker handoff](#ci-only-worker-waits) is independent of this flag.
 
 ## No-mistakes pipeline spend (config/pipeline-spend)
