@@ -852,10 +852,10 @@ test_ship_and_scout_teach_validation_round_pause() {
       "$kind brief did not require a single long blocking wait"
     assert_grep 'make any paused declaration once before the first blocking wait; if that call times out, your very next tool call must be the identical wait (same command and arguments), with no text, status append, or other check in between, even if you forgot the initial paused declaration - never catch up on pause bookkeeping after a timeout' "$brief" \
       "$kind brief did not require silent timeout retries without redeclaring the pause"
-    assert_grep "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait - with the Bash tool's \`run_in_background\`, append the \`paused\` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile" "$brief" \
+    assert_grep "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's \`run_in_background\`, append the \`paused\` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile" "$brief" \
       "$kind brief did not teach Claude Code workers to background long jobs and wait for the exit wake"
-    assert_grep "though the Definition of done still owns how you drive the no-mistakes pipeline" "$brief" \
-      "$kind brief's Claude Code background rule did not exempt the no-mistakes drive"
+    assert_no_grep "though the Definition of done still owns how you drive the no-mistakes pipeline" "$brief" \
+      "$kind brief's Claude Code background rule still exempted the no-mistakes drive"
   done
   pass "fm-brief.sh: ship and scout scaffolds declare a validation-round pause once, then hold it"
 }
@@ -960,6 +960,10 @@ test_workers_wait_without_spending_turns() {
     assert_grep "natural checkpoint" "$brief" "$id: the flag dropped the natural-checkpoint inbox check"
   done
   brief="$home/data/brief-wait-ship/brief.md"
+  assert_grep "In Claude Code, start every drive/wait call" "$brief" \
+    "the no-mistakes DOD omitted the Claude Code native-wait exception"
+  assert_grep "For harnesses other than Claude Code:" "$brief" \
+    "the no-mistakes DOD did not scope the foreground rule to other harnesses"
   assert_grep "issue the same foreground call again" "$brief" \
     "the no-mistakes DOD must reattach with the same foreground call"
   assert_no_grep "background the drive call" "$brief" "the no-mistakes DOD still backgrounds the drive call"
@@ -980,6 +984,8 @@ test_wait_no_turns_absent_keeps_the_previous_brief() {
   assert_grep "natural checkpoint" "$brief" "an absent flag dropped the unprompted inbox check"
   assert_no_grep "Do not poll or list the inbox while waiting" "$brief" "an absent flag still added the no-poll inbox line"
   assert_grep "background the drive call" "$brief" "an absent flag replaced the backgrounded drive text"
+  assert_grep "In Claude Code, start every drive/wait call" "$brief" \
+    "an absent flag dropped the no-mistakes Claude Code native-wait exception"
   assert_no_grep "issue the same foreground call again" "$brief" \
     "an absent flag still asked for the foreground reattach"
   assert_grep "In Claude Code, this brief says to background such a job" "$brief" \
