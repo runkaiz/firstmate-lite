@@ -1,0 +1,34 @@
+[
+  {
+    "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/bin/fm-brief.sh ship-wait-False firstmate --mode local-only",
+    "wait_no_turns": false,
+    "kind": "ship",
+    "stdout": "scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/.l/data/ship-wait-False/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})",
+    "emitted_native_wait_instruction": "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's `run_in_background`, append the `paused` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile.",
+    "emitted_service_instruction": "That exit wake fits only a job that finishes on its own (a suite, a build, a pipeline drive call); for a long-lived service you must use (a server, runtime, emulator, or anything else that keeps running until stopped), background its launcher, background-wait only until the service is ready (a readiness check such as its port answering), then use it, stop it, and verify its resources are released - never wait for such a service to exit."
+  },
+  {
+    "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/bin/fm-brief.sh scout-wait-False firstmate --scout",
+    "wait_no_turns": false,
+    "kind": "scout",
+    "stdout": "scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/.l/data/scout-wait-False/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})",
+    "emitted_native_wait_instruction": "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's `run_in_background`, append the `paused` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile.",
+    "emitted_service_instruction": "That exit wake fits only a job that finishes on its own (a suite, a build, a pipeline drive call); for a long-lived service you must use (a server, runtime, emulator, or anything else that keeps running until stopped), background its launcher, background-wait only until the service is ready (a readiness check such as its port answering), then use it, stop it, and verify its resources are released - never wait for such a service to exit."
+  },
+  {
+    "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/bin/fm-brief.sh ship-wait-True firstmate --mode local-only",
+    "wait_no_turns": true,
+    "kind": "ship",
+    "stdout": "scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/.l/data/ship-wait-True/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})",
+    "emitted_native_wait_instruction": "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's `run_in_background`, append the `paused` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile.",
+    "emitted_service_instruction": "That exit wake fits only a job that finishes on its own (a suite, a build, a pipeline drive call); for a long-lived service you must use (a server, runtime, emulator, or anything else that keeps running until stopped), background its launcher, background-wait only until the service is ready (a readiness check such as its port answering), then use it, stop it, and verify its resources are released - never wait for such a service to exit."
+  },
+  {
+    "command": "/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/bin/fm-brief.sh scout-wait-True firstmate --scout",
+    "wait_no_turns": true,
+    "kind": "scout",
+    "stdout": "scaffolded: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M7X9VHA056W4MAKR1BZ3W631/.l/data/scout-wait-True/brief.md (scout; replace {TASK} and {FIRSTMATE_SPEC})",
+    "emitted_native_wait_instruction": "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's `run_in_background`, append the `paused` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile.",
+    "emitted_service_instruction": "That exit wake fits only a job that finishes on its own (a suite, a build, a pipeline drive call); for a long-lived service you must use (a server, runtime, emulator, or anything else that keeps running until stopped), background its launcher, background-wait only until the service is ready (a readiness check such as its port answering), then use it, stop it, and verify its resources are released - never wait for such a service to exit."
+  }
+]

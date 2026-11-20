@@ -1,0 +1,5 @@
+{"event": "launcher_started", "time": 1795206160.4037757, "pid": 3960216}
+{"event": "ready", "time": 1795206185.409024, "pid": 3960216, "port": 38591}
+{"event": "request", "time": 1795206186.1840847, "pid": 3960216, "path": "/"}
+{"event": "request", "time": 1795206191.5615878, "pid": 3960216, "path": "/exercise"}
+{"event": "stopped", "time": 1795206191.562125, "pid": 3960216}

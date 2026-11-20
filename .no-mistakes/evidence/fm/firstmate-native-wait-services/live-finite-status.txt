@@ -1,0 +1,2 @@
+paused [at=1795206224]: running python3 .l/finite.py (~20s) in background; resumes when it exits and writes .l/finite-result.json
+done [at=1795206263]: finite job exited 0; .l/finite-result.json result=FINITE_JOB_COMPLETE (20.0s); report at .l/data/live-finite/report.md

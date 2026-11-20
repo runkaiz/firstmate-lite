@@ -1,0 +1,54 @@
+{
+  "service": {
+    "delayed_readiness_seconds": 25.005248308181763,
+    "events": [
+      {
+        "event": "launcher_started",
+        "time": 1795206160.4037757,
+        "pid": 3960216
+      },
+      {
+        "event": "ready",
+        "time": 1795206185.409024,
+        "pid": 3960216,
+        "port": 38591
+      },
+      {
+        "event": "request",
+        "time": 1795206186.1840847,
+        "pid": 3960216,
+        "path": "/"
+      },
+      {
+        "event": "request",
+        "time": 1795206191.5615878,
+        "pid": 3960216,
+        "path": "/exercise"
+      },
+      {
+        "event": "stopped",
+        "time": 1795206191.562125,
+        "pid": 3960216
+      }
+    ],
+    "native_background_launcher": true,
+    "native_background_readiness_check": true,
+    "readiness_notification_before_launcher_exit_notification": true,
+    "no_agent_polling_while_waiting": true,
+    "used_before_stopped": true,
+    "server_process_absent": true,
+    "port_connection_refused": true
+  },
+  "finite_job": {
+    "result": {
+      "result": "FINITE_JOB_COMPLETE",
+      "start": 1795206225.3376858,
+      "finish": 1795206245.3377512
+    },
+    "native_background": true,
+    "exit_notification_resumed_agent": true,
+    "no_agent_polling_while_waiting": true
+  },
+  "pause_declarations": "exactly once per task",
+  "generated_output_matrix": "ship/scout, wait-no-turns absent/present"
+}

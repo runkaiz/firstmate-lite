@@ -1,0 +1,4 @@
+working [at=1795206159]: launching delayed-start service
+paused [at=1795206164]: waiting for delayed-start service readiness (port file + HTTP answer, ~25s)
+resolved [at=1795206191]: service ready; exercising
+done [at=1795206216]: service ready in 25s, /exercise -> 200 SERVICE_USED_WHILE_RUNNING, SIGTERM stop verified PID gone + port released; report at .l/data/live-service/report.md
