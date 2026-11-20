@@ -854,6 +854,8 @@ test_ship_and_scout_teach_validation_round_pause() {
       "$kind brief did not require silent timeout retries without redeclaring the pause"
     assert_grep "In Claude Code, this brief says to background such a job: start any command expected to outlast one tool call - a resource-locked run, a validation or test suite, a GPU or other lock wait, including no-mistakes pipeline waits - with the Bash tool's \`run_in_background\`, append the \`paused\` line once, and end your turn; Claude Code wakes you when the command exits, so then read its output and continue, and never poll it or re-issue a blocking wait meanwhile" "$brief" \
       "$kind brief did not teach Claude Code workers to background long jobs and wait for the exit wake"
+    assert_grep "That exit wake fits only a job that finishes on its own (a suite, a build, a pipeline drive call); for a long-lived service you must use (a server, runtime, emulator, or anything else that keeps running until stopped), background its launcher, background-wait only until the service is ready (a readiness check such as its port answering), then use it, stop it, and verify its resources are released - never wait for such a service to exit" "$brief" \
+      "$kind brief did not teach Claude Code workers to wait for a long-lived service's readiness rather than its exit"
     assert_no_grep "though the Definition of done still owns how you drive the no-mistakes pipeline" "$brief" \
       "$kind brief's Claude Code background rule still exempted the no-mistakes drive"
   done
