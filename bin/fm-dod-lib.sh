@@ -370,8 +370,8 @@ fm_nm_driving_block() {  # <forge> <task-id>
     pr_return_line="Only a drive call's return reports the green PR: \`no-mistakes axi status\` shows progress but never reports \`checks-passed\` while the ci step is still monitoring the PR for merge, so never wait on a status poll for the next gate or outcome.
 "
     pr_reattach_clause="; once checks are green it returns \`checks-passed\` immediately, and"
-  # config/wait-no-turns selects the foreground drive. Absent, the text matches
-  # the backgrounded drive a home had before that flag.
+  # config/wait-no-turns selects the foreground drive for non-Claude harnesses.
+  # Absent, those harnesses keep the backgrounded drive from before that flag.
   wait_cfg=${CONFIG:-${FM_CONFIG_OVERRIDE:-${FM_HOME:-}/config}}
   if [ -e "$wait_cfg/wait-no-turns" ]; then
     drive_block="Drive the run with ONE foreground \`no-mistakes axi run\` and let it block.
@@ -399,6 +399,13 @@ When the captain's intent refers to a report, decision, or PR ("do items 1, 2, 3
 This replaces the no-mistakes skill's advice to enrich \`--intent\` with decisions and tradeoffs; that advice does not apply to Firstmate-dispatched work.
 Do not hand-edit, commit, or fix findings yourself while a run is active - the pipeline applies every fix.
 
+In Claude Code, start every drive/wait call (\`no-mistakes axi run\` or \`no-mistakes axi respond\`) with the Bash tool's \`run_in_background\`, including reattachment calls.
+Declare that wait using the brief's status-reporting rule once, then end your turn; Claude Code wakes you when the command exits.
+Do not poll the background task or re-issue a blocking wait while it runs.
+On wake, read the returned output and handle its gate or outcome using the rules below.
+${pr_return_line}If the call returned without a gate or outcome because its wait elapsed, or it was killed or timed out, run \`no-mistakes axi status\` once and apply the CI-only handoff below when it qualifies; otherwise reattach with \`no-mistakes axi run\` without flags using \`run_in_background\` again, never resend the same \`respond\`, and end your turn until its exit wake${pr_reattach_clause} if it refuses because no run is active, read the finished outcome from \`no-mistakes axi status\`.
+
+For harnesses other than Claude Code:
 $drive_block
 
 CI-only handoff (always enabled, independent of proactive mode or wait configuration): it qualifies when that status shows only CI still running and every preceding step completed (a skipped rebase is allowed).

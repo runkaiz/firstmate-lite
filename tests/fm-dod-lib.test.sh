@@ -483,4 +483,55 @@ test_worker_role_requires_full_sources_and_conflict_escalation() {
 
 test_worker_role_requires_full_sources_and_conflict_escalation
 
+test_pipeline_driving_prompt_scopes_native_waits_to_claude() {
+  local flag config output native other previous_native=''
+  for flag in absent present; do
+    config="$TMP_ROOT/native-wait-$flag/config"
+    mkdir -p "$config"
+    if [ "$flag" = present ]; then
+      : > "$config/wait-no-turns"
+    fi
+    output=$(CONFIG="$config" fm_dod_block no-mistakes native-wait-task fm/native-wait-task) \
+      || fail "$flag: no-mistakes DOD failed to render"
+    native=$(printf '%s\n' "$output" | awk '
+      /^In Claude Code, start every drive\/wait call/ { active = 1 }
+      /^For harnesses other than Claude Code:/ { active = 0 }
+      active { print }
+    ')
+    other=$(printf '%s\n' "$output" | awk '
+      /^CI-only handoff / { active = 0 }
+      active { print }
+      /^For harnesses other than Claude Code:/ { active = 1 }
+    ')
+    assert_contains "$native" "every drive/wait call (\`no-mistakes axi run\` or \`no-mistakes axi respond\`) with the Bash tool's \`run_in_background\`, including reattachment calls" \
+      "$flag: Claude must start both drive commands natively"
+    assert_contains "$native" "status-reporting rule once, then end your turn; Claude Code wakes you when the command exits" \
+      "$flag: Claude must pause once and end its turn"
+    assert_contains "$native" "Do not poll the background task or re-issue a blocking wait while it runs" \
+      "$flag: Claude must wait for the native wake"
+    assert_contains "$native" "On wake, read the returned output and handle its gate or outcome using the rules below" \
+      "$flag: Claude must handle the actual drive return"
+    assert_contains "$native" "reattach with \`no-mistakes axi run\` without flags using \`run_in_background\` again, never resend the same \`respond\`" \
+      "$flag: elapsed waits must reattach natively without repeating a gate response"
+    assert_contains "$native" "apply the CI-only handoff below when it qualifies" \
+      "$flag: Claude lost the existing CI handoff"
+    if [ -n "$previous_native" ]; then
+      assert_equals "$previous_native" "$native" "$flag: native wait guidance changed with the flag"
+    fi
+    previous_native=$native
+    if [ "$flag" = present ]; then
+      assert_contains "$other" "Drive the run with ONE foreground" "$flag: other harnesses lost foreground driving"
+      assert_contains "$other" "issue the same foreground call again" "$flag: other harnesses lost foreground reattachment"
+    else
+      assert_contains "$other" "So background the drive call" "$flag: other harnesses lost background driving"
+      assert_contains "$other" "backgrounded the same way" "$flag: other harnesses lost background reattachment"
+    fi
+    assert_contains "$output" "When the decision comes back, feed it to the gate with \`no-mistakes axi respond\`" \
+      "$flag: native waits changed gate decision handling"
+  done
+  pass "pipeline driving prompt scopes Claude native waits with and without the wait flag"
+}
+
+test_pipeline_driving_prompt_scopes_native_waits_to_claude
+
 echo "all fm-dod-lib tests passed"
