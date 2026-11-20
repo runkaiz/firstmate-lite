@@ -1191,7 +1191,8 @@ sleep 40; echo "checked at $(date +%s)"              # rc=0
 ```
 
 An earlier `sleep 60` chained ahead of a status check was refused before execution, with a message pointing at `Monitor` with an until-loop and at `run_in_background: true`, and adding "Do not chain shorter sleeps to work around this block".
-A wait chained in the foreground is therefore refused, and the brief names the native shape instead: start the long command with `run_in_background`, end the turn, and let Claude Code wake the worker when the command exits.
+That refusal does not establish a blanket ban on foreground waits; the separate calls above succeeded.
+The [shared pause rules](../../bin/fm-brief.sh) own the current worker wait policy, and the [shared driving block](../../bin/fm-dod-lib.sh) owns pipeline reattachment and gate handling.
 Verified on 2026-11-20 on Linux with Claude Code 2.1.329: a worker started `date +%s; sleep 20; echo "bg-probe exited at $(date +%s)"` with `run_in_background: true` and ended its turn, and a task notification with `<status>completed</status>` and exit code 0 started its next turn, whose output file read `1795166663` then `bg-probe exited at 1795166683`.
 The generated brief and shared pipeline-driving prompt contracts are covered by `tests/fm-brief.test.sh` and `tests/fm-dod-lib.test.sh`, including the Claude-only native-wait exception with and without the wait flag; rerun these commands after upgrading any of the three harnesses and update the numbers in the brief when they move.
 

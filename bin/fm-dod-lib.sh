@@ -370,8 +370,8 @@ fm_nm_driving_block() {  # <forge> <task-id>
     pr_return_line="Only a drive call's return reports the green PR: \`no-mistakes axi status\` shows progress but never reports \`checks-passed\` while the ci step is still monitoring the PR for merge, so never wait on a status poll for the next gate or outcome.
 "
     pr_reattach_clause="; once checks are green it returns \`checks-passed\` immediately, and"
-  # config/wait-no-turns selects the foreground drive. Absent, the text matches
-  # the backgrounded drive a home had before that flag.
+  # config/wait-no-turns selects the foreground drive for non-Claude harnesses.
+  # Absent, those harnesses keep the backgrounded drive from before that flag.
   wait_cfg=${CONFIG:-${FM_CONFIG_OVERRIDE:-${FM_HOME:-}/config}}
   if [ -e "$wait_cfg/wait-no-turns" ]; then
     drive_block="Drive the run with ONE foreground \`no-mistakes axi run\` and let it block.
