@@ -401,12 +401,21 @@ if out=$(teardown 2>&1); then fail 'a symlinked node_modules was preserved autom
 retained && [ ! -e "$keep" ] || fail 'a symlink refusal moved artifacts or removed records'
 rm -f -- "$WT/node_modules"
 mv "$CASE/real_modules" "$WT/node_modules"
+# A generic build directory joins the one pass only once the project ignores it.
+mkdir -p "$WT/build"
+printf 'object\n' > "$WT/build/app.o"
+if out=$(teardown 2>&1); then fail 'an unignored build directory was preserved automatically'; fi
+retained && [ ! -e "$keep" ] || fail 'an unignored-build refusal moved artifacts or removed records'
+exclude=$(git -C "$WT" rev-parse --path-format=absolute --git-path info/exclude)
+mkdir -p -- "${exclude%/*}"
+printf '/build/\n' >> "$exclude"
 out=$(teardown 2>&1)
 expect_code 0 "$?" "recognised generated leftovers were not preserved in one pass: $out"
 assert_contains "$out" 'preserving recognised generated output' 'one-pass preservation was not announced'
 retired || fail 'one-pass preservation left the copy or records'
 [ "$(cat "$keep/files/node_modules/pkg/index.js")" = 'module' ] || fail 'one-pass preservation lost node_modules'
 [ "$(cat "$keep/files/__pycache__/mod.pyc")" = 'bytecode' ] || fail 'one-pass preservation lost __pycache__'
+[ "$(cat "$keep/files/build/app.o")" = 'object' ] || fail 'one-pass preservation lost project-ignored build output'
 pass 'teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers'
 
 for scenario in clean partial explicit; do
