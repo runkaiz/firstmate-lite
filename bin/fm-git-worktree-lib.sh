@@ -160,7 +160,10 @@ fm_git_worktree_leftover_roots() { # <copy> [<paths-file>] [<full-list-file>]
 # .nuxt, .svelte-kit, .turbo, .parcel-cache, .cache, .pytest_cache,
 # .mypy_cache, .ruff_cache, .hypothesis, .tox, .nox, .venv, .gradle, or
 # *.egg-info, or a regular file named *.pyc, *.pyo, *.tsbuildinfo, or
-# .eslintcache. A recognised directory holding a nested repository (any .git
+# .eslintcache. A real directory named build, dist, out, or target, or a
+# regular file named next-env.d.ts, counts only when the project's own ignore
+# rules ignore that exact path, since those names alone are not proof.
+# A recognised directory holding a nested repository (any .git
 # entry) is uncertain, since it can carry unique commits. Anything else, or an
 # unreadable copy, fails. Read-only.
 fm_git_worktree_generated_roots() { # <copy>
@@ -177,8 +180,16 @@ fm_git_worktree_generated_roots() { # <copy>
         [ -d "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
         nested=$(find "$copy/$root" -name .git -print -quit) || return 1
         [ -z "$nested" ] || return 1 ;;
+      build|dist|out|target)
+        [ -d "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
+        git -C "$copy" check-ignore -q -- "$root/" || return 1
+        nested=$(find "$copy/$root" -name .git -print -quit) || return 1
+        [ -z "$nested" ] || return 1 ;;
       *.pyc|*.pyo|*.tsbuildinfo|.eslintcache)
         [ -f "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1 ;;
+      next-env.d.ts)
+        [ -f "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
+        git -C "$copy" check-ignore -q -- "$root" || return 1 ;;
       *) return 1 ;;
     esac
     out="$out$root"$'\n'

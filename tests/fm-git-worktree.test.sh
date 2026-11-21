@@ -208,7 +208,27 @@ if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'an unrecognised 
 rm "$WT/docs/draft.md"
 printf 'edit\n' >> "$WT/docs/index.md"
 if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'generated leftovers beside a tracked change were classified'; fi
-pass 'native generated-output classification names recognised roots and refuses clean, unrecognised, or tracked-change copies'
+git -C "$WT" checkout -q -- docs/index.md
+# Generic build-output names count only where the project's own ignore rules
+# ignore that exact path (the Weave layout: /build/ at the top, /out/ under web).
+mkdir -p "$WT/build/lib" "$WT/web/out"
+printf '{}\n' > "$WT/web/package.json"
+git -C "$WT" add web/package.json
+git -C "$WT" -c user.name='Firstmate Tests' -c user.email=tests@example.invalid commit -qm web
+printf 'artifact\n' > "$WT/build/lib/a.o"
+printf 'page\n' > "$WT/web/out/index.html"
+printf 'types\n' > "$WT/web/next-env.d.ts"
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'unignored build-output names were classified as generated'; fi
+exclude=$(git -C "$WT" rev-parse --path-format=absolute --git-path info/exclude)
+mkdir -p -- "${exclude%/*}"
+printf '/build/\n/web/out/\n/web/next-env.d.ts\n' >> "$exclude"
+roots=$(fm_git_worktree_generated_roots "$WT") || fail 'project-ignored build output was not classified'
+[ "$roots" = "$(printf '%s\n' build docs/.next docs/app.tsbuildinfo pkg.egg-info web/next-env.d.ts web/out)" ] || fail "unexpected ignored build-output roots: $roots"
+mkdir -p "$WT/dist"
+printf 'mine\n' > "$WT/dist/notes"
+if fm_git_worktree_generated_roots "$WT" >/dev/null; then fail 'an unignored dist directory was classified as generated'; fi
+rm -rf -- "${WT:?}/dist" "${WT:?}/build" "${WT:?}/web/out" "${WT:?}/web/next-env.d.ts"
+pass 'native generated-output classification names recognised roots and refuses clean, unrecognised, unignored, or tracked-change copies'
 
 for source in local remote; do
   make_case "replaced-base-$source"
