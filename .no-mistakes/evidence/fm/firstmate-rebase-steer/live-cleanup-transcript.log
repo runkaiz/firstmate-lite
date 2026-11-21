@@ -1,0 +1,463 @@
+Private tmux inventory: main
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+Preparing worktree (detached HEAD 26830bb)
+HEAD is now at 26830bb project with tracked ignore rules
+Updating 26830bb..3fb978c
+Fast-forward
+ fix-one.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 fix-one.txt
+Original generated-file hashes: {".cache/state": "30ae8992e30d51db6ae07a86d91703976f6e69880457a946a3c1e63ffeaaf83e", "build/lib/main.o": "eab32d918fc1c07d87eddb59a45086666f9117538d6d9c40ee0efeda635bd330", "scripts/__pycache__/main.pyc": "f4185d07b1ea619f8fbc7368597ea29702d8590a9c80438bc1d6f76979b91b2b", "web/.next/server.js": "be8351a624cb7c01fd9d8bbfd37b42475f707d24d86564159cdc0c27e4956c02", "web/next-env.d.ts": "d488792ef6ee99eb54f9fac4f41ff3b678aea1beb2f00d420893dafa26047ec5", "web/node_modules/pkg/index.js": "ac255051373b0ee71bcaf575bd128f969f0c464493b83a8a7fe64226c3e14077", "web/out/index.html": "22509304e5f835e5179363a71de99449f8d06029f4ca817d1bccfc96dc4f7ef3"}
+task:
+  id: fix-one
+  title: First landed fix.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+BASELINE: the same cleanup before this change
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/fix-one/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (1 file)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (7 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/base/bin/fm-teardown.sh fix-one --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+task:
+  id: fix-one
+  title: First landed fix.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+TARGET: one cleanup call for the first landed fix
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: .cache build scripts/__pycache__ web/.next web/next-env.d.ts web/node_modules web/out
+preserved: .cache -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/.cache
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/build
+preserved: scripts/__pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/scripts/__pycache__
+preserved: web/.next -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/web/.next
+preserved: web/next-env.d.ts -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/web/next-env.d.ts
+preserved: web/node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/web/node_modules
+preserved: web/out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-one/preserved-artifacts/files/web/out
+teardown fix-one complete (window fm-lab-cleanup:fm-fix-one, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/fix-one/worktree)
+Backlog: fix-one is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+Preserved exact bytes: .cache/state, build/lib/main.o, scripts/__pycache__/main.pyc, web/.next/server.js, web/next-env.d.ts, web/node_modules/pkg/index.js, web/out/index.html
+Preservation receipt:
+1795299169	4d607cc8aedb0f000e1de67d96c937ce4089634c1154e7980e9b056d32517005	.cache
+1795299169	7b4b18ba02caffbc16644b7847dd979819099ff5c941f080a4f2c832c3ee623e	build
+1795299169	c5a2a181d69d68646e2c83d5b175a59f9b3356a1060c29ef0e92774d99059702	scripts/__pycache__
+1795299169	6ced525e39956165e237fa0131c8a93efb0cd47e6426401684e18b382d54bd18	web/.next
+1795299169	b087fc77f11f0617fa904368b49780e2bf7bbd732a0b4b6455322cfe5216412a	web/next-env.d.ts
+1795299169	042e99159e4e044bd1cd18bc1ecb8e4c444f52ff345d3e91772e1ee68d7ce363	web/node_modules
+1795299169	c1ccadc16aec1520b7a0c741c53254fe8a8bd019d3e6175d44ae02220beed6a5	web/out
+
+task:
+  id: fix-one
+  title: First landed fix.
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-21
+  links: local main
+  body: ""
+  notes_file: "-"
+  archived: no
+Preparing worktree (detached HEAD 3fb978c)
+HEAD is now at 3fb978c fix-one implementation
+Updating 3fb978c..952e48f
+Fast-forward
+ fix-two.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 fix-two.txt
+Original generated-file hashes: {"build/app": "c6db63c7be4216b0be496c628675e1dc671868ac15b1edca3161c2e6e9dceca7", "dist/app": "b495ec7cd564e0c1ab0afa7f0592c9fe16b8e85befe65defd10a4feb99898f75", "out/app": "ac537ae533f20293cae01f0a9d933980af0ddcb476a57adee96769267c48b6ba", "target/app": "60894ca0541ec70e002737d59742f7ea258a4d9e232f5c7172fc0e4a32c5ad67", "web/next-env.d.ts": "1676cab650e6d36fcaa6acbc5745f400e5f5bcc7a0b6cc704a56b8605b078953", "web/out/app": "8f326a8bba7ce622f1a2371c8f3fb6534b58015c3793c3310b0a444ca9ff394e"}
+
+TARGET: one cleanup call for the second landed fix
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: build dist out target web/next-env.d.ts web/out
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/build
+preserved: dist -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/dist
+preserved: out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/out
+preserved: target -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/target
+preserved: web/next-env.d.ts -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/web/next-env.d.ts
+preserved: web/out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/fix-two/preserved-artifacts/files/web/out
+teardown fix-two complete (window fm-lab-cleanup:fm-fix-two, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/fix-two/worktree)
+Backlog: fix-two is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+Preserved exact bytes: build/app, dist/app, out/app, target/app, web/next-env.d.ts, web/out/app
+Preservation receipt:
+1795299171	d3ebac2de135813af0b7d46d26e855cb9d2ecacdb317d542e07d578be7599aed	build
+1795299171	4762dc9dfdf4508b19348b7ba5ef82cf99ae8d4a7e4a020627b49fd1633b37a7	dist
+1795299171	c28bf0eed9b32244529b0fadf59bf319e718c4551e69784369ff990ce9088334	out
+1795299171	38290796d195b5460894e487325723a102563e99e93d414452047094598d0b5a	target
+1795299171	9d359157433a9157b0e3d2832c07272e7f93a486b7761df79730cdcbd360b9d7	web/next-env.d.ts
+1795299171	d3d2618dac4243a001cc6925904c670ae95d4e1b3dbbd2e8c2f0a25002b30547	web/out
+
+task:
+  id: fix-two
+  title: Second landed fix.
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-21
+  links: local main
+  body: ""
+  notes_file: "-"
+  archived: no
+Preparing worktree (detached HEAD 952e48f)
+HEAD is now at 952e48f fix-two implementation
+Updating 952e48f..60d6ae4
+Fast-forward
+ guard.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 guard.txt
+
+ATTEMPT: unknown untracked notes mixed with ignored output
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  notes.txt (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (3 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/bin/fm-teardown.sh guard --preserve-untracked build --preserve-untracked notes.txt --preserve-untracked web/out
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+ATTEMPT: tracked edit mixed with ignored output
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+ M README.md
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+ATTEMPT: root /dist/ ignore must not authorize web/dist
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  web/dist (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (3 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/bin/fm-teardown.sh guard --preserve-untracked build --preserve-untracked web/dist --preserve-untracked web/out
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+ATTEMPT: unignored next-env.d.ts must remain
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  next-env.d.ts (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (3 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/bin/fm-teardown.sh guard --preserve-untracked build --preserve-untracked next-env.d.ts --preserve-untracked web/out
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+ATTEMPT: ignored build name is a symlink
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (2 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/bin/fm-teardown.sh guard --preserve-untracked build --preserve-untracked web/out
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+ATTEMPT: ignored build contains a nested repository with a unique commit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  build (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (2 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/bin/fm-teardown.sh guard --preserve-untracked build --preserve-untracked web/out
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+unique nested repo
+
+ATTEMPT: generated leftovers cannot authorize an unlanded commit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: build web/out
+error: native worktree: task delivery is not proven landed; preserving copy
+Teardown exit: 1
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: in_flight
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: "-"
+  links: none
+  body: ""
+  notes_file: "-"
+  archived: no
+
+Land the followup through ordinary fast-forward, then retry cleanup
+Updating 60d6ae4..ed3a8a5
+Fast-forward
+ unlanded.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 unlanded.txt
+Original generated-file hashes: {"build/app.o": "9f5936ff15d3a2ba7d3d8f21858338a6c1e2adc9fe34c685c7de5b4a00caa29a", "web/out/index.html": "00b99fe6e810d157d990aac48d8435b142e5bac3dfe2a19355acd5395347046a"}
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: build web/out
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/preserved-artifacts/files/build
+preserved: web/out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/guard/preserved-artifacts/files/web/out
+teardown guard complete (window fm-lab-cleanup:fm-guard, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/copies/guard/worktree)
+Backlog: guard is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/live/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+Preserved exact bytes: build/app.o, web/out/index.html
+Preservation receipt:
+1795299177	1c3edd9d81bf37d724b16353f045f35fa61828bed7726792df9fb7c76fc2ae11	build
+1795299177	37db279f30478e52611d61cfd3919eea7739fc560b68ee9e95b6f27dce764965	web/out
+
+task:
+  id: guard
+  title: Guarded cleanup.
+  state: done
+  kind: task
+  repo: "-"
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-21
+  links: local main
+  body: ""
+  notes_file: "-"
+  archived: no
+
+Final queue:
+tasks[3]{id,title,state,kind,repo,notes_file}:
+  guard,Guarded cleanup.,done,task,"-","-"
+  fix-two,Second landed fix.,done,task,"-","-"
+  fix-one,First landed fix.,done,task,"-","-"
+
+All live scenarios completed; disposing private tmux and lab home.

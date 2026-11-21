@@ -1,0 +1,198 @@
+Preparing worktree (detached HEAD f58ef38)
+HEAD is now at f58ef38 initial
+error: native worktree: recorded allocator conflicts with retained native reservation
+error: native worktree: ambiguous recorded allocator
+error: native worktree: requested base does not match source ref; inspect source before retrying
+error: native worktree: reserved base is missing or source history was rewritten; inspect reservation before retrying
+error: native worktree: reserved source changed; preserving copy rather than rebasing recovery
+error: native worktree: reservation identity cannot be proved; inspect /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/resume/home/state/resumed.git-worktree and its copy
+error: native worktree: foreign task/home/project ownership
+error: native worktree: reservation identity cannot be proved; inspect /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/resume/home/state/resumed.git-worktree and its copy
+error: native worktree: task metadata already exists; use guarded task relaunch
+error: native worktree: foreign task/home/project ownership
+error: native worktree: reservation identity cannot be proved; inspect /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/resume/home/state/resumed.git-worktree and its copy
+ok - native reservation resumes one copy, rejects foreign ownership and removes clean accepted copy
+Preparing worktree (detached HEAD 32ca6ff)
+HEAD is now at 32ca6ff initial
+ok - native reservation interruption preserves ownership and resumes only clean creation
+Preparing worktree (detached HEAD 32ca6ff)
+HEAD is now at 32ca6ff initial
+ok - native container interruption preserves ownership and resumes only clean creation
+Preparing worktree (detached HEAD 32ca6ff)
+HEAD is now at 32ca6ff initial
+ok - native empty interruption preserves ownership and resumes only clean creation
+Preparing worktree (detached HEAD 32ca6ff)
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/interrupt-partial/copies/interrupted/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+D  README.md
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: interrupted copy changed; preserving it for recovery
+ok - native partial interruption preserves ownership and resumes only clean creation
+Preparing worktree (detached HEAD 32ca6ff)
+HEAD is now at 32ca6ff initial
+error: native worktree: interrupted copy changed; preserving it for recovery
+ok - native recovery preserves a user branch even at the recorded base
+Preparing worktree (detached HEAD 32ca6ff)
+HEAD is now at 32ca6ff initial
+error: native worktree: reserved copy has a live process owner; stop its lifecycle before retrying
+error: native worktree: cannot prove reserved copy has no live owner (lsof failed); preserving copy
+ok - native recovery refuses live and unverified owners
+error: native worktree: task path already exists without this reservation
+error: native worktree: root is inside project/primary/home
+ok - native allocation refuses existing paths and primary roots before writing them
+Preparing worktree (detached HEAD 78fae1f)
+HEAD is now at 78fae1f initial
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  untracked (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: interrupted copy changed; preserving it for recovery
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  untracked (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  ignored (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: interrupted copy changed; preserving it for recovery
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  ignored (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+ M README.md
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: interrupted copy changed; preserving it for recovery
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/content/copies/content/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+ M README.md
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: interrupted copy changed; preserving it for recovery
+error: native worktree: unlanded HEAD is not contained in refs/heads/main; preserving copy
+ok - native cleanup preserves untracked, ignored, dirty and unlanded content
+Preparing worktree (detached HEAD da36c1b)
+HEAD is now at da36c1b initial
+ok - native generated-output classification names recognised roots and refuses clean, unrecognised, unignored, or tracked-change copies
+Preparing worktree (detached HEAD da36c1b)
+HEAD is now at da36c1b initial
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/replaced-base-local/copies/unchanged/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .gitignore (1 file)
+  ignored (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: task delivery is not proven landed; preserving copy
+ok - unchanged local base retires after source replacement while retaining original commit custody
+Preparing worktree (detached HEAD da36c1b)
+HEAD is now at da36c1b initial
+fatal: update_ref failed for ref 'refs/heads/main': trying to write ref 'refs/heads/main' with nonexistent object 7c14b3d298d53b6a4aaed12f8c98c5c0c7b4374e
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/replaced-base-remote/copies/unchanged/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .gitignore (1 file)
+  ignored (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+error: native worktree: task delivery is not proven landed; preserving copy
+ok - unchanged remote base retires after source replacement while retaining original commit custody
+Preparing worktree (detached HEAD da36c1b)
+HEAD is now at da36c1b initial
+From file:///var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/remote-landing/origin
+   da36c1b..e6afe3b  main       -> origin/main
+fatal: '/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/remote-landing/missing-remote' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+error: native worktree: recorded remote source could not be refreshed; preserving copy
+ok - native safety refreshes only its recorded remote ref and fails closed on refresh failure
+Preparing worktree (detached HEAD afa981a)
+HEAD is now at afa981a initial
+error: native worktree: unlanded HEAD is not contained in refs/heads/main; preserving copy
+error: native worktree: task delivery is not proven landed; preserving copy
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M802FN83P0KK3GS6SKC80VSE/.test-cleanup-tmp/fm-git-worktree.dMLtPW/rebased-delivery/copies/rebased/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  private (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+ok - native cleanup accepts an explicit landed-work proof without weakening default ancestry or dirt gates
+ok - native ship selects exact accepted source on divergence and refuses duplicate spawn
+ok - native scout selects exact accepted source on divergence and refuses duplicate spawn
+Preparing worktree (detached HEAD 4880c35)
+HEAD is now at 4880c35 remote divergence
+ok - native remote selects exact accepted source on divergence and refuses duplicate spawn
+Preparing worktree (detached HEAD 79f02dd)
+HEAD is now at 79f02dd initial
+REFUSED: archived task record: archive digest does not match
+REFUSED: archived task record: archive digest does not match
+REFUSED: archived task record: endpoint mismatch
+REFUSED: archived task record: generation mismatch
+REFUSED: archived task record: archive lacks exact busy generation
+REFUSED: archived task record: task lifecycle is busy
+REFUSED: archived task record: reservation identity mismatch
+Restored missing-endpoint metadata with sha256=8be877c6bce79e659099249e468b78e11e595d76d12948fff4312c03e4fb5d0c; endpoint and copy unchanged.
+Restored missing-endpoint metadata with sha256=8be877c6bce79e659099249e468b78e11e595d76d12948fff4312c03e4fb5d0c; endpoint and copy unchanged.
+REFUSED: archived task record: publication or replay could not be proved
+ok - archived native metadata restoration binds exact bytes, generation, endpoint and reservation
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD de31fd1)
+HEAD is now at de31fd1 other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD 778c97a)
+HEAD is now at 778c97a initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD 04f252e)
+HEAD is now at 04f252e other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD 5f3ce00)
+HEAD is now at 5f3ce00 initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+ok - exact sibling PR landing retires a contained local producer without merging private divergence
+Preparing worktree (detached HEAD 92c0d6e)
+HEAD is now at 92c0d6e other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD 244bc8d)
+HEAD is now at 244bc8d initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+ok - legacy native local-only reservation accepts documented local default ancestry
+Preparing worktree (detached HEAD 3227596)
+HEAD is now at 3227596 other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD bdb0840)
+HEAD is now at bdb0840 initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD cc83e84)
+HEAD is now at cc83e84 other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD e2b8ad0)
+HEAD is now at e2b8ad0 initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD 0e6de37)
+HEAD is now at 0e6de37 other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD a6d5b0b)
+HEAD is now at a6d5b0b initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD 6a849f3)
+HEAD is now at 6a849f3 other base
+ok - native tmux teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD 8eea24a)
+HEAD is now at 8eea24a initial
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+error: native worktree: task retirement is pending; finish teardown or its recorded replay first
+Preparing worktree (detached HEAD 126b075)
+HEAD is now at 126b075 other base
+ok - native herdr teardown retries a missing endpoint but preserves unreadable and live owners
+Preparing worktree (detached HEAD 5fabd1c)
+HEAD is now at 5fabd1c initial
+ok - native teardown preserves named generated leftovers, refuses unique or unnamed work, and resumes after interruption
+Preparing worktree (detached HEAD aa3a1f7)
+HEAD is now at aa3a1f7 project layout
+ok - native teardown summarizes leftovers by root, keeps the full list, and prints the exact preservation command
+ok - native teardown expands a named tracked directory to its leftover roots and stops only a task-owned browser MCP server
+ok - real native tmux worker owns one isolated copy; busy refusal and clean teardown preserve lifecycle guards
