@@ -418,6 +418,97 @@ retired || fail 'one-pass preservation left the copy or records'
 [ "$(cat "$keep/files/build/app.o")" = 'object' ] || fail 'one-pass preservation lost project-ignored build output'
 pass 'teardown preserves recognised generated output in one pass and still refuses unrecognised, tracked, or symlinked leftovers'
 
+# The Weave layout: every leftover is project-ignored build output, and the
+# ignored .cache holds the pinned upstream clone the build patches and compiles.
+weave_case() { # <name> - a landed local-only ship with that layout
+  local upstream
+  make_case "$1" ship local-only
+  keep="$HOME_DIR/data/$ID/preserved-artifacts"
+  clone="$WT/.cache/CoffeeMud"
+  upstream="$CASE/upstream"
+  mkdir -p "$WT/scripts" "$WT/web"
+  printf '/.cache/\n/build/\n__pycache__/\n/web/.next/\n/web/next-env.d.ts\n/web/node_modules/\n/web/out/\n' > "$WT/.gitignore"
+  printf 'build\n' > "$WT/scripts/build.py"
+  printf '{}\n' > "$WT/web/package.json"
+  git -C "$WT" add .gitignore scripts web
+  git -C "$WT" "${GIT_ID[@]}" commit -qm 'weave layout'
+  git -C "$PROJ" merge -q --ff-only "$(git -C "$WT" rev-parse HEAD)"
+  fm_git_init_commit "$upstream"
+  commit_in "$upstream" Engine.java 'upstream source' 'pinned release'
+  git -C "$upstream" checkout -q --detach
+  commit_in "$upstream" release.txt 'side release' 'release off every branch'
+  git -C "$upstream" tag side-release
+  git -C "$upstream" checkout -q -
+  commit_in "$upstream" later.txt 'later' 'after the pin'
+  git clone -q "$upstream" "$clone"
+  git -C "$clone" checkout -q --detach HEAD~1
+  printf 'patched by the build\n' >> "$clone/Engine.java"
+  printf 'compiled\n' > "$clone/Engine.class"
+  mkdir -p "$WT/.cache/jdk/bin" "$WT/build" "$WT/scripts/__pycache__" "$WT/web/.next" "$WT/web/node_modules/pkg" "$WT/web/out"
+  printf 'java\n' > "$WT/.cache/jdk/bin/java"
+  printf 'object\n' > "$WT/build/app.o"
+  printf 'bytecode\n' > "$WT/scripts/__pycache__/build.pyc"
+  printf 'page\n' > "$WT/web/.next/page"
+  printf 'types\n' > "$WT/web/next-env.d.ts"
+  printf 'module\n' > "$WT/web/node_modules/pkg/index.js"
+  printf 'page\n' > "$WT/web/out/index.html"
+}
+refuses_clone() { # <reason>
+  local out
+  if out=$(teardown 2>&1); then fail "one-pass teardown accepted a nested clone $1"; fi
+  assert_contains "$out" '--preserve-untracked' "a nested clone $1 lost the guarded next action"
+  retained && [ -d "$clone" ] && [ ! -e "$keep" ] || fail "a nested clone $1 was moved or lost its records"
+}
+
+weave_case weave
+out=$(teardown 2>&1)
+expect_code 0 "$?" "landed work with only project-ignored build output was not cleaned up in one pass: $out"
+retired || fail 'Weave-layout cleanup left the copy or records'
+[ "$(tail -1 "$keep/files/.cache/CoffeeMud/Engine.java")" = 'patched by the build' ] \
+  && [ "$(cat "$keep/files/.cache/CoffeeMud/Engine.class")" = 'compiled' ] \
+  || fail 'Weave-layout cleanup lost the nested clone content'
+git -C "$keep/files/.cache/CoffeeMud" rev-parse -q --verify HEAD >/dev/null || fail 'Weave-layout cleanup broke the nested clone'
+[ "$(cat "$keep/files/web/out/index.html")" = 'page' ] && [ "$(cat "$keep/files/.cache/jdk/bin/java")" = 'java' ] \
+  || fail 'Weave-layout cleanup lost build output'
+pass 'teardown cleans up landed work in one pass when an ignored cache holds a clone with no commit of its own'
+
+weave_case weave-refusals
+commit_in "$clone" own.txt 'own work' 'commit only this clone holds'
+refuses_clone 'with a detached commit of its own'
+git -C "$clone" reset -q --hard HEAD~1
+refuses_clone 'whose reflog holds a commit of its own'
+rm -rf -- "${clone:?}"
+git clone -q "$CASE/upstream" "$clone"
+git -C "$clone" checkout -q -b local-work
+git -C "$clone" "${GIT_ID[@]}" commit -q --allow-empty -m 'branch work'
+git -C "$clone" checkout -q -
+rm -rf -- "${clone:?}/.git/logs"
+refuses_clone 'with an unpublished branch'
+git -C "$clone" branch -qD local-work
+printf 'stashed\n' >> "$clone/Engine.java"
+git -C "$clone" "${GIT_ID[@]}" stash -q
+refuses_clone 'with a stash'
+rm -rf -- "${clone:?}"
+git clone -q "$CASE/upstream" "$clone"
+git -C "$clone" worktree add -q --detach "$CASE/linked"
+refuses_clone 'that another checkout is linked to'
+git -C "$clone" worktree remove --force "$CASE/linked"
+git -C "$clone" remote remove origin
+refuses_clone 'with no remote to hold its commits'
+rm -rf -- "${clone:?}"
+git clone -q --shared "$CASE/upstream" "$clone"
+refuses_clone 'that borrows objects from another repository'
+rm -rf -- "${clone:?}"
+git -C "$CASE/upstream" worktree add -q --detach "$clone"
+refuses_clone 'that is a linked checkout of another repository'
+git -C "$CASE/upstream" worktree remove --force "$clone"
+git clone -q "$CASE/upstream" "$clone"
+printf '%s\n' '/build/' '__pycache__/' '/web/.next/' '/web/next-env.d.ts' '/web/node_modules/' '/web/out/' > "$WT/.gitignore"
+git -C "$WT" "${GIT_ID[@]}" commit -qam 'stop ignoring the cache'
+git -C "$PROJ" merge -q --ff-only "$(git -C "$WT" rev-parse HEAD)"
+refuses_clone 'under a root the project does not ignore'
+pass 'a nested clone that could hold its own commits, is not self-contained, or is not ignored still refuses'
+
 for scenario in clean partial explicit; do
   make_case "generated-retry-$scenario" ship local-only
   keep="$HOME_DIR/data/$ID/preserved-artifacts"

@@ -1813,6 +1813,37 @@ SH
 
 
 
+# Landed work whose worker exited is finished, not failed: it keeps a moving row
+# until cleanup and never counts as an unhealthy endpoint, while the same exit
+# without a landing still does.
+test_landed_exited_task_shows_finished_not_gone() {
+  local home fakebin json id wt
+  home=$(make_home landed-exited)
+  : > "$home/data/secondmates.md"
+  fakebin=$(make_fakebin "$home")
+  printf '## In flight\n' > "$home/data/backlog.md"
+  for id in dead-landed dead-unlanded; do
+    wt="$home/projects/$id"
+    fm_git_init_commit "$wt"
+    git -C "$wt" checkout -q -b "fm/$id"
+    git -C "$wt" -c user.name=test -c user.email=test@example.invalid commit -q --allow-empty -m work
+    git -C "$wt" update-ref refs/heads/main "fm/$id~1"
+    printf -- '- [ ] %s - Task %s (repo: firstmate) (kind: ship) (since 2026-07-11)\n' "$id" "$id" >> "$home/data/backlog.md"
+    fm_write_meta "$home/state/$id.meta" "window=firstmate:fm-$id" "worktree=$wt" "project=$wt" \
+      "harness=codex" "kind=ship" "mode=local-only" "branch=fm/$id" "base_branch=main"
+    printf 'done: branch ready\n' > "$home/state/$id.status"
+  done
+  git -C "$home/projects/dead-landed" update-ref refs/heads/main fm/dead-landed
+  json=$(run "$home" "$fakebin" --json) || fail "landed-exited snapshot failed"
+  printf '%s' "$json" | jq -e '
+    (.in_flight | any(.id == "dead-landed" and .state == "done" and .stage == "finished, landed"
+      and .doing == "finished, landed on local main; awaiting cleanup"))
+    and (.in_flight | any(.id == "dead-unlanded" and .state == "unknown" and .stage == "unknown"))
+    and ([.unhealthy_endpoints[].id] == ["dead-unlanded"])
+  ' >/dev/null || fail "landed work whose worker exited was not shown as finished: $json"
+  pass "landed work whose worker exited shows finished and landed, not an unhealthy endpoint"
+}
+
 test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue() {
   local home fakebin first unchanged changed before
   home=$(make_home ahoy-checkpoint)
@@ -1963,6 +1994,7 @@ EOF
   pass "Ahoy excludes closures and defers conditional calls while preserving titles and elapsed time"
 }
 
+test_landed_exited_task_shows_finished_not_gone
 test_ahoy_checkpoint_compares_observed_facts_without_mutating_queue
 test_ahoy_completion_does_not_infer_pr_readiness
 test_ahoy_checkpoint_tracks_disappearances_and_blockers

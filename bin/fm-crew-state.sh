@@ -24,7 +24,7 @@
 # Output is one stable, parseable, token-tight line firstmate can read every
 # heartbeat:
 #
-#   state: <working|idle|parked|done|blocked|paused|failed|unknown> · source: <run-step|pane|status-log|remote-endpoint|none> · <detail>
+#   state: <working|idle|parked|done|blocked|paused|failed|unknown> · source: <run-step|pane|status-log|landed|remote-endpoint|none> · <detail>
 #
 # Logic, in order:
 #   1. Resolve worktree + backend target + kind from state/<id>.meta. A meta
@@ -157,6 +157,9 @@
 #      unreachable, and an alive endpoint whose scrollback read failed is still
 #      classified by step 4. Backends with no classifier keep reading a failed
 #      capture as gone. The fallback's own comment owns the per-verdict rules.
+#      A local endpoint that positively reads as gone is instead done · landed
+#      when ship_landed proves the finished ship's branch already landed: an
+#      ordinary worker exit that only awaits cleanup, never a failure.
 #
 # Read-only and side-effect free. Always exits 0 on a successful read regardless
 # of state; exit 2 only on a usage error (no id).
@@ -183,6 +186,10 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-timeout-lib.sh"
 # shellcheck source=bin/fm-dod-lib.sh
 . "$SCRIPT_DIR/fm-dod-lib.sh"
+# shellcheck source=bin/fm-git-worktree-lib.sh
+. "$SCRIPT_DIR/fm-git-worktree-lib.sh"
+# shellcheck source=bin/fm-tangle-lib.sh
+. "$SCRIPT_DIR/fm-tangle-lib.sh"
 
 ID=${1:-}
 [ -n "$ID" ] || { echo "usage: fm-crew-state.sh <id>" >&2; exit 2; }
@@ -1165,6 +1172,40 @@ if [ "$HAVE_RUN" = 1 ]; then
   emit "$RUN_STATE" run-step "$RUN_DETAIL"
 fi
 
+# Local, network-free evidence that a ship whose status reads done has landed
+# with no tracked edit left: a local-only HEAD held by its local landing branch,
+# or a HEAD contained in the recorded head of a PR whose merge the poll retired.
+# Display only; bin/fm-teardown.sh owns the proof that permits removal.
+LANDED_ON=
+ship_landed() {
+  local changes ref head
+  [ "$KIND" = ship ] && [ "$LOG_VERB" = "done" ] || return 1
+  changes=$(git -C "$WT" status --porcelain --untracked-files=no 2>/dev/null) && [ -z "$changes" ] || return 1
+  if [ "$(meta_value mode)" = local-only ]; then
+    ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || ref=
+    case "$ref" in
+      refs/heads/*) ;;
+      *)
+        ref=$(meta_value base_branch)
+        [ -n "$ref" ] || ref=$(fm_default_branch "$WT") || return 1
+        ref="refs/heads/$ref" ;;
+    esac
+    fm_git_worktree_head_in_ref "$WT" "$ref" 2>/dev/null || return 1
+    LANDED_ON="local ${ref#refs/heads/}"
+  else
+    fm_pr_poll_retirement_receipt_valid "$STATE" "$ID" || return 1
+    head=$(meta_value pr_head)
+    [ -n "$head" ] && git -C "$WT" merge-base --is-ancestor HEAD "$head" 2>/dev/null || return 1
+    LANDED_ON=$FM_PR_RETIRE_URL
+  fi
+}
+emit_gone() {  # [<detail>]
+  if ship_landed; then
+    emit "done" landed "finished, landed on $LANDED_ON; awaiting cleanup"
+  fi
+  emit unknown none "backend target gone: $BACKEND_TARGET${1:-}"
+}
+
 # --- fallback: no run attributed to this crew ------------------------------
 [ -n "$BACKEND_TARGET" ] || emit unknown none "no backend target recorded"
 HERDR_ACTIVITY=
@@ -1196,9 +1237,8 @@ if [ "$TASK_BACKEND" = herdr ]; then
       fi
       ;;
     done) ;;
-    missing) emit unknown none "backend target gone: $BACKEND_TARGET" ;;
-    dead)
-      emit unknown none "backend target gone: $BACKEND_TARGET (agent gone, pane shell remains)" ;;
+    missing) emit_gone ;;
+    dead) emit_gone " (agent gone, pane shell remains)" ;;
     *)
       case "$LOG_VERB" in
         needs-decision|blocked|done|failed|"${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}") ;;
@@ -1240,8 +1280,8 @@ elif ! tmux display-message -p -t "$BACKEND_TARGET" '#{pane_id}' >/dev/null 2>&1
   AGENT_STATE=$(fm_backend_agent_state "$TASK_BACKEND" "$BACKEND_TARGET")
   case "$AGENT_STATE" in
     alive) ;;
-    missing) emit unknown none "backend target gone: $BACKEND_TARGET" ;;
-    dead) emit unknown none "backend target gone: $BACKEND_TARGET (agent gone, pane shell remains)" ;;
+    missing) emit_gone ;;
+    dead) emit_gone " (agent gone, pane shell remains)" ;;
     *) emit unknown none "backend unreachable ($TASK_BACKEND endpoint state: $AGENT_STATE)" ;;
   esac
 fi

@@ -29,6 +29,7 @@
 #   (f) no run + semantic busy                                    -> pane
 #   (g) no run + semantic idle falls to the status-log verb       -> status-log
 #   (h) dead pane: no run -> unknown/none; with a run -> run-step (not the shell)
+#   (h2) gone endpoint, finished ship already landed              -> done/landed
 #   (i) kind=scout skips the run lookup                           -> pane/status-log
 #   (j) torn-down worktree / missing meta                         -> unknown/none
 #   (k) crew_is_provably_working end-to-end over the REAL helper (not a canned
@@ -2924,6 +2925,74 @@ test_dead_window_ignores_stale_status_log() {
   pass "dead window ignores stale status log"
 }
 
+# A finished worker whose branch already landed exits normally before cleanup:
+# that is landed work awaiting cleanup, not a gone agent. Anything the landing
+# evidence does not cover keeps the gone reading.
+test_exited_worker_with_landed_branch_reads_landed() {
+  reset_fakes
+  local d wt state url out backend
+  d=$(new_case landed-exit); wt="$d/wt"; state="$d/state"
+  make_repo_on_branch "$wt" fm/feat-landed
+  make_fakebin "$d" >/dev/null
+  git -C "$wt" update-ref refs/heads/main HEAD
+  git -C "$wt" update-ref refs/heads/release HEAD
+  printf 'work\n' > "$wt/work"
+  git -C "$wt" add work
+  git -C "$wt" commit -qm work
+  FM_FAKE_TMUX_MISSING=1
+  FM_FAKE_HERDR_AGENT_STATUS=idle
+  FM_FAKE_HERDR_PROCESS=shell
+  for backend in tmux herdr; do
+    [ "$backend" = tmux ] || command -v jq >/dev/null 2>&1 || continue
+    case "$backend" in tmux) out=fm:fm-feat-landed ;; *) out=default:w1:p2 ;; esac
+    fm_write_meta "$state/feat-landed.meta" "window=$out" "worktree=$wt" "kind=ship" \
+      "mode=local-only" "backend=$backend" "harness=claude"
+    git -C "$wt" update-ref refs/heads/main HEAD~1
+    printf 'done: branch ready\n' > "$state/feat-landed.status"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "backend target gone" "$backend: an unlanded branch lost its gone reading"
+    git -C "$wt" update-ref refs/heads/main HEAD
+    out=$(run_crew_state "$d" feat-landed)
+    assert_equals "state: done · source: landed · finished, landed on local main; awaiting cleanup" "$out" \
+      "$backend: a landed finished branch was not shown as landed"
+    printf 'tracked edit\n' >> "$wt/work"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "backend target gone" "$backend: tracked edits were shown as landed"
+    git -C "$wt" checkout -q -- work
+    printf 'working: more to do\n' >> "$state/feat-landed.status"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "backend target gone" "$backend: unfinished work was shown as landed"
+  done
+
+  # A rebased landing carries the same patch; the recorded base names the branch.
+  printf 'done: branch ready\n' > "$state/feat-landed.status"
+  fm_write_meta "$state/feat-landed.meta" "window=fm:fm-feat-landed" "worktree=$wt" "kind=ship" \
+    "mode=local-only" "base_branch=release"
+  git -C "$wt" update-ref refs/heads/main HEAD
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "backend target gone" "a branch absent from its recorded base was shown as landed"
+  git -C "$wt" checkout -q release
+  git -C "$wt" commit -q --allow-empty -m 'other work'
+  git -C "$wt" cherry-pick fm/feat-landed >/dev/null
+  git -C "$wt" checkout -q fm/feat-landed
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "source: landed · finished, landed on local release" "a patch-equivalent landing was not shown as landed"
+
+  # A PR ship needs its retired merge and a head inside the recorded PR head.
+  url=https://github.com/o/r/pull/1
+  fm_write_meta "$state/feat-landed.meta" "window=fm:fm-feat-landed" "worktree=$wt" "kind=ship" \
+    "mode=direct-PR" "pr=$url" "pr_head=$(git -C "$wt" rev-parse HEAD)"
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "backend target gone" "an unmerged PR was shown as landed"
+  seed_retired_pr_receipt "$state" feat-landed "$url"
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "state: done · source: landed · finished, landed on $url" "a merged PR was not shown as landed"
+  git -C "$wt" commit -q --allow-empty -m 'after the PR head'
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "backend target gone" "work past the merged PR head was shown as landed"
+  pass "an exited worker whose branch landed reads finished and landed, never gone; anything uncertain stays gone"
+}
+
 # Regression (2026-09 G7 stale-claim incident, tmux half): the default backend
 # reached the same false-death path as herdr. A tmux that cannot answer at all
 # - a trimmed PATH, or any non-definitive error - made every live crew report
@@ -5446,6 +5515,7 @@ test_no_run_idle_pane_paused
 test_no_run_idle_pane_custom_paused_verb
 test_retired_supervisor_events_do_not_revive_current_state
 test_dead_window_ignores_stale_status_log
+test_exited_worker_with_landed_branch_reads_landed
 test_no_run_tmux_unreadable_reads_unreachable_not_gone
 test_dead_window_still_reports_terminal_run_step
 test_dead_window_still_reports_active_run_step
