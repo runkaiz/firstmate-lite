@@ -229,13 +229,19 @@ set -u
 [ "${FM_FAKE_TMUX_UNREADABLE:-0}" = 1 ] && { printf 'no current client\n' >&2; exit 1; }
 case "${1:-}" in
   list-windows)
+    if [ "${FM_FAKE_TMUX_MISSING:-0}" != 1 ] && [ -n "${FM_FAKE_TMUX_WINDOW:-}" ]; then
+      printf '%s\n' "$FM_FAKE_TMUX_WINDOW"
+    fi
     # A successful but empty inventory: it omits the crew's window, so absence
     # is proved by the answer rather than by an addressed call failing. Only
     # reached once display-message has already failed.
     ;;
   display-message)
     [ "${FM_FAKE_TMUX_MISSING:-0}" = 1 ] && exit 1
-    printf '%%1\n' ;;
+    case "${*: -1}" in
+      '#{pane_current_command}') printf '%s\n' "${FM_FAKE_TMUX_COMMAND:-%1}" ;;
+      *) printf '%%1\n' ;;
+    esac ;;
   capture-pane)
     [ "${FM_FAKE_TMUX_MISSING:-0}" = 1 ] && exit 1
     if [ "${FM_FAKE_BUSY:-0}" = 1 ]; then printf 'work in progress\n%s\n' "${FM_FAKE_BUSY_TEXT:-esc to interrupt}"
@@ -347,6 +353,8 @@ reset_fakes() {
   FM_FAKE_BUSY_TEXT=
   FM_FAKE_TMUX_MISSING=0
   FM_FAKE_TMUX_UNREADABLE=0
+  FM_FAKE_TMUX_WINDOW=
+  FM_FAKE_TMUX_COMMAND=
   FM_FAKE_HERDR_BUSY=0
   FM_FAKE_HERDR_MISSING=0
   FM_FAKE_HERDR_READ_FAIL=0
@@ -377,6 +385,7 @@ reset_fakes() {
   FM_FAKE_GERRIT_READ_LOG=
   unset FM_FAKE_PR_47_STATE FM_FAKE_PR_47_MERGED FM_FAKE_PR_48_STATE FM_FAKE_PR_48_MERGED
   export FM_FAKE_AXI_STATUS FM_FAKE_AXI_STATUS_RUN FM_FAKE_RUNS_LIST FM_FAKE_BUSY FM_FAKE_BUSY_TEXT FM_FAKE_TMUX_MISSING FM_FAKE_TMUX_UNREADABLE
+  export FM_FAKE_TMUX_WINDOW FM_FAKE_TMUX_COMMAND
   export FM_FAKE_HERDR_BUSY FM_FAKE_HERDR_MISSING FM_FAKE_HERDR_READ_FAIL FM_FAKE_HERDR_HUSK FM_FAKE_HERDR_AGENT_STATUS FM_FAKE_HERDR_PROCESS FM_FAKE_HERDR_SHELL_PID FM_FAKE_CI_LOGS
   export FM_FAKE_DAEMON_DOWN FM_FAKE_DAEMON_TIMEOUT FM_FAKE_DAEMON_PROBE_LOG FM_FAKE_AXI_HOME
   export FM_FAKE_AXI_HOME_ERROR FM_FAKE_AXI_STATUS_RUN_ERROR FM_FAKE_AXI_STATUS_ERROR
@@ -2964,6 +2973,31 @@ test_exited_worker_with_landed_branch_reads_landed() {
     assert_contains "$out" "backend target gone" "$backend: unfinished work was shown as landed"
   done
 
+  FM_FAKE_TMUX_MISSING=0
+  FM_FAKE_TMUX_WINDOW=fm-feat-landed
+  FM_FAKE_TMUX_COMMAND=bash
+  fm_write_meta "$state/feat-landed.meta" "window=fm:fm-feat-landed" "worktree=$wt" "kind=ship" \
+    "mode=local-only" "harness=claude"
+  printf 'done: branch ready\n' > "$state/feat-landed.status"
+  out=$(PATH="$d/fakebin:$PATH" bash -c '. "$1"; fm_backend_agent_state tmux fm:fm-feat-landed' _ "$ROOT/bin/fm-backend.sh")
+  assert_equals dead "$out" "readable tmux pane must positively prove that only its shell remains"
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "state: done · source: landed" "a readable shell remaining after landing was not shown as landed"
+  git -C "$wt" update-ref refs/heads/main HEAD~1
+  out=$(run_crew_state "$d" feat-landed)
+  assert_not_contains "$out" "source: landed" "a readable shell with unlanded work was shown as landed"
+  assert_not_contains "$out" "backend target gone" "a readable unlanded shell lost its existing reading"
+  git -C "$wt" update-ref refs/heads/main HEAD
+  arm_idle_record "$state" feat-landed
+  FM_FAKE_TMUX_COMMAND=claude
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "source: status-log" "a live endpoint was reclassified as landed"
+  FM_FAKE_TMUX_UNREADABLE=1
+  out=$(run_crew_state "$d" feat-landed)
+  assert_contains "$out" "backend unreachable" "an unreadable endpoint lost its unreachable reading"
+  FM_FAKE_TMUX_UNREADABLE=0
+  FM_FAKE_TMUX_MISSING=1
+
   # A rebased landing carries the same patch; the recorded base names the branch.
   printf 'done: branch ready\n' > "$state/feat-landed.status"
   fm_write_meta "$state/feat-landed.meta" "window=fm:fm-feat-landed" "worktree=$wt" "kind=ship" \
@@ -2991,6 +3025,65 @@ test_exited_worker_with_landed_branch_reads_landed() {
   out=$(run_crew_state "$d" feat-landed)
   assert_contains "$out" "backend target gone" "work past the merged PR head was shown as landed"
   pass "an exited worker whose branch landed reads finished and landed, never gone; anything uncertain stays gone"
+}
+
+test_landed_run_preserves_endpoint_and_run_precedence() {
+  local d wt state out endpoint backend target
+  for backend in tmux herdr; do
+    [ "$backend" = tmux ] || command -v jq >/dev/null 2>&1 || continue
+    reset_fakes
+    d=$(new_case "landed-run-$backend"); wt="$d/wt"; state="$d/state"
+    make_repo_on_branch "$wt" fm/feat-landed
+    make_fakebin "$d" >/dev/null
+    FM_FAKE_TMUX_WINDOW=fm-feat-landed
+    case "$backend" in tmux) target=fm:fm-feat-landed ;; *) target=default:w1:p2 ;; esac
+    fm_write_meta "$state/feat-landed.meta" "window=$target" "worktree=$wt" "kind=ship" \
+      "mode=no-mistakes" "backend=$backend" "harness=claude" \
+      "pr=https://github.com/o/r/pull/1" "pr_head=$FM_FAKE_RUN_HEAD"
+    seed_retired_pr_receipt "$state" feat-landed https://github.com/o/r/pull/1
+    FM_FAKE_AXI_STATUS="$(run_passed_no_pr fm/feat-landed)"
+    : > "$state/feat-landed.status"
+    for endpoint in dead missing alive unreadable; do
+      FM_FAKE_TMUX_MISSING=0
+      FM_FAKE_TMUX_UNREADABLE=0
+      FM_FAKE_TMUX_COMMAND=bash
+      FM_FAKE_HERDR_MISSING=0
+      FM_FAKE_HERDR_READ_FAIL=0
+      FM_FAKE_HERDR_AGENT_STATUS=idle
+      FM_FAKE_HERDR_PROCESS=shell
+      case "$endpoint" in
+        missing) FM_FAKE_TMUX_MISSING=1; FM_FAKE_HERDR_MISSING=1 ;;
+        alive) FM_FAKE_TMUX_COMMAND=claude; FM_FAKE_HERDR_PROCESS=agent ;;
+        unreadable) FM_FAKE_TMUX_UNREADABLE=1; FM_FAKE_HERDR_PROCESS=unknown; FM_FAKE_HERDR_AGENT_STATUS= ;;
+      esac
+      out=$(run_crew_state "$d" feat-landed)
+      case "$endpoint" in
+        dead|missing) assert_contains "$out" "state: done · source: landed" "$backend $endpoint: merged run was not shown as landed" ;;
+        *) assert_contains "$out" "source: run-step" "$backend $endpoint: merged run lost its existing reading" ;;
+      esac
+    done
+    FM_FAKE_TMUX_UNREADABLE=0
+    FM_FAKE_HERDR_PROCESS=shell
+    FM_FAKE_HERDR_AGENT_STATUS=idle
+    printf 'done: branch ready\n' > "$state/feat-landed.status"
+    FM_FAKE_AXI_STATUS="$(run_passed_with_pr fm/feat-landed https://github.com/o/r/pull/2)"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "source: run-step" "$backend: another PR's receipt reclassified the completed run"
+    FM_FAKE_AXI_STATUS="$(run_running fm/feat-landed)"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "state: working · source: run-step" "$backend: landing proof masked an active run"
+    FM_FAKE_AXI_STATUS="$(run_parked fm/feat-landed)"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "state: parked · source: run-step" "$backend: landing proof masked a parked run"
+    FM_FAKE_AXI_STATUS="$(run_failed fm/feat-landed)"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "state: failed · source: run-step" "$backend: landing proof masked a failed run"
+    FM_FAKE_AXI_STATUS="$(run_passed_no_pr fm/feat-landed)"
+    printf 'needs-decision: review question\n' > "$state/feat-landed.status"
+    out=$(run_crew_state "$d" feat-landed)
+    assert_contains "$out" "source: run-step" "$backend: landing proof changed open-decision reconciliation"
+  done
+  pass "landed merged runs require positive endpoint death and preserve run precedence"
 }
 
 # Regression (2026-09 G7 stale-claim incident, tmux half): the default backend
@@ -5516,6 +5609,7 @@ test_no_run_idle_pane_custom_paused_verb
 test_retired_supervisor_events_do_not_revive_current_state
 test_dead_window_ignores_stale_status_log
 test_exited_worker_with_landed_branch_reads_landed
+test_landed_run_preserves_endpoint_and_run_precedence
 test_no_run_tmux_unreadable_reads_unreachable_not_gone
 test_dead_window_still_reports_terminal_run_step
 test_dead_window_still_reports_active_run_step

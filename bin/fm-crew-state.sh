@@ -212,6 +212,17 @@ SEP=' · '
 
 # Emit the one canonical line and exit 0. Detail is optional.
 emit() {  # <state> <source> [detail]
+  case "$1:$2:${TASK_BACKEND:-}" in
+    done:status-log:tmux|done:status-log:herdr|done:run-step:tmux|done:run-step:herdr)
+      if [ -n "$BACKEND_TARGET" ]; then
+        case "$(fm_backend_agent_state "$TASK_BACKEND" "$BACKEND_TARGET")" in
+          dead|missing)
+            if ship_landed; then
+              set -- done landed "finished, landed on $LANDED_ON; awaiting cleanup"
+            fi ;;
+        esac
+      fi ;;
+  esac
   local line="state: $1${SEP}source: $2"
   [ -n "${3:-}" ] && line="$line${SEP}$3"
   printf '%s\n' "$line"
@@ -987,6 +998,46 @@ if [ "$KIND" = ship ] && [ -n "$CREW_BRANCH" ] && command -v no-mistakes >/dev/n
   fi
 fi
 
+# Local, network-free evidence that a ship whose status reads done has landed
+# with no tracked edit left: a local-only HEAD held by its local landing branch,
+# or a HEAD contained in the recorded head of a PR whose merge the poll retired.
+# Display only; bin/fm-teardown.sh owns the proof that permits removal.
+LANDED_ON=
+ship_landed() {
+  local changes ref head
+  [ "$KIND" = ship ] || return 1
+  case "$LOG_VERB" in needs-decision|blocked) return 1 ;; esac
+  [ "$LOG_VERB" = "done" ] || [ "${RUN_STATE:-}" = done ] || return 1
+  changes=$(git -C "$WT" status --porcelain --untracked-files=no 2>/dev/null) && [ -z "$changes" ] || return 1
+  if [ "$(meta_value mode)" = local-only ]; then
+    ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || ref=
+    case "$ref" in
+      refs/heads/*) ;;
+      *)
+        ref=$(meta_value base_branch)
+        [ -n "$ref" ] || ref=$(fm_default_branch "$WT") || return 1
+        ref="refs/heads/$ref" ;;
+    esac
+    fm_git_worktree_head_in_ref "$WT" "$ref" 2>/dev/null || return 1
+    LANDED_ON="local ${ref#refs/heads/}"
+  else
+    fm_pr_poll_retirement_receipt_valid "$STATE" "$ID" || return 1
+    if [ "${HAVE_RUN:-0}" = 1 ]; then
+      head=$(strip_quotes "$(nm_field pr)")
+      [ -z "$head" ] || [ "$head" = "$FM_PR_RETIRE_URL" ] || return 1
+    fi
+    head=$(meta_value pr_head)
+    [ -n "$head" ] && git -C "$WT" merge-base --is-ancestor HEAD "$head" 2>/dev/null || return 1
+    LANDED_ON=$FM_PR_RETIRE_URL
+  fi
+}
+emit_gone() {  # [<detail>]
+  if ship_landed; then
+    emit "done" landed "finished, landed on $LANDED_ON; awaiting cleanup"
+  fi
+  emit unknown none "backend target gone: $BACKEND_TARGET${1:-}"
+}
+
 # --- run-step authoritative path -------------------------------------------
 
 if [ "$HAVE_RUN" = 1 ]; then
@@ -1172,40 +1223,6 @@ if [ "$HAVE_RUN" = 1 ]; then
   emit "$RUN_STATE" run-step "$RUN_DETAIL"
 fi
 
-# Local, network-free evidence that a ship whose status reads done has landed
-# with no tracked edit left: a local-only HEAD held by its local landing branch,
-# or a HEAD contained in the recorded head of a PR whose merge the poll retired.
-# Display only; bin/fm-teardown.sh owns the proof that permits removal.
-LANDED_ON=
-ship_landed() {
-  local changes ref head
-  [ "$KIND" = ship ] && [ "$LOG_VERB" = "done" ] || return 1
-  changes=$(git -C "$WT" status --porcelain --untracked-files=no 2>/dev/null) && [ -z "$changes" ] || return 1
-  if [ "$(meta_value mode)" = local-only ]; then
-    ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || ref=
-    case "$ref" in
-      refs/heads/*) ;;
-      *)
-        ref=$(meta_value base_branch)
-        [ -n "$ref" ] || ref=$(fm_default_branch "$WT") || return 1
-        ref="refs/heads/$ref" ;;
-    esac
-    fm_git_worktree_head_in_ref "$WT" "$ref" 2>/dev/null || return 1
-    LANDED_ON="local ${ref#refs/heads/}"
-  else
-    fm_pr_poll_retirement_receipt_valid "$STATE" "$ID" || return 1
-    head=$(meta_value pr_head)
-    [ -n "$head" ] && git -C "$WT" merge-base --is-ancestor HEAD "$head" 2>/dev/null || return 1
-    LANDED_ON=$FM_PR_RETIRE_URL
-  fi
-}
-emit_gone() {  # [<detail>]
-  if ship_landed; then
-    emit "done" landed "finished, landed on $LANDED_ON; awaiting cleanup"
-  fi
-  emit unknown none "backend target gone: $BACKEND_TARGET${1:-}"
-}
-
 # --- fallback: no run attributed to this crew ------------------------------
 [ -n "$BACKEND_TARGET" ] || emit unknown none "no backend target recorded"
 HERDR_ACTIVITY=
@@ -1287,6 +1304,11 @@ elif ! tmux display-message -p -t "$BACKEND_TARGET" '#{pane_id}' >/dev/null 2>&1
 fi
 
 if [ "$TASK_BACKEND" = tmux ] && [ "$KIND" != secondmate ]; then
+  if [ "$KIND" = ship ] && [ "$LOG_VERB" = done ] \
+    && [ "$(fm_backend_agent_state "$TASK_BACKEND" "$BACKEND_TARGET")" = dead ] \
+    && ship_landed; then
+    emit_gone " (agent gone, pane shell remains)"
+  fi
   BUSY_VERDICT=$(crew_busy_verdict "$BACKEND_TARGET")
   case "${BUSY_VERDICT%% *}" in
     busy) emit working pane "harness busy (${BUSY_VERDICT#* })" ;;
