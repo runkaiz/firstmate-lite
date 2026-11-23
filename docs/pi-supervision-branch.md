@@ -624,9 +624,7 @@ It sets these limits:
 
 ### Cleanup after landing
 
-The ordinary cleanup of a task whose pull request or local-only branch has landed needs no relocation, because it is the branch's own job in both postures.
-`bin/fm-branch-prompt.sh` names the `check: merge landed:` wake, the branch's own local landing, and any later stale or inactive-outcome row on that task, as the moment to attempt `bin/fm-teardown.sh` without `--force`.
-At that moment the branch reports any refusal instead of concluding there is "nothing to recover".
+Cleanup after landing needs no relocation; the landed-work rule in [`bin/fm-branch-prompt.sh`](../bin/fm-branch-prompt.sh) owns handling PR and local-only landings in both postures, including refusal reporting.
 
 ## Verification
 

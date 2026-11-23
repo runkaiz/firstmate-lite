@@ -21,6 +21,8 @@ TMP_ROOT=$(fm_test_tmproot fm-bearings)
 # TMPDIR is inside an isolated source worktree.
 FM_ROOT_OVERRIDE="$TMP_ROOT/fixture-root"
 mkdir -p "$FM_ROOT_OVERRIDE"
+# Non-repository task directories must not discover the enclosing source copy.
+export GIT_CEILING_DIRECTORIES="$TMP_ROOT"
 export FM_ROOT_OVERRIDE
 
 command -v jq >/dev/null 2>&1 || { echo "skip: jq not found"; exit 0; }

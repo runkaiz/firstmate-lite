@@ -157,9 +157,14 @@
 #      unreachable, and an alive endpoint whose scrollback read failed is still
 #      classified by step 4. Backends with no classifier keep reading a failed
 #      capture as gone. The fallback's own comment owns the per-verdict rules.
-#      A local endpoint that positively reads as gone is instead done · landed
-#      when ship_landed proves the finished ship's branch already landed: an
-#      ordinary worker exit that only awaits cleanup, never a failure.
+#      On tmux/herdr, ship_landed may instead emit done · landed when local
+#      evidence proves a finished ship landed with no tracked edits or open
+#      needs-decision/blocked declaration. This covers gone fallbacks, a
+#      readable tmux pane whose agent is positively dead, and done status-log
+#      or run-step readings whose endpoint is positively dead/missing.
+#      Live or unreadable endpoints retain their original readings, as do
+#      non-done run-step readings. This display classification awaits cleanup;
+#      bin/fm-teardown.sh retains its own removal proof.
 #
 # Read-only and side-effect free. Always exits 0 on a successful read regardless
 # of state; exit 2 only on a usage error (no id).
@@ -998,8 +1003,8 @@ if [ "$KIND" = ship ] && [ -n "$CREW_BRANCH" ] && command -v no-mistakes >/dev/n
   fi
 fi
 
-# Local, network-free evidence that a ship whose status reads done has landed
-# with no tracked edit left: a local-only HEAD held by its local landing branch,
+# Local, network-free evidence that a finished ship has landed with no tracked
+# edit left: a local-only HEAD held by its local landing branch,
 # or a HEAD contained in the recorded head of a PR whose merge the poll retired.
 # Display only; bin/fm-teardown.sh owns the proof that permits removal.
 LANDED_ON=
