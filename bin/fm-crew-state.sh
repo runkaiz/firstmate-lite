@@ -223,7 +223,7 @@ emit() {  # <state> <source> [detail]
         case "$(fm_backend_agent_state "$TASK_BACKEND" "$BACKEND_TARGET")" in
           dead|missing)
             if ship_landed; then
-              set -- done landed "finished, landed on $LANDED_ON; awaiting cleanup"
+              set -- "done" landed "finished, landed on $LANDED_ON; awaiting cleanup"
             fi ;;
         esac
       fi ;;
@@ -1012,7 +1012,7 @@ ship_landed() {
   local changes ref head
   [ "$KIND" = ship ] || return 1
   case "$LOG_VERB" in needs-decision|blocked) return 1 ;; esac
-  [ "$LOG_VERB" = "done" ] || [ "${RUN_STATE:-}" = done ] || return 1
+  [ "$LOG_VERB" = "done" ] || [ "${RUN_STATE:-}" = "done" ] || return 1
   changes=$(git -C "$WT" status --porcelain --untracked-files=no 2>/dev/null) && [ -z "$changes" ] || return 1
   if [ "$(meta_value mode)" = local-only ]; then
     ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || ref=
@@ -1309,7 +1309,7 @@ elif ! tmux display-message -p -t "$BACKEND_TARGET" '#{pane_id}' >/dev/null 2>&1
 fi
 
 if [ "$TASK_BACKEND" = tmux ] && [ "$KIND" != secondmate ]; then
-  if [ "$KIND" = ship ] && [ "$LOG_VERB" = done ] \
+  if [ "$KIND" = ship ] && [ "$LOG_VERB" = "done" ] \
     && [ "$(fm_backend_agent_state "$TASK_BACKEND" "$BACKEND_TARGET")" = dead ] \
     && ship_landed; then
     emit_gone " (agent gone, pane shell remains)"
