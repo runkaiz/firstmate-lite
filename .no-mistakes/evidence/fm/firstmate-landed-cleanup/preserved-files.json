@@ -1,0 +1,11 @@
+{
+  "build/app.o": "object\n",
+  "web/next-env.d.ts": "types\n",
+  "web/.next/page": "page\n",
+  "web/out/index.html": "page\n",
+  "web/node_modules/pkg/index.js": "module\n",
+  "scripts/__pycache__/build.pyc": "bytecode\n",
+  ".cache/CoffeeMud/Engine.java": "patched source\n",
+  ".cache/CoffeeMud/Engine.class": "compiled\n",
+  ".cache/jdk/bin/java": "java\n"
+}

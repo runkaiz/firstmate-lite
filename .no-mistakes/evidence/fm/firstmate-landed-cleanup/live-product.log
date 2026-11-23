@@ -1,0 +1,438 @@
+$ bash bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo rev-parse HEAD
+f69156c0372d7b24f5d8d495e0a0ee52cfea22be
+[exit 0]
+$ bash -c . "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" landed "$2" "$3" "$4" "$5" refs/heads/main; printf "%s\n" "$FM_GIT_WORKTREE_PATH" _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies f69156c0372d7b24f5d8d495e0a0ee52cfea22be
+Preparing worktree (detached HEAD f69156c)
+HEAD is now at f69156c base
+/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree switch -qc fm/landed
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree add result.txt
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree commit -qm delivery
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree rev-parse HEAD
+0a781b2394ca485244e296e65dfb79b37553ad03
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo merge -q --ff-only fm/landed
+[exit 0]
+$ bash bin/fm-busy-event.sh arm /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/state landed
+g1795467215.2972794.22470
+[exit 0]
+$ bash bin/fm-busy-event.sh apply /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/state landed idle --gen g1795467215.2972794.22470 --source claude-hook --event stop
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s new-window -d -t fm-lab -n fm-landed -c /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree bash --noprofile --norc
+[exit 0]
+$ bash -c . bin/fm-backend.sh; fm_backend_agent_state tmux fm-lab:fm-landed
+dead[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/baseline/bin/fm-crew-state.sh landed
+state: done · source: status-log · ready in branch fm/landed
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: landed · finished, landed on local main; awaiting cleanup
+[exit 0]
+$ bash bin/fm-bearings-snapshot.sh --json
+{
+  "schema": "fm-bearings.v1",
+  "home": "live/home",
+  "generated": "2026-11-23T20:53:36Z",
+  "prs": "not_requested (run: /ahoy include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [
+    {
+      "id": "landed",
+      "kind": "ship",
+      "state": "done",
+      "stage": "finished, landed",
+      "elapsed_seconds": 2544816,
+      "repo": "demo",
+      "name": "Finished work",
+      "doing": "finished, landed on local main; awaiting cleanup"
+    }
+  ],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ]
+}
+[exit 0]
+$ bash bin/fm-bearings-snapshot.sh
+schema: fm-bearings.v1
+home: live/home
+generated: "2026-11-23T20:53:36Z"
+prs: "not_requested (run: /ahoy include PRs)"
+contributions: 
+  scope: owned contributions per home
+  known: 0
+  checked: 0
+  counts: 
+    captain: 0
+    fleet: 0
+    maintainer: 0
+    nobody: 0
+  complete: true
+  proven_clear: true
+  unmeasured_homes: 0
+  unreadable_records: 0
+  unmeasured: 0
+  stale_verdicts: 0
+  missing_verdicts: 0
+  captain_omitted: 0
+  captain: []
+in_flight[1]{id,kind,state,stage,elapsed_seconds,repo,name,doing}:
+  landed,ship,done,"finished, landed",2544816,demo,Finished work,"finished, landed on local main; awaiting cleanup"
+secondmates: []
+secondmate_reconcile: []
+decisions_open: []
+landed: []
+gates: []
+reports: []
+recorded_prs: []
+omitted[6]{surface,reveal}:
+  backlog item bodies,"--fields bodies"
+  task paths,"--fields paths"
+  watch/steer actions,"--fields actions"
+  healthy endpoint detail,"--fields endpoints"
+  full scout-report inventory,"--all-reports"
+  live PR discovery + checks,"--include-prs"
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: unknown · source: none · backend unreachable (tmux endpoint state: unreadable)
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo update-ref refs/heads/main f69156c0372d7b24f5d8d495e0a0ee52cfea22be
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: status-log · ready in branch fm/landed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo update-ref refs/heads/main 0a781b2394ca485244e296e65dfb79b37553ad03
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: status-log · ready in branch fm/landed
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree checkout -- result.txt
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: parked · source: status-log · choose release
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: failed · source: status-log · validation failed
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s send-keys -t fm-lab:fm-landed env CODEX_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/codex codex --no-daemon Enter
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s capture-pane -p -t fm-lab:fm-landed
+  Welcome to Codex, OpenAI's command-line coding agent
+
+  Choose how you want to use Codex.
+
+> 1. Sign in with ChatGPT
+     Usage included with Plus, Pro, Business, and Enterprise plans
+
+  2. Sign in with Device Code
+     Sign in from another device with a one-time code
+
+  3. Sign in another way
+     Use an API key or another provider
+
+  Press enter to continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ bash -c . bin/fm-backend.sh; fm_backend_agent_state tmux fm-lab:fm-landed
+alive[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: status-log · ready in branch fm/landed
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s capture-pane -p -t fm-lab:fm-landed
+  Welcome to Codex, OpenAI's command-line coding agent
+
+  Choose how you want to use Codex.
+
+> 1. Sign in with ChatGPT
+     Usage included with Plus, Pro, Business, and Enterprise plans
+
+  2. Sign in with Device Code
+     Sign in from another device with a one-time code
+
+  3. Sign in another way
+     Use an API key or another provider
+
+  Press enter to continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[exit 0]
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s kill-window -t fm-lab:fm-landed
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: landed · finished, landed on local main; awaiting cleanup
+[exit 0]
+$ git clone -q --bare /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/remote.git
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo remote add origin file:///home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/remote.git
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/projects/demo fetch -q origin
+[exit 0]
+$ bash -c . bin/fm-pr-lib.sh; fm_pr_poll_prepare "$1/state" landed github "$2" github.com fixture/project 7 "$3/bin/fm-pr-poll.sh" && fm_pr_poll_publish_prepared && fm_pr_poll_snapshot_capture "$1/state" landed "$3/bin/fm-pr-poll.sh" && fm_pr_poll_retirement_publish "$1/state" landed "$3/bin/fm-pr-poll.sh" merged _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home https://github.com/fixture/project/pull/7 /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: landed · finished, landed on https://github.com/fixture/project/pull/7; awaiting cleanup
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree commit -q --allow-empty -m after merge
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: blocked · source: status-log · named head 79028fbeb2a7a7a4e68e6573cd8d63959c537af6 is unreachable outside the worker copy
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree reset -q --hard 0a781b2394ca485244e296e65dfb79b37553ad03
+[exit 0]
+$ no-mistakes axi status
+[33mA new version of no-mistakes is available: v1.84.0 -> v1.106.1
+Run "no-mistakes update" to update[0m
+run:
+  id: "01LABCOMPLETED0000000000000"
+  branch: fm/landed
+  status: completed
+  head: 0a781b23
+  head_sha: 0a781b2394ca485244e296e65dfb79b37553ad03
+  verification_plan: none
+  pr: "https://github.com/fixture/project/pull/7"
+  findings: none
+  steps[8]{step,status,findings,duration_ms}:
+    intent,completed,0,1
+    review,completed,0,1
+    test,completed,0,1
+    lint,completed,0,1
+    docs,completed,0,1
+    push,completed,0,1
+    pr,completed,0,1
+    ci,completed,0,1
+outcome: passed
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: done · source: landed · finished, landed on https://github.com/fixture/project/pull/7; awaiting cleanup
+[exit 0]
+$ bash bin/fm-crew-state.sh landed
+state: failed · source: run-step · run failed · run: 01LABCOMPLETED0000000000000
+[exit 0]
+$ bash -c . bin/fm-pr-lib.sh; fm_pr_poll_retirement_recover_one "$FM_HOME/state" landed "$PWD/bin/fm-pr-poll.sh"
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/upstream init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/upstream add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/upstream commit -qm release
+[exit 0]
+$ git clone -q /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/upstream /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree/.cache/CoffeeMud
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree/.cache/CoffeeMud add own.txt
+[exit 0]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree/.cache/CoffeeMud commit -qm unpublished
+[exit 0]
+$ bash bin/fm-teardown.sh landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (2 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (8 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/bin/fm-teardown.sh landed --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+$ git -C /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree/.cache/CoffeeMud reset -q --hard HEAD~1
+[exit 0]
+$ bash bin/fm-teardown.sh landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (2 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (8 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/bin/fm-teardown.sh landed --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+$ git clone -q /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/upstream /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree/.cache/CoffeeMud
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/baseline/bin/fm-teardown.sh landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree; preserving copy
+Untracked or ignored leftovers, by top-level root:
+  .cache (2 files)
+  build (1 file)
+  scripts/__pycache__ (1 file)
+  web/.next (1 file)
+  web/next-env.d.ts (1 file)
+  web/node_modules (1 file)
+  web/out (1 file)
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+full leftover list (8 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/teardown-leftovers.txt
+next: inspect those roots; only if every one is task-owned generated output, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/baseline/bin/fm-teardown.sh landed --preserve-untracked .cache --preserve-untracked build --preserve-untracked scripts/__pycache__ --preserve-untracked web/.next --preserve-untracked web/next-env.d.ts --preserve-untracked web/node_modules --preserve-untracked web/out
+[exit 1]
+$ bash bin/fm-teardown.sh landed
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: preserving recognised generated output after the landing proofs: .cache build scripts/__pycache__ web/.next web/next-env.d.ts web/node_modules web/out
+preserved: .cache -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/.cache
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/build
+preserved: scripts/__pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/scripts/__pycache__
+preserved: web/.next -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/web/.next
+preserved: web/next-env.d.ts -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/web/next-env.d.ts
+preserved: web/node_modules -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/web/node_modules
+preserved: web/out -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/web/out
+teardown landed complete (window fm-lab:fm-landed, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/copies/landed/worktree)
+Backlog: landed is closed in /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/backlog.md. Run bin/fm-tasks-axi.sh ready for dependency-cleared candidates, check date gates, and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/live/home/data/landed/preserved-artifacts/files/.cache/CoffeeMud rev-parse HEAD
+3fe7501d5df6c87b30201e09cf52729c60bf1c40
+[exit 0]
+$ bash bin/fm-queue.sh show landed
+task:
+  id: landed
+  title: Finished work
+  state: done
+  kind: ship
+  repo: demo
+  priority: "-"
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  hold_when: "-"
+  blocked: no
+  blocked_by: none
+  deps: none
+  created: "-"
+  closed: 2026-11-23
+  links: local main
+  body: ""
+  notes_file: "-"
+  archived: no
+[exit 0]
+ALL LIVE PRODUCT ASSERTIONS PASSED
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M8523ET7SQQKNK6ZPCWHTJR6/.test-phase/m/s kill-server
+[exit 0]
