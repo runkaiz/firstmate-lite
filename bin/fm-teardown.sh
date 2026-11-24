@@ -9,9 +9,9 @@
 # A live/unverified owner remaining after the one-pass stop below refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
-# for leftovers the caller inspected and classified as task-owned generated
-# artifacts: after the endpoint, landed-work and process-free proofs pass, each
-# named path moves to data/<id>/preserved-artifacts/ through
+# for task-owned generated leftovers the caller inspected, or the scout scratch
+# leftovers described below: after the endpoint, landed-work and process-free
+# proofs pass, each named path moves to data/<id>/preserved-artifacts/ through
 # fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
 # A refusal or interruption leaves the copy, task records and journal in place,
 # and rerunning the same command completes the preservation idempotently.
