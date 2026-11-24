@@ -1,0 +1,7 @@
+[
+  {
+    "scenario": "baseline-before-fix",
+    "result": "pass",
+    "exit": 1
+  }
+]

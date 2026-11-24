@@ -1,0 +1,748 @@
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.fm-lab -f /dev/null new-session -d -s fm-lab-cleanup -c /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ 'bash --noprofile --norc'
+[exit 0]
+
+SCENARIO tracked-and-binary
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project rev-parse HEAD
+1a94bdef81e0b44bfe4c5d6aff35a32c2f17da3b
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies 1a94bdef81e0b44bfe4c5d6aff35a32c2f17da3b
+Preparing worktree (detached HEAD 1a94bde)
+HEAD is now at 1a94bde base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: saved tracked scout scratch in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home/data/scout/scratch/teardown.GmDii4
+teardown scout complete (window fm-lab-cleanup:fm-scout, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/copies/scout/worktree)
+Backlog: scout just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home/data/backlog.md - move scout to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project apply --index /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home/data/scout/scratch/teardown.GmDii4/staged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project apply /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/home/data/scout/scratch/teardown.GmDii4/unstaged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: copy, reservation and metadata removed; report retained; saved patches restore exact staged index and all working-file hashes, including binary, added and deleted files.
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/tracked-and-binary/project status --short
+MM README.md
+AM added.txt
+D  delete-me.txt
+MM image.bin
+[exit 0]
+
+SCENARIO generated
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project rev-parse HEAD
+de78b2d7bdab9afbe3264000cdff9246d9fa4d71
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies de78b2d7bdab9afbe3264000cdff9246d9fa4d71
+Preparing worktree (detached HEAD de78b2d)
+HEAD is now at de78b2d base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: preserving recognised generated output after the landing proofs: __pycache__ build
+teardown: saved tracked scout scratch in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/scout/scratch/teardown.ejfyJ3
+preserved: __pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/scout/preserved-artifacts/files/__pycache__
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/scout/preserved-artifacts/files/build
+teardown scout complete (window fm-lab-cleanup:fm-scout, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/copies/scout/worktree)
+Backlog: scout just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/backlog.md - move scout to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project apply --index /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/scout/scratch/teardown.ejfyJ3/staged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project apply /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/home/data/scout/scratch/teardown.ejfyJ3/unstaged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: copy, reservation and metadata removed; report retained; saved patches restore exact staged index and all working-file hashes, including binary, added and deleted files.
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/generated/project status --short
+MM README.md
+AM added.txt
+D  delete-me.txt
+MM image.bin
+[exit 0]
+
+SCENARIO named
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project rev-parse HEAD
+944f4debe352527ad8955223797bd1afa70d75fc
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies 944f4debe352527ad8955223797bd1afa70d75fc
+Preparing worktree (detached HEAD 944f4de)
+HEAD is now at 944f4de base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout --preserve-untracked scratch-test.py
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: preserving recognised generated output after the landing proofs: scratch-test.py __pycache__ build
+teardown: saved tracked scout scratch in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/scratch/teardown.El83Bp
+preserved: scratch-test.py -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/preserved-artifacts/files/scratch-test.py
+preserved: __pycache__ -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/preserved-artifacts/files/__pycache__
+preserved: build -> /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/preserved-artifacts/files/build
+teardown scout complete (window fm-lab-cleanup:fm-scout, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/copies/scout/worktree)
+Backlog: scout just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/backlog.md - move scout to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project apply --index /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/scratch/teardown.El83Bp/staged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project apply /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/home/data/scout/scratch/teardown.El83Bp/unstaged.patch
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: copy, reservation and metadata removed; report retained; saved patches restore exact staged index and all working-file hashes, including binary, added and deleted files.
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/named/project status --short
+MM README.md
+AM added.txt
+D  delete-me.txt
+MM image.bin
+[exit 0]
+
+SCENARIO no-report
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/project rev-parse HEAD
+db91e2f488ccde0d572a0b1f215b3ddcbcc51e0b
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies db91e2f488ccde0d572a0b1f215b3ddcbcc51e0b
+Preparing worktree (detached HEAD db91e2f)
+HEAD is now at db91e2f base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout task scout has no report at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/home/data/scout/report.md.
+The report is the work product. Have the crewmate write it, or use --force after explicit discard approval.
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-report/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO no-inventory
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/project rev-parse HEAD
+db91e2f488ccde0d572a0b1f215b3ddcbcc51e0b
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies db91e2f488ccde0d572a0b1f215b3ddcbcc51e0b
+Preparing worktree (detached HEAD db91e2f)
+HEAD is now at db91e2f base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-captain-hold: origin scout has no completed captain-call inventory
+REFUSED: scout task scout has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/no-inventory/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO unfinished
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/project rev-parse HEAD
+e4a1b4c6f97a6177d776b71fedad1e13324ba77c
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies e4a1b4c6f97a6177d776b71fedad1e13324ba77c
+Preparing worktree (detached HEAD e4a1b4c)
+HEAD is now at e4a1b4c base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout has tracked edits and has not reported completion; preserving the copy
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unfinished/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO unique-commit
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project rev-parse HEAD
+e4a1b4c6f97a6177d776b71fedad1e13324ba77c
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies e4a1b4c6f97a6177d776b71fedad1e13324ba77c
+Preparing worktree (detached HEAD e4a1b4c)
+HEAD is now at e4a1b4c base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree commit --allow-empty -qm 'unique scout commit'
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree rev-parse HEAD
+61ae593b8cfcac3dd6af4696ab6bd767e9523a9e
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/project merge -q --ff-only 61ae593b8cfcac3dd6af4696ab6bd767e9523a9e
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout with tracked edits is not proven to be at its recorded base; preserving the copy
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unique-commit/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO unnamed
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/project rev-parse HEAD
+2705425599a49f7f3a7adc5ef0bb312a105e280e
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies 2705425599a49f7f3a7adc5ef0bb312a105e280e
+Preparing worktree (detached HEAD 2705425)
+HEAD is now at 2705425 base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: tracked scout scratch has unclassified leftovers; preserving the copy
+full leftover list (3 path(s)): /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home/data/scout/teardown-leftovers.txt
+next: inspect those roots before explicitly preserving them; to preserve all of them, run:
+  FM_HOME=/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout --preserve-untracked __pycache__ --preserve-untracked build --preserve-untracked scratch-test.py
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unnamed/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO unmerged
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/project rev-parse HEAD
+79403f830a3d5e3b3aea972fe47b2c1147daa265
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies 79403f830a3d5e3b3aea972fe47b2c1147daa265
+Preparing worktree (detached HEAD 79403f8)
+HEAD is now at 79403f8 base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree rev-parse HEAD:README.md
+fdd0106594f304db6d31adb912349cbe5d07a414
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree rev-parse :README.md
+3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree ls-files --stage
+100644 fdd0106594f304db6d31adb912349cbe5d07a414 1	README.md
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 2	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: tracked scout scratch has unmerged paths; preserving the copy
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/unmerged/copies/scout/worktree ls-files --stage
+100644 fdd0106594f304db6d31adb912349cbe5d07a414 1	README.md
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 2	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO patch-destination-failure
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/project rev-parse HEAD
+79403f830a3d5e3b3aea972fe47b2c1147daa265
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies 79403f830a3d5e3b3aea972fe47b2c1147daa265
+Preparing worktree (detached HEAD 79403f8)
+HEAD is now at 79403f8 base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+mkdir: cannot create directory ‘/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home/data/scout/scratch’: File exists
+REFUSED: could not preserve tracked scout scratch under /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/home/data/scout/scratch
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/patch-destination-failure/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO open-decision
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/project rev-parse HEAD
+df26406f9c93b9292595a5c6ac36965247494564
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies df26406f9c93b9292595a5c6ac36965247494564
+Preparing worktree (detached HEAD df26406)
+HEAD is now at df26406 base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-captain-hold: open captain decision scout/prototype is not transferred to the captain-held inventory; re-run complete
+REFUSED: scout task scout has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/open-decision/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO live-owner
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/project rev-parse HEAD
+1cc9f7e7221c97c42f1dcc154860dfb0988fd398
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies 1cc9f7e7221c97c42f1dcc154860dfb0988fd398
+Preparing worktree (detached HEAD 1cc9f7e)
+HEAD is now at 1cc9f7e base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: native copy still has processes; nothing preserved
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/live-owner/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+
+SCENARIO ship-guard
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-lab-home.sh create /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/home
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/home
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/project init -q -b main
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/project add .
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/project commit -qm base
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/project rev-parse HEAD
+1cc9f7e7221c97c42f1dcc154860dfb0988fd398
+[exit 0]
+$ bash -c '. "$1/bin/fm-git-worktree-lib.sh"; fm_git_worktree_allocate "$2/state" scout "$2" "$3" "$4" "$5" refs/heads/main || exit; printf "LAB_WORKTREE=%s\n" "$FM_GIT_WORKTREE_PATH"' _ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/project /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies 1cc9f7e7221c97c42f1dcc154860dfb0988fd398
+Preparing worktree (detached HEAD 1cc9f7e)
+HEAD is now at 1cc9f7e base
+LAB_WORKTREE=/var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-captain-hold.sh complete scout --none
+complete: scout captain-call inventory reviewed
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree add README.md
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree add image.bin
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree add delete-me.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree add added.txt
+[exit 0]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+$ bash /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/bin/fm-teardown.sh scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+MM README.md
+AM added.txt
+D  delete-me.txt
+MM image.bin
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them
+[exit 1]
+$ git -C /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.test-cleanup-live/ship-guard/copies/scout/worktree ls-files --stage
+100644 3e4f3d0ad3df5ec9c3743c9a386a3a4c13b0fa37 0	README.md
+100644 c18cdd697d33c453574c5b6d8bcfc408a90e24dc 0	added.txt
+100644 636c21582bbb77d632432da2f982b7a97b4c151f 0	image.bin
+[exit 0]
+OBSERVED: cleanup refused; exact index, all working-file hashes, copy, metadata and reservation retained.
+$ tmux -S /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87TMQ0134RQA58XJAG82EYZ/.fm-lab kill-server
+[exit 0]

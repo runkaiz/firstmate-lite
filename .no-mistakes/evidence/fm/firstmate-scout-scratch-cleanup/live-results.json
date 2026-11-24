@@ -1,0 +1,67 @@
+[
+  {
+    "scenario": "tracked-and-binary",
+    "result": "pass",
+    "exit": 0
+  },
+  {
+    "scenario": "generated",
+    "result": "pass",
+    "exit": 0
+  },
+  {
+    "scenario": "named",
+    "result": "pass",
+    "exit": 0
+  },
+  {
+    "scenario": "no-report",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "no-inventory",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "unfinished",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "unique-commit",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "unnamed",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "unmerged",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "patch-destination-failure",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "open-decision",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "live-owner",
+    "result": "pass",
+    "exit": 1
+  },
+  {
+    "scenario": "ship-guard",
+    "result": "pass",
+    "exit": 1
+  }
+]

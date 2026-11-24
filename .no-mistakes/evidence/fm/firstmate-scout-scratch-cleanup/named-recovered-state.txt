@@ -1,0 +1,14 @@
+MM README.md
+AM added.txt
+D  delete-me.txt
+MM image.bin
+
+Recovered file SHA256:
+{
+  "README.md": "ec01ee11b1859474e804d6624b76aee24256e0b69f3b765725df1dcf37c19ea8",
+  "image.bin": "c59ad014d9625dd02ce46c33ae82f524715a0f15a24a632e9096c966a636fd8f",
+  "added.txt": "794a6af6cdf5ed042ad434be50929d905ffb63aceb7a1d76e3c0603ea3439c7a",
+  "scratch-test.py": "3de9dca3c6cf001c0722efafe78cf1bedf3c921e4c45e948c6f4b600cb724ddf",
+  "build/output": "c4335743d2f191b4d7a6cf67fb86a7c7a0c36baf264e7b8f8836c80f0203e703",
+  "__pycache__/mod.pyc": "857a294d84699ea3f9a859a380647e58eee6612d12d8a5691ce21393c8876f45"
+}
