@@ -1615,9 +1615,9 @@ detach_runner() {  # <source-id>
 # stranded claims clear differently and naming the wrong recovery would
 # send someone to a command that reports `already owned` and changes nothing.
 #
-# The marker records the claim generation that was reported, so the same strand
-# never wakes twice while a genuinely new claim still does - an alarm that
-# repeats every supervision cycle is as unusable as one nobody gets. It is
+# The marker records the reported claim generation or unverified CI registration,
+# so an unchanged strand stays silent while a new generation announces - an alarm
+# that repeats every supervision cycle is as unusable as one nobody gets. It is
 # written before the wake and removed again if the wake does not land, so a
 # failed announcement retries instead of being silently marked as delivered.
 report_stranded_source() {  # <source-id> <generation> <why-and-recovery>

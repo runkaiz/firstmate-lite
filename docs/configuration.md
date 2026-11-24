@@ -1854,6 +1854,7 @@ It names the source and the recovery step:
 Later cycles stay silent for the same generation.
 A genuinely new stranded claim announces again.
 For delegated no-mistakes CI waits, a claim or runner identity that reconcile cannot verify produces one stranded wake per registration while leaving ownership untouched.
+It starts no replacement; the wake asks firstmate to inspect the claim and confirm whether anything is still polling the source.
 
 **Reclaim a generation proved gone**
 
@@ -1959,7 +1960,7 @@ A later fresh failure gets a fresh key, because the watcher never re-surfaces a 
   The detached launch discards that output.
 - A later cycle that finds the source owned ends the episode automatically.
   A runner that was merely slow to claim needs no operator action.
-- A source stranded on a claim nothing may automatically displace is announced the same way, once per stranded claim generation, as described above.
+- Stranded-source announcements follow "Report stranded claims" above.
 - `bin/fm-watch.sh` surfaces both under their own headlines - `process-event source stranded` and `process-event source failed to start` - rather than as a captured result.
 
 **Reject unusable settings**
