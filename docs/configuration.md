@@ -1853,6 +1853,7 @@ It names the source and the recovery step:
 
 Later cycles stay silent for the same generation.
 A genuinely new stranded claim announces again.
+For delegated no-mistakes CI waits, a claim or runner identity that reconcile cannot verify produces one stranded wake per registration while leaving ownership untouched.
 
 **Reclaim a generation proved gone**
 
