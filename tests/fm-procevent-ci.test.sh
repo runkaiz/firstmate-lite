@@ -242,18 +242,38 @@ out=$(poll)
 check 'pipeline repair restarts the zero-check bound' test ! -s "$queue"
 check 'no forge read before the restarted bound' test "$(rollup_calls)" = 0
 rm -f "$queue"; unset CI_CHECKS
-# Recovery through the real runner: a persisted registration with no listener
-# is reconciled, pending holds publish nothing, one terminal capture wakes once,
-# and handled + restart cannot wake a completed worker again.
+# Recovery through the real runner after a delegated listener is killed.
 reset_counts; export CI_SCENARIO=hold CI_AFTER=1
-"$ROOT/bin/fm-procevent.sh" register ci ci-run1 -- "$ADAPTER" poll task "$LAB/wt" RUN1 fm/ci "$PR" >/dev/null
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-pr-lib.sh"
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-procevent-lib.sh"
-check 'durable registration owns wait before listener recovery' fm_procevent_ci_waiting "$FM_STATE_OVERRIDE" task "$ROOT"
-"$ROOT/bin/fm-procevent.sh" ensure-listening ci-run1 >/dev/null
-check 'recovered pending listener emits zero supervisor dispatch events' test ! -s "$FM_STATE_OVERRIDE/.wake-queue"
+"$ADAPTER" arm task > "$LAB/recovery-arm.out"
+for ((i=0; i<200; i++)); do [ -s "$LAB/drives" ] && break; /bin/sleep .05; done
+check 'delegated listener drove the run before it died' test -s "$LAB/drives"
+check 'live pending listener emits no wakes' test ! -s "$queue"
+claim="$FM_PROCEVENT_CLAIM_ROOT/ci-run1.claim"
+runner=$(cat "$FM_STATE_OVERRIDE/procevent/ci-run1.runner")
+case "$runner" in ''|*[!0-9]*) exit 1 ;; esac
+check 'fixture runner leads its isolated process group' test "$(ps -o pgid= -p "$runner" | tr -d '[:space:]')" = "$runner"
+kill -KILL "-$runner"
+for ((i=0; i<200; i++)); do kill -0 "-$runner" 2>/dev/null || break; /bin/sleep .05; done
+check 'fixture listener group is gone' test "$i" -lt 200
+check 'dead listener left the delegated wait registered' fm_procevent_ci_waiting "$FM_STATE_OVERRIDE" task "$ROOT"
+# Model an unreadable claim after the interruption. Even with the worker
+# parked, reconcile must preserve ownership until it can prove a restart safe.
+cp "$claim" "$LAB/saved-claim"
+printf 'incomplete claim\n' > "$claim"
+out=$("$ROOT/bin/fm-procevent.sh" reconcile)
+check 'uncertain ownership refuses to restart' contains "$out" 'started=0 stopped=0 uncertain=1'
+check 'uncertain listener queues a stranded wake' grep -q 'procevent:ci-run1:stranded:.*cannot verify its listener' "$queue"
+"$ROOT/bin/fm-procevent.sh" reconcile >/dev/null
+check 'repeated reconciliation reports the strand once' test "$(line_count "$queue")" = 1
+check 'uncertain claim is preserved' grep -Fxq 'incomplete claim' "$claim"
+check 'dead listener did not leave a captured result' test ! -d "$FM_STATE_OVERRIDE/procevent-inbox"
+mv "$LAB/saved-claim" "$claim"
+out=$("$ROOT/bin/fm-procevent.sh" reconcile)
+check 'reconcile restarts the wait once ownership is known dead' contains "$out" 'started=1'
 check 'listener recovery dispatches no models' test ! -e "$LAB/model-dispatches"
 # The poll is blocked on a fixture clock event; advance it once into green.
 touch "$LAB/release"
@@ -261,12 +281,12 @@ touch "$LAB/release"
 # reconciling the completed listener, with a bounded fixture-only deadline.
 for ((i=0; i<200; i++)); do
   results=("$FM_STATE_OVERRIDE/procevent-inbox/ci-run1."*.result)
-  [ -f "${results[0]}" ] && [ -s "$FM_STATE_OVERRIDE/.wake-queue" ] \
+  [ -f "${results[0]}" ] && [ "$(line_count "$queue")" -eq 2 ] \
     && not_waiting "$FM_STATE_OVERRIDE" task "$ROOT" && break
   /bin/sleep .05
 done
 check 'action captured durably and queued' test -f "${results[0]}"
-check 'one actionable transition produces one queued wake' test "$(line_count "$FM_STATE_OVERRIDE/.wake-queue")" = 1
+check 'one actionable transition adds one queued wake' test "$(line_count "$queue")" = 2
 result_file=${results[0]}
 check 'capture classified by owning adapter' test "$("$ADAPTER" classify "$result_file")" = action
 seq=${result_file##*/ci-run1.}; seq=${seq%.result}

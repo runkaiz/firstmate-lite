@@ -94,6 +94,8 @@
 #            human makes for a group that lost its leader, which `start`
 #            reports as owned and which the next cycle reclaims on its own
 #            once that group is empty.
+#            A CI wait whose claim or runner identity cannot be verified is
+#            also announced as stranded, once per registration.
 # handled    Durably and idempotently record that a captured result has been
 #            fully handled: <source-id> <sequence>. Prints "handled: id seq"
 #            the first time for that exact source-and-sequence generation and
@@ -1603,22 +1605,22 @@ detach_runner() {  # <source-id>
 }
 
 # Announce a source whose claim no unattended caller may displace, once per
-# stranded claim generation.
+# stranded claim generation or CI registration with unverified ownership.
 #
 # The supervision cycle runs this command with its output and its exit status
 # both discarded, so a strand that only shows up in `list` as `orphaned` and in
 # this command's `uncertain=` count reaches nobody. A durable `check` wake does
 # reach firstmate through the ordinary queue, and it carries what clears the
 # strand so acting on it needs no hunt. The caller supplies that part, because
-# the two strand shapes clear differently and naming the wrong recovery would
+# stranded claims clear differently and naming the wrong recovery would
 # send someone to a command that reports `already owned` and changes nothing.
 #
-# The marker records the claim generation that was reported, so the same strand
-# never wakes twice while a genuinely new claim still does - an alarm that
-# repeats every supervision cycle is as unusable as one nobody gets. It is
+# The marker records the reported claim generation or unverified CI registration,
+# so an unchanged strand stays silent while a new generation announces - an alarm
+# that repeats every supervision cycle is as unusable as one nobody gets. It is
 # written before the wake and removed again if the wake does not land, so a
 # failed announcement retries instead of being silently marked as delivered.
-report_stranded_source() {  # <source-id> <claim-token> <why-and-recovery>
+report_stranded_source() {  # <source-id> <generation> <why-and-recovery>
   local id=$1 token=$2 detail=$3
   case "$token" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
   [ -n "$detail" ] || return 1
@@ -1822,6 +1824,13 @@ cmd_reconcile() {
             "$(stranded_leaderless_detail "$id")" || true
         elif [ "$claim_state" -eq 2 ]; then
           uncertain=$((uncertain + 1))
+          # A delegated CI wait suppresses routine worker checks while its
+          # registration exists. Preserve uncertain ownership and surface it.
+          if [ "$(read_adapter "$id" 2>/dev/null)" = ci ] \
+            && launch_identity=$(fm_pr_file_identity "$rec" 2>/dev/null); then
+            report_stranded_source "$id" "unverified-${launch_identity//:/-}" \
+              "reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling $id." || true
+          fi
         elif [ "$claim_state" -eq 0 ]; then
           # A live owner is the same evidence confirmation reads, however the
           # runner was started, so it ends any launch-failure episode here.
