@@ -1,0 +1,8 @@
+Real second engine paused PID 1152814
+Queue before cleanup:
+1795557441	10	signal	demo.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557441	11	signal	demo.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557443	12	stale	fm-lab-wake-gate-074c27d:w1:p999997	stale: fm-lab-wake-gate-074c27d:w1:p999997 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+Queue after cleanup:
+1795557441	10	signal	demo.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557441	11	signal	demo.status	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status

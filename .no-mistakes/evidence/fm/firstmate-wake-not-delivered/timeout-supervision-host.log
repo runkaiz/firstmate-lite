@@ -1,0 +1,4 @@
+1795557584	start	gen=host-1235321-1795557584	primary=claude
+1795557633	handled	turn=host-1235321-1795557584.1	posture=attended	rc=0	reports=1	error=0 cost=0.011513 conversation_cost=0.011513 input=42 cache_read=477470 cache_write=14983 output=7476 turns=21	stale: fm-lab-wake-gate-074c27d:w1:p999995 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+1795557634	to-main	branch-outcome: the supervision session handled this wake and recorded captain outcomes for you (store rows 1); run bin/fm-wake-drain.sh, act on its BRANCH OUTCOMES section, and acknowledge them as it prints
+1795557637	start	gen=host-1269794-1795557637	primary=claude

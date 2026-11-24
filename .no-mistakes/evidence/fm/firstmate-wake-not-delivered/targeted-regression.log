@@ -1,0 +1,2 @@
+ok - host+hook: cleanup settles a stale close without stranding the next actionable notification
+ok - host+hook: an attended main-only pass-through rewakes main and keeps its successor watcher

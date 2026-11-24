@@ -1,0 +1,16 @@
+Target: 074c27d11f34450141d50a7a8decd4a359fd2aeb
+Base: 220db688bdded7976780f853ae8d41e77e733bca
+
+Targeted portable regression used the real host, arm, watcher, queue, cleanup and Claude Stop-hook scripts with a stub engine/harness; it is supplemental, not live evidence. The same added regression on the base host failed at the original lost-rewake symptom.
+
+Live evidence used real Claude 2.1.331 primary and headless engine with the normal login, Herdr 0.9.5 in fm-lab-wake-gate-074c27d, and a private 160x48 tmux socket in the worktree. An interactive launch encountered workspace trust and was stopped; print mode avoided the trust mutation and exercised real asyncRewake hooks.
+
+Initial disposable task metadata omitted a worktree; the real engine correctly escalated it. The fixture was corrected with a disposable project and a paused lab-timer status before repeating the race. SIGSTOP/SIGCONT on the actual engine held the intended timing window; no backend or engine response was mocked.
+
+The original observer expected an unresolved stale close in its own host-log line. It instead coalesced with the later decision. Independent assertions over the real primary drain, acknowledgement command, ACKED reply, host settled log, and absence of retired p999997 in primary output verified all intended outcomes. The observer timeout is a test-driver assumption, not a product failure.
+
+Evidence surface is CLI/process supervision, with no visual rendering change. Product-level evidence is the primary observable transcript and host logs.
+
+A separate real pending-stale run retained p999995. The normal host accepted this unresolved stale wake for the real supervision engine, which recorded a captain outcome; primary Stop feedback delivered that outcome and the primary drained/acknowledged it. The auxiliary observer expected main-only pass-through and timed out, but independent semantic assertions confirmed ordinary engine handling and primary delivery, with no settled suppression. See unresolved-primary-transcript.jsonl and unresolved-guard-assertions.txt.
+
+Both real lab sessions were torn down by the helper in their evidence turns; the disposable tmux servers, homes, and temporary primary markers were removed.

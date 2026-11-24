@@ -1,0 +1,15 @@
+1795557294	start	gen=host-1057210-1795557294	primary=claude
+1795557295	to-main	the handling handoff to the successor watcher could not be confirmed; this wake is yours
+1795557299	start	gen=host-1061401-1795557299	primary=claude
+1795557331	handled	turn=host-1061401-1795557299.1	posture=attended	rc=0	reports=1	error=0 cost=0.005285 conversation_cost=0.005285 input=12 cache_read=87819 cache_write=18472 output=1422 turns=6	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557331	to-main	branch-outcome: the supervision session handled this wake and recorded captain outcomes for you (store rows 1); run bin/fm-wake-drain.sh, act on its BRANCH OUTCOMES section, and acknowledge them as it prints
+1795557337	start	gen=host-1083152-1795557337	primary=claude
+1795557403	handled	turn=host-1083152-1795557337.1	posture=attended	rc=0	reports=1	error=0 cost=0.001868 conversation_cost=0.007153 input=10 cache_read=96964 cache_write=1861 output=1051 turns=5	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557450	handled	turn=host-1083152-1795557337.2	posture=attended	rc=0	reports=1	error=0 cost=0.001749 conversation_cost=0.008902 input=10 cache_read=105128 cache_write=1451 output=813 turns=5	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557450	settled	stale: fm-lab-wake-gate-074c27d:w1:p999997 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+1795557452	pass-through	attended	main-only	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557452	pass-through	successor-unrecorded	signal: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH602E3VG3Q41E3ZEDWGW/.w/state/demo.status
+1795557457	start	gen=host-1163778-1795557457	primary=claude
+1795557489	pass-through	attended	main-only	stale: fm-lab-wake-gate-074c27d:w1:p999996 (herdr: agent missing - the recorded endpoint is gone, recovery required - reconcile this record, and check for unlanded work before any cleanup)
+1795557493	start	gen=host-1188412-1795557493	primary=claude
+1795557493	take-over	arm=1185082

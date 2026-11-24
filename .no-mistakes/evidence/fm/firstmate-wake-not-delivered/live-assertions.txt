@@ -1,0 +1,6 @@
+Observed real Claude Code 2.1.331 and Herdr 0.9.5 through isolated lab:
+1. Retired p999997 stale close logged settled; no such close reached primary.
+2. Later LIVE_AFTER_CLEANUP decision reached Stop feedback, primary drain, exact generation-bound acknowledgement through sequence 15, and ACKED reply.
+3. Unresolved p999998 stale wake remained visible in the same primary drain.
+4. Injected malformed durable queue row prevented suppression of retired p999996 close; host passed it to main.
+Primary transcript retained as primary-observable-transcript.jsonl.
