@@ -39,7 +39,12 @@
 # the away-posture record state/.afk-contract, read at every close and again
 # when a turn starts: only an away record is away, and no record or quiet
 # mode's record (fm_afk_contract_away_present, bin/fm-afk-contract.sh AWAY OR
-# QUIET) is a present captain. On each actionable close:
+# QUIET) is a present captain. Before routing an actionable close, unless the
+# away daemon's flag exists, the host settles a Herdr missing-endpoint close
+# when the durable queue exists, can be read, has at least five tab-separated
+# fields and a numeric sequence on every row, and has no stale row for that
+# target. It keeps the park and starts an ordinary arm, without a handling
+# handoff, so other queued work can resurface. On each remaining actionable close:
 #   - attended (no away record): the close reaches main exactly as the arm printed
 #     it, as without the host, unless the supervision session may take it: the
 #     home names a usable engine, its turns have every tool they need, this
@@ -59,7 +64,7 @@
 #     session's next park without --restart requests a take-over of its cycle
 #     rather than an ordinary attach; bin/fm-watch-arm.sh's --take-over header owns the
 #     conditions under which that restores a single owner and the fallback;
-#   - away (an away record exists): every close goes to the engine.
+#   - away (an away record exists): the close goes to the engine.
 # Every turn that starts attended meets that rule again at its start, so a
 # close accepted away whose turn starts attended (the captain returned in
 # between) or an attended close whose task turned main-only while the
