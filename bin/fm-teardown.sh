@@ -24,7 +24,9 @@
 # may retire tracked scratch only at its recorded base. After endpoint and
 # process checks, teardown saves staged and unstaged binary-capable patches
 # under data/<id>/scratch/teardown.* before reversing either in the copy.
-# Untracked or ignored leftovers alongside tracked scratch still refuse.
+# Recognised generated output is preserved afterwards through the ordinary
+# leftover gate; other leftovers must be named with --preserve-untracked.
+# Unmerged paths refuse.
 # One-pass stop: a native ship or scout whose current status reads done, with
 # no open decision, is first stopped through bin/fm-control.sh exit (which
 # preserves the endpoint, copy, and every uncommitted change) before teardown
@@ -836,12 +838,14 @@ if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
 fi
 # Leftover refusal advice: full list to data/<id>/teardown-leftovers.txt and the
 # exact command naming the minimal roots; the caller still inspects them.
-native_leftover_next_action() {  # <copy>
+native_leftover_next_action() {  # <copy> [scout-scratch]
   local copy=$1 list="$DATA/$ID/teardown-leftovers.txt" roots tracked_changes cmd count root total
-  tracked_changes=$(git -C "$copy" status --porcelain --untracked-files=no) || tracked_changes=unreadable
-  if [ -n "$tracked_changes" ]; then
-    echo "next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them" >&2
-    return 0
+  if [ "${2:-}" != scout-scratch ]; then
+    tracked_changes=$(git -C "$copy" status --porcelain --untracked-files=no) || tracked_changes=unreadable
+    if [ -n "$tracked_changes" ]; then
+      echo "next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them" >&2
+      return 0
+    fi
   fi
   mkdir -p -- "$DATA/$ID" || return 0
   roots=$(fm_git_worktree_leftover_roots "$copy" "" "$list") || {
@@ -861,7 +865,11 @@ native_leftover_next_action() {  # <copy>
     total=$((total + count))
   done <<< "$roots"
   echo "full leftover list ($total path(s)): $list" >&2
-  echo "next: inspect those roots; only if every one is task-owned generated output, run:" >&2
+  if [ "${2:-}" = scout-scratch ]; then
+    echo "next: inspect those roots before explicitly preserving them; to preserve all of them, run:" >&2
+  else
+    echo "next: inspect those roots; only if every one is task-owned generated output, run:" >&2
+  fi
   echo "  $cmd" >&2
 }
 NATIVE_SCOUT_TRACKED=
@@ -883,14 +891,14 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ "$KIND" = scout ] && [ "$BACKEND" != herdr-remote ] && [ -d "$WT" ]; then
     NATIVE_SCOUT_TRACKED=$(git -C "$WT" status --porcelain --untracked-files=no --ignore-submodules=none) || exit 1
   fi
-  if [ -n "$NATIVE_SCOUT_TRACKED" ]; then
-    : # Defer the ordinary clean gate until after guarded scratch preservation.
-  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT"); then
+  if [ -d "$WT" ] && { [ "${#PRESERVE_PATHS[@]}" = 0 ] || [ -n "$NATIVE_SCOUT_TRACKED" ]; } &&
+     NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT" ${NATIVE_SCOUT_TRACKED:+scout-scratch} \
+       ${PRESERVE_PATHS[@]+"${PRESERVE_PATHS[@]}"}); then
     while IFS= read -r NATIVE_GENERATED_ROOT; do
       [ -z "$NATIVE_GENERATED_ROOT" ] || PRESERVE_PATHS+=("$NATIVE_GENERATED_ROOT")
     done <<< "$NATIVE_GENERATED_ROOTS"
     printf 'teardown: preserving recognised generated output after the landing proofs: %s\n' "${PRESERVE_PATHS[*]}" >&2
-  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
+  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && [ -z "$NATIVE_SCOUT_TRACKED" ] && ! fm_git_worktree_clean "$WT"; then
     native_leftover_next_action "$WT"
     exit 1
   fi
@@ -2607,13 +2615,21 @@ teardown_close_endpoint() {
 }
 
 teardown_preserve_scout_scratch() {
-  local scratch="$DATA/$ID/scratch" patches leftovers
+  local scratch="$DATA/$ID/scratch" patches unmerged leftovers
   local diff_args=(--binary --no-color --no-ext-diff --no-textconv --unified=3
     --src-prefix=a/ --dst-prefix=b/ --ignore-submodules=none --submodule=short)
-  leftovers=$(git -C "$WT" ls-files --others --unmerged) || return 1
-  if [ -n "$leftovers" ]; then
-    echo 'REFUSED: tracked scout scratch has untracked, ignored, or unmerged paths alongside it; preserving the copy' >&2
+  unmerged=$(git -C "$WT" ls-files --unmerged) || return 1
+  if [ -n "$unmerged" ]; then
+    echo 'REFUSED: tracked scout scratch has unmerged paths; preserving the copy' >&2
     return 1
+  fi
+  if [ "${#PRESERVE_PATHS[@]}" = 0 ]; then
+    leftovers=$(git -C "$WT" ls-files --others) || return 1
+    if [ -n "$leftovers" ]; then
+      echo 'REFUSED: tracked scout scratch has unclassified leftovers; preserving the copy' >&2
+      native_leftover_next_action "$WT" scout-scratch
+      return 1
+    fi
   fi
   if [ -L "$DATA/$ID" ] || [ -L "$scratch" ] || ! mkdir -p -- "$scratch" ||
      ! patches=$(mktemp -d "$scratch/teardown.XXXXXX"); then
