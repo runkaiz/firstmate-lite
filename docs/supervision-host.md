@@ -121,6 +121,8 @@ It also passes the close through unchanged, with no added line, when any of thes
 - The main session's lock holder cannot be identified.
 - The session is cooling down after engine errors; see [The broken-session latch](#the-broken-session-latch).
 
+When cleanup has already pruned a Herdr missing-endpoint wake from the durable queue, the host keeps its park and starts an ordinary watcher cycle that can resurface any remaining work.
+
 A close the engine takes is handled as in [One wake](#one-wake), with the dialog mirror at the head of the wake message.
 A handled wake with only routine outcomes never reaches main.
 A handled wake that recorded a captain outcome while the captain is still attended exits with one `supervision-host: branch-outcome:` line naming its store rows, without the close it handled; see [Captain outcomes](#captain-outcomes).

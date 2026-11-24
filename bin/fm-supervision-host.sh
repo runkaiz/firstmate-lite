@@ -1089,6 +1089,25 @@ while :; do
     emit
     exit 0
   fi
+  # Teardown can prune a missing endpoint's stale row while the engine is
+  # still handling the preceding close. Its arm output survives that prune.
+  # Handing it back can end a Claude park silently: once the empty recovery
+  # episode is acknowledged, the Stop hook cannot commit the obsolete rewake.
+  if [[ "$REASON" =~ ^stale:\ ([^[:space:]]+)\ \(herdr:\ agent\ missing\ -\  ]] \
+    && [ -f "$FM_WAKE_QUEUE" ] \
+    && awk -F '\t' -v target="${BASH_REMATCH[1]}" '
+      NF < 5 || $2 !~ /^[0-9]+$/ || ($3 == "stale" && $4 == target) { exit 1 }
+    ' "$FM_WAKE_QUEUE"; then
+    host_still_owner || stand_down "this session no longer owns supervision"
+    log_line "settled	$REASON"
+    ARM_TEXT=
+    # There is no handling turn in progress for this close. An ordinary arm
+    # can resurface any other work still queued without detaching a successor.
+    start_arm "" || exit_to_main "could not re-arm after a settled stale wake"
+    ARM_PID=$STARTED_ARM_PID
+    ARM_OUT=$STARTED_ARM_OUT
+    continue
+  fi
   # Attended: the close reaches main exactly as the plain arm delivers it,
   # unless the supervision session may take it (attended_acceptor).
   if ! fm_afk_contract_away_present "$STATE"; then
