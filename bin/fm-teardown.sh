@@ -2471,7 +2471,7 @@ teardown_native_pr_landed() {
 # single commit). The local branch is the reservation's refs/heads source, or
 # for a legacy origin-recorded reservation the local base/default branch.
 teardown_native_local_landed() {
-  local ref cherry merges
+  local ref
   fm_git_worktree_unchanged_base "$STATE" "$ID" "$PROJ" && return 0
   ref=$(fm_git_worktree_field "$STATE/$ID.git-worktree" source_ref) || return 1
   case "$ref" in
@@ -2479,11 +2479,7 @@ teardown_native_local_landed() {
     *) ref=${BASE_BRANCH:-}; [ -n "$ref" ] || ref=$(default_branch) || return 1; ref="refs/heads/$ref" ;;
   esac
   git -C "$PROJ" show-ref --verify --quiet "$ref" || return 1
-  git -C "$WT" merge-base --is-ancestor HEAD "$ref" && return 0
-  merges=$(git -C "$WT" rev-list --merges "$ref..HEAD" --) || return 1
-  [ -z "$merges" ] || return 1
-  cherry=$(git -C "$WT" cherry "$ref" HEAD) || return 1
-  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
+  fm_git_worktree_head_in_ref "$WT" "$ref"
 }
 # --retain-branch: the captain decided this ship's commits stay on its branch
 # rather than landing through this task. Only the copy is retired: HEAD must be

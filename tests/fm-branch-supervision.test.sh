@@ -62,7 +62,7 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor() {
   # moment or the command, so the stale wake ended in the recovery playbook's
   # "nothing to recover".
   case "$out_a" in
-    *"A worker whose pull request has landed is finished, not stuck"*"\`check: merge landed:\` wake names exactly that moment"*"\`bin/fm-teardown.sh <task>\` with no flags"*"never forced, worked around, or repaired by hand"*) ;;
+    *"A worker whose pull request has landed, or whose local-only branch has landed on its local default branch, is finished, not stuck"*"\`check: merge landed:\` wake names exactly that moment"*"your own \`bin/fm-merge-local.sh\` landing, so clean that task up in the same handling"*"or reads finished and landed awaiting cleanup, is the same moment seen later"*"\`bin/fm-teardown.sh <task>\` with no flags"*"never forced, worked around, or repaired by hand"*) ;;
     *) fail "branch prompt lost the landed-work cleanup rule" ;;
   esac
   case "$out_a" in

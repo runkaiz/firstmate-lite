@@ -154,6 +154,38 @@ fm_git_worktree_leftover_roots() { # <copy> [<paths-file>] [<full-list-file>]
   return "$rc"
 }
 
+# Succeed only when <git-dir> is a self-contained clone holding no commit of its
+# own: a real directory whose objects and checkouts are all inside it, with a
+# remote, where everything reachable from HEAD, a branch, a stash, or any other
+# ref or reflog is also reachable from its remote-tracking refs. A tag neither
+# adds to nor proves that set, since clones fetch tags off every branch.
+# Uncommitted content needs no proof: preservation moves the whole clone.
+# Read-only, without fetching.
+fm_git_worktree_nested_clone() { # <git-dir>
+  local dir=$1 inside own
+  [ -d "$dir" ] && [ ! -L "$dir" ] || return 1
+  for inside in commondir worktrees modules objects/info/alternates; do
+    [ ! -e "$dir/$inside" ] && [ ! -L "$dir/$inside" ] || return 1
+  done
+  own=$(GIT_NO_LAZY_FETCH=1 git --no-replace-objects --git-dir="$dir" for-each-ref --count=1 refs/remotes) || return 1
+  [ -n "$own" ] || return 1
+  own=$(GIT_NO_LAZY_FETCH=1 git --no-replace-objects --git-dir="$dir" \
+    rev-list --max-count=1 --exclude='refs/tags/*' --all --reflog --not --remotes) || return 1
+  [ -z "$own" ]
+}
+
+# Succeed when <root> holds no nested repository, or is project-ignored and
+# every nested repository passes fm_git_worktree_nested_clone.
+fm_git_worktree_nested_clones() { # <copy> <root>
+  local copy=$1 root=$2 nested dir
+  nested=$(find "$copy/$root" -name .git -print) || return 1
+  [ -n "$nested" ] || return 0
+  git -C "$copy" check-ignore -q -- "$root/" || return 1
+  while IFS= read -r dir; do
+    fm_git_worktree_nested_clone "$dir" || return 1
+  done <<< "$nested"
+}
+
 # Print the leftover roots of <copy>, one per line, and succeed only when the
 # copy has leftovers, no tracked change, and every root is recognised
 # generated output: a real directory named node_modules, __pycache__, .next,
@@ -164,10 +196,12 @@ fm_git_worktree_leftover_roots() { # <copy> [<paths-file>] [<full-list-file>]
 # regular file named next-env.d.ts, counts only when the project's own ignore
 # rules ignore that exact path, since those names alone are not proof.
 # A recognised directory holding a nested repository (any .git
-# entry) is uncertain, since it can carry unique commits. Anything else, or an
-# unreadable copy, fails. Read-only.
+# entry) is uncertain, since it can carry unique commits, unless the project's
+# own ignore rules ignore that root and fm_git_worktree_nested_clone proves
+# every such repository a clone with none. Anything else, or an unreadable
+# copy, fails. Read-only.
 fm_git_worktree_generated_roots() { # <copy>
-  local copy=$1 changes roots count root name nested out=''
+  local copy=$1 changes roots count root name out=''
   changes=$(git -C "$copy" status --porcelain --untracked-files=no) || return 1
   [ -z "$changes" ] || return 1
   roots=$(fm_git_worktree_leftover_roots "$copy") || return 1
@@ -178,13 +212,11 @@ fm_git_worktree_generated_roots() { # <copy>
     case "$name" in
       node_modules|__pycache__|.next|.nuxt|.svelte-kit|.turbo|.parcel-cache|.cache|.pytest_cache|.mypy_cache|.ruff_cache|.hypothesis|.tox|.nox|.venv|.gradle|*.egg-info)
         [ -d "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
-        nested=$(find "$copy/$root" -name .git -print -quit) || return 1
-        [ -z "$nested" ] || return 1 ;;
+        fm_git_worktree_nested_clones "$copy" "$root" || return 1 ;;
       build|dist|out|target)
         [ -d "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1
         git -C "$copy" check-ignore -q -- "$root/" || return 1
-        nested=$(find "$copy/$root" -name .git -print -quit) || return 1
-        [ -z "$nested" ] || return 1 ;;
+        fm_git_worktree_nested_clones "$copy" "$root" || return 1 ;;
       *.pyc|*.pyo|*.tsbuildinfo|.eslintcache)
         [ -f "$copy/$root" ] && [ ! -L "$copy/$root" ] || return 1 ;;
       next-env.d.ts)
@@ -336,6 +368,17 @@ fm_git_worktree_unchanged_base() { # <state> <id> <project>
   base=$(fm_git_worktree_field "$1/$2.git-worktree" base) || return 1
   [ "$(git -C "$FM_GIT_WORKTREE_PATH" rev-parse HEAD)" = "$base" ] || return 1
   fm_git_worktree_pin "$3" "refs/firstmate/retained-bases/$base" "$base"
+}
+
+# Succeed when every commit of <copy>'s HEAD is in <ref>: ancestry, or an
+# identical patch id for each non-merge commit. Read-only.
+fm_git_worktree_head_in_ref() { # <copy> <ref>
+  local cherry merges
+  git -C "$1" merge-base --is-ancestor HEAD "$2" && return 0
+  merges=$(git -C "$1" rev-list --merges "$2..HEAD" --) || return 1
+  [ -z "$merges" ] || return 1
+  cherry=$(git -C "$1" cherry "$2" HEAD) || return 1
+  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
 }
 
 fm_git_worktree_landed() { # same arguments as safe; landing proof only, no dirt gate

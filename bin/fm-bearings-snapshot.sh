@@ -82,7 +82,7 @@ Default fields: schema, home, generated, prs, in_flight{id,kind,state,stage,elap
   secondmate_reconcile{id,spawn_gen,host,kind,ids},
   decisions_open{id,key,verb,summary,owner}, landed{id,what,artifact,owner},
   gates{id,title,blocked_by,reason,owner,filed}, reports{id,path}, recorded_prs{id,url},
-  unhealthy_endpoints{...} (only when non-empty), omitted{surface,reveal}.
+  unhealthy_endpoints{...} (only when non-empty; never landed work awaiting cleanup), omitted{surface,reveal}.
 Default gates are selected newest filed first before their bound; undated gates
   retain input order after dated gates.
 landed merges this home's Done with registered secondmate homes' Done, bounded by
@@ -318,8 +318,11 @@ MODEL=$(printf '%s' "$SNAP" | jq \
   def trunc($n): if . == null then null else
     (tostring | gsub("\\s+"; " ") | if (length > $n) then (.[:$n] + "…") else . end) end;
   def live_captain_call: .hold_bucket == "live";
+  def landed_awaiting_cleanup:
+    .current_state.source == "landed";
   def plain_stage:
-    if .current_state.state != "working" then .current_state.state
+    if landed_awaiting_cleanup then "finished, landed"
+    elif .current_state.state != "working" then .current_state.state
     elif .current_state.source == "run-step" then "in review/tests"
     else "implementing" end;
   def elapsed_seconds:
@@ -389,6 +392,7 @@ MODEL=$(printf '%s' "$SNAP" | jq \
   | ([.tasks[] | select(.kind != "secondmate" and .current_state.state == "working") | .id]) as $working_ids
   | ($live_ids + $done_ids) as $rel_ids
   | ([ .tasks[]
+       | select(landed_awaiting_cleanup | not)
        | select(.endpoint.exists == false or .endpoint.agent_alive == "dead")
        | {id, backend, target:(.endpoint.target // "-"), exists:.endpoint.exists, agent:.endpoint.agent_alive} ]
      + [ (.secondmate_current.records // [])[] as $m | $m.endpoints[]?

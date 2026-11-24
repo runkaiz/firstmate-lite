@@ -91,7 +91,7 @@ emit_teardown() { # <id> <copy> <evidence>
 
 # Advisory local-only landing read; teardown_native_local_landed is the proof.
 local_landed() { # <copy> <reservation-or-empty> <project>
-  local ref base merges cherry
+  local ref base
   base=$( [ -n "$2" ] && fm_git_worktree_field "$2" base 2>/dev/null ) || base=
   [ -n "$base" ] && [ "$(git -C "$1" rev-parse HEAD 2>/dev/null)" = "$base" ] && return 0
   ref=$( [ -n "$2" ] && fm_git_worktree_field "$2" source_ref 2>/dev/null ) || ref=
@@ -100,11 +100,7 @@ local_landed() { # <copy> <reservation-or-empty> <project>
     *) ref=$(git -C "$3" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null) && ref="refs/heads/${ref#origin/}" \
          || { git -C "$3" show-ref --verify --quiet refs/heads/main && ref=refs/heads/main; } || ref=refs/heads/master ;;
   esac
-  git -C "$1" merge-base --is-ancestor HEAD "$ref" 2>/dev/null && return 0
-  merges=$(git -C "$1" rev-list --merges "$ref..HEAD" -- 2>/dev/null) || return 1
-  [ -z "$merges" ] || return 1
-  cherry=$(git -C "$1" cherry "$ref" HEAD 2>/dev/null) || return 1
-  [ -n "$cherry" ] && ! printf '%s\n' "$cherry" | grep -qv '^- '
+  fm_git_worktree_head_in_ref "$1" "$ref" 2>/dev/null
 }
 
 classify_record() { # <id> <meta>
