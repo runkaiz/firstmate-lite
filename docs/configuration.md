@@ -359,7 +359,7 @@ Only Claude has a verified engine of its own, so a Cursor, OpenCode, omp, Grok, 
 ### Failures and when changes apply
 
 An unverified engine, a primary without a verified engine, or a malformed line leaves the host without an engine.
-It takes no wake, so every wake reaches main as it would without the host.
+It takes no wake onto the engine; wakes remaining after [settlement](supervision-host.md#postures) reach main as they would without the host.
 Each away-posture wake includes a line naming the problem.
 The running host reads both files at every wake, so an engine change or an opt-out takes effect at the next wake without a restart.
 

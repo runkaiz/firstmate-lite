@@ -1281,6 +1281,59 @@ test_claude_stop_hook_delivers_a_main_only_pass_through() {
   pass "host+hook: an attended main-only pass-through rewakes main and keeps its successor watcher"
 }
 
+test_claude_stop_hook_keeps_park_after_a_retired_stale_close() {
+  local home successor
+  home=$(make_primary_home hook-retired-stale)
+  ln -s "$ROOT/.agents" "$home/.agents"
+  echo held > "$home/stub-mode"
+  mkfifo "$home/stub-release"
+  cat > "$home/fakebin/herdr" <<'SH'
+#!/usr/bin/env bash
+case "$1 $2" in
+  'pane get') printf '{"error":{"code":"pane_not_found"}}\n' ;;
+  'status --json') printf '{"server":{"running":true}}\n' ;;
+  *) exit 1 ;;
+esac
+SH
+  chmod +x "$home/fakebin/herdr"
+  FM_BACKEND_HERDR_EVENTS_FORCE=0 start_hook_session "$home"
+  turn_end "$home"
+  wait_until 150 watcher_live "$home" || fail "retired stale: the Stop hook never started a watcher"
+  append_status "$home" 'finishing a routine turn'
+  wait_until 250 test -s "$home/engine-drain.1" || fail "retired stale: the engine did not drain before cleanup"
+  successor=$(cat "$home/state/.watch.lock/pid")
+
+  # The worker endpoint disappears during cleanup, before its task record is retired.
+  printf 'project=demo\nwindow=test:w1:p1\nbackend=herdr\nkind=ship\n' > "$home/state/retiring.meta"
+  wait_until 250 grep -qs 'herdr: agent missing' "$home/state/.wake-queue" \
+    || fail "retired stale: the watcher did not queue the missing endpoint"
+  wait_until 250 bash -c '! kill -0 "$1" 2>/dev/null' _ "$successor" \
+    || fail "retired stale: the watcher did not close on the missing endpoint"
+  # Use the same queue retirement as teardown, without touching a backend or copy.
+  FM_HOME="$home" bash -c '. "$1"; fm_wake_queue_prune_task "$2" retiring test:w1:p1' _ \
+    "$ROOT/bin/fm-wake-lib.sh" "$home/state" || fail "retired stale: cleanup did not prune the stale row"
+  rm "$home/state/retiring.meta"
+  printf 'continue\n' > "$home/stub-release"
+  wait_until 250 handled_at_least "$home" 1 || fail "retired stale: the routine turn did not settle"
+  assert_no_grep 'herdr: agent missing' "$home/state/.wake-queue" "cleanup must have settled the stale row"
+  wait_until 250 watcher_live "$home" || fail "retired stale: no successor watcher started after cleanup"
+  if grep -qs 'pass-through.*stale:' "$home/state/.supervision-host.log"; then
+    wait_until 250 hook_exited "$home" || fail "retired stale: the hook never completed the stale hand-back"
+  fi
+
+  # The idle session gets no further Stop until a real notification is delivered.
+  successor=$(cat "$home/state/.watch.lock/pid")
+  append_status "$home" 'unrelated decision after cleanup' needs-decision
+  wait_until 250 grep -qs "watcher_pid=$successor.*reason=actionable-signal" "$home/state/.watch-cycle-exits.log" \
+    || fail "retired stale: the successor did not close on the later decision"
+  wait_until 250 hook_exited "$home" || fail "retired stale: the hook did not deliver the later decision"
+  assert_rewoke_main "$home" "retired stale"
+  assert_no_grep 'herdr: agent missing' "$home/hook.err" "the retired stale close must stay off main"
+  assert_re '^signal: .*demo.status' "$home/hook.err" "the same hook must deliver the later decision"
+  assert_grep 'demo.status' "$home/state/.wake-queue" "the later decision must remain queued for main"
+  pass "host+hook: cleanup settles a stale close without stranding the next actionable notification"
+}
+
 # Close the confirmed handling watcher after the engine has acknowledged its
 # wake but before its captain outcome returns to the host.
 test_claude_stop_hook_restores_handoff_when_successor_closed_before_exit_to_main() {

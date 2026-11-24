@@ -39,7 +39,12 @@
 # the away-posture record state/.afk-contract, read at every close and again
 # when a turn starts: only an away record is away, and no record or quiet
 # mode's record (fm_afk_contract_away_present, bin/fm-afk-contract.sh AWAY OR
-# QUIET) is a present captain. On each actionable close:
+# QUIET) is a present captain. Before routing an actionable close, unless the
+# away daemon's flag exists, the host settles a Herdr missing-endpoint close
+# when the durable queue exists, can be read, has at least five tab-separated
+# fields and a numeric sequence on every row, and has no stale row for that
+# target. It keeps the park and starts an ordinary arm, without a handling
+# handoff, so other queued work can resurface. On each remaining actionable close:
 #   - attended (no away record): the close reaches main exactly as the arm printed
 #     it, as without the host, unless the supervision session may take it: the
 #     home names a usable engine, its turns have every tool they need, this
@@ -59,7 +64,7 @@
 #     session's next park without --restart requests a take-over of its cycle
 #     rather than an ordinary attach; bin/fm-watch-arm.sh's --take-over header owns the
 #     conditions under which that restores a single owner and the fallback;
-#   - away (an away record exists): every close goes to the engine.
+#   - away (an away record exists): the close goes to the engine.
 # Every turn that starts attended meets that rule again at its start, so a
 # close accepted away whose turn starts attended (the captain returned in
 # between) or an attended close whose task turned main-only while the
@@ -1088,6 +1093,25 @@ while :; do
     log_line "pass-through	the away daemon's flag exists	$(printf '%s\n' "$REASON" | head -n 1)"
     emit
     exit 0
+  fi
+  # Teardown can prune a missing endpoint's stale row while the engine is
+  # still handling the preceding close. Its arm output survives that prune.
+  # Handing it back can end a Claude park silently: once the empty recovery
+  # episode is acknowledged, the Stop hook cannot commit the obsolete rewake.
+  if [[ "$REASON" =~ ^stale:\ ([^[:space:]]+)\ \(herdr:\ agent\ missing\ -\  ]] \
+    && [ -f "$FM_WAKE_QUEUE" ] \
+    && awk -F '\t' -v target="${BASH_REMATCH[1]}" '
+      NF < 5 || $2 !~ /^[0-9]+$/ || ($3 == "stale" && $4 == target) { exit 1 }
+    ' "$FM_WAKE_QUEUE"; then
+    host_still_owner || stand_down "this session no longer owns supervision"
+    log_line "settled	$REASON"
+    ARM_TEXT=
+    # There is no handling turn in progress for this close. An ordinary arm
+    # can resurface any other work still queued without detaching a successor.
+    start_arm "" || exit_to_main "could not re-arm after a settled stale wake"
+    ARM_PID=$STARTED_ARM_PID
+    ARM_OUT=$STARTED_ARM_OUT
+    continue
   fi
   # Attended: the close reaches main exactly as the plain arm delivers it,
   # unless the supervision session may take it (attended_acceptor).
