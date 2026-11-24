@@ -186,8 +186,9 @@ fm_git_worktree_nested_clones() { # <copy> <root>
   done <<< "$nested"
 }
 
-# Print the leftover roots of <copy>, one per line, and succeed only when the
-# copy has leftovers, no tracked change, and every root is recognised
+# Print the automatically classifiable leftover roots of <copy>, one per line,
+# and succeed only when at least one qualifies and every root not overlapping
+# an explicit name is recognised
 # generated output: a real directory named node_modules, __pycache__, .next,
 # .nuxt, .svelte-kit, .turbo, .parcel-cache, .cache, .pytest_cache,
 # .mypy_cache, .ruff_cache, .hypothesis, .tox, .nox, .venv, .gradle, or
@@ -199,15 +200,27 @@ fm_git_worktree_nested_clones() { # <copy> <root>
 # entry) is uncertain, since it can carry unique commits, unless the project's
 # own ignore rules ignore that root and fm_git_worktree_nested_clone proves
 # every such repository a clone with none. Anything else, or an unreadable
-# copy, fails. Read-only.
-fm_git_worktree_generated_roots() { # <copy>
-  local copy=$1 changes roots count root name out=''
-  changes=$(git -C "$copy" status --porcelain --untracked-files=no) || return 1
-  [ -z "$changes" ] || return 1
+# copy, fails. Tracked changes refuse unless scout-scratch mode is selected
+# to classify before teardown saves the patches; roots overlapping explicit
+# names are left to the ordinary coverage gate.
+# Read-only.
+fm_git_worktree_generated_roots() { # <copy> [scout-scratch [<named-root>...]]
+  local copy=$1 changes roots count root name named out=''
+  shift
+  if [ "${1:-}" = scout-scratch ]; then
+    shift
+  else
+    changes=$(git -C "$copy" status --porcelain --untracked-files=no) || return 1
+    [ -z "$changes" ] || return 1
+  fi
   roots=$(fm_git_worktree_leftover_roots "$copy") || return 1
   [ -n "$roots" ] || return 1
   while IFS=$'\t' read -r count root; do
     [ -n "$root" ] || return 1
+    for named in "$@"; do
+      case "$root" in "$named"|"$named"/*) continue 2 ;; esac
+      case "$named" in "$root"/*) continue 2 ;; esac
+    done
     name=${root##*/}
     case "$name" in
       node_modules|__pycache__|.next|.nuxt|.svelte-kit|.turbo|.parcel-cache|.cache|.pytest_cache|.mypy_cache|.ruff_cache|.hypothesis|.tox|.nox|.venv|.gradle|*.egg-info)
@@ -226,6 +239,7 @@ fm_git_worktree_generated_roots() { # <copy>
     esac
     out="$out$root"$'\n'
   done <<< "$roots"
+  [ -n "$out" ] || return 1
   printf '%s' "$out"
 }
 

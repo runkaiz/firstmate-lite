@@ -795,6 +795,102 @@ expect_code 0 "$?" "restarted preservation did not complete teardown: $out"
   || fail "receipt does not record each preserved path once: $(cat "$KEEP/receipt")"
 pass 'native teardown preserves named generated leftovers, refuses unique or unnamed work, and resumes after interruption'
 
+for scenario in reported generated explicit no-report no-inventory unfinished commits untracked unmerged patch-write-failure; do
+  make_case "scout-$scenario"
+  printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
+  id=scout-scratch
+  allocate "$id" || fail 'scout allocation failed'
+  WT=$FM_GIT_WORKTREE_PATH
+  task_data="$HOME_DIR/data/$id"
+  meta="$HOME_DIR/state/$id.meta"
+  fm_write_meta "$meta" \
+    "window=native-fixture:fm-$id" "endpoint_task_id=$id" 'backend=tmux' \
+    "worktree=$WT" "project=$PROJ" 'kind=scout' 'mode=local-only' \
+    'spawn_gen=s1792922400.123.456' 'allocator=git'
+  if [ "$scenario" != unfinished ]; then
+    printf 'done: scout report delivered\n' > "$HOME_DIR/state/$id.status"
+  fi
+  mkdir -p "$task_data"
+  [ "$scenario" = no-report ] || printf 'Scout report.\n' > "$task_data/report.md"
+  [ "$scenario" = no-inventory ] || printf 'decisions_reviewed=1\n' >> "$meta"
+  if [ "$scenario" = commits ]; then
+    git -C "$WT" -c user.name=Tests -c user.email=tests@example.invalid commit --allow-empty -qm scratch
+    git -C "$PROJ" merge -q --ff-only "$(git -C "$WT" rev-parse HEAD)"
+  fi
+  printf 'staged scratch\n' >> "$WT/README.md"
+  git -C "$WT" add README.md
+  printf 'unstaged scratch\n' >> "$WT/README.md"
+  if [ "$scenario" = generated ] || [ "$scenario" = explicit ] || [ "$scenario" = untracked ]; then
+    printf 'build/\n' >> "$PROJ/.git/info/exclude"
+    mkdir -p "$WT/build" "$WT/__pycache__"
+    printf 'build artifact\n' > "$WT/build/output"
+    printf 'bytecode\n' > "$WT/__pycache__/mod.pyc"
+  fi
+  if [ "$scenario" = explicit ] || [ "$scenario" = untracked ]; then
+    printf 'scratch test\n' > "$WT/scratch-test.py"
+  fi
+  if [ "$scenario" = unmerged ]; then
+    base_blob=$(git -C "$WT" rev-parse HEAD:README.md)
+    stage_blob=$(git -C "$WT" rev-parse :README.md)
+    printf '0 %s\tREADME.md\n100644 %s 1\tREADME.md\n100644 %s 2\tREADME.md\n' \
+      "${base_blob//?/0}" "$base_blob" "$stage_blob" | git -C "$WT" update-index --index-info
+  fi
+  if [ "$scenario" = patch-write-failure ]; then
+    printf 'existing evidence\n' > "$task_data/scratch"
+  fi
+  fakebin="$TMP_ROOT/preserve/fake"
+  scout_args=()
+  if [ "$scenario" = explicit ]; then
+    scout_args=(--preserve-untracked scratch-test.py)
+  fi
+  rc=0
+  out=$(run_preserve_teardown ${scout_args[@]+"${scout_args[@]}"} 2>&1) || rc=$?
+  if [ "$scenario" = reported ] || [ "$scenario" = generated ] || [ "$scenario" = explicit ]; then
+    expect_code 0 "$rc" "finished scout cleanup failed: $out"
+    assert_absent "$WT" 'finished scout copy was retained'
+    assert_absent "$meta" 'finished scout record was retained'
+    assert_present "$task_data/report.md" 'cleanup removed the report'
+    git -C "$PROJ" apply --index "$task_data"/scratch/teardown.*/staged.patch \
+      || fail 'saved staged scratch patch could not be reapplied'
+    git -C "$PROJ" apply "$task_data"/scratch/teardown.*/unstaged.patch \
+      || fail 'saved unstaged scratch patch could not be reapplied'
+    assert_contains "$(git -C "$PROJ" show :README.md)" 'staged scratch' 'staged scratch was lost'
+    assert_contains "$(cat "$PROJ/README.md")" 'unstaged scratch' 'unstaged scratch was lost'
+    if [ "$scenario" != reported ]; then
+      assert_contains "$(cat "$task_data/preserved-artifacts/files/build/output")" 'build artifact' 'build artifact was lost'
+      assert_contains "$(cat "$task_data/preserved-artifacts/files/__pycache__/mod.pyc")" bytecode 'bytecode was lost'
+    fi
+    if [ "$scenario" = explicit ]; then
+      assert_contains "$(cat "$task_data/preserved-artifacts/files/scratch-test.py")" 'scratch test' 'named scratch file was lost'
+    fi
+  else
+    expect_code 1 "$rc" "$scenario scout cleanup should refuse: $out"
+    case "$scenario" in
+      no-report) diagnostic='has no report' ;;
+      no-inventory) diagnostic='has not passed the captain-call completion gate' ;;
+      unfinished) diagnostic='has not reported completion' ;;
+      commits) diagnostic='recorded base' ;;
+      untracked) diagnostic='unclassified leftovers' ;;
+      unmerged) diagnostic='unmerged paths' ;;
+      patch-write-failure) diagnostic='could not preserve tracked scout scratch' ;;
+    esac
+    assert_contains "$out" "$diagnostic" "$scenario refused for the wrong reason"
+    assert_present "$meta" "$scenario retired the scout record"
+    assert_present "$HOME_DIR/state/$id.git-worktree" "$scenario retired the reservation"
+    case "$scenario" in
+      unmerged) assert_contains "$(git -C "$WT" show :2:README.md)" 'staged scratch' 'cleanup changed the unmerged index' ;;
+      *) assert_contains "$(git -C "$WT" show :README.md)" 'staged scratch' "$scenario changed the index" ;;
+    esac
+    assert_contains "$(cat "$WT/README.md")" 'unstaged scratch' "$scenario changed scratch bytes"
+    if [ "$scenario" = untracked ]; then
+      assert_contains "$out" '--preserve-untracked scratch-test.py' 'refusal omitted the naming command'
+      assert_contains "$(cat "$WT/scratch-test.py")" 'scratch test' 'unnamed scratch file was lost'
+      assert_absent "$task_data/scratch" 'leftover refusal saved patches before its proof passed'
+    fi
+  fi
+done
+pass 'native scout cleanup preserves tracked scratch after completion and refuses missing proof or failed preservation'
+
 make_case weave
 printf 'manual\n' > "$HOME_DIR/config/backlog-backend"
 mkdir -p "$PROJ/web" "$PROJ/scripts" "$PROJ/docs"

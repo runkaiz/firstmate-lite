@@ -102,7 +102,7 @@ The portable checks cover foreign reservations, path collisions, primary-root re
 They also exercise one real tmux marker worker on a private socket, busy-owner refusal and complete clean removal.
 The lifecycle suites preserve dirty native work across an allocator-setting change and still return an existing pooled task after new tasks opt into native allocation.
 These checks submit no model prompts and authorize no production allocator switch.
-The native cleanup contract is deliberately more conservative than pooled scout discard; `bin/fm-git-worktree-lib.sh` owns it and the [configuration guide](../configuration.md#task-worktree-allocator-configworktree-allocator) records its supported limits.
+The native cleanup contract is deliberately more conservative than pooled scout discard; the [configuration guide](../configuration.md#task-worktree-allocator-configworktree-allocator) records its supported limits and points to the cleanup owners.
 
 The native removal proof was refreshed on 2026-10-29 UTC with Git 2.56.0 and GNU Bash 5.3.9:
 

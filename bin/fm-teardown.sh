@@ -9,9 +9,9 @@
 # A live/unverified owner remaining after the one-pass stop below refuses.
 # `--preserve-untracked <relative-path>` (repeatable, native copies only, never
 # with --force) is the guarded next action when that clean gate refuses solely
-# for leftovers the caller inspected and classified as task-owned generated
-# artifacts: after the endpoint, landed-work and process-free proofs pass, each
-# named path moves to data/<id>/preserved-artifacts/ through
+# for task-owned generated leftovers the caller inspected, or the scout scratch
+# leftovers described below: after the endpoint, landed-work and process-free
+# proofs pass, each named path moves to data/<id>/preserved-artifacts/ through
 # fm_git_worktree_preserve, and the ordinary clean gate then runs unchanged.
 # A refusal or interruption leaves the copy, task records and journal in place,
 # and rerunning the same command completes the preservation idempotently.
@@ -19,7 +19,14 @@
 # the copy is otherwise clean; no new --preserve-untracked arguments are needed.
 # When none is named and every leftover root is recognised generated output
 # (fm_git_worktree_generated_roots), teardown names those roots itself in the
-# same pass; anything uncertain, tracked, or unlanded still refuses.
+# same pass; anything uncertain or unlanded still refuses.
+# A finished local native scout with a report and verified decision inventory
+# may retire tracked scratch only at its recorded base. After endpoint and
+# process checks, teardown saves staged and unstaged binary-capable patches
+# under data/<id>/scratch/teardown.* before reversing either in the copy.
+# Recognised generated output is preserved afterwards through the ordinary
+# leftover gate; other leftovers must be named with --preserve-untracked.
+# Unmerged paths refuse.
 # One-pass stop: a native ship or scout whose current status reads done, with
 # no open decision, is first stopped through bin/fm-control.sh exit (which
 # preserves the endpoint, copy, and every uncommitted change) before teardown
@@ -831,12 +838,14 @@ if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ "$WORKTREE_ALLOCATOR" != git ]; then
 fi
 # Leftover refusal advice: full list to data/<id>/teardown-leftovers.txt and the
 # exact command naming the minimal roots; the caller still inspects them.
-native_leftover_next_action() {  # <copy>
+native_leftover_next_action() {  # <copy> [scout-scratch]
   local copy=$1 list="$DATA/$ID/teardown-leftovers.txt" roots tracked_changes cmd count root total
-  tracked_changes=$(git -C "$copy" status --porcelain --untracked-files=no) || tracked_changes=unreadable
-  if [ -n "$tracked_changes" ]; then
-    echo "next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them" >&2
-    return 0
+  if [ "${2:-}" != scout-scratch ]; then
+    tracked_changes=$(git -C "$copy" status --porcelain --untracked-files=no) || tracked_changes=unreadable
+    if [ -n "$tracked_changes" ]; then
+      echo "next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them" >&2
+      return 0
+    fi
   fi
   mkdir -p -- "$DATA/$ID" || return 0
   roots=$(fm_git_worktree_leftover_roots "$copy" "" "$list") || {
@@ -856,9 +865,14 @@ native_leftover_next_action() {  # <copy>
     total=$((total + count))
   done <<< "$roots"
   echo "full leftover list ($total path(s)): $list" >&2
-  echo "next: inspect those roots; only if every one is task-owned generated output, run:" >&2
+  if [ "${2:-}" = scout-scratch ]; then
+    echo "next: inspect those roots before explicitly preserving them; to preserve all of them, run:" >&2
+  else
+    echo "next: inspect those roots; only if every one is task-owned generated output, run:" >&2
+  fi
   echo "  $cmd" >&2
 }
+NATIVE_SCOUT_TRACKED=
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   [ "$FORCE" != --force ] || { echo 'REFUSED: native allocator never force-discards a copy' >&2; exit 1; }
   fm_git_worktree_identity "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" || exit 1
@@ -874,12 +888,17 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
     echo 'REFUSED: preservation journal is unreadable; retaining the copy and task records' >&2
     exit 1
   }
-  if [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT"); then
+  if [ "$KIND" = scout ] && [ "$BACKEND" != herdr-remote ] && [ -d "$WT" ]; then
+    NATIVE_SCOUT_TRACKED=$(git -C "$WT" status --porcelain --untracked-files=no --ignore-submodules=none) || exit 1
+  fi
+  if [ -d "$WT" ] && { [ "${#PRESERVE_PATHS[@]}" = 0 ] || [ -n "$NATIVE_SCOUT_TRACKED" ]; } &&
+     NATIVE_GENERATED_ROOTS=$(fm_git_worktree_generated_roots "$WT" ${NATIVE_SCOUT_TRACKED:+scout-scratch} \
+       ${PRESERVE_PATHS[@]+"${PRESERVE_PATHS[@]}"}); then
     while IFS= read -r NATIVE_GENERATED_ROOT; do
       [ -z "$NATIVE_GENERATED_ROOT" ] || PRESERVE_PATHS+=("$NATIVE_GENERATED_ROOT")
     done <<< "$NATIVE_GENERATED_ROOTS"
     printf 'teardown: preserving recognised generated output after the landing proofs: %s\n' "${PRESERVE_PATHS[*]}" >&2
-  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && ! fm_git_worktree_clean "$WT"; then
+  elif [ -d "$WT" ] && [ "${#PRESERVE_PATHS[@]}" = 0 ] && [ -z "$NATIVE_SCOUT_TRACKED" ] && ! fm_git_worktree_clean "$WT"; then
     native_leftover_next_action "$WT"
     exit 1
   fi
@@ -2595,6 +2614,47 @@ teardown_close_endpoint() {
   fi
 }
 
+teardown_preserve_scout_scratch() {
+  local scratch="$DATA/$ID/scratch" patches unmerged leftovers
+  local diff_args=(--binary --no-color --no-ext-diff --no-textconv --unified=3
+    --src-prefix=a/ --dst-prefix=b/ --ignore-submodules=none --submodule=short)
+  unmerged=$(git -C "$WT" ls-files --unmerged) || return 1
+  if [ -n "$unmerged" ]; then
+    echo 'REFUSED: tracked scout scratch has unmerged paths; preserving the copy' >&2
+    return 1
+  fi
+  if [ "${#PRESERVE_PATHS[@]}" = 0 ]; then
+    leftovers=$(git -C "$WT" ls-files --others) || return 1
+    if [ -n "$leftovers" ]; then
+      echo 'REFUSED: tracked scout scratch has unclassified leftovers; preserving the copy' >&2
+      native_leftover_next_action "$WT" scout-scratch
+      return 1
+    fi
+  fi
+  if [ -L "$DATA/$ID" ] || [ -L "$scratch" ] || ! mkdir -p -- "$scratch" ||
+     ! patches=$(mktemp -d "$scratch/teardown.XXXXXX"); then
+    echo "REFUSED: could not preserve tracked scout scratch under $scratch" >&2
+    return 1
+  fi
+  if ! git -C "$WT" diff --cached "${diff_args[@]}" -- > "$patches/staged.patch" ||
+     ! git -C "$WT" diff "${diff_args[@]}" -- > "$patches/unstaged.patch" ||
+     { [ ! -s "$patches/staged.patch" ] && [ ! -s "$patches/unstaged.patch" ]; }; then
+    rm -f -- "$patches/staged.patch" "$patches/unstaged.patch"
+    rmdir -- "$patches"
+    echo "REFUSED: could not preserve tracked scout scratch under $scratch" >&2
+    return 1
+  fi
+  printf 'teardown: saved tracked scout scratch in %s\n' "$patches" >&2
+  if { [ -s "$patches/unstaged.patch" ] && ! git -C "$WT" apply --reverse --whitespace=nowarn "$patches/unstaged.patch"; } ||
+     { [ -s "$patches/staged.patch" ] && ! {
+       git -C "$WT" update-index --refresh &&
+         git -C "$WT" apply --reverse --index --whitespace=nowarn "$patches/staged.patch"
+     }; }; then
+    echo "REFUSED: could not reverse saved scout edits; retaining the copy and patches in $patches" >&2
+    return 1
+  fi
+}
+
 NATIVE_PROOF_ACCEPTED=0
 if [ "$WORKTREE_ALLOCATOR" = git ]; then
   if [ -n "$SIBLING_PR" ]; then
@@ -2606,17 +2666,30 @@ if [ "$WORKTREE_ALLOCATOR" = git ]; then
   elif [ "$KIND" = ship ]; then
     NATIVE_LANDING_CHECK=(teardown_native_pr_landed)
   fi
-  if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && [ -d "$WT" ]; then
+  if [ -n "$NATIVE_SCOUT_TRACKED" ]; then
+    if [ "$(status_line_verb "$(status_current_line "$STATE/$ID.status" scout)")" != "done" ]; then
+      echo 'REFUSED: scout has tracked edits and has not reported completion; preserving the copy' >&2
+      exit 1
+    fi
+    if ! fm_git_worktree_unchanged_base "$STATE" "$ID" "$PROJ"; then
+      echo 'REFUSED: scout with tracked edits is not proven to be at its recorded base; preserving the copy' >&2
+      exit 1
+    fi
+  fi
+  if [ -d "$WT" ] && { [ -n "$NATIVE_SCOUT_TRACKED" ] || [ "${#PRESERVE_PATHS[@]}" -gt 0 ]; }; then
     fm_git_worktree_landed "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
       "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
     teardown_close_endpoint
     task_pids_under_roots "$WT" || { echo 'REFUSED: cannot prove native copy is process-free; nothing preserved' >&2; exit 1; }
     stop_owned_browser_mcp "$WT" || { echo 'REFUSED: native copy still has processes; nothing preserved' >&2; exit 1; }
-    fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}" || {
+    if [ -n "$NATIVE_SCOUT_TRACKED" ]; then
+      teardown_preserve_scout_scratch || exit 1
+    fi
+    if [ "${#PRESERVE_PATHS[@]}" -gt 0 ] && ! fm_git_worktree_preserve "$WT" "$DATA/$ID/preserved-artifacts" "${PRESERVE_PATHS[@]}"; then
       echo "REFUSED: leftovers were not all preserved; the copy and task records remain, and the same command resumes" >&2
       [ "${FM_GIT_WORKTREE_UNCOVERED:-0}" = 0 ] || native_leftover_next_action "$WT"
       exit 1
-    }
+    fi
   fi
   fm_git_worktree_safe "$STATE" "$ID" "$FM_HOME" "$PROJ" "$WT" \
     "${NATIVE_LANDING_CHECK[@]+"${NATIVE_LANDING_CHECK[@]}"}" || exit 1
