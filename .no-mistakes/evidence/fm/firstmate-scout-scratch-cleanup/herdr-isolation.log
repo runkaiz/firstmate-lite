@@ -1,0 +1,23 @@
+Normal session storage:
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/runkai/.config/herdr","socket_path":"/home/runkai/.config/herdr/herdr.sock"}]}
+Config-file-only override retains external runtime/log root:
+  --skill             Print the agent skill file and exit
+  --version, -V       Print version and exit
+  --help, -h          Show this help
+
+Config: /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/isolated-herdr/config.toml
+Logs:   /home/runkai/.config/herdr/herdr.log (plus herdr-client.log, herdr-server.log)
+Env:    HERDR_CONFIG_PATH overrides config file path
+Home:   https://herdr.dev
+
+Are you an AI? Use these resources ONLY IF your task specifically asks you to:
+  Help a human understand or set up Herdr for the first time:
+    https://herdr.dev/agent-guide.md
+  Debug or investigate a problem with Herdr:
+    https://herdr.dev/llms.txt
+  Control Herdr panes, agents, or workspaces:
+    SKIP if a Herdr skill is already in your context. Otherwise run: herdr --skill
+Fully isolated XDG config attempt:
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+Isolated prepare exit: 1
+Release original prepare ownership (no named server was provisioned):

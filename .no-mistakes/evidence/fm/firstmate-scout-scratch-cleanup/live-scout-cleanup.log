@@ -1,0 +1,220 @@
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/baseline/home
+Preparing worktree (detached HEAD 6097ccd)
+HEAD is now at 6097ccd base
+
+CASE baseline: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/baseline/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/baseline/copies/scout-baseline/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+MM README.md
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/recover/home
+Preparing worktree (detached HEAD abaa831)
+HEAD is now at abaa831 base
+
+CASE recover: exit 0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/recover/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: saved tracked scout scratch in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/recover/home/data/scout-recover/scratch/teardown.NDYZTB
+teardown scout-recover complete (window fm-lab-scout:fm-scout-recover, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/recover/copies/scout-recover/worktree)
+Backlog: scout-recover just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/recover/home/data/backlog.md - move scout-recover to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+VERIFIED: report retained; task endpoint and records retired; neighbor survives; staged tree 704b030417fdce2eb035abd87c8ddc99e03289b9 and all working bytes/modes restored from patches.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/no-report/home
+Preparing worktree (detached HEAD 89e592f)
+HEAD is now at 89e592f base
+
+CASE no-report: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/no-report/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout task scout-no-report has no report at /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/no-report/home/data/scout-no-report/report.md.
+The report is the work product. Have the crewmate write it, or use --force after explicit discard approval.
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/no-inventory/home
+Preparing worktree (detached HEAD 49624c5)
+HEAD is now at 49624c5 base
+
+CASE no-inventory: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/no-inventory/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-captain-hold: origin scout-no-inventory has no completed captain-call inventory
+REFUSED: scout task scout-no-inventory has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/unfinished/home
+Preparing worktree (detached HEAD 49624c5)
+HEAD is now at 49624c5 base
+
+CASE unfinished: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/unfinished/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout has tracked edits and has not reported completion; preserving the copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/committed/home
+Preparing worktree (detached HEAD 1eb3382)
+HEAD is now at 1eb3382 base
+
+CASE committed: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/committed/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: scout with tracked edits is not proven to be at its recorded base; preserving the copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/ignored/home
+Preparing worktree (detached HEAD 1eb3382)
+HEAD is now at 1eb3382 base
+
+CASE ignored: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/ignored/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: tracked scout scratch has untracked, ignored, or unmerged paths alongside it; preserving the copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/untracked/home
+Preparing worktree (detached HEAD 029282d)
+HEAD is now at 029282d base
+
+CASE untracked: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/untracked/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: tracked scout scratch has untracked, ignored, or unmerged paths alongside it; preserving the copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/conflicted/home
+Preparing worktree (detached HEAD 371c053)
+HEAD is now at 371c053 base
+
+CASE conflicted: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/conflicted/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: tracked scout scratch has untracked, ignored, or unmerged paths alongside it; preserving the copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home
+Preparing worktree (detached HEAD 7174248)
+HEAD is now at 7174248 base
+
+CASE blocked-archive: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+mkdir: cannot create directory ‘/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home/data/scout-blocked-archive/scratch’: File exists
+REFUSED: could not preserve tracked scout scratch under /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home/data/scout-blocked-archive/scratch
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+
+CASE archive-retry: exit 0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: saved tracked scout scratch in /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home/data/scout-blocked-archive/scratch/teardown.ZaPELC
+teardown scout-blocked-archive complete (window fm-lab-scout:fm-scout-blocked-archive, worktree /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/copies/scout-blocked-archive/worktree)
+Backlog: scout-blocked-archive just finished (config/backlog-backend selects manual editing). Update /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/blocked-archive/home/data/backlog.md - move scout-blocked-archive to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+VERIFIED: retry succeeds after archive obstruction is removed.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/foreign-process/home
+Preparing worktree (detached HEAD 3f291d7)
+HEAD is now at 3f291d7 base
+
+CASE foreign-process: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/foreign-process/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: native copy still has processes; nothing preserved
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+VERIFIED: foreign process was alive after refusal.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/ship/home
+Preparing worktree (detached HEAD 2eaf4c9)
+HEAD is now at 2eaf4c9 base
+
+CASE ship: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/ship/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: native worktree: dirty or untracked content at /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/ship/copies/scout-ship/worktree; preserving copy
+Tracked changes (unique work; never preserved):
+MM README.md
+Inspect these paths, including ignored session evidence; only task-owned generated artifacts may be preserved through fm-teardown.sh --preserve-untracked.
+next: tracked changes are unique work; land or deliberately recover them first - --preserve-untracked never moves them
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/force/home
+Preparing worktree (detached HEAD 2eaf4c9)
+HEAD is now at 2eaf4c9 base
+
+CASE force: exit 1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87RH3JA5P9H2JK2DRB55G61/.test-tmp/scout-live.QEFu3Y/force/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: native allocator never force-discards a copy
+VERIFIED: refused; tracked bytes, index, copy and ownership retained.
+
+ALL LIVE SCENARIOS PASSED; disposable homes and private tmux server cleaned on exit.

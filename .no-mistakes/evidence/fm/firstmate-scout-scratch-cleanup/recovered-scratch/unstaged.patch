@@ -1,0 +1,26 @@
+diff --git a/blob.bin b/blob.bin
+index 6d5a8240a7b52254a9e415eb720d2e2491b8293e..d0c66851a3aaf1efe9abcc8cb8246a680d990360 100644
+GIT binary patch
+literal 265
+zcmV+k0rviNZgX^DXJupn009C61O)~M2nh-c3=Iws5D^j+6crX17#SKH9337XAR!_n
+zBqb&%C@Cr{EG;fCFflSSG&MFiI5|2yJUu=?KtV!7L`6nNNJ&adOifNtP*GA-R8>}2
+zSXo+ITwPvYU}0ioWMyV&XlZI|Y;A6DaB*^Tbai%jczJqze0_d@fPsR8goTEOh>41e
+zjE#<ukdcy;l$Dm3n3<ZJoSmMZprN9pq@|{(sHv)}tgWuEu(7hUw6(UkxVgH!yuH4^
+zz`?@9#Kp$P$jQpf%+1cv(9zP<)YaD4*xB0K+}+;a;Njxq<mKk)=;`X~?CtLF@bU8V
+P^!4`l`1$(#{Qds_936t(
+
+literal 263
+zcmV+i0r>uNbYW*@WB~vE{rvm-`S|zt_4M=d@$m2N?d<F7>FDR?<>cey;o#ri-Q3&S
+z+1S_C)zs6{(a_J%&CJWn$;ijX#l*wH!N9-1y}Y}+xwyBswY0Ocv9PbMt*oo6si>!>
+zrKF>xp`f3hot&GRnV6TBm6Vf`k&us$jf{(miHL`Wg@l8Gfq;L0eSCX*d3bkrb#!xb
+zad2;LZES05X=rC=Wn^PwVPIcgU0hpQSy)$ARa8?_QBY4#O-xHlNk~UVMMOhFK|nt~
+zJv=))IXE{qH8e9aF)%MKEi5Z4DJUl<B_tyvAs`<f9UL1P85kE96%-Q^5fBd!4Gaqk
+N2?z%U1q1^E0RY~0f%yOc
+
+diff --git a/new file.txt b/new file.txt
+index 2ce75e2..9a2a417 100644
+--- a/new file.txt	
++++ b/new file.txt	
+@@ -1 +1,2 @@
+ new staged
++unstaged new
