@@ -1,0 +1,26 @@
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/bin/fm-procevent.sh register ci ci-counterfactual -- /bin/sleep 300
+registered: ci-counterfactual (ci)
+Same persisted CI registration and damaged claim for both executable versions.
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/counterfactual-7v0m2g3e/before/bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Observed at base: uncertain listener counted, no durable warning delivered.
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Observed at target: durable warning delivered; damaged ownership left untouched.
+
+Real notification presentation (no primary or supervision process started in disposable home):
+$ /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/bin/fm-wake-drain.sh
+1795556870	1	check	procevent:ci-counterfactual:stranded:unverified-39-11500670355	check: process-event source ci-counterfactual is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-counterfactual.
+stderr: PROACTIVE MODE: off
+Use baseline orchestration; any earlier proactive instruction is inactive.
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 788393.1795556870.sEdDXt
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 process-event source(s) registered, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - left untouched because this session lacks verified fleet-lock ownership.
+Verified: ordinary drain presents the missing-listener warning and recovery guidance.
+Disposable comparison home removed; no listener was started.

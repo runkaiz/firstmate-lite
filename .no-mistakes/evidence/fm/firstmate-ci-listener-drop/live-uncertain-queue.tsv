@@ -1,0 +1,1 @@
+1795556810	1	check	procevent:ci-live-monitor:stranded:unverified-39-11500551441	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.

@@ -1,0 +1,89 @@
+Real product: fm-procevent.sh at target commit; no CLI stubs or production services.
+External input: disposable shell source blocks until a local release file appears.
+This exercises monitor lifecycle, not a real forge build or no-mistakes pipeline.
+$ bin/fm-procevent.sh register ci ci-live-monitor -- /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v/blocking-source.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v
+registered: ci-live-monitor (ci)
+$ bin/fm-procevent.sh ensure-listening ci-live-monitor
+(no stdout)
+$ bin/fm-procevent.sh list
+SOURCE                       ADAPTER      OWNER      PENDING
+ci-live-monitor              ci           live       0
+Verified: confirmed listener is live
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+Verified: healthy pending listener produces no warning
+
+SCENARIO: ambiguous live ownership warns without replacement or signals
+$ bin/fm-procevent.sh list
+SOURCE                       ADAPTER      OWNER      PENDING
+ci-live-monitor              ci           uncertain  0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Verified: uncertain ownership neither restarts nor stops a listener
+Verified: one actionable stranded notification reaches the durable queue
+Verified: uncertain claim bytes are preserved
+Verified: original live poller survives and no duplicate poller starts
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Verified: repeated cycles produce no duplicate warning for this registration
+Durable notification queue:
+1795556810	1	check	procevent:ci-live-monitor:stranded:unverified-39-11500551441	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.
+
+SCENARIO: a fresh registration can warn again; queue failure remains retryable
+$ bin/fm-procevent.sh register ci ci-live-monitor -- /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v/blocking-source.sh /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v
+registered: ci-live-monitor (ci)
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+stderr: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/bin/fm-wake-lib.sh: line 2197: /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v/home/state/.wake-queue: Is a directory
+Verified: notification append failure was injected through a real filesystem obstruction
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Verified: notification retries successfully after queue obstruction clears
+Verified: fresh registration has a distinct durable notification identity
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Verified: new registration also deduplicates and preserves the existing poller
+Durable notification queue:
+1795556810	1	check	procevent:ci-live-monitor:stranded:unverified-39-11500551441	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.
+1795556810	3	check	procevent:ci-live-monitor:stranded:unverified-39-11500551531	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.
+
+SCENARIO: dropped listener recovers only after ownership is provably dead
+Verified: runner leads its isolated process group 565196
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=1 failed=0
+Verified: dead listener with unreadable claim still preserves ownership
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=1 stopped=0 uncertain=0 failed=0
+Verified: restoring verifiable dead ownership restarts the listener
+$ bin/fm-procevent.sh list
+SOURCE                       ADAPTER      OWNER      PENDING
+ci-live-monitor              ci           live       0
+Verified: one replacement listener is confirmed live
+Captured external completion:
+ci_wait: action
+evidence: disposable external source completed
+$ bin/fm-procevent.sh classify /var/home/runkai/.no-mistakes/worktrees/6b05071b95c8/01M87R7RCAV5KBP10PD9A56WNQ/.validation-ci-tmp/live-monitor-sphg6k6v/home/state/procevent-inbox/ci-live-monitor.1.result
+action
+Verified: real adapter classifies the captured completion
+$ bin/fm-procevent.sh handled ci-live-monitor 1
+handled: ci-live-monitor 1
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+$ bin/fm-procevent.sh reconcile
+reconciled: published=0 started=0 stopped=0 uncertain=0 failed=0
+Verified: handled terminal result never replays or starts another listener
+$ bin/fm-procevent.sh list
+no sources registered
+Durable notification queue:
+1795556810	1	check	procevent:ci-live-monitor:stranded:unverified-39-11500551441	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.
+1795556810	3	check	procevent:ci-live-monitor:stranded:unverified-39-11500551531	check: process-event source ci-live-monitor is registered but nothing can arm it: reconcile cannot verify its listener from the claim and runner identity. It leaves ownership untouched and starts no replacement. Inspect the claim and confirm whether anything is still polling ci-live-monitor.
+1795556811	4	check	procevent:ci-live-monitor:1	check: procevent ci ci-live-monitor 1
+
+All live monitor scenarios passed.
+$ bin/fm-procevent.sh retire ci-live-monitor
+retired: ci-live-monitor
+Disposable monitor home and external source removed.
